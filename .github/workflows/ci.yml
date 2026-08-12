@@ -1,0 +1,28 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install validation dependencies
+        run: pip install -r requirements-dev.txt
+      - name: Build static site
+        env:
+          SEEAI_BASE_URL: https://example.com
+        run: python3 scripts/build_site.py
+      - name: Validate
+        run: python3 scripts/validate.py

@@ -1,0 +1,38 @@
+{
+  "brand": "SeeAI",
+  "home": {
+    "title": "SeeAI — Understand AI by seeing it work",
+    "description": "Interactive visual lessons for AI engineering: tokens, context windows, RAG, agents, evaluation, and production AI.",
+    "headline": "Understand AI by seeing it work.",
+    "subheadline": "Interactive lessons for AI engineering. Explore token generation, context windows, RAG, and agent workflows through visual simulations."
+  },
+  "lessons": {
+    "token-playground": {
+      "name": "Token Playground",
+      "category": "Foundations",
+      "level": "Beginner",
+      "minutes": 6,
+      "description": "See how large language models tokenize text, assign next-token probabilities, and change sampling behavior with temperature.",
+      "quick": "LLMs generate text by repeatedly estimating probabilities for the next token, selecting one, appending it to the context, and repeating the process."
+    },
+    "context-window": {
+      "name": "Context Window Lab",
+      "category": "Context Engineering",
+      "level": "Beginner",
+      "minutes": 8,
+      "description": "Visualize how an LLM context window fills up and compare summarization, RAG, memory, and truncation strategies.",
+      "quick": "A context window is the model's finite working input budget; system instructions, conversation history, documents, and tool results all compete for that space."
+    },
+    "agent-loop": {
+      "name": "Agent Loop Simulator",
+      "category": "Agents",
+      "level": "Intermediate",
+      "minutes": 9,
+      "description": "Step through an AI agent loop: understand the task, choose an action, call a tool, observe the result, recover from errors, and answer.",
+      "quick": "An AI agent repeatedly decides what to do next, acts through tools, observes the result, and uses that observation to decide whether to continue, retry, or answer."
+    }
+  },
+  "meta": {
+    "updated": "2026-08-12"
+  }
+}
