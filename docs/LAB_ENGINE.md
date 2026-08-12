@@ -1,4 +1,4 @@
-# AhaFrame Lab / Simulation Engine — v0.2
+# AhaFrame Lab / Simulation Engine — v0.3
 
 Date: 2026-08-12
 
@@ -41,14 +41,15 @@ Failure Injection
 ## Runtime files
 
 ```text
-src/assets/lab-engine.js       generic state/simulation runtime
-src/assets/lab-scenarios.js    current deterministic scenario definitions
-src/assets/token.js            Token Playground DOM adapter
-src/assets/context.js          Context Window DOM adapter
-src/assets/agent.js            Agent Loop DOM adapter
-src/assets/rag.js              RAG Failure Lab DOM adapter
-src/assets/home.js             homepage Token Playground adapter
-scripts/test_lab_engine.js     behavioral regression tests
+src/assets/lab-engine.js          generic state/simulation runtime
+src/assets/lab-scenarios.js       deterministic scenario definitions
+src/assets/token.js               Token Playground DOM adapter
+src/assets/context.js             Context Window DOM adapter
+src/assets/agent.js               Agent Loop DOM adapter
+src/assets/rag.js                 RAG Failure Lab DOM adapter
+src/assets/agent-reliability.js   Agent Reliability Lab DOM adapter
+src/assets/home.js                homepage Token Playground adapter
+scripts/test_lab_engine.js        behavioral regression tests
 ```
 
 The page builder emits the engine before the scenario registry and page adapters.
@@ -182,7 +183,7 @@ strategy explanation
 
 ### RAG Failure Lab
 
-This is the first Production Lab used to pressure-test the abstraction beyond the three MVP demos.
+The first Production Lab pressure test.
 
 State:
 
@@ -223,7 +224,52 @@ failure diagnosis
 
 The adapter saves the intentionally bad starting state as a checkpoint and continuously uses `compare('baseline')` to show how the learner's configuration changes quality and context pressure.
 
-The metrics are synthetic and pedagogical. They are not benchmark results from a live embedding model, vector database, reranker, or LLM.
+### Agent Reliability Lab
+
+The second Production Lab pressure test and the first one focused on policy/safety trade-offs rather than retrieval optimization.
+
+State:
+
+```text
+maxSteps
+retryLimit
+timeoutSec
+validation
+humanApproval
+termination
+```
+
+Actions include:
+
+```text
+SET_MAX_STEPS
+SET_RETRY_LIMIT
+SET_TIMEOUT
+SET_VALIDATION
+SET_HUMAN_APPROVAL
+SET_TERMINATION
+APPLY_RELIABILITY_PRESET
+```
+
+Derived data:
+
+```text
+success rate
+runaway risk
+unsafe-action risk
+expected steps
+simulated latency
+cost index
+human reviews / 100 runs
+reliability score
+failure diagnosis
+```
+
+The scenario is deliberately structured so one metric cannot be optimized in isolation. More retries and step budget may raise completion while also increasing loop risk and cost. Validation and approval reduce safety risk but add execution overhead. Goal-aware termination improves boundedness without pretending that max-step exhaustion is a sufficient stopping policy.
+
+The adapter saves the unreliable starting state as a checkpoint and compares every learner configuration against that baseline.
+
+All RAG and Agent Reliability metrics are synthetic and pedagogical. They are not benchmark results from live models, tools, vector databases, customer-support traffic, or human-review queues.
 
 ### Agent Loop Simulator
 
@@ -250,12 +296,11 @@ The browser adapter owns the recovery timer and cancels stale timers on Reset / 
 
 - scenario registration;
 - Token probability invariants;
-- greedy vs deterministic teaching sample behavior;
 - Context arithmetic;
-- RAG broken-baseline metrics;
-- RAG balanced-preset improvement;
-- RAG checkpoint / compare behavior;
-- Agent error / recovery transitions;
+- RAG broken-baseline metrics and balanced-preset improvement;
+- Agent Reliability unreliable-baseline metrics and reliability-preset improvement;
+- baseline checkpoint / compare behavior for both Production Labs;
+- Agent Loop error / recovery transitions;
 - history / checkpoint / compare / replay / reset;
 - invalid-input rejection.
 
@@ -275,28 +320,23 @@ These capabilities should be introduced above or beside the engine only when a v
 
 ## Next pressure tests
 
-RAG Failure Lab validates that parameters, derived metrics, failure diagnosis, checkpoints, and compare work together in a real product experience.
+RAG Failure validated multi-parameter optimization, failure diagnosis, checkpoints, and compare.
 
-The next useful scenarios should test different dimensions rather than adding engine features for their own sake:
+Agent Reliability adds execution-policy trade-offs across success, boundedness, safety, latency, and cost.
+
+The next useful pressure test is **Evaluation Lab**, because it introduces a different shape of problem:
 
 ```text
-Agent Reliability Lab
-  retries
-  max steps
-  validation
-  termination
-  latency / cost
-
 Evaluation Lab
-  datasets
-  pass/fail criteria
-  regression comparisons
+  dataset / slices
+  pass thresholds
+  version A vs version B
   quality metrics
-
-Context Engineering Lab
-  budget allocation
-  memory / retrieval / summary trade-offs
+  regressions
+  cost / latency constraints
 ```
+
+After that, **Context Engineering Lab** should test budget allocation across compression, retrieval, memory, and information loss.
 
 If scenario definitions grow materially, split them into route-specific modules while keeping the engine API unchanged.
 
