@@ -44,8 +44,7 @@
     if(typeof definition.reduce!=='function')throw new TypeError(`Lab scenario ${definition.id} requires a reducer.`);
     if(definition.derive!==undefined&&typeof definition.derive!=='function')throw new TypeError(`Lab scenario ${definition.id} derive must be a function.`);
     if(definition.compare!==undefined&&typeof definition.compare!=='function')throw new TypeError(`Lab scenario ${definition.id} compare must be a function.`);
-    const initial=typeof definition.initialState==='function'?definition.initialState({}):definition.initialState;
-    assertPlainState(initial,`Lab scenario ${definition.id} initialState`);
+    if(typeof definition.initialState!=='function')assertPlainState(definition.initialState,`Lab scenario ${definition.id} initialState`);
   }
 
   AhaFrame.registerLabScenario=function(definition){
@@ -72,7 +71,11 @@
     const maxHistory=Math.max(1,Number(options.maxHistory)||100);
     const listeners=new Set();
     const checkpoints=new Map();
-    const makeInitial=()=>clone(typeof definition.initialState==='function'?definition.initialState(options):definition.initialState);
+    const makeInitial=()=>{
+      const initial=clone(typeof definition.initialState==='function'?definition.initialState(options):definition.initialState);
+      assertPlainState(initial,`Lab scenario ${definition.id} initialState`);
+      return initial;
+    };
     let state=makeInitial();
     let history=[];
 
@@ -106,7 +109,7 @@
       history.push({action:clone(action),before:clone(before),after:clone(after),at:Date.now()});
       if(history.length>maxHistory)history=history.slice(history.length-maxHistory);
       after.historyLength=history.length;
-      if(options.track!==false&&typeof AhaFrame.track==='function'){
+      if(options.track===true&&typeof AhaFrame.track==='function'){
         AhaFrame.track('lab_action',{lab:definition.id,action:action.type});
       }
       notify(after);
@@ -117,7 +120,7 @@
       state=makeInitial();
       if(!keepHistory)history=[];
       const frame=makeFrame({type:'RESET',payload:{}});
-      if(options.track!==false&&typeof AhaFrame.track==='function')AhaFrame.track('lab_reset',{lab:definition.id});
+      if(options.track===true&&typeof AhaFrame.track==='function')AhaFrame.track('lab_reset',{lab:definition.id});
       if(!silent)notify(frame);
       return clone(frame);
     }
