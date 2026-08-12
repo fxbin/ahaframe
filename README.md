@@ -1,67 +1,92 @@
-# AhaFrame MVP v0.2
+# AhaFrame v0.3 Validation
 
-AhaFrame is an English-first interactive visual learning product for AI engineering.
+AhaFrame is an English-first **Interactive AI Engineering Lab** for software developers moving toward AI engineering.
 
 > **Understand AI by seeing it work.**
 
-This repository is a static, dependency-light validation MVP. Version control contains source files only; `site/` is generated build output and is intentionally ignored. The project is optimized for fast launch, crawlable content, deterministic interactive simulations, and straightforward deployment to Vercel or Cloudflare Pages.
+The repository is a static, dependency-light validation product. Version control contains source files only; `site/` is generated build output and intentionally ignored.
 
-## Brand
+## Product direction
 
-- **Name:** AhaFrame
-- **Domain:** `https://ahaframe.com`
-- **Category:** Interactive AI Learning
-- **Positioning:** Visual learning for AI engineers
-- **Learning model:** `SEE → PLAY → AHA → BUILD`
-- **Primary slogan:** **Understand AI by seeing it work.**
+```text
+AI Engineering Learning
+        ↓
+Interactive Mental Models
+        ↓
+Failure Simulations
+        ↓
+Production Labs
+        ↓
+Build Projects
+        ↓
+Paid capability
+```
 
-## What changed in v0.2
+Core architecture principle:
 
-### Visual system
+> **Simulate the concept. Spend compute only to validate reality.**
 
-- Replaced the original blue/purple AI-SaaS look with the approved **warm white + graphite + teal** system.
-- Removed large brand gradients and glow-heavy visual language.
-- New outline AhaFrame logo and matching OG image.
-- Visual hierarchy is closer to a technical learning product than a generic AI landing page.
+## Current product
 
-### Product experience
+### Foundation lessons
 
-- Interactive Token Playground in the homepage hero.
-- Three interactive lessons:
-  - Token Playground
-  - Context Window Lab
-  - Agent Loop Simulator
-- Local lesson completion and progress tracking using `localStorage`.
-- Share / copy-link action on lesson pages.
-- `In one sentence` answer-first blocks.
-- `See → Play → Aha → Build` learning model.
-- Build Challenge after each lesson.
-- Pricing-intent tracking through `?intent=pro`, `?intent=founder`, etc.
+- Token Playground
+- Context Window Lab
+- Agent Loop Simulator
 
-### Lab / Simulation Engine
+### Production Lab preview
 
-- Added a dependency-free client-side Lab Engine.
-- Migrated Token Playground, Context Window Lab, Agent Loop Simulator, and the homepage token demo onto shared scenario state machines.
-- Added reusable history, checkpoint, compare, replay, reset, and derived-metrics primitives.
-- Kept scenario logic independent from DOM rendering and server infrastructure.
-- Added behavioral regression tests for the engine and all three MVP scenarios.
+- **RAG Failure Lab** — start from a broken retrieval configuration and tune chunk size, overlap, Top-K, retrieval strategy, and reranking while watching recall, precision, context pressure, latency, cost index, and answer-quality score.
 
-See `docs/LAB_ENGINE.md` for the architecture contract.
+### Pricing validation
 
-### SEO / generative-search readiness
+```text
+Free                       $0
+AI Engineer Foundations    $49 one-time hypothesis
+Production Labs            $12/month future hypothesis
+```
 
-- Fully crawlable lesson content in HTML (not hidden behind JS or login).
-- Unique title / description / canonical / hreflang per page.
-- `WebPage`, `LearningResource`, `BreadcrumbList`, `Organization`, `WebSite`, and `ItemList` JSON-LD where appropriate.
-- Removed `Course` structured data from individual MVP lessons because the product does not yet satisfy Google's stricter Course rich-result definition.
-- Sitemap + robots.txt.
-- Optional `llms.txt`, explicitly treated as non-essential.
-- Stable answer-first definitions, concept guides, FAQs, update timestamps, and simulation disclaimers.
-- Optional IndexNow submission script for post-deploy discovery.
+No payment is collected yet. The pricing page records intent only.
 
-## Design source of truth
+## Lab / Simulation Engine
 
-The approved warm-white / graphite / teal system is documented in `docs/VISUAL_SYSTEM.md`. Design screenshots and superseded mockups are intentionally not versioned.
+AhaFrame uses a dependency-free deterministic browser runtime:
+
+```text
+Scenario
+  ↓
+State
+  ↓
+Action
+  ↓
+Reducer
+  ↓
+Derived Metrics
+  ↓
+DOM Adapter
+```
+
+Reusable primitives:
+
+```text
+History
+Checkpoint
+Compare
+Replay
+Reset
+Failure Injection
+```
+
+Registered scenarios:
+
+```text
+token-playground
+context-window
+rag-failure
+agent-loop
+```
+
+See `docs/LAB_ENGINE.md` for the engine contract and `docs/ROADMAP.md` for the development sequence.
 
 ## Routes
 
@@ -71,6 +96,7 @@ The approved warm-white / graphite / teal system is documented in `docs/VISUAL_S
     ├── /lessons/token-playground/
     ├── /lessons/context-window/
     ├── /lessons/agent-loop/
+    ├── /labs/rag-failure/
     ├── /pricing/
     └── /early-access/
 ```
@@ -78,23 +104,20 @@ The approved warm-white / graphite / teal system is documented in `docs/VISUAL_S
 ## Source architecture
 
 ```text
-content/                  English content model
-src/assets/               browser JavaScript + favicon
-  lab-engine.js           generic deterministic Lab runtime
-  lab-scenarios.js        current scenario definitions
-src/styles/               base / marketing / lesson / responsive CSS modules
-scripts/ahaframe/         page-specific static-site build modules
-scripts/build_site.py     small orchestration entrypoint
+content/                   English content model
+src/assets/                browser JavaScript + favicon
+  lab-engine.js            generic deterministic Lab runtime
+  lab-scenarios.js         scenario definitions
+  rag.js                   RAG Failure Lab DOM adapter
+src/styles/                CSS modules
+scripts/ahaframe/          page-specific static-site build modules
+  rag.py                   RAG Failure Lab page builder
+scripts/build_site.py      build entrypoint
 scripts/test_lab_engine.js Lab Engine behavioral regression suite
-docs/LAB_ENGINE.md        Lab Engine architecture contract
-site/                     generated output (ignored)
+docs/LAB_ENGINE.md         Lab Engine architecture contract
+docs/ROADMAP.md            product / auth / Live Mode roadmap
+site/                      generated output (ignored)
 ```
-
-The build concatenates the CSS modules into the public `/assets/styles.css` bundle and generates the OG image at build time, so generated binary/output files do not need to live in Git history.
-
-The current simulation principle is:
-
-> **Simulate the concept. Spend compute only to validate reality.**
 
 ## Run locally
 
@@ -103,25 +126,25 @@ python3 scripts/build_site.py
 python3 -m http.server 8080 --directory site
 ```
 
-Then open:
+Open:
 
 ```text
 http://localhost:8080/en/
 ```
 
-## Build for AhaFrame.com
+## Production build
 
-Local builds default to `http://localhost:8080` and intentionally emit `noindex` safeguards. Before production launch, provide the real public origin:
+Local builds default to `http://localhost:8080` and intentionally emit `noindex` safeguards.
 
 ```bash
 AHAFRAME_BASE_URL=https://ahaframe.com python3 scripts/build_site.py
 ```
 
-This updates canonical URLs, JSON-LD URLs, sitemap URLs, robots.txt, and `llms.txt`. The content update date comes from `content/en.json` (`meta.updated`) unless `AHAFRAME_UPDATED=YYYY-MM-DD` is explicitly supplied.
+This updates canonical URLs, JSON-LD URLs, sitemap URLs, robots.txt, and `llms.txt`.
 
 ## Waitlist and analytics integration
 
-Runtime endpoint configuration is generated at build time. Configure public endpoint URLs through environment variables instead of editing generated files:
+Public runtime endpoint URLs are generated at build time:
 
 ```bash
 AHAFRAME_WAITLIST_ENDPOINT=https://your-api.example.com/waitlist \
@@ -130,20 +153,9 @@ AHAFRAME_BASE_URL=https://ahaframe.com \
 python3 scripts/build_site.py
 ```
 
-Do **not** put API secrets in these variables: endpoint URLs are written to public browser JavaScript.
+Do **not** put API secrets in these variables; endpoint URLs are written to public browser JavaScript.
 
-Expected waitlist request:
-
-```json
-{
-  "email": "user@example.com",
-  "intent": "pro",
-  "source": "/en/early-access/",
-  "createdAt": "2026-08-12T..."
-}
-```
-
-When no waitlist endpoint is configured, the UI clearly reports **demo mode** and saves the address only in that browser. It never claims a remote signup succeeded without a backend.
+When no waitlist endpoint is configured, the UI explicitly reports demo mode and saves the address only in that browser.
 
 ## Analytics events
 
@@ -151,141 +163,77 @@ Examples:
 
 ```text
 hero_start_learning_click
-hero_temperature_changed
-lesson_card_click
 interaction_slider_changed
 interaction_strategy_selected
 lesson_step_completed
 tool_error_simulated
-lesson_completed
-lesson_share
+rag_parameter_changed
+rag_balanced_preset_applied
+rag_failure_baseline_reset
+rag_paid_intent_click
+pricing_foundations_click
 pricing_pro_click
-pricing_founder_click
 waitlist_submit
 ```
 
-The Lab Engine keeps engine-level analytics opt-in so controls such as sliders do not automatically generate duplicate high-frequency events.
+The Lab Engine keeps engine-level analytics opt-in so high-frequency state actions do not automatically duplicate product events.
 
-## Local progress
+## Authentication policy
 
-Completed lessons are stored under:
+No account is required for public v0.3 learning.
 
-```text
-ahaframe_progress_v02
-```
+Authentication should be introduced when it enables durable value such as:
 
-No account is required in the MVP.
+- cross-device Lab history/checkpoints;
+- paid entitlements;
+- Live Mode credits;
+- Build Project submissions;
+- persistent progress.
 
-## i18n
-
-MVP is English-only, but content has been separated into:
-
-```text
-content/en.json
-```
-
-A later version can add:
-
-```text
-content/zh.json
-content/ja.json
-content/ko.json
-content/es.json
-```
-
-and extend the builder to emit locale routes.
-
-## Development dependencies
-
-The production build uses only the Python standard library. Validation and OG regeneration use development dependencies:
-
-```bash
-pip install -r requirements-dev.txt
-```
+The intended UX is to ask for sign-in only when the learner chooses **Save / Purchase / Live Mode / Build Project**. See `docs/ROADMAP.md`.
 
 ## Validation
-
-Run:
 
 ```bash
 python3 scripts/build_site.py
 python3 scripts/validate.py
-```
-
-You can also run the Lab Engine tests directly:
-
-```bash
 node scripts/test_lab_engine.js
 ```
 
-The validator checks:
+Validation covers:
 
-- exact route set
-- internal links
-- titles, descriptions, canonicals
-- JSON-LD validity
-- `LearningResource` semantic markup (not presented as a guaranteed Google rich-result feature)
-- answer-first blocks
-- share/completion controls
-- explicit button types and duplicate IDs
-- sitemap accuracy
-- legacy blue/purple brand tokens
-- Lab Engine assets and script load order
-- Lab Engine behavioral regression suite
-- JavaScript syntax
-- deployment configuration
-
-## IndexNow (optional)
-
-IndexNow requires a publicly reachable verification key file. Build and deploy with the key first; only submit after the deployed key URL is reachable.
-
-```bash
-# Build/deploy with the key so /{KEY}.txt exists publicly
-INDEXNOW_KEY=YOUR_KEY \
-AHAFRAME_BASE_URL=https://ahaframe.com \
-python3 scripts/build_site.py
-
-# After deployment, verify the key file and submit the sitemap URLs
-INDEXNOW_KEY=YOUR_KEY \
-AHAFRAME_BASE_URL=https://ahaframe.com \
-python3 scripts/indexnow.py
-```
-
-Never commit the IndexNow key file; `site/` is generated and ignored.
+- exact route set and internal links;
+- metadata / canonical / JSON-LD;
+- answer-first learning blocks;
+- accessibility basics;
+- sitemap accuracy;
+- Lab Engine asset order;
+- Token / Context / RAG / Agent behavioral invariants;
+- JavaScript syntax;
+- deployment configuration.
 
 ## Deployment
 
 ### Vercel
 
-Deploy the repository root. `vercel.json` runs `python3 scripts/build_site.py` and publishes `site/` automatically, with the root redirect and basic security headers configured.
+Deploy the repository root. `vercel.json` runs `python3 scripts/build_site.py` and publishes `site/`.
 
 ### Cloudflare Pages
 
-Build command:
-
-```bash
-python3 scripts/build_site.py
-```
-
-Output directory:
-
 ```text
-site
+Build command: python3 scripts/build_site.py
+Output directory: site
 ```
 
-## Important MVP constraints
+## Intentional non-goals for v0.3
 
-The following are intentionally not included yet:
-
-- user accounts
-- billing
-- real LLM calls
-- CMS
-- admin console
-- certificates
-- community
-- AI tutor
-- production waitlist backend
-- production analytics provider
+- mandatory accounts;
+- billing;
+- real LLM / vector database inference;
+- code sandbox;
+- CMS / admin console;
+- certificates;
+- community;
+- AI tutor.
 
 The goal remains **validation before platform**.
