@@ -1,16 +1,18 @@
-# SeeAI SEO + Generative Search Strategy — v0.2
+# AhaFrame SEO + Generative Search Strategy — v0.2
 
 ## 1. Core principle
 
-SeeAI does **not** treat GEO as a separate bag of hacks.
+AhaFrame does **not** treat GEO as a separate bag of hacks.
 
 For Google, current official guidance says generative-search visibility still depends on the normal Search index, ranking systems, crawlability, useful original content, page experience, and established SEO practices.
 
-This means SeeAI should optimize for:
+This means AhaFrame should optimize for:
 
 1. humans learning the concept;
 2. search engines understanding the page;
 3. AI search systems being able to retrieve and accurately cite the same public content.
+
+Production origin: `https://ahaframe.com`.
 
 ## 2. What v0.2 implements
 
@@ -80,7 +82,7 @@ v0.2 uses:
 
 Google's Course-list feature has stricter eligibility requirements than simply having an educational page. The MVP lessons are interactive learning resources, not yet a formal instructor-led course with the full commercial/educational structure described in Google's Course guidelines.
 
-We should re-evaluate `Course` markup only when SeeAI has an actual structured course/program that satisfies the relevant requirements.
+We should re-evaluate `Course` markup only when AhaFrame has an actual structured course/program that satisfies the relevant requirements.
 
 ### Canonicals + hreflang
 
@@ -190,7 +192,7 @@ Do not generate hundreds of thin query-variant pages. Build one strong interacti
 
 ### Google
 
-- verify production domain in Search Console;
+- verify `ahaframe.com` in Search Console;
 - submit sitemap;
 - inspect each lesson URL;
 - test structured data;
@@ -199,7 +201,7 @@ Do not generate hundreds of thin query-variant pages. Build one strong interacti
 
 ### Bing
 
-- verify production domain in Bing Webmaster Tools;
+- verify `ahaframe.com` in Bing Webmaster Tools;
 - submit sitemap;
 - optionally configure IndexNow only after the public verification key file has been deployed;
 - monitor AI Performance citations and grounding queries.
