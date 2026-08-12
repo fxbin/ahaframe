@@ -1,1 +1,1 @@
-"""SeeAI static-site build modules."""
+"""AhaFrame static-site build modules."""
