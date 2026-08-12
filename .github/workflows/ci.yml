@@ -20,8 +20,13 @@ jobs:
           node-version: '22'
       - name: Install validation dependencies
         run: pip install -r requirements-dev.txt
-      - name: Verify legacy package is gone
-        run: test ! -d scripts/seeai
+      - name: Verify legacy source branding is gone
+        run: |
+          test ! -d scripts/seeai
+          if grep -R -n -E 'SeeAI|SEEAI_|window\.SeeAI|seeai_' scripts src content; then
+            echo 'Legacy SeeAI branding remains in source.'
+            exit 1
+          fi
       - name: Build static site
         env:
           AHAFRAME_BASE_URL: https://ahaframe.com
