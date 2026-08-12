@@ -1,5 +1,31 @@
 # AhaFrame Changelog
 
+## v0.3 validation — 2026-08-12
+
+### RAG Failure Lab
+
+- Added the first Production Lab preview at `/en/labs/rag-failure/`.
+- Starts from an intentionally broken retrieval configuration rather than a happy-path demo.
+- Exposes chunk size, overlap, Top-K, vector vs hybrid retrieval, and reranking.
+- Derives deterministic recall, precision, context usage, overflow, latency, cost index, answer-quality score, and failure diagnosis.
+- Uses Lab Engine checkpoints and compare to show the current configuration against the broken baseline.
+- Added RAG scenario regression coverage to `scripts/test_lab_engine.js`.
+- Added the lab to sitemap, `llms.txt`, validation, and generated asset checks.
+
+### Pricing validation
+
+- Retired the `$19/month Pro` and `$39/month Founding Member` hypotheses.
+- Added a `$49 one-time` **AI Engineer Foundations** hypothesis.
+- Added a future `$12/month` **Production Labs** membership hypothesis.
+- Kept core mental models and selected simulations free.
+- Reframed the paid boundary around failure simulations, production labs, build projects, and evaluation rather than basic explanation access.
+
+### Product architecture
+
+- Added `docs/ROADMAP.md` with the post-engine development sequence.
+- Deferred mandatory authentication; public lessons and simulations remain no-signup.
+- Defined optional identity triggers around saving experiments, paid entitlements, Live Mode credits, Build Projects, and cross-device progress.
+
 ## Lab Engine v0.1 — 2026-08-12
 
 - Added a dependency-free generic Lab / Simulation Engine for deterministic interactive lessons.
