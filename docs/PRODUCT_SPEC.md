@@ -1,4 +1,4 @@
-# AhaFrame Product Spec — v0.3 Validation
+# AhaFrame Product Spec — v0.3 Content MVP
 
 Date: 2026-08-12
 
@@ -26,8 +26,6 @@ The product tests whether developers can build stronger engineering intuition by
 
 ## Learning model
 
-The product ladder is:
-
 ```text
 SEE → PLAY → BREAK → AHA → BUILD
 ```
@@ -46,6 +44,7 @@ SEE → PLAY → BREAK → AHA → BUILD
 /en/lessons/context-window/
 /en/lessons/agent-loop/
 /en/labs/rag-failure/
+/en/labs/agent-reliability/
 /en/pricing/
 /en/early-access/
 ```
@@ -66,13 +65,11 @@ Teaches finite working context and the trade-offs between truncation, summarizat
 
 Teaches task interpretation, action selection, tool use, observation, retry/error recovery, and final response. Error simulation must never race with Reset or manual progression.
 
-## Production Lab preview
+## Production Lab previews
 
 ### RAG Failure Lab
 
-The first lab designed specifically to pressure-test the generic Lab Engine and the paid-product thesis.
-
-The learner starts from a deliberately poor configuration and controls:
+The learner starts from a deliberately poor retrieval configuration and controls:
 
 ```text
 Chunk Size
@@ -97,13 +94,60 @@ Failure Diagnosis
 
 The lab uses Engine checkpoints and comparison so the learner can compare the current configuration against the broken baseline.
 
-All metrics are educational synthetic values. They are not presented as benchmark results from a live embedding model, vector database, reranker, or LLM.
+### Agent Reliability Lab
+
+The learner starts from a weak control policy for a customer-support agent that may perform an irreversible refund action.
+
+Controls:
+
+```text
+Max Steps
+Retry Limit
+Tool Timeout
+Result Validation
+Human Approval
+Termination Rule
+```
+
+Derived metrics:
+
+```text
+Success Rate
+Reliability Score
+Runaway Risk
+Unsafe-Action Risk
+Expected Steps
+Simulated Latency
+Cost Index
+Human Reviews / 100 Runs
+Failure Diagnosis
+```
+
+The baseline intentionally demonstrates that a policy can complete many tasks while remaining operationally unsafe: generous retries and step budget raise success, but also allow loops and repeated actions. The reliability preset introduces bounded execution, goal-aware termination, validation, and approval around the irreversible tool boundary.
+
+Both Production Lab previews use deterministic educational metrics. They are not presented as benchmark results from live models, tools, vector stores, customer-support traffic, or human-review queues.
+
+## Content MVP stop line
+
+Do not launch broadly after only one or two Production Labs. The first coherent external-alpha target is:
+
+```text
+RAG Failure Lab            done
+Agent Reliability Lab      done
+Evaluation Lab             next
+Context Engineering Lab    next
+Build Challenge            next
+        ↓
+UX / content review
+        ↓
+20–50 developer Soft Alpha
+```
+
+The objective is a 60–120 minute product journey that demonstrates the AhaFrame method before investing in full account, payment, or sandbox infrastructure.
 
 ## Pricing hypothesis
 
-The previous `$19/month Pro` and `$39/month Founding Member` concepts are retired for v0.3.
-
-The new validation offers are:
+The previous `$19/month Pro` and `$39/month Founding Member` concepts are retired.
 
 ```text
 Free                       $0
@@ -138,7 +182,7 @@ Start free lesson / lab
   ↓
 Interact with parameters
   ↓
-Complete or improve scenario
+Improve a failed scenario
   ↓
 Start another lab
   ↓
@@ -166,11 +210,7 @@ Principles:
 - no API secrets are shipped client-side;
 - framework migration should be driven by product/content scale, not aesthetics.
 
-Build-time public configuration uses the `AHAFRAME_*` environment-variable namespace.
-
 ## Lab / Simulation Engine
-
-The runtime contract is:
 
 ```text
 Scenario
@@ -186,7 +226,7 @@ Derived View / Metrics
 DOM Adapter
 ```
 
-Reusable capabilities include:
+Reusable capabilities:
 
 ```text
 History
@@ -197,20 +237,23 @@ Reset
 Failure Injection
 ```
 
-The registered deterministic scenarios are now:
+Registered deterministic scenarios:
 
 ```text
 token-playground
 context-window
 rag-failure
+agent-reliability
 agent-loop
 ```
+
+RAG Failure validates multi-parameter optimization and comparison. Agent Reliability adds a second pressure test focused on policy trade-offs: execution bounds, retry behavior, safety controls, termination, latency, and cost.
 
 See `docs/LAB_ENGINE.md` for the architecture contract.
 
 ## Authentication boundary
 
-Authentication is **not** required for v0.3 public learning.
+Authentication is **not** required for public Content MVP learning.
 
 Do not introduce a login wall in front of lessons or simulations. Identity becomes justified when users need one of these durable capabilities:
 
@@ -221,8 +264,6 @@ Do not introduce a login wall in front of lessons or simulations. Identity becom
 5. persist learning progress beyond local browser storage.
 
 The intended UX is optional sign-in at the moment the learner chooses **Save / Purchase / Live Mode / Build Project**.
-
-See `docs/ROADMAP.md` for the phased account plan.
 
 ## Visual direction
 
@@ -252,7 +293,10 @@ tool_error_simulated
 rag_parameter_changed
 rag_balanced_preset_applied
 rag_failure_baseline_reset
-rag_paid_intent_click
+agent_reliability_parameter_changed
+agent_reliability_preset_applied
+agent_reliability_baseline_reset
+agent_reliability_paid_intent_click
 pricing_foundations_click
 pricing_pro_click
 waitlist_submit
@@ -260,7 +304,7 @@ waitlist_submit
 
 The Lab Engine itself keeps analytics opt-in so high-frequency simulation actions do not automatically duplicate product events.
 
-## Intentional non-goals for v0.3
+## Intentional non-goals for the Content MVP
 
 - mandatory authentication;
 - real billing;
@@ -274,12 +318,13 @@ The Lab Engine itself keeps analytics opt-in so high-frequency simulation action
 
 ## Exit criteria
 
-Do not expand merely because the platform architecture can support more labs. Expansion should be justified by behavior:
+Before Soft Alpha, complete the small coherent content path and review the end-to-end UX. After external use starts, expansion should be justified by behavior:
 
 - lesson/lab start rate;
-- completion / successful-tuning rate;
+- successful-tuning rate;
 - second-lab rate;
-- RAG parameter interaction depth;
+- parameter interaction depth;
+- baseline-vs-current improvement behavior;
 - pricing intent;
 - waitlist conversion;
 - qualitative feedback that simulations improve understanding;

@@ -11,8 +11,8 @@ const approx=(actual,expected,epsilon=1e-9)=>assert.ok(Math.abs(actual-expected)
 
 assert.deepEqual(
   AhaFrame.listLabScenarios().map(({id})=>id),
-  ['token-playground','context-window','rag-failure','agent-loop'],
-  'expected the four deterministic scenarios to be registered',
+  ['token-playground','context-window','rag-failure','agent-reliability','agent-loop'],
+  'expected the five deterministic scenarios to be registered',
 );
 
 const token=AhaFrame.createLab('token-playground',{track:false});
@@ -72,6 +72,39 @@ const ragDiff=rag.compare('baseline');
 assert.ok(ragDiff.metrics.qualityScore.after>ragDiff.metrics.qualityScore.before);
 assert.ok(ragDiff.metrics.contextTokens.after<ragDiff.metrics.contextTokens.before);
 
+const reliability=AhaFrame.createLab('agent-reliability',{track:false});
+frame=reliability.getFrame();
+assert.equal(frame.state.maxSteps,14);
+assert.equal(frame.state.retryLimit,4);
+assert.equal(frame.state.termination,'weak');
+approx(frame.derived.successRate,0.78);
+approx(frame.derived.runawayRisk,0.544);
+approx(frame.derived.unsafeActionRisk,0.35);
+approx(frame.derived.costIndex,79.96);
+assert.equal(frame.derived.failureType,'runaway-loop');
+assert.ok(frame.derived.reliabilityScore<70,'unreliable baseline should expose a weak control policy');
+reliability.checkpoint('baseline');
+frame=reliability.dispatch('APPLY_RELIABILITY_PRESET');
+assert.equal(frame.state.maxSteps,8);
+assert.equal(frame.state.retryLimit,2);
+assert.equal(frame.state.timeoutSec,6);
+assert.equal(frame.state.validation,true);
+assert.equal(frame.state.humanApproval,true);
+assert.equal(frame.state.termination,'goal-aware');
+approx(frame.derived.successRate,0.908);
+approx(frame.derived.runawayRisk,0.01);
+approx(frame.derived.unsafeActionRisk,0.01);
+approx(frame.derived.latencySeconds,16.722);
+approx(frame.derived.costIndex,62.6);
+assert.equal(frame.derived.humanReviewsPer100,43);
+assert.equal(frame.derived.failureType,'healthy');
+assert.ok(frame.derived.reliabilityScore>94);
+const reliabilityDiff=reliability.compare('baseline');
+assert.ok(reliabilityDiff.metrics.reliabilityScore.after>reliabilityDiff.metrics.reliabilityScore.before);
+assert.ok(reliabilityDiff.metrics.runawayPercent.after<reliabilityDiff.metrics.runawayPercent.before);
+assert.ok(reliabilityDiff.metrics.unsafeActionPercent.after<reliabilityDiff.metrics.unsafeActionPercent.before);
+assert.ok(reliabilityDiff.metrics.costIndex.after<reliabilityDiff.metrics.costIndex.before);
+
 const agent=AhaFrame.createLab('agent-loop',{track:false});
 frame=agent.dispatch('NEXT');
 assert.equal(frame.state.step,1);
@@ -89,6 +122,9 @@ assert.throws(()=>token.dispatch('SET_TEMPERATURE',{value:3}),/between 0 and 2/)
 assert.throws(()=>context.dispatch('SELECT_STRATEGY',{strategy:'magic'}),/Unknown context strategy/);
 assert.throws(()=>rag.dispatch('SET_TOP_K',{value:1}),/between 2 and 15/);
 assert.throws(()=>rag.dispatch('SET_OVERLAP',{value:1300}),/smaller than chunk size/);
+assert.throws(()=>reliability.dispatch('SET_MAX_STEPS',{value:3}),/between 4 and 20/);
+assert.throws(()=>reliability.dispatch('SET_RETRY_LIMIT',{value:6}),/between 0 and 5/);
+assert.throws(()=>reliability.dispatch('SET_TERMINATION',{value:'forever'}),/weak, bounded, or goal-aware/);
 assert.throws(()=>AhaFrame.createLab('missing-scenario'),/Unknown lab scenario/);
 
-console.log('PASS Lab Engine: registry, Token, Context, RAG failure simulation, Agent, history, checkpoints, compare, replay, reset, validation.');
+console.log('PASS Lab Engine: registry, Token, Context, RAG failure simulation, Agent Reliability, Agent Loop, history, checkpoints, compare, replay, reset, validation.');
