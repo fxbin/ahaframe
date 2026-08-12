@@ -1,6 +1,6 @@
-"""Build the SeeAI static validation site."""
+"""Build the AhaFrame static validation site."""
 
-from seeai import agent, context, discovery, home, marketing, token
+from ahaframe import agent, context, discovery, home, marketing, token
 
 def main():
     home.build()

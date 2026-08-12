@@ -1,14 +1,24 @@
-# SeeAI Product Spec — v0.2 Validation MVP
+# AhaFrame Product Spec — v0.2 Validation MVP
 
 Date: 2026-08-12
 
 ## Product thesis
 
-SeeAI is an English-first interactive visual learning product for software developers moving toward AI engineering.
+AhaFrame is an English-first interactive visual learning product for software developers moving toward AI engineering.
 
 > **Understand AI by seeing it work.**
 
 The MVP tests whether developers prefer learning abstract AI concepts through deterministic visual simulations rather than passive explanation alone.
+
+## Brand system
+
+- **Brand:** AhaFrame
+- **Primary domain:** `https://ahaframe.com`
+- **Category:** Interactive AI Learning
+- **Positioning:** Visual learning for AI engineers
+- **Primary slogan:** **Understand AI by seeing it work.**
+
+The name expresses the product promise: frame a complex technical system clearly enough for the learner to reach an “aha” moment and carry that mental model into real engineering work.
 
 ## Primary audience
 
@@ -21,12 +31,13 @@ The MVP tests whether developers prefer learning abstract AI concepts through de
 Every lesson follows:
 
 ```text
-See → Play → Build
+SEE → PLAY → AHA → BUILD
 ```
 
 - **See** — visualize a hidden AI-system behavior;
 - **Play** — change a meaningful parameter or state;
-- **Build** — connect the concept to an engineering decision or challenge.
+- **Aha** — connect cause and effect until the concept clicks as a durable mental model;
+- **Build** — apply that mental model to an engineering decision or challenge.
 
 ## MVP routes
 
@@ -89,6 +100,8 @@ Principles:
 - no API secrets are shipped client-side;
 - move to a component/template framework only when validation or content scale justifies the migration.
 
+Build-time public configuration uses the `AHAFRAME_*` environment-variable namespace, including `AHAFRAME_BASE_URL`, `AHAFRAME_WAITLIST_ENDPOINT`, `AHAFRAME_ANALYTICS_ENDPOINT`, and `AHAFRAME_UPDATED`.
+
 ## Visual direction
 
 The approved system is documented in `docs/VISUAL_SYSTEM.md`.
@@ -102,6 +115,8 @@ Use warm white, graphite, and teal. Avoid generic blue-purple AI gradients, deco
 ## SEO / generative-search posture
 
 The canonical HTML page is the content source of truth. Lessons use stable URLs, crawlable explanations, answer-first definitions, semantically appropriate structured data, sitemap/robots, and explicit modification dates.
+
+The production origin is `https://ahaframe.com`. Local builds remain `noindex` by default unless an explicit non-local origin is supplied.
 
 See `docs/SEO_GEO.md` for the detailed policy.
 

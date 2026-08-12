@@ -2,7 +2,7 @@ from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 
 ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_OUTPUT = ROOT / "site" / "assets" / "og-seeai.png"
+DEFAULT_OUTPUT = ROOT / "site" / "assets" / "og-ahaframe.png"
 
 
 def _font(size: int, *, bold: bool = False):
@@ -30,7 +30,7 @@ def generate_og(output: Path = DEFAULT_OUTPUT) -> Path:
     # Brand mark.
     points = [(78, 56), (105, 40), (132, 56), (132, 88), (105, 104), (78, 88)]
     draw.line(points + [points[0]], fill="#0f766e", width=7, joint="curve")
-    draw.text((150, 48), "SeeAI", fill="#17201e", font=logo)
+    draw.text((150, 48), "AhaFrame", fill="#17201e", font=logo)
 
     # Main message.
     draw.text((78, 190), "Understand AI", fill="#17201e", font=bold)

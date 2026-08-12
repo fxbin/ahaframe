@@ -1,7 +1,7 @@
 {
-  "brand": "SeeAI",
+  "brand": "AhaFrame",
   "home": {
-    "title": "SeeAI — Understand AI by seeing it work",
+    "title": "AhaFrame — Understand AI by seeing it work",
     "description": "Interactive visual lessons for AI engineering: tokens, context windows, RAG, agents, evaluation, and production AI.",
     "headline": "Understand AI by seeing it work.",
     "subheadline": "Interactive lessons for AI engineering. Explore token generation, context windows, RAG, and agent workflows through visual simulations."

@@ -1,8 +1,8 @@
-# SeeAI Visual System — Approved Direction
+# AhaFrame Visual System — Approved Direction
 
 ## Positioning
 
-SeeAI should feel like a **technical learning product**, not a generic AI startup landing page.
+AhaFrame should feel like a **technical learning product**, not a generic AI startup landing page.
 
 The target feeling is:
 
@@ -26,6 +26,12 @@ Soft teal        #EDF7F3
 Border           #E2E7E3
 ```
 
+## Brand metaphor
+
+A **frame** makes a complex system legible by defining what matters and showing relationships clearly. Use that idea as a restrained layout metaphor: outlined learning surfaces, bounded simulations, explicit states, and diagrams that turn invisible behavior into something inspectable.
+
+Do not turn the name into decorative picture-frame motifs. The visual system should communicate clarity through structure rather than ornament.
+
 ## Rules
 
 - No large blue-purple brand gradients.
@@ -34,6 +40,7 @@ Border           #E2E7E3
 - Use accent colors semantically inside simulations, not as generic “AI magic”.
 - Prefer white cards, thin borders, generous whitespace, and restrained shadows.
 - Motion must explain state change.
+- Product diagrams should help users move through **SEE → PLAY → AHA → BUILD**.
 
 ## Brand idea
 

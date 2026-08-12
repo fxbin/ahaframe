@@ -17,6 +17,6 @@
     count.textContent=c.count;
     bar.style.width=c.width;
     note.textContent=c.note;
-    window.SeeAI?.track('interaction_strategy_selected',{lesson:'context-window',strategy:btn.dataset.strategy});
+    window.AhaFrame?.track('interaction_strategy_selected',{lesson:'context-window',strategy:btn.dataset.strategy});
   }));
 })();

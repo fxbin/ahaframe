@@ -35,7 +35,7 @@
 
   slider.addEventListener('input',()=>{
     render();
-    window.SeeAI?.track('interaction_slider_changed',{lesson:'token-playground',temperature:Number(slider.value)});
+    window.AhaFrame?.track('interaction_slider_changed',{lesson:'token-playground',temperature:Number(slider.value)});
   });
   render();
 })();

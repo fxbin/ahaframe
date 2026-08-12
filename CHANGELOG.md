@@ -1,4 +1,17 @@
-# SeeAI Changelog
+# AhaFrame Changelog
+
+## Brand migration — 2026-08-12
+
+- Renamed the product from **SeeAI** to **AhaFrame**.
+- Locked `https://ahaframe.com` as the production domain.
+- Kept the primary slogan: **Understand AI by seeing it work.**
+- Expanded the learning model to **SEE → PLAY → AHA → BUILD**.
+- Migrated page titles, navigation, footer, structured data, Open Graph metadata, manifest, `llms.txt`, 404, and discovery output.
+- Renamed browser runtime state from `SeeAI` / `SEEAI_*` / `seeai_*` to `AhaFrame` / `AHAFRAME_*` / `ahaframe_*`.
+- Renamed the Python builder package from `scripts/seeai/` to `scripts/ahaframe/`.
+- Renamed the generated social image to `og-ahaframe.png`.
+- Updated README, product spec, visual system, SEO/GEO policy, Code Review record, and CI.
+- Added CI protection that rejects legacy SeeAI branding in generated output.
 
 ## v0.2 — 2026-08-12
 
@@ -13,7 +26,7 @@
 - Added a live temperature-controlled Token Playground preview.
 - Added no-signup / simulation-first proof chips without fabricated social proof.
 - Added local learning progress.
-- Expanded See / Play / Build methodology.
+- Expanded the learning methodology.
 - Expanded six-stage AI engineering roadmap.
 - Added audience positioning for developers, builders, and technical learners.
 
