@@ -89,6 +89,108 @@
     },
   });
 
+  const clamp=(value,min,max)=>Math.max(min,Math.min(max,value));
+  const RAG_BALANCED={chunkSize:600,overlap:100,topK:5,retrieval:'hybrid',reranker:true,contextBudget:8000};
+
+  AhaFrame.registerLabScenario({
+    id:'rag-failure',
+    version:'1.0.0',
+    title:'RAG Failure Lab',
+    initialState:{chunkSize:1200,overlap:100,topK:12,retrieval:'vector',reranker:false,contextBudget:8000},
+    reduce(state,action){
+      switch(action.type){
+        case 'SET_CHUNK_SIZE': {
+          const value=Number(action.payload?.value);
+          if(!Number.isFinite(value)||value<200||value>1400)throw new RangeError('Chunk size must be between 200 and 1400 tokens.');
+          return {...state,chunkSize:value,overlap:Math.min(state.overlap,Math.max(0,value-50))};
+        }
+        case 'SET_OVERLAP': {
+          const value=Number(action.payload?.value);
+          if(!Number.isFinite(value)||value<0||value>=state.chunkSize)throw new RangeError('Overlap must be non-negative and smaller than chunk size.');
+          return {...state,overlap:value};
+        }
+        case 'SET_TOP_K': {
+          const value=Number(action.payload?.value);
+          if(!Number.isInteger(value)||value<2||value>15)throw new RangeError('Top-K must be an integer between 2 and 15.');
+          return {...state,topK:value};
+        }
+        case 'SET_RETRIEVAL': {
+          const value=action.payload?.value;
+          if(!['vector','hybrid'].includes(value))throw new RangeError('Retrieval must be vector or hybrid.');
+          return {...state,retrieval:value};
+        }
+        case 'SET_RERANKER':
+          return {...state,reranker:Boolean(action.payload?.value)};
+        case 'APPLY_BALANCED_PRESET':
+          return {...RAG_BALANCED};
+        default:
+          throw new Error(`Unsupported rag-failure action: ${action.type}`);
+      }
+    },
+    derive(state){
+      const overlapRatio=state.overlap/state.chunkSize;
+      const chunkFit=Math.exp(-Math.abs(state.chunkSize-600)/700);
+      const topKRecallGain=1-Math.exp(-state.topK/4);
+      const retrievalRecallBonus=state.retrieval==='hybrid'?0.08:0;
+      const overlapRecallBonus=Math.min(overlapRatio,0.25)*0.35;
+      const recall=clamp(0.34+0.36*topKRecallGain+0.16*chunkFit+retrievalRecallBonus+overlapRecallBonus,0.2,0.98);
+
+      const topKPrecisionPenalty=Math.max(0,state.topK-3)*0.028;
+      const chunkPrecisionPenalty=Math.abs(state.chunkSize-550)/1800;
+      const smallChunkPenalty=Math.max(0,350-state.chunkSize)/1000;
+      const retrievalPrecisionBonus=state.retrieval==='hybrid'?0.05:0;
+      const rerankerBonus=state.reranker?0.15:0;
+      const precision=clamp(0.88-topKPrecisionPenalty-chunkPrecisionPenalty-smallChunkPenalty+retrievalPrecisionBonus+rerankerBonus,0.2,0.98);
+
+      const effectiveChunk=Math.max(100,state.chunkSize-state.overlap*0.25);
+      const contextTokens=Math.round(state.topK*effectiveChunk);
+      const overflowTokens=Math.max(0,contextTokens-state.contextBudget);
+      const overflowRatio=overflowTokens/state.contextBudget;
+      const qualityScore=clamp((0.55*recall+0.45*precision)*100-overflowRatio*35,0,100);
+      const latencyMs=Math.round(150+state.topK*24+state.chunkSize*0.07+(state.retrieval==='hybrid'?80:0)+(state.reranker?150:0));
+      const costIndex=Math.round((contextTokens/state.contextBudget*60+state.topK*2+(state.retrieval==='hybrid'?8:0)+(state.reranker?12:0))*10)/10;
+
+      let failureType='healthy';
+      let failure='Healthy configuration: evidence coverage and context precision are balanced.';
+      if(overflowTokens>0){
+        failureType='context-overflow';
+        failure=`Context overflow: ${overflowTokens.toLocaleString()} retrieved tokens exceed the ${state.contextBudget.toLocaleString()} token budget.`;
+      }else if(recall<0.72){
+        failureType='missed-evidence';
+        failure='Missed evidence: retrieval recall is too low, so relevant facts are likely absent from context.';
+      }else if(precision<0.62){
+        failureType='retrieval-noise';
+        failure='Retrieval noise: too much irrelevant context competes with useful evidence.';
+      }else if(qualityScore<78){
+        failureType='weak-tradeoff';
+        failure='Weak trade-off: the pipeline works, but retrieval quality is not yet production-ready.';
+      }
+
+      return {
+        recall,
+        precision,
+        noise:1-precision,
+        contextTokens,
+        overflowTokens,
+        contextUsagePercent:contextTokens/state.contextBudget*100,
+        qualityScore,
+        latencyMs,
+        costIndex,
+        failureType,
+        failure,
+        metrics:{
+          recallPercent:recall*100,
+          precisionPercent:precision*100,
+          contextTokens,
+          overflowTokens,
+          qualityScore,
+          latencyMs,
+          costIndex,
+        },
+      };
+    },
+  });
+
   const AGENT_LABELS=[
     'The agent reads the user task and identifies missing information.',
     'The agent selects the weather tool.',
