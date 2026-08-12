@@ -1,5 +1,19 @@
 # AhaFrame Changelog
 
+## Content MVP — Agent Reliability Lab — 2026-08-12
+
+- Added `/en/labs/agent-reliability/` as the second Production Lab preview.
+- Uses a customer-support refund scenario so retries, validation, human approval, and termination rules map to a concrete consequential workflow.
+- Starts from an intentionally weak policy: 14 max steps, 4 retries, 12-second tool timeout, weak termination, no result validation, and no human approval.
+- Added controls for max steps, retry limit, timeout, validation, approval, and weak / bounded / goal-aware termination.
+- Added deterministic success rate, reliability score, runaway risk, unsafe-action risk, expected steps, simulated latency, cost index, human-review load, and failure diagnosis.
+- Added an Engine checkpoint for the unreliable baseline and live baseline-vs-current comparison.
+- Added a reliability preset that improves success and control while making approval overhead visible instead of treating guardrails as free.
+- Extended Lab Engine regression tests and generated-page validation to cover the new scenario and route.
+- Added the Lab to sitemap, `llms.txt`, homepage discovery, pricing roadmap, README, product spec, and development roadmap.
+- Updated the homepage learning model to **SEE → PLAY → BREAK → AHA → BUILD** and surfaced RAG + Agent Reliability as a distinct Production Labs layer.
+- Hardened mobile layout for the multi-column Production Lab controls and Content MVP sections.
+
 ## v0.3 validation — 2026-08-12
 
 ### RAG Failure Lab
