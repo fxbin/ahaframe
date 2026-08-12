@@ -36,6 +36,43 @@ SEE → PLAY → BREAK → AHA → BUILD
 - **Aha** — connect cause and effect into a durable mental model;
 - **Build** — apply the mental model to architecture, debugging, evaluation, and production trade-offs.
 
+## Curriculum v1
+
+`docs/CURRICULUM.md` is the curriculum source of truth.
+
+AhaFrame uses external material as research references, not runtime or content dependencies:
+
+- **AI Engineering from Scratch** provides a broad dependency map across LLM engineering, tools/protocols, agent engineering, production infrastructure, and capstones.
+- **AI Agent Book** provides deeper references for Agent design, context, memory, tools/MCP, evaluation, continuous improvement, and multi-agent engineering.
+
+AhaFrame transforms those references into original failure-first experiences instead of copying source lessons.
+
+The curriculum is organized into eight tracks:
+
+```text
+01 LLM Mental Models
+02 Context & Retrieval
+03 Tools & Protocols
+04 Agent Engineering
+05 Evaluation & Reliability
+06 Production AI
+07 Multi-Agent Systems
+08 Build Systems
+```
+
+The map is intentionally larger than the current product. It is a prioritization and dependency tool, not a commitment to build every topic.
+
+A new full Lab should normally require:
+
+- a real engineering decision;
+- a visible failure mode;
+- a meaningful parameter trade-off;
+- a deterministic low-cost first implementation;
+- a reusable mental model;
+- a connection to another Lab or Build Challenge.
+
+If a topic does not satisfy these criteria, prefer a guide or reference instead of manufacturing an interactive Lab.
+
 ## Public routes
 
 ```text
@@ -127,21 +164,73 @@ The baseline intentionally demonstrates that a policy can complete many tasks wh
 
 Both Production Lab previews use deterministic educational metrics. They are not presented as benchmark results from live models, tools, vector stores, customer-support traffic, or human-review queues.
 
+## Next Production Lab — Evaluation Failure
+
+The next implementation target is specified in `docs/EVALUATION_FAILURE_LAB.md`.
+
+Core scenario:
+
+```text
+System A overall: 82
+System B overall: 88
+        ↓
+Naive conclusion: SHIP B
+        ↓
+Inspect evaluation slices / gates
+        ↓
+Safety-critical regression discovered
+        ↓
+Release decision changes
+```
+
+The learner controls:
+
+```text
+Dataset preset
+Pass threshold
+Safety veto
+Sample size
+Judge mode
+Cost gate
+```
+
+The deterministic model should derive:
+
+```text
+Aggregate scores
+Slice regressions
+Critical regression count
+Confidence width
+Judge-noise index
+Estimated evaluation cost
+Cost per success
+SHIP / BLOCK / INCONCLUSIVE
+Failure diagnosis
+```
+
+The core lesson is:
+
+> **Evaluation is a decision system, not a single score.**
+
+A better evaluation preset is allowed to block the candidate. AhaFrame presets do not need to magically “fix” every system; they should reveal the correct engineering decision.
+
 ## Content MVP stop line
 
 Do not launch broadly after only one or two Production Labs. The first coherent external-alpha target is:
 
 ```text
-RAG Failure Lab            done
-Agent Reliability Lab      done
-Evaluation Lab             next
-Context Engineering Lab    next
-Build Challenge            next
+RAG Failure Lab                 done
+Agent Reliability Lab           done
+Evaluation Failure Lab          next
+Context Compression Lab         next
+Reliable Support Agent Build    next
         ↓
 UX / content review
         ↓
 20–50 developer Soft Alpha
 ```
+
+`Tool Contract Failure Lab` is an optional bridge if the Build Challenge exposes a missing Tools & Protocols concept. It does not delay Soft Alpha by default.
 
 The objective is a 60–120 minute product journey that demonstrates the AhaFrame method before investing in full account, payment, or sandbox infrastructure.
 
@@ -159,7 +248,7 @@ Production Labs            $12/month future hypothesis
 
 - core mental models;
 - foundational simulations;
-- public concept guides;
+- public concept guides and curriculum map;
 - local progress;
 - rotating Production Lab previews.
 
@@ -182,7 +271,7 @@ Start free lesson / lab
   ↓
 Interact with parameters
   ↓
-Improve a failed scenario
+Improve or correctly diagnose a failed scenario
   ↓
 Start another lab
   ↓
@@ -249,6 +338,8 @@ agent-loop
 
 RAG Failure validates multi-parameter optimization and comparison. Agent Reliability adds a second pressure test focused on policy trade-offs: execution bounds, retry behavior, safety controls, termination, latency, and cost.
 
+Evaluation Failure should become the third pressure test, focused on dataset policy, release gates, evidence strength, and decision logic.
+
 See `docs/LAB_ENGINE.md` for the architecture contract.
 
 ## Authentication boundary
@@ -302,6 +393,8 @@ pricing_pro_click
 waitlist_submit
 ```
 
+The next Evaluation Failure adapter should own semantic evaluation events described in `docs/EVALUATION_FAILURE_LAB.md`.
+
 The Lab Engine itself keeps analytics opt-in so high-frequency simulation actions do not automatically duplicate product events.
 
 ## Intentional non-goals for the Content MVP
@@ -321,7 +414,7 @@ The Lab Engine itself keeps analytics opt-in so high-frequency simulation action
 Before Soft Alpha, complete the small coherent content path and review the end-to-end UX. After external use starts, expansion should be justified by behavior:
 
 - lesson/lab start rate;
-- successful-tuning rate;
+- successful-tuning or correct-diagnosis rate;
 - second-lab rate;
 - parameter interaction depth;
 - baseline-vs-current improvement behavior;

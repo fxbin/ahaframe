@@ -1,5 +1,19 @@
 # AhaFrame Changelog
 
+## Curriculum v1.0 — 2026-08-12
+
+- Added `docs/CURRICULUM.md` as the curriculum source of truth.
+- Mapped AhaFrame into eight tracks: LLM Mental Models, Context & Retrieval, Tools & Protocols, Agent Engineering, Evaluation & Reliability, Production AI, Multi-Agent Systems, and Build Systems.
+- Added a dependency-aware Lab backlog instead of continuing topic-by-topic lesson expansion.
+- Defined **AI Engineering from Scratch** as a broad curriculum / prerequisite reference and **AI Agent Book** as an Agent / Evaluation engineering-depth reference.
+- Added an explicit source-use policy: research concepts and experiment methodology, but write original explanations, scenarios, simulations, and visual assets.
+- Narrowed the previous broad `Context Engineering Lab` candidate into a more testable **Context Compression Lab**.
+- Defined the Content MVP capstone as a **Reliable Support Agent Build** combining retrieval, bounded execution, approval, evaluation, and cost/latency constraints.
+- Added `docs/EVALUATION_FAILURE_LAB.md` as the approved product and deterministic simulation specification for the next Production Lab.
+- Reframed the Evaluation Lab around a broken evaluation process: aggregate score improvement can hide safety-critical and long-horizon regressions.
+- Defined Evaluation Failure controls for dataset composition, pass threshold, safety veto, sample size, judge mode, and cost gate, with `SHIP / BLOCK / INCONCLUSIVE` as release-decision outcomes.
+- Explicitly deferred real LLM judges, benchmark ingestion, accounts, persistence, and billing from the first Evaluation Failure implementation.
+
 ## Content MVP — Agent Reliability Lab — 2026-08-12
 
 - Added `/en/labs/agent-reliability/` as the second Production Lab preview.

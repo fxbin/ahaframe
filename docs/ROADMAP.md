@@ -24,6 +24,11 @@ Architecture principle:
 
 > **Simulate the concept. Spend compute only to validate reality.**
 
+Curriculum source of truth:
+
+- `docs/CURRICULUM.md` — track map, prerequisites, candidate Labs, free/paid boundary, source-reference policy.
+- `docs/EVALUATION_FAILURE_LAB.md` — approved design target for the next Production Lab.
+
 ## Phase 0 — Foundation complete
 
 Status: complete
@@ -37,22 +42,68 @@ Status: complete
 - history / checkpoint / compare / replay
 - CI and validation
 - pricing hypothesis reset to `$49 one-time Foundations` + future `$12/month Production Labs`
+- RAG Failure Lab
+- Agent Reliability Lab
 
-## Phase 1 — Content MVP
+## Phase 1 — Curriculum v1 + Content MVP
 
 Status: current
 
 The goal is not a large course catalog. The goal is a coherent 60–120 minute journey that proves the AhaFrame method before broad external promotion.
 
-### Production Labs
+### Curriculum v1 — complete
+
+AhaFrame now uses two external projects as research references without turning them into runtime or content dependencies:
 
 ```text
-RAG Failure Lab            done
-Agent Reliability Lab      done
-Evaluation Lab             next
-Context Engineering Lab    next
-Build Challenge            next
+AI Engineering from Scratch
+        ↓
+broad AI-engineering dependency map
+
+AI Agent Book
+        ↓
+Agent / Evaluation engineering depth
+
+        ↓
+AhaFrame original treatment
+
+SEE → PLAY → BREAK → AHA → BUILD
 ```
+
+The mapping is documented in `docs/CURRICULUM.md`.
+
+The eight curriculum tracks are:
+
+```text
+01 LLM Mental Models
+02 Context & Retrieval
+03 Tools & Protocols
+04 Agent Engineering
+05 Evaluation & Reliability
+06 Production AI
+07 Multi-Agent Systems
+08 Build Systems
+```
+
+Do not implement every mapped topic. The map exists to prevent curriculum drift and identify the highest-value failure simulations.
+
+### Content MVP stop line
+
+```text
+RAG Failure Lab                 done
+Agent Reliability Lab           done
+Evaluation Failure Lab          next
+Context Compression Lab         next
+Reliable Support Agent Build    next
+```
+
+Optional bridge if user testing or the Build Challenge reveals a missing tools concept:
+
+```text
+Tool Contract Failure Lab       optional
+```
+
+It must not delay Soft Alpha by default.
 
 ### RAG Failure Lab
 
@@ -81,57 +132,115 @@ Pressure-tests agent control-policy decisions:
 
 The scenario intentionally demonstrates that an agent can have a reasonable completion rate while still being operationally unsafe or expensive.
 
-### Evaluation Lab — next
+### Evaluation Failure Lab — next
 
 Primary product question:
 
-> How do you prove that a new RAG or agent configuration is actually better across representative cases instead of one happy-path demo?
+> **How do you know a new AI-system version is actually better, rather than merely better on an aggregate score or a convenient demo set?**
 
-Candidate controls / concepts:
+The learner starts from an apparently strong candidate:
 
 ```text
-Evaluation set composition
+System A overall: 82
+System B overall: 88
+Suggested decision: SHIP B
+```
+
+Then changes the evaluation policy and discovers hidden long-horizon and safety-critical regressions.
+
+Initial controls:
+
+```text
+Dataset preset
 Pass threshold
-Exact / semantic / rubric judging
-Regression budget
-Failure slices
-Cost / latency constraints
+Safety veto
+Sample size
+Judge mode
+Cost gate
 ```
 
-The Lab should compare two system versions and surface where aggregate scores hide regressions.
-
-### Context Engineering Lab — next
-
-Unify context budget decisions across:
+Derived signals:
 
 ```text
-Compression
-Retrieval
-Memory
-Chunking
-Context allocation
+Aggregate score
+Slice regressions
+Critical regression count
+Confidence width
+Judge noise
+Eval cost
+Cost per success
+SHIP / BLOCK / INCONCLUSIVE
 ```
 
-The learner should see how optimizing one budget dimension changes retrieval quality, latency, and information loss elsewhere.
+The full deterministic scenario contract is specified in `docs/EVALUATION_FAILURE_LAB.md`.
 
-### Build Challenge — next
+The key teaching outcome is not metric vocabulary. It is understanding that **evaluation itself can fail**.
 
-The first Build Challenge should connect the Production Labs into an architecture decision rather than add another isolated concept page.
+### Context Compression Lab — after Evaluation
 
-Candidate challenge:
+Narrow the previously broad “Context Engineering Lab” into a concrete trade-off:
 
-> Design a support agent with RAG, bounded execution, evaluation gates, and an irreversible-action approval boundary under a fixed latency/cost budget.
+```text
+Original context
+      ↓
+Compression / retrieval / summary policy
+      ↓
+Token budget ↓
+Latency / cost ↓
+Information loss ?
+Task quality ?
+```
+
+Candidate controls:
+
+```text
+Compression ratio
+Summary depth
+Retrieval budget
+Memory allocation
+Protected instructions / facts
+```
+
+The learner should discover that reducing context cost can silently remove task-critical information.
+
+### Reliable Support Agent Build — Content MVP capstone
+
+Connect the existing Labs into one architecture decision:
+
+> Design a customer-support agent with RAG, bounded execution, evaluation gates, and approval before irreversible actions under fixed cost and latency budgets.
+
+The challenge should require explicit trade-offs rather than boilerplate code copying.
+
+Candidate inputs:
+
+```text
+Context budget
+Retrieval configuration
+Tool retry policy
+Approval boundary
+Evaluation policy
+Cost / latency budget
+```
+
+Candidate output:
+
+```text
+Architecture decision
+Trade-off explanation
+Release gate
+```
 
 ## Phase 2 — UX review + Soft Alpha
 
 Only after the Content MVP stop line is complete:
 
 1. review all English copy and technical claims;
-2. verify the cross-Lab learning path and navigation;
-3. deploy the reviewed build to `ahaframe.com`;
-4. connect real analytics and waitlist storage;
-5. invite approximately **20–50 software developers** for a Soft Alpha;
-6. observe where users stop, what they tune, which Labs create the strongest “aha,” and whether paid-capability intent appears.
+2. verify the dependency path and cross-Lab navigation;
+3. verify synthetic metrics are clearly labeled and internally coherent;
+4. deploy the reviewed build to `ahaframe.com`;
+5. connect real analytics and waitlist storage;
+6. invite approximately **20–50 software developers** for a Soft Alpha;
+7. observe where users stop, what they tune, which Labs create the strongest “aha,” and whether paid-capability intent appears.
 
 This is not a broad Product Hunt / Hacker News / Reddit launch yet.
 
@@ -188,24 +297,9 @@ Only after behavior supports the hypothesis:
 - include failure simulations and meaningful Build Projects;
 - test the `$49 one-time` offer with actual payment, not only intent clicks.
 
-Candidate larger Foundations sequence:
+The larger candidate backlog is maintained in `docs/CURRICULUM.md` rather than duplicated here.
 
-```text
-Token Prediction
-Context Window
-RAG Failure
-Agent Reliability
-Evaluation
-Context Engineering
-Embeddings / Retrieval
-Reranking
-Tool Contracts
-Tracing / Observability
-Cost + Latency
-Model Routing / Caching
-```
-
-The exact count follows user behavior rather than a fixed curriculum promise.
+The exact Foundations count should follow observed user behavior rather than a fixed curriculum promise.
 
 ## Phase 5 — Live Mode
 
@@ -257,6 +351,6 @@ The next feature should answer a product question, not merely make the platform 
 
 Current question:
 
-> Can AhaFrame teach production AI reliability by making developers tune a failing system and observe explicit trade-offs faster than another tutorial can?
+> **Can AhaFrame make a developer discover that an evaluation process is giving a false release signal—and understand how to repair the decision policy—faster than a tutorial can?**
 
-RAG Failure and Agent Reliability are the first two complementary tests. Evaluation Lab is the next required piece of the Content MVP.
+Evaluation Failure Lab is the next required Content MVP test.
