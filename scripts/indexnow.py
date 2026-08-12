@@ -3,10 +3,10 @@
 Workflow:
   1. Build/deploy with INDEXNOW_KEY set so /{key}.txt is published.
   2. Verify the deployed key file is publicly reachable.
-  3. Run this script with the same INDEXNOW_KEY and production SEEAI_BASE_URL.
+  3. Run this script with the same INDEXNOW_KEY and production AHAFRAME_BASE_URL.
 
 Usage:
-  INDEXNOW_KEY=... SEEAI_BASE_URL=https://example.com python3 scripts/indexnow.py
+  INDEXNOW_KEY=... AHAFRAME_BASE_URL=https://ahaframe.com python3 scripts/indexnow.py
 """
 from pathlib import Path
 from urllib.parse import urlparse
@@ -17,17 +17,17 @@ import urllib.request
 import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[1]
-BASE = os.environ.get("SEEAI_BASE_URL", "").rstrip("/")
+BASE = os.environ.get("AHAFRAME_BASE_URL", "").rstrip("/")
 KEY = os.environ.get("INDEXNOW_KEY", "")
 
 if not BASE or not KEY:
-    raise SystemExit("Set SEEAI_BASE_URL and INDEXNOW_KEY first.")
+    raise SystemExit("Set AHAFRAME_BASE_URL and INDEXNOW_KEY first.")
 if not re.fullmatch(r"[A-Za-z0-9-]{8,128}", KEY):
     raise SystemExit("INDEXNOW_KEY must be 8–128 characters using letters, digits, or hyphens.")
 
 parsed = urlparse(BASE)
 if parsed.scheme not in {"http", "https"} or not parsed.netloc or parsed.path not in {"", "/"}:
-    raise SystemExit("SEEAI_BASE_URL must be an origin such as https://example.com (no path).")
+    raise SystemExit("AHAFRAME_BASE_URL must be an origin such as https://ahaframe.com (no path).")
 
 sitemap = ROOT / "site" / "sitemap.xml"
 if not sitemap.exists():
@@ -37,7 +37,7 @@ root = ET.parse(sitemap).getroot()
 ns = {"s": "http://www.sitemaps.org/schemas/sitemap/0.9"}
 urls = [x.text for x in root.findall("s:url/s:loc", ns) if x.text]
 if not urls or any(urlparse(url).netloc != parsed.netloc for url in urls):
-    raise SystemExit("Sitemap URLs do not match SEEAI_BASE_URL.")
+    raise SystemExit("Sitemap URLs do not match AHAFRAME_BASE_URL.")
 
 key_url = f"{BASE}/{KEY}.txt"
 try:
