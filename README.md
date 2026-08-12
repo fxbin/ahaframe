@@ -1,4 +1,4 @@
-# AhaFrame v0.3 Validation
+# AhaFrame v0.3 Content MVP
 
 AhaFrame is an English-first **Interactive AI Engineering Lab** for software developers moving toward AI engineering.
 
@@ -34,9 +34,12 @@ Core architecture principle:
 - Context Window Lab
 - Agent Loop Simulator
 
-### Production Lab preview
+### Production Lab previews
 
 - **RAG Failure Lab** — start from a broken retrieval configuration and tune chunk size, overlap, Top-K, retrieval strategy, and reranking while watching recall, precision, context pressure, latency, cost index, and answer-quality score.
+- **Agent Reliability Lab** — start from a weak customer-support agent control policy and tune max steps, retry limits, timeouts, result validation, human approval, and termination while watching success, runaway risk, unsafe-action risk, latency, cost, and review load.
+
+Both labs use synthetic deterministic metrics for teaching. They are not presented as benchmark measurements from live model, retrieval, tool, or human-review systems.
 
 ### Pricing validation
 
@@ -47,6 +50,24 @@ Production Labs            $12/month future hypothesis
 ```
 
 No payment is collected yet. The pricing page records intent only.
+
+## Content MVP stop line
+
+AhaFrame is not launching broadly yet. The current closed-development target is a small coherent content path rather than a large course catalog:
+
+```text
+RAG Failure Lab            done
+Agent Reliability Lab      done
+Evaluation Lab             next
+Context Engineering Lab    next
+Build Challenge            next
+        ↓
+UX / content review
+        ↓
+Soft Alpha with 20–50 developers
+```
+
+Authentication, payment, Live Mode, and sandbox infrastructure stay behind this content-validation work unless a concrete feature requires them.
 
 ## Lab / Simulation Engine
 
@@ -83,6 +104,7 @@ Registered scenarios:
 token-playground
 context-window
 rag-failure
+agent-reliability
 agent-loop
 ```
 
@@ -97,6 +119,7 @@ See `docs/LAB_ENGINE.md` for the engine contract and `docs/ROADMAP.md` for the d
     ├── /lessons/context-window/
     ├── /lessons/agent-loop/
     ├── /labs/rag-failure/
+    ├── /labs/agent-reliability/
     ├── /pricing/
     └── /early-access/
 ```
@@ -104,19 +127,21 @@ See `docs/LAB_ENGINE.md` for the engine contract and `docs/ROADMAP.md` for the d
 ## Source architecture
 
 ```text
-content/                   English content model
-src/assets/                browser JavaScript + favicon
-  lab-engine.js            generic deterministic Lab runtime
-  lab-scenarios.js         scenario definitions
-  rag.js                   RAG Failure Lab DOM adapter
-src/styles/                CSS modules
-scripts/ahaframe/          page-specific static-site build modules
-  rag.py                   RAG Failure Lab page builder
-scripts/build_site.py      build entrypoint
-scripts/test_lab_engine.js Lab Engine behavioral regression suite
-docs/LAB_ENGINE.md         Lab Engine architecture contract
-docs/ROADMAP.md            product / auth / Live Mode roadmap
-site/                      generated output (ignored)
+content/                          English content model
+src/assets/                       browser JavaScript + favicon
+  lab-engine.js                   generic deterministic Lab runtime
+  lab-scenarios.js                scenario definitions
+  rag.js                          RAG Failure Lab DOM adapter
+  agent-reliability.js            Agent Reliability Lab DOM adapter
+src/styles/                       CSS modules
+scripts/ahaframe/                 page-specific static-site build modules
+  rag.py                          RAG Failure Lab page builder
+  agent_reliability.py            Agent Reliability Lab page builder
+scripts/build_site.py             build entrypoint
+scripts/test_lab_engine.js        Lab Engine behavioral regression suite
+docs/LAB_ENGINE.md                Lab Engine architecture contract
+docs/ROADMAP.md                   content / auth / Live Mode roadmap
+site/                             generated output (ignored)
 ```
 
 ## Run locally
@@ -170,7 +195,9 @@ tool_error_simulated
 rag_parameter_changed
 rag_balanced_preset_applied
 rag_failure_baseline_reset
-rag_paid_intent_click
+agent_reliability_parameter_changed
+agent_reliability_preset_applied
+agent_reliability_baseline_reset
 pricing_foundations_click
 pricing_pro_click
 waitlist_submit
@@ -180,7 +207,7 @@ The Lab Engine keeps engine-level analytics opt-in so high-frequency state actio
 
 ## Authentication policy
 
-No account is required for public v0.3 learning.
+No account is required for public content-MVP learning.
 
 Authentication should be introduced when it enables durable value such as:
 
@@ -208,7 +235,7 @@ Validation covers:
 - accessibility basics;
 - sitemap accuracy;
 - Lab Engine asset order;
-- Token / Context / RAG / Agent behavioral invariants;
+- Token / Context / RAG / Agent Reliability / Agent Loop behavioral invariants;
 - JavaScript syntax;
 - deployment configuration.
 
@@ -225,7 +252,7 @@ Build command: python3 scripts/build_site.py
 Output directory: site
 ```
 
-## Intentional non-goals for v0.3
+## Intentional non-goals for the Content MVP
 
 - mandatory accounts;
 - billing;
