@@ -38,6 +38,16 @@ This repository is a static, dependency-light validation MVP. Version control co
 - Build Challenge after each lesson.
 - Pricing-intent tracking through `?intent=pro`, `?intent=founder`, etc.
 
+### Lab / Simulation Engine
+
+- Added a dependency-free client-side Lab Engine.
+- Migrated Token Playground, Context Window Lab, Agent Loop Simulator, and the homepage token demo onto shared scenario state machines.
+- Added reusable history, checkpoint, compare, replay, reset, and derived-metrics primitives.
+- Kept scenario logic independent from DOM rendering and server infrastructure.
+- Added behavioral regression tests for the engine and all three MVP scenarios.
+
+See `docs/LAB_ENGINE.md` for the architecture contract.
+
 ### SEO / generative-search readiness
 
 - Fully crawlable lesson content in HTML (not hidden behind JS or login).
@@ -70,13 +80,21 @@ The approved warm-white / graphite / teal system is documented in `docs/VISUAL_S
 ```text
 content/                  English content model
 src/assets/               browser JavaScript + favicon
+  lab-engine.js           generic deterministic Lab runtime
+  lab-scenarios.js        current scenario definitions
 src/styles/               base / marketing / lesson / responsive CSS modules
 scripts/ahaframe/         page-specific static-site build modules
 scripts/build_site.py     small orchestration entrypoint
+scripts/test_lab_engine.js Lab Engine behavioral regression suite
+docs/LAB_ENGINE.md        Lab Engine architecture contract
 site/                     generated output (ignored)
 ```
 
 The build concatenates the CSS modules into the public `/assets/styles.css` bundle and generates the OG image at build time, so generated binary/output files do not need to live in Git history.
+
+The current simulation principle is:
+
+> **Simulate the concept. Spend compute only to validate reality.**
 
 ## Run locally
 
@@ -146,6 +164,8 @@ pricing_founder_click
 waitlist_submit
 ```
 
+The Lab Engine keeps engine-level analytics opt-in so controls such as sliders do not automatically generate duplicate high-frequency events.
+
 ## Local progress
 
 Completed lessons are stored under:
@@ -192,6 +212,12 @@ python3 scripts/build_site.py
 python3 scripts/validate.py
 ```
 
+You can also run the Lab Engine tests directly:
+
+```bash
+node scripts/test_lab_engine.js
+```
+
 The validator checks:
 
 - exact route set
@@ -204,6 +230,8 @@ The validator checks:
 - explicit button types and duplicate IDs
 - sitemap accuracy
 - legacy blue/purple brand tokens
+- Lab Engine assets and script load order
+- Lab Engine behavioral regression suite
 - JavaScript syntax
 - deployment configuration
 
