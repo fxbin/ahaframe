@@ -21,12 +21,14 @@ EXPECTED_HTML = {
     "en/lessons/token-playground/index.html",
     "en/lessons/context-window/index.html",
     "en/lessons/agent-loop/index.html",
+    "en/labs/rag-failure/index.html",
 }
 INTERACTIVE_HTML = {
     "en/index.html",
     "en/lessons/token-playground/index.html",
     "en/lessons/context-window/index.html",
     "en/lessons/agent-loop/index.html",
+    "en/labs/rag-failure/index.html",
 }
 errors: list[str] = []
 
@@ -101,6 +103,24 @@ for file in html_files:
         if not soup.select_one("[data-complete-lesson]"):
             errors.append(f"{rel}: missing completion control")
 
+    if rel.startswith("en/labs/"):
+        h1 = soup.find_all("h1")
+        if len(h1) != 1:
+            errors.append(f"{rel}: expected one H1, found {len(h1)}")
+        if len(soup.get_text(" ", strip=True).split()) < 300:
+            errors.append(f"{rel}: production lab textual content too thin")
+        ld_text = " ".join(
+            node.get_text() for node in soup.find_all("script", attrs={"type": "application/ld+json"})
+        )
+        if "LearningResource" not in ld_text:
+            errors.append(f"{rel}: missing LearningResource semantic schema")
+        if not soup.select_one(".quick-answer"):
+            errors.append(f"{rel}: missing answer-first block")
+        if not soup.select_one("[data-share]"):
+            errors.append(f"{rel}: missing share control")
+        if rel == "en/labs/rag-failure/index.html" and not soup.select_one("[data-rag-lab]"):
+            errors.append(f"{rel}: missing RAG Lab mount point")
+
     for anchor in soup.find_all("a", href=True):
         href = anchor["href"]
         if href.startswith("/") and not href.startswith("//"):
@@ -115,7 +135,6 @@ for file in html_files:
             if not target.exists():
                 errors.append(f"{rel}: broken link {href}")
 
-# Sitemap: Google uses accurate lastmod but ignores changefreq and priority.
 try:
     sitemap_text = (SITE / "sitemap.xml").read_text(encoding="utf-8")
     if "<changefreq>" in sitemap_text or "<priority>" in sitemap_text:
@@ -124,8 +143,10 @@ try:
     ns = {"s": "http://www.sitemaps.org/schemas/sitemap/0.9"}
     locs = [node.text for node in root.findall("s:url/s:loc", ns)]
     lastmods = [node.text for node in root.findall("s:url/s:lastmod", ns)]
-    if len(locs) != 6:
-        errors.append(f"sitemap: expected 6 URLs, got {len(locs)}")
+    if len(locs) != 7:
+        errors.append(f"sitemap: expected 7 URLs, got {len(locs)}")
+    if not any((value or "").endswith("/en/labs/rag-failure/") for value in locs):
+        errors.append("sitemap: missing RAG Failure Lab URL")
     if len(lastmods) != len(locs) or any(value != CONTENT["meta"]["updated"] for value in lastmods):
         errors.append("sitemap: lastmod must match the explicit content update date")
 except Exception as exc:
@@ -135,9 +156,9 @@ css = (SITE / "assets/styles.css").read_text(encoding="utf-8").lower()
 if "#4f46e5" in css or "#6d38f7" in css:
     errors.append("legacy blue-purple brand colors remain in CSS")
 
-for required in ["lab-engine.js", "lab-scenarios.js"]:
+for required in ["lab-engine.js", "lab-scenarios.js", "rag.js"]:
     if not (SITE / "assets" / required).exists():
-        errors.append(f"assets/{required}: missing generated Lab Engine asset")
+        errors.append(f"assets/{required}: missing generated Lab asset")
 
 for js in sorted((SITE / "assets").glob("*.js")):
     result = subprocess.run(["node", "--check", str(js)], capture_output=True, text=True)
@@ -150,7 +171,6 @@ lab_test = subprocess.run(
 if lab_test.returncode:
     errors.append(f"Lab Engine behavioral tests failed\n{lab_test.stdout}\n{lab_test.stderr}")
 
-# Deployment config must build from source and emit site/ rather than committing generated output.
 try:
     vercel = json.loads((ROOT / "vercel.json").read_text(encoding="utf-8"))
     if vercel.get("outputDirectory") != "site":
@@ -165,6 +185,6 @@ if errors:
     sys.exit(1)
 
 print(
-    f"PASS v0.2: {len(html_files)} HTML pages; routes, links, metadata, JSON-LD, "
-    "accessibility basics, sitemap, theme, Lab Engine, JS and deployment config validated."
+    f"PASS v0.3: {len(html_files)} HTML pages; routes, links, metadata, JSON-LD, "
+    "accessibility basics, sitemap, theme, Lab Engine, RAG Failure Lab, JS and deployment config validated."
 )
