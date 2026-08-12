@@ -6,14 +6,14 @@ ROOT=Path(__file__).resolve().parents[2]
 SRC=ROOT/'src'
 SITE=ROOT/'site'
 CONTENT=json.loads((ROOT/'content/en.json').read_text(encoding='utf-8'))
-BASE=os.environ.get('SEEAI_BASE_URL','http://localhost:8080').rstrip('/')
-UPDATED=os.environ.get('SEEAI_UPDATED',CONTENT.get('meta',{}).get('updated','2026-08-12'))
+BASE=os.environ.get('AHAFRAME_BASE_URL','http://localhost:8080').rstrip('/')
+UPDATED=os.environ.get('AHAFRAME_UPDATED',CONTENT.get('meta',{}).get('updated','2026-08-12'))
 
 parsed_base=urlparse(BASE)
 if parsed_base.scheme not in {'http','https'} or not parsed_base.netloc or parsed_base.path not in {'','/'}:
-    raise SystemExit('SEEAI_BASE_URL must be an origin such as https://example.com (no path).')
+    raise SystemExit('AHAFRAME_BASE_URL must be an origin such as https://example.com (no path).')
 if not re.fullmatch(r'\d{4}-\d{2}-\d{2}',UPDATED):
-    raise SystemExit('SEEAI_UPDATED must use YYYY-MM-DD.')
+    raise SystemExit('AHAFRAME_UPDATED must use YYYY-MM-DD.')
 IS_LOCAL=parsed_base.hostname in {'localhost','127.0.0.1'}
 
 # site/ is build output only. Recreate it to prevent stale pages or assets from surviving a build.
@@ -26,14 +26,14 @@ styles = ROOT/'src'/'styles'
 css = ''.join((styles/name).read_text(encoding='utf-8') for name in ['base.css','marketing.css','lessons.css','responsive.css'])
 (SITE/'assets'/'styles.css').write_text(css, encoding='utf-8')
 from generate_og import generate_og
-generate_og(SITE/'assets'/'og-seeai.png')
+generate_og(SITE/'assets'/'og-ahaframe.png')
 
 # Public runtime configuration. Endpoint URLs are intentionally build-time values, never secrets.
 runtime_config={
-    'waitlistEndpoint':os.environ.get('SEEAI_WAITLIST_ENDPOINT',''),
-    'analyticsEndpoint':os.environ.get('SEEAI_ANALYTICS_ENDPOINT',''),
+    'waitlistEndpoint':os.environ.get('AHAFRAME_WAITLIST_ENDPOINT',''),
+    'analyticsEndpoint':os.environ.get('AHAFRAME_ANALYTICS_ENDPOINT',''),
 }
-(SITE/'assets/config.js').write_text('window.SEEAI_CONFIG = '+json.dumps(runtime_config,separators=(',',':'))+';\n',encoding='utf-8')
+(SITE/'assets/config.js').write_text('window.AHAFRAME_CONFIG = '+json.dumps(runtime_config,separators=(',',':'))+';\n',encoding='utf-8')
 
 def logo():
     return '''<span class="logo" aria-hidden="true"><svg viewBox="0 0 40 40" fill="none"><path d="M20 4.5 33 12v16L20 35.5 7 28V12L20 4.5Z" stroke="currentColor" stroke-width="4.2" stroke-linejoin="round"/></svg></span>'''
@@ -41,10 +41,10 @@ def logo():
 def header(active=''):
     def cls(n): return 'active' if n==active else ''
     links=f'''<a class="{cls('Lessons')}" href="/en/#lessons">Lessons</a><a class="{cls('Roadmap')}" href="/en/#roadmap">Roadmap</a><a class="{cls('Pricing')}" href="/en/pricing/">Pricing</a><a class="{cls('About')}" href="/en/#about">About</a>'''
-    return f'''<header class="site-header"><div class="container nav"><a class="brand" href="/en/" aria-label="SeeAI home">{logo()}<span>SeeAI</span></a><nav class="nav-links" aria-label="Primary">{links}</nav><div class="nav-actions"><a class="btn primary" data-event="header_early_access" href="/en/early-access/">Join Early Access</a></div><details class="mobile-nav"><summary class="btn small" aria-label="Open navigation">Menu</summary><div class="mobile-panel">{links}<a href="/en/early-access/">Join Early Access</a></div></details></div></header>'''
+    return f'''<header class="site-header"><div class="container nav"><a class="brand" href="/en/" aria-label="AhaFrame home">{logo()}<span>AhaFrame</span></a><nav class="nav-links" aria-label="Primary">{links}</nav><div class="nav-actions"><a class="btn primary" data-event="header_early_access" href="/en/early-access/">Join Early Access</a></div><details class="mobile-nav"><summary class="btn small" aria-label="Open navigation">Menu</summary><div class="mobile-panel">{links}<a href="/en/early-access/">Join Early Access</a></div></details></div></header>'''
 
 def footer():
-    return '''<footer class="footer"><div class="container footer-grid"><div>© 2026 SeeAI · Interactive visual learning for AI engineering.</div><div class="footer-links"><a href="/sitemap.xml">Sitemap</a><a href="/en/#about">About</a><a href="/en/early-access/">Early Access</a></div></div></footer>'''
+    return '''<footer class="footer"><div class="container footer-grid"><div>© 2026 AhaFrame · Interactive visual learning for AI engineering.</div><div class="footer-links"><a href="/sitemap.xml">Sitemap</a><a href="/en/#about">About</a><a href="/en/early-access/">Early Access</a></div></div></footer>'''
 
 def jsonld(obj):
     return '<script type="application/ld+json">'+json.dumps(obj,ensure_ascii=False,separators=(',',':'))+'</script>'
@@ -53,8 +53,8 @@ def page(title,desc,path,body,active='',schemas=None,scripts='',robots=None):
     url=BASE+path
     if robots is None:
         robots='noindex,nofollow' if IS_LOCAL else 'index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1'
-    head=f'''<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{html.escape(title)}</title><meta name="description" content="{html.escape(desc,quote=True)}"><link rel="canonical" href="{url}"><link rel="alternate" hreflang="en" href="{url}"><link rel="alternate" hreflang="x-default" href="{url}"><meta name="robots" content="{robots}"><meta property="og:type" content="website"><meta property="og:site_name" content="SeeAI"><meta property="og:title" content="{html.escape(title,quote=True)}"><meta property="og:description" content="{html.escape(desc,quote=True)}"><meta property="og:url" content="{url}"><meta property="og:image" content="{BASE}/assets/og-seeai.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="SeeAI — interactive visual learning for AI engineering"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="{html.escape(title,quote=True)}"><meta name="twitter:description" content="{html.escape(desc,quote=True)}"><meta name="twitter:image" content="{BASE}/assets/og-seeai.png"><meta name="theme-color" content="#fbfbf8"><link rel="icon" href="/assets/favicon.svg"><link rel="manifest" href="/manifest.webmanifest"><link rel="stylesheet" href="/assets/styles.css">'''
-    base_schema={'@context':'https://schema.org','@type':'Organization','@id':BASE+'/#organization','name':'SeeAI','url':BASE,'description':'Interactive visual lessons for understanding and building AI systems.'}
+    head=f'''<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{html.escape(title)}</title><meta name="description" content="{html.escape(desc,quote=True)}"><link rel="canonical" href="{url}"><link rel="alternate" hreflang="en" href="{url}"><link rel="alternate" hreflang="x-default" href="{url}"><meta name="robots" content="{robots}"><meta property="og:type" content="website"><meta property="og:site_name" content="AhaFrame"><meta property="og:title" content="{html.escape(title,quote=True)}"><meta property="og:description" content="{html.escape(desc,quote=True)}"><meta property="og:url" content="{url}"><meta property="og:image" content="{BASE}/assets/og-ahaframe.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="AhaFrame — interactive visual learning for AI engineering"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="{html.escape(title,quote=True)}"><meta name="twitter:description" content="{html.escape(desc,quote=True)}"><meta name="twitter:image" content="{BASE}/assets/og-ahaframe.png"><meta name="theme-color" content="#fbfbf8"><link rel="icon" href="/assets/favicon.svg"><link rel="manifest" href="/manifest.webmanifest"><link rel="stylesheet" href="/assets/styles.css">'''
+    base_schema={'@context':'https://schema.org','@type':'Organization','@id':BASE+'/#organization','name':'AhaFrame','url':BASE,'description':'Interactive visual lessons for understanding and building AI systems.'}
     head+=jsonld(base_schema)
     for s in schemas or []: head+=jsonld(s)
     return f'''<!doctype html><html lang="en"><head>{head}</head><body>{header(active)}<main>{body}</main>{footer()}<script src="/assets/config.js" defer></script><script src="/assets/app.js" defer></script>{scripts}</body></html>'''
