@@ -1,24 +1,22 @@
-# AhaFrame Product Spec — v0.2 Validation MVP
+# AhaFrame Product Spec — v0.3 Validation
 
 Date: 2026-08-12
 
 ## Product thesis
 
-AhaFrame is an English-first interactive visual learning product for software developers moving toward AI engineering.
+AhaFrame is an English-first **Interactive AI Engineering Lab** for software developers moving toward AI engineering.
 
 > **Understand AI by seeing it work.**
 
-The MVP tests whether developers prefer learning abstract AI concepts through deterministic visual simulations rather than passive explanation alone.
+The product tests whether developers can build stronger engineering intuition by manipulating deterministic simulations, breaking systems, comparing configurations, and then applying the resulting mental model to production decisions.
 
 ## Brand system
 
 - **Brand:** AhaFrame
 - **Primary domain:** `https://ahaframe.com`
-- **Category:** Interactive AI Learning
-- **Positioning:** Visual learning for AI engineers
+- **Category:** Interactive AI Engineering
+- **Positioning:** Interactive labs for developers becoming AI engineers
 - **Primary slogan:** **Understand AI by seeing it work.**
-
-The name expresses the product promise: frame a complex technical system clearly enough for the learner to reach an “aha” moment and carry that mental model into real engineering work.
 
 ## Primary audience
 
@@ -28,31 +26,33 @@ The name expresses the product promise: frame a complex technical system clearly
 
 ## Learning model
 
-Every lesson follows:
+The product ladder is:
 
 ```text
-SEE → PLAY → AHA → BUILD
+SEE → PLAY → BREAK → AHA → BUILD
 ```
 
-- **See** — visualize a hidden AI-system behavior;
-- **Play** — change a meaningful parameter or state;
-- **Aha** — connect cause and effect until the concept clicks as a durable mental model;
-- **Build** — apply that mental model to an engineering decision or challenge.
+- **See** — visualize hidden AI-system behavior;
+- **Play** — change meaningful parameters or state;
+- **Break** — expose failure modes intentionally;
+- **Aha** — connect cause and effect into a durable mental model;
+- **Build** — apply the mental model to architecture, debugging, evaluation, and production trade-offs.
 
-## MVP routes
+## Public routes
 
 ```text
 /en/
 /en/lessons/token-playground/
 /en/lessons/context-window/
 /en/lessons/agent-loop/
+/en/labs/rag-failure/
 /en/pricing/
 /en/early-access/
 ```
 
 The root route redirects to `/en/`.
 
-## Lessons
+## Foundation lessons
 
 ### Token Playground
 
@@ -66,29 +66,94 @@ Teaches finite working context and the trade-offs between truncation, summarizat
 
 Teaches task interpretation, action selection, tool use, observation, retry/error recovery, and final response. Error simulation must never race with Reset or manual progression.
 
-## MVP conversion model
+## Production Lab preview
 
-The product does not charge users in v0.2. Pricing pages test intent only.
+### RAG Failure Lab
+
+The first lab designed specifically to pressure-test the generic Lab Engine and the paid-product thesis.
+
+The learner starts from a deliberately poor configuration and controls:
+
+```text
+Chunk Size
+Overlap
+Top-K
+Retrieval Strategy
+Reranker
+```
+
+The deterministic model derives:
+
+```text
+Recall
+Precision
+Context Usage
+Overflow
+Latency
+Cost Index
+Answer Quality Score
+Failure Diagnosis
+```
+
+The lab uses Engine checkpoints and comparison so the learner can compare the current configuration against the broken baseline.
+
+All metrics are educational synthetic values. They are not presented as benchmark results from a live embedding model, vector database, reranker, or LLM.
+
+## Pricing hypothesis
+
+The previous `$19/month Pro` and `$39/month Founding Member` concepts are retired for v0.3.
+
+The new validation offers are:
+
+```text
+Free                       $0
+AI Engineer Foundations    $49 one-time hypothesis
+Production Labs            $12/month future hypothesis
+```
+
+### Free boundary
+
+- core mental models;
+- foundational simulations;
+- public concept guides;
+- local progress;
+- rotating Production Lab previews.
+
+### Paid boundary
+
+- full failure simulations;
+- Production Labs;
+- build projects;
+- evaluation challenges;
+- later: saved cloud experiments and Live Mode capabilities.
+
+The MVP still collects no payment. Pricing clicks and waitlist intent are validation signals only.
+
+## Conversion model
 
 ```text
 Visitor
   ↓
-Start lesson
+Start free lesson / lab
   ↓
-Complete lesson
+Interact with parameters
   ↓
-Start another lesson
+Complete or improve scenario
   ↓
-View pricing / early access
+Start another lab
   ↓
-Waitlist intent
+View paid capability
+  ↓
+Select realistic pricing intent
+  ↓
+Waitlist
 ```
 
 If no production waitlist endpoint is configured, the UI must explicitly identify demo mode and must not claim that a remote signup succeeded.
 
 ## Technical strategy
 
-v0.2 deliberately uses a small static Python site generator with dependency-light browser JavaScript.
+The site remains a small static Python generator with dependency-light browser JavaScript.
 
 Principles:
 
@@ -99,15 +164,13 @@ Principles:
 - public conceptual content is available without JavaScript or authentication;
 - local builds fail closed for search indexing;
 - no API secrets are shipped client-side;
-- move to a component/template framework only when validation or content scale justifies the migration.
+- framework migration should be driven by product/content scale, not aesthetics.
 
-Build-time public configuration uses the `AHAFRAME_*` environment-variable namespace, including `AHAFRAME_BASE_URL`, `AHAFRAME_WAITLIST_ENDPOINT`, `AHAFRAME_ANALYTICS_ENDPOINT`, and `AHAFRAME_UPDATED`.
+Build-time public configuration uses the `AHAFRAME_*` environment-variable namespace.
 
-### Lab / Simulation Engine
+## Lab / Simulation Engine
 
-The three MVP interactions now share a generic deterministic Lab Engine instead of maintaining independent state machines.
-
-The engine contract is:
+The runtime contract is:
 
 ```text
 Scenario
@@ -123,7 +186,7 @@ Derived View / Metrics
 DOM Adapter
 ```
 
-Reusable runtime capabilities include:
+Reusable capabilities include:
 
 ```text
 History
@@ -134,9 +197,32 @@ Reset
 Failure Injection
 ```
 
-Scenario logic remains independent from DOM rendering and server infrastructure. This is the base abstraction for future RAG Failure, Agent Reliability, Evaluation, Model Routing, MCP Security, and other Production Labs.
+The registered deterministic scenarios are now:
+
+```text
+token-playground
+context-window
+rag-failure
+agent-loop
+```
 
 See `docs/LAB_ENGINE.md` for the architecture contract.
+
+## Authentication boundary
+
+Authentication is **not** required for v0.3 public learning.
+
+Do not introduce a login wall in front of lessons or simulations. Identity becomes justified when users need one of these durable capabilities:
+
+1. save experiment history/checkpoints across devices;
+2. own a paid entitlement;
+3. receive and meter Live Mode credits;
+4. submit Build Projects;
+5. persist learning progress beyond local browser storage.
+
+The intended UX is optional sign-in at the moment the learner chooses **Save / Purchase / Live Mode / Build Project**.
+
+See `docs/ROADMAP.md` for the phased account plan.
 
 ## Visual direction
 
@@ -150,11 +236,7 @@ Use warm white, graphite, and teal. Avoid generic blue-purple AI gradients, deco
 
 ## SEO / generative-search posture
 
-The canonical HTML page is the content source of truth. Lessons use stable URLs, crawlable explanations, answer-first definitions, semantically appropriate structured data, sitemap/robots, and explicit modification dates.
-
-The production origin is `https://ahaframe.com`. Local builds remain `noindex` by default unless an explicit non-local origin is supplied.
-
-See `docs/SEO_GEO.md` for the detailed policy.
+The canonical HTML page is the content source of truth. Lessons and public lab previews use stable URLs, crawlable explanations, answer-first definitions, semantic structured data, sitemap/robots, and explicit modification dates.
 
 ## Validation events
 
@@ -164,29 +246,41 @@ Core events include:
 lesson_started
 lesson_step_completed
 lesson_completed
-second_lesson_started
 interaction_slider_changed
 interaction_strategy_selected
 tool_error_simulated
+rag_parameter_changed
+rag_balanced_preset_applied
+rag_failure_baseline_reset
+rag_paid_intent_click
+pricing_foundations_click
 pricing_pro_click
-pricing_founder_click
 waitlist_submit
 ```
 
 The Lab Engine itself keeps analytics opt-in so high-frequency simulation actions do not automatically duplicate product events.
 
-## Intentional non-goals for v0.2
+## Intentional non-goals for v0.3
 
-- authentication and accounts;
-- billing;
-- real LLM inference;
+- mandatory authentication;
+- real billing;
+- real LLM/retrieval inference;
+- code sandbox;
 - full LMS/CMS/admin systems;
 - community;
 - certificates;
 - AI tutor;
-- multi-language UI beyond an i18n-ready content layout;
-- production waitlist/analytics vendor integration.
+- multi-language UI beyond an i18n-ready content layout.
 
-## Exit criteria for the validation phase
+## Exit criteria
 
-Do not expand into a full platform merely because the MVP is technically complete. Expansion should be justified by real behavior: lesson starts, completions, second-lesson rate, pricing intent, waitlist conversion, qualitative user feedback, and evidence that the interactive format improves understanding.
+Do not expand merely because the platform architecture can support more labs. Expansion should be justified by behavior:
+
+- lesson/lab start rate;
+- completion / successful-tuning rate;
+- second-lab rate;
+- RAG parameter interaction depth;
+- pricing intent;
+- waitlist conversion;
+- qualitative feedback that simulations improve understanding;
+- eventually, actual payment rather than only intent.
