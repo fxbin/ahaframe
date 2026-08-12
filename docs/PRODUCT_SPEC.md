@@ -93,6 +93,7 @@ v0.2 deliberately uses a small static Python site generator with dependency-ligh
 Principles:
 
 - simulation first, real model second;
+- **simulate the concept; spend compute only to validate reality**;
 - source and generated output are separate;
 - `site/` is disposable build output;
 - public conceptual content is available without JavaScript or authentication;
@@ -101,6 +102,41 @@ Principles:
 - move to a component/template framework only when validation or content scale justifies the migration.
 
 Build-time public configuration uses the `AHAFRAME_*` environment-variable namespace, including `AHAFRAME_BASE_URL`, `AHAFRAME_WAITLIST_ENDPOINT`, `AHAFRAME_ANALYTICS_ENDPOINT`, and `AHAFRAME_UPDATED`.
+
+### Lab / Simulation Engine
+
+The three MVP interactions now share a generic deterministic Lab Engine instead of maintaining independent state machines.
+
+The engine contract is:
+
+```text
+Scenario
+  ↓
+State
+  ↓
+Action
+  ↓
+Reducer
+  ↓
+Derived View / Metrics
+  ↓
+DOM Adapter
+```
+
+Reusable runtime capabilities include:
+
+```text
+History
+Checkpoint
+Compare
+Replay
+Reset
+Failure Injection
+```
+
+Scenario logic remains independent from DOM rendering and server infrastructure. This is the base abstraction for future RAG Failure, Agent Reliability, Evaluation, Model Routing, MCP Security, and other Production Labs.
+
+See `docs/LAB_ENGINE.md` for the architecture contract.
 
 ## Visual direction
 
@@ -136,6 +172,8 @@ pricing_pro_click
 pricing_founder_click
 waitlist_submit
 ```
+
+The Lab Engine itself keeps analytics opt-in so high-frequency simulation actions do not automatically duplicate product events.
 
 ## Intentional non-goals for v0.2
 

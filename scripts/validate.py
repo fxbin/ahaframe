@@ -22,6 +22,12 @@ EXPECTED_HTML = {
     "en/lessons/context-window/index.html",
     "en/lessons/agent-loop/index.html",
 }
+INTERACTIVE_HTML = {
+    "en/index.html",
+    "en/lessons/token-playground/index.html",
+    "en/lessons/context-window/index.html",
+    "en/lessons/agent-loop/index.html",
+}
 errors: list[str] = []
 
 if not SITE.exists():
@@ -65,6 +71,15 @@ for file in html_files:
             json.loads(script.string or script.get_text())
         except Exception as exc:
             errors.append(f"{rel}: invalid JSON-LD: {exc}")
+
+    if rel in INTERACTIVE_HTML:
+        scripts = [node.get("src") for node in soup.find_all("script", src=True)]
+        engine = "/assets/lab-engine.js"
+        scenarios = "/assets/lab-scenarios.js"
+        if engine not in scripts or scenarios not in scripts:
+            errors.append(f"{rel}: missing Lab Engine runtime")
+        elif scripts.index(engine) > scripts.index(scenarios):
+            errors.append(f"{rel}: lab-engine.js must load before lab-scenarios.js")
 
     if rel.startswith("en/lessons/"):
         h1 = soup.find_all("h1")
@@ -120,10 +135,20 @@ css = (SITE / "assets/styles.css").read_text(encoding="utf-8").lower()
 if "#4f46e5" in css or "#6d38f7" in css:
     errors.append("legacy blue-purple brand colors remain in CSS")
 
+for required in ["lab-engine.js", "lab-scenarios.js"]:
+    if not (SITE / "assets" / required).exists():
+        errors.append(f"assets/{required}: missing generated Lab Engine asset")
+
 for js in sorted((SITE / "assets").glob("*.js")):
     result = subprocess.run(["node", "--check", str(js)], capture_output=True, text=True)
     if result.returncode:
         errors.append(f"{js.relative_to(SITE)}: JS syntax error\n{result.stderr}")
+
+lab_test = subprocess.run(
+    ["node", str(ROOT / "scripts/test_lab_engine.js")], capture_output=True, text=True
+)
+if lab_test.returncode:
+    errors.append(f"Lab Engine behavioral tests failed\n{lab_test.stdout}\n{lab_test.stderr}")
 
 # Deployment config must build from source and emit site/ rather than committing generated output.
 try:
@@ -141,5 +166,5 @@ if errors:
 
 print(
     f"PASS v0.2: {len(html_files)} HTML pages; routes, links, metadata, JSON-LD, "
-    "accessibility basics, sitemap, theme, JS and deployment config validated."
+    "accessibility basics, sitemap, theme, Lab Engine, JS and deployment config validated."
 )

@@ -5,38 +5,26 @@
   const selected=document.querySelector('[data-hero-selected]');
   const sampling=document.querySelector('#hero-sampling');
   const rows=[...document.querySelectorAll('[data-hero-prob]')];
-  const candidates=[['Paris',3.0],['Lyon',0.6114269475],['located',0.3276013718],['other',0.8128043982]];
+  const lab=window.AhaFrame.createLab('token-playground');
 
-  function distribution(temperature){
-    if(temperature<=0.05)return [1,0,0];
-    const scaled=candidates.map(([,logit])=>logit/temperature);
-    const max=Math.max(...scaled);
-    const exp=scaled.map(x=>Math.exp(x-max));
-    const total=exp.reduce((a,b)=>a+b,0);
-    return exp.map(x=>x/total);
-  }
-
-  function render(){
-    const t=Number(slider.value);
-    out.textContent=t.toFixed(1);
-    const probs=distribution(t);
-    candidates.slice(0,rows.length).forEach(([label],i)=>{
+  lab.subscribe(({state,derived})=>{
+    out.textContent=state.temperature.toFixed(1);
+    derived.candidates.slice(0,rows.length).forEach(({token,probability},i)=>{
       const row=rows[i];
-      row.querySelector('[data-label]').textContent=label;
-      row.querySelector('[data-value]').textContent=Math.round(probs[i]*100)+'%';
-      row.querySelector('.bar span').style.width=Math.max(2,probs[i]*100)+'%';
+      row.querySelector('[data-label]').textContent=token;
+      row.querySelector('[data-value]').textContent=Math.round(probability*100)+'%';
+      row.querySelector('.bar span').style.width=Math.max(2,probability*100)+'%';
     });
-    const pick=sampling?.value==='greedy'?0:(t>1.15?1:0);
-    selected.textContent=candidates[pick][0];
-  }
+    selected.textContent=derived.selected.token;
+  });
 
   slider.addEventListener('input',()=>{
-    render();
-    window.AhaFrame?.track('hero_temperature_changed',{temperature:Number(slider.value)});
+    const temperature=Number(slider.value);
+    lab.dispatch('SET_TEMPERATURE',{value:temperature});
+    window.AhaFrame?.track('hero_temperature_changed',{temperature});
   });
   sampling?.addEventListener('change',()=>{
-    render();
+    lab.dispatch('SET_SAMPLING',{value:sampling.value});
     window.AhaFrame?.track('hero_sampling_changed',{strategy:sampling.value});
   });
-  render();
 })();

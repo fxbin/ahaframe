@@ -27,6 +27,8 @@ jobs:
             echo 'Legacy SeeAI branding remains in source.'
             exit 1
           fi
+      - name: Test Lab Engine
+        run: node scripts/test_lab_engine.js
       - name: Build static site
         env:
           AHAFRAME_BASE_URL: https://ahaframe.com

@@ -57,7 +57,7 @@ def page(title,desc,path,body,active='',schemas=None,scripts='',robots=None):
     base_schema={'@context':'https://schema.org','@type':'Organization','@id':BASE+'/#organization','name':'AhaFrame','url':BASE,'description':'Interactive visual lessons for understanding and building AI systems.'}
     head+=jsonld(base_schema)
     for s in schemas or []: head+=jsonld(s)
-    return f'''<!doctype html><html lang="en"><head>{head}</head><body>{header(active)}<main>{body}</main>{footer()}<script src="/assets/config.js" defer></script><script src="/assets/app.js" defer></script>{scripts}</body></html>'''
+    return f'''<!doctype html><html lang="en"><head>{head}</head><body>{header(active)}<main>{body}</main>{footer()}<script src="/assets/config.js" defer></script><script src="/assets/app.js" defer></script><script src="/assets/lab-engine.js" defer></script><script src="/assets/lab-scenarios.js" defer></script>{scripts}</body></html>'''
 
 def breadcrumb(items):
     return {'@context':'https://schema.org','@type':'BreadcrumbList','itemListElement':[{'@type':'ListItem','position':i+1,'name':name,'item':BASE+url} for i,(name,url) in enumerate(items)]}
