@@ -1,6 +1,53 @@
 (function(){
- const next=document.querySelector('[data-agent-next]');if(!next)return;const reset=document.querySelector('[data-agent-reset]'),err=document.querySelector('[data-agent-error]'),nodes=[...document.querySelectorAll('[data-agent-node]')],timeline=[...document.querySelectorAll('[data-time-step]')],status=document.querySelector('[data-agent-status]'),result=document.querySelector('[data-agent-result]');let step=0;let recoveryTimer=null;
- const labels=['The agent reads the user task and identifies missing information.','The agent selects the weather tool.','The weather tool is called with city = Tokyo.','Observation received: light rain, 18°C, humidity 92%.','The agent checks whether the observation is sufficient.','Final answer ready: bring an umbrella.'];
- function paint(){nodes.forEach((n,i)=>{n.classList.toggle('done',i<step);n.classList.toggle('active',i===step)});timeline.forEach((n,i)=>{n.classList.toggle('done',i<step);n.classList.toggle('active',i===step)});status.textContent=labels[Math.min(step,labels.length-1)];result.textContent=step>=5?'Bring an umbrella — light rain is expected in Tokyo.':'Waiting for final answer…'}
- next.addEventListener('click',()=>{if(recoveryTimer){clearTimeout(recoveryTimer);recoveryTimer=null}step=Math.min(step+1,5);paint();window.AhaFrame?.track('lesson_step_completed',{lesson:'agent-loop',step})});reset?.addEventListener('click',()=>{if(recoveryTimer){clearTimeout(recoveryTimer);recoveryTimer=null}step=0;paint()});err?.addEventListener('click',()=>{status.textContent='Tool error: Weather API timeout → observe failure → retry.';window.AhaFrame?.track('tool_error_simulated',{lesson:'agent-loop'});if(recoveryTimer)clearTimeout(recoveryTimer);recoveryTimer=setTimeout(()=>{step=2;recoveryTimer=null;paint()},1100)});paint();
+  const next=document.querySelector('[data-agent-next]');
+  if(!next)return;
+  const reset=document.querySelector('[data-agent-reset]');
+  const errorButton=document.querySelector('[data-agent-error]');
+  const nodes=[...document.querySelectorAll('[data-agent-node]')];
+  const timeline=[...document.querySelectorAll('[data-time-step]')];
+  const status=document.querySelector('[data-agent-status]');
+  const result=document.querySelector('[data-agent-result]');
+  const lab=window.AhaFrame.createLab('agent-loop');
+  let recoveryTimer=null;
+
+  function cancelRecovery(){
+    if(recoveryTimer){
+      clearTimeout(recoveryTimer);
+      recoveryTimer=null;
+    }
+  }
+
+  lab.subscribe(({state,derived})=>{
+    nodes.forEach((node,i)=>{
+      node.classList.toggle('done',i<state.step);
+      node.classList.toggle('active',i===state.step&&!state.failure);
+    });
+    timeline.forEach((item,i)=>{
+      item.classList.toggle('done',i<state.step);
+      item.classList.toggle('active',i===state.step&&!state.failure);
+    });
+    status.textContent=derived.status;
+    result.textContent=derived.result;
+  });
+
+  next.addEventListener('click',()=>{
+    cancelRecovery();
+    const frame=lab.dispatch('NEXT');
+    window.AhaFrame?.track('lesson_step_completed',{lesson:'agent-loop',step:frame.state.step});
+  });
+
+  reset?.addEventListener('click',()=>{
+    cancelRecovery();
+    lab.reset();
+  });
+
+  errorButton?.addEventListener('click',()=>{
+    cancelRecovery();
+    lab.dispatch('INJECT_TOOL_ERROR');
+    window.AhaFrame?.track('tool_error_simulated',{lesson:'agent-loop'});
+    recoveryTimer=setTimeout(()=>{
+      recoveryTimer=null;
+      lab.dispatch('RECOVER_TOOL_ERROR');
+    },1100);
+  });
 })();
