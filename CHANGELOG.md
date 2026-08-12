@@ -1,5 +1,19 @@
 # AhaFrame Changelog
 
+## Lab Engine v0.1 — 2026-08-12
+
+- Added a dependency-free generic Lab / Simulation Engine for deterministic interactive lessons.
+- Introduced a reusable `Scenario → State → Action → Reducer → Derived Metrics → Adapter` contract.
+- Added engine primitives for history, checkpoints, compare, replay, reset, subscriptions, and bounded action history.
+- Migrated the homepage Token demo and full Token Playground to the same shared Token scenario.
+- Migrated Context Window strategy state and arithmetic into a shared Context scenario.
+- Migrated Agent step, failure injection, and recovery state into a shared Agent scenario while preserving the existing stale-timer protection.
+- Kept analytics opt-in at the engine layer so existing semantic product events are not duplicated by high-frequency interactions.
+- Added `scripts/test_lab_engine.js` behavioral regression tests and wired them into CI and `scripts/validate.py`.
+- Added generated-page validation for Lab Engine asset presence and load order.
+- Added `docs/LAB_ENGINE.md` as the architecture source of truth for future Production Labs.
+- Locked the simulation principle: **Simulate the concept. Spend compute only to validate reality.**
+
 ## Brand migration — 2026-08-12
 
 - Renamed the product from **SeeAI** to **AhaFrame**.
