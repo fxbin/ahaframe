@@ -1,10 +1,19 @@
-# SeeAI MVP v0.2
+# AhaFrame MVP v0.2
 
-SeeAI is an English-first interactive visual learning product for AI engineering.
+AhaFrame is an English-first interactive visual learning product for AI engineering.
 
 > **Understand AI by seeing it work.**
 
 This repository is a static, dependency-light validation MVP. Version control contains source files only; `site/` is generated build output and is intentionally ignored. The project is optimized for fast launch, crawlable content, deterministic interactive simulations, and straightforward deployment to Vercel or Cloudflare Pages.
+
+## Brand
+
+- **Name:** AhaFrame
+- **Domain:** `https://ahaframe.com`
+- **Category:** Interactive AI Learning
+- **Positioning:** Visual learning for AI engineers
+- **Learning model:** `SEE → PLAY → AHA → BUILD`
+- **Primary slogan:** **Understand AI by seeing it work.**
 
 ## What changed in v0.2
 
@@ -12,8 +21,8 @@ This repository is a static, dependency-light validation MVP. Version control co
 
 - Replaced the original blue/purple AI-SaaS look with the approved **warm white + graphite + teal** system.
 - Removed large brand gradients and glow-heavy visual language.
-- New outline SeeAI logo and matching OG image.
-- Visual hierarchy is now closer to a technical learning product than a generic AI landing page.
+- New outline AhaFrame logo and matching OG image.
+- Visual hierarchy is closer to a technical learning product than a generic AI landing page.
 
 ### Product experience
 
@@ -25,7 +34,7 @@ This repository is a static, dependency-light validation MVP. Version control co
 - Local lesson completion and progress tracking using `localStorage`.
 - Share / copy-link action on lesson pages.
 - `In one sentence` answer-first blocks.
-- `See → Play → Build` learning model.
+- `See → Play → Aha → Build` learning model.
 - Build Challenge after each lesson.
 - Pricing-intent tracking through `?intent=pro`, `?intent=founder`, etc.
 
@@ -39,7 +48,6 @@ This repository is a static, dependency-light validation MVP. Version control co
 - Optional `llms.txt`, explicitly treated as non-essential.
 - Stable answer-first definitions, concept guides, FAQs, update timestamps, and simulation disclaimers.
 - Optional IndexNow submission script for post-deploy discovery.
-
 
 ## Design source of truth
 
@@ -60,12 +68,12 @@ The approved warm-white / graphite / teal system is documented in `docs/VISUAL_S
 ## Source architecture
 
 ```text
-content/               English content model
-src/assets/            browser JavaScript + favicon
-src/styles/            base / marketing / lesson / responsive CSS modules
-scripts/seeai/         page-specific static-site build modules
-scripts/build_site.py  small orchestration entrypoint
-site/                  generated output (ignored)
+content/                  English content model
+src/assets/               browser JavaScript + favicon
+src/styles/               base / marketing / lesson / responsive CSS modules
+scripts/ahaframe/         page-specific static-site build modules
+scripts/build_site.py     small orchestration entrypoint
+site/                     generated output (ignored)
 ```
 
 The build concatenates the CSS modules into the public `/assets/styles.css` bundle and generates the OG image at build time, so generated binary/output files do not need to live in Git history.
@@ -73,7 +81,6 @@ The build concatenates the CSS modules into the public `/assets/styles.css` bund
 ## Run locally
 
 ```bash
-cd seeai-mvp-v0.2
 python3 scripts/build_site.py
 python3 -m http.server 8080 --directory site
 ```
@@ -84,24 +91,24 @@ Then open:
 http://localhost:8080/en/
 ```
 
-## Build for a real domain
+## Build for AhaFrame.com
 
-Local builds default to `http://localhost:8080` and intentionally emit `noindex` safeguards. Before production launch, always provide the real public origin:
+Local builds default to `http://localhost:8080` and intentionally emit `noindex` safeguards. Before production launch, provide the real public origin:
 
 ```bash
-SEEAI_BASE_URL=https://your-domain.com python3 scripts/build_site.py
+AHAFRAME_BASE_URL=https://ahaframe.com python3 scripts/build_site.py
 ```
 
-This updates canonical URLs, JSON-LD URLs, sitemap URLs, robots.txt, and `llms.txt`. The content update date comes from `content/en.json` (`meta.updated`) unless `SEEAI_UPDATED=YYYY-MM-DD` is explicitly supplied.
+This updates canonical URLs, JSON-LD URLs, sitemap URLs, robots.txt, and `llms.txt`. The content update date comes from `content/en.json` (`meta.updated`) unless `AHAFRAME_UPDATED=YYYY-MM-DD` is explicitly supplied.
 
 ## Waitlist and analytics integration
 
 Runtime endpoint configuration is generated at build time. Configure public endpoint URLs through environment variables instead of editing generated files:
 
 ```bash
-SEEAI_WAITLIST_ENDPOINT=https://your-api.example.com/waitlist \
-SEEAI_ANALYTICS_ENDPOINT=https://your-api.example.com/events \
-SEEAI_BASE_URL=https://your-domain.com \
+AHAFRAME_WAITLIST_ENDPOINT=https://your-api.example.com/waitlist \
+AHAFRAME_ANALYTICS_ENDPOINT=https://your-api.example.com/events \
+AHAFRAME_BASE_URL=https://ahaframe.com \
 python3 scripts/build_site.py
 ```
 
@@ -144,7 +151,7 @@ waitlist_submit
 Completed lessons are stored under:
 
 ```text
-seeai_progress_v02
+ahaframe_progress_v02
 ```
 
 No account is required in the MVP.
@@ -207,12 +214,12 @@ IndexNow requires a publicly reachable verification key file. Build and deploy w
 ```bash
 # Build/deploy with the key so /{KEY}.txt exists publicly
 INDEXNOW_KEY=YOUR_KEY \
-SEEAI_BASE_URL=https://your-domain.com \
+AHAFRAME_BASE_URL=https://ahaframe.com \
 python3 scripts/build_site.py
 
 # After deployment, verify the key file and submit the sitemap URLs
 INDEXNOW_KEY=YOUR_KEY \
-SEEAI_BASE_URL=https://your-domain.com \
+AHAFRAME_BASE_URL=https://ahaframe.com \
 python3 scripts/indexnow.py
 ```
 
