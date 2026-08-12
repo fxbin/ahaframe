@@ -4,9 +4,7 @@ Date: 2026-08-12
 
 ## Product direction
 
-AhaFrame is moving from a generic interactive AI-learning site toward an **Interactive AI Engineering Lab** for experienced software developers becoming AI engineers.
-
-The product ladder is:
+AhaFrame is an **Interactive AI Engineering Lab** for experienced software developers becoming AI engineers.
 
 ```text
 AI Engineering Learning
@@ -22,7 +20,7 @@ Build Projects
 Paid capability
 ```
 
-The architecture principle remains:
+Architecture principle:
 
 > **Simulate the concept. Spend compute only to validate reality.**
 
@@ -38,75 +36,122 @@ Status: complete
 - generic Lab / Simulation Engine
 - history / checkpoint / compare / replay
 - CI and validation
+- pricing hypothesis reset to `$49 one-time Foundations` + future `$12/month Production Labs`
 
-## Phase 1 — v0.3 market + engine validation
+## Phase 1 — Content MVP
 
 Status: current
 
-### Product
+The goal is not a large course catalog. The goal is a coherent 60–120 minute journey that proves the AhaFrame method before broad external promotion.
 
-- ship **RAG Failure Lab** as the first Production Lab preview;
-- deliberately start from a broken RAG configuration;
-- expose chunk size, overlap, Top-K, retrieval strategy, and reranking;
-- visualize recall, precision, context pressure, latency, cost index, and answer-quality score;
-- use Lab Engine checkpoints and compare to show improvement against the broken baseline.
-
-### Pricing
-
-Replace the early `$19/month` + `$39/month` hypotheses with:
+### Production Labs
 
 ```text
-Free                       $0
-AI Engineer Foundations    $49 one-time hypothesis
-Production Labs            $12/month future hypothesis
+RAG Failure Lab            done
+Agent Reliability Lab      done
+Evaluation Lab             next
+Context Engineering Lab    next
+Build Challenge            next
 ```
 
-The paid boundary is capability, not access to basic explanations:
+### RAG Failure Lab
+
+Pressure-tests retrieval decisions:
+
+- chunk size;
+- overlap;
+- Top-K;
+- vector vs hybrid retrieval;
+- reranking;
+- recall / precision / context / latency / cost / answer quality;
+- broken-baseline checkpoint and compare.
+
+### Agent Reliability Lab
+
+Pressure-tests agent control-policy decisions:
+
+- max steps;
+- retry limits;
+- tool timeout;
+- result validation;
+- human approval before an irreversible action;
+- weak / bounded / goal-aware termination;
+- success, runaway risk, unsafe-action risk, latency, cost, review load;
+- unreliable-baseline checkpoint and compare.
+
+The scenario intentionally demonstrates that an agent can have a reasonable completion rate while still being operationally unsafe or expensive.
+
+### Evaluation Lab — next
+
+Primary product question:
+
+> How do you prove that a new RAG or agent configuration is actually better across representative cases instead of one happy-path demo?
+
+Candidate controls / concepts:
 
 ```text
-Free
-  mental models
-  foundational simulations
-  public guides
-  rotating Production Lab previews
-
-Paid
-  failure simulations
-  full Production Labs
-  build projects
-  evaluation challenges
-  later: saved cloud experiments / Live Mode
+Evaluation set composition
+Pass threshold
+Exact / semantic / rubric judging
+Regression budget
+Failure slices
+Cost / latency constraints
 ```
 
-No payment is collected in v0.3; pricing remains intent validation.
+The Lab should compare two system versions and surface where aggregate scores hide regressions.
 
-### Launch infrastructure
+### Context Engineering Lab — next
 
-Before expanding the curriculum aggressively:
+Unify context budget decisions across:
 
-- deploy to `ahaframe.com`;
-- connect a real waitlist endpoint;
-- connect product analytics;
-- measure lesson starts, completion, second-lab rate, RAG Lab usage, pricing intent, and waitlist conversion;
-- collect qualitative feedback from developer communities.
+```text
+Compression
+Retrieval
+Memory
+Chunking
+Context allocation
+```
 
-## Phase 2 — optional identity, not mandatory login
+The learner should see how optimizing one budget dimension changes retrieval quality, latency, and information loss elsewhere.
+
+### Build Challenge — next
+
+The first Build Challenge should connect the Production Labs into an architecture decision rather than add another isolated concept page.
+
+Candidate challenge:
+
+> Design a support agent with RAG, bounded execution, evaluation gates, and an irreversible-action approval boundary under a fixed latency/cost budget.
+
+## Phase 2 — UX review + Soft Alpha
+
+Only after the Content MVP stop line is complete:
+
+1. review all English copy and technical claims;
+2. verify the cross-Lab learning path and navigation;
+3. deploy the reviewed build to `ahaframe.com`;
+4. connect real analytics and waitlist storage;
+5. invite approximately **20–50 software developers** for a Soft Alpha;
+6. observe where users stop, what they tune, which Labs create the strongest “aha,” and whether paid-capability intent appears.
+
+This is not a broad Product Hunt / Hacker News / Reddit launch yet.
+
+## Phase 3 — optional identity, not mandatory login
 
 Do **not** put a login wall in front of public lessons or simulations.
 
-Authentication becomes justified when identity unlocks durable user value.
+Authentication becomes justified when identity unlocks durable value.
 
-### Triggers for implementation
+### Triggers
 
-Start the identity layer when at least one of these features is ready:
+Start the identity layer when at least one of these is ready:
 
 1. save Lab checkpoints and experiment history across devices;
-2. paid entitlements need to be attached to a user;
-3. Live Mode credits / usage limits need metering;
-4. Build Project submissions need persistence;
-5. personal learning progress must survive browser/device changes.
+2. attach paid entitlements to a user;
+3. meter Live Mode credits;
+4. persist Build Project submissions;
+5. persist progress beyond local browser storage.
 
-### Recommended UX
+### Intended UX
 
 ```text
 Visit AhaFrame
@@ -118,11 +163,9 @@ User chooses Save / Purchase / Live Mode / Build Project
 Ask for sign-in
 ```
 
-For the developer audience, GitHub sign-in should be considered first, with email magic-link as a fallback. The authentication vendor is intentionally not locked yet.
+GitHub sign-in should be considered first for the developer audience, with email magic-link as a fallback. The authentication vendor remains intentionally unlocked.
 
-### Minimal account data
-
-Keep the first account model small:
+Minimal account model:
 
 ```text
 User
@@ -135,36 +178,36 @@ UsageCredit (only when Live Mode exists)
 
 Do not build profiles, social features, teams, organizations, certificates, or a large LMS model at this stage.
 
-## Phase 3 — payment validation and Foundations product
+## Phase 4 — payment validation and Foundations product
 
-Only after v0.3 behavior supports the hypothesis:
+Only after behavior supports the hypothesis:
 
 - introduce real checkout / preorder or launch purchase;
 - implement entitlements;
-- package **AI Engineer Foundations** around approximately 12 high-quality labs;
-- include failure simulations and 2–3 meaningful Build Projects;
+- package **AI Engineer Foundations** around a compact set of high-quality labs;
+- include failure simulations and meaningful Build Projects;
 - test the `$49 one-time` offer with actual payment, not only intent clicks.
 
-Candidate lab sequence:
+Candidate larger Foundations sequence:
 
 ```text
 Token Prediction
 Context Window
 RAG Failure
-Embeddings / Retrieval
-Chunking
-Reranking
 Agent Reliability
-Tool Contracts
 Evaluation
+Context Engineering
+Embeddings / Retrieval
+Reranking
+Tool Contracts
 Tracing / Observability
 Cost + Latency
 Model Routing / Caching
 ```
 
-The exact count should follow user behavior rather than a fixed curriculum promise.
+The exact count follows user behavior rather than a fixed curriculum promise.
 
-## Phase 4 — Live Mode
+## Phase 5 — Live Mode
 
 Add real compute only where it validates the simulation against reality.
 
@@ -188,11 +231,9 @@ Rules:
 - keep model/API keys out of static client persistence;
 - record cost, latency, model, tokens, and evaluation results per run.
 
-## Phase 5 — Build Projects + sandbox
+## Phase 6 — Build Projects + sandbox
 
 Code execution is the most expensive and security-sensitive tier.
-
-Introduce it after payment and learning demand are validated.
 
 Prefer:
 
@@ -216,6 +257,6 @@ The next feature should answer a product question, not merely make the platform 
 
 Current question:
 
-> Can an experienced software developer learn a production AI trade-off faster by breaking and tuning a deterministic simulation than by reading another tutorial?
+> Can AhaFrame teach production AI reliability by making developers tune a failing system and observe explicit trade-offs faster than another tutorial can?
 
-RAG Failure Lab is the first strong test of that proposition.
+RAG Failure and Agent Reliability are the first two complementary tests. Evaluation Lab is the next required piece of the Content MVP.
