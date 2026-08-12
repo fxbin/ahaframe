@@ -26,6 +26,37 @@ Core architecture principle:
 
 > **Simulate the concept. Spend compute only to validate reality.**
 
+## Curriculum
+
+AhaFrame now has a formal curriculum map rather than adding Labs topic-by-topic.
+
+See:
+
+- `docs/CURRICULUM.md` — AhaFrame Curriculum v1.0, prerequisites, tracks, Lab backlog, source-reference policy, and free/paid boundary.
+- `docs/EVALUATION_FAILURE_LAB.md` — next Production Lab product + simulation specification.
+- `docs/ROADMAP.md` — Content MVP stop line, Soft Alpha, identity, payment, Live Mode, and sandbox sequence.
+
+The curriculum uses **AI Engineering from Scratch** as a broad dependency-map reference and **AI Agent Book** as an Agent/Evaluation engineering-depth reference. AhaFrame does not copy their lessons; it independently re-models useful engineering concepts into original failure-first simulations.
+
+Eight curriculum tracks:
+
+```text
+01 LLM Mental Models
+02 Context & Retrieval
+03 Tools & Protocols
+04 Agent Engineering
+05 Evaluation & Reliability
+06 Production AI
+07 Multi-Agent Systems
+08 Build Systems
+```
+
+The learning method is:
+
+```text
+SEE → PLAY → BREAK → AHA → BUILD
+```
+
 ## Current product
 
 ### Foundation lessons
@@ -53,21 +84,46 @@ No payment is collected yet. The pricing page records intent only.
 
 ## Content MVP stop line
 
-AhaFrame is not launching broadly yet. The current closed-development target is a small coherent content path rather than a large course catalog:
+AhaFrame is not launching broadly yet. The closed-development target is a small coherent journey rather than a large course catalog:
 
 ```text
-RAG Failure Lab            done
-Agent Reliability Lab      done
-Evaluation Lab             next
-Context Engineering Lab    next
-Build Challenge            next
+RAG Failure Lab                 done
+Agent Reliability Lab           done
+Evaluation Failure Lab          next
+Context Compression Lab         next
+Reliable Support Agent Build    next
         ↓
 UX / content review
         ↓
 Soft Alpha with 20–50 developers
 ```
 
+`Tool Contract Failure Lab` is an optional bridge only if the Build Challenge reveals a real missing Tools & Protocols concept.
+
 Authentication, payment, Live Mode, and sandbox infrastructure stay behind this content-validation work unless a concrete feature requires them.
+
+## Next Lab: Evaluation Failure
+
+The learner starts with a candidate that appears better on the aggregate score and then discovers that the evaluation design is hiding safety-critical and long-horizon regressions.
+
+Core controls:
+
+```text
+Dataset preset
+Pass threshold
+Safety veto
+Sample size
+Judge mode
+Cost gate
+```
+
+Core outcome:
+
+```text
+SHIP / BLOCK / INCONCLUSIVE
+```
+
+The Lab teaches that **evaluation is a decision system, not a single score**. See `docs/EVALUATION_FAILURE_LAB.md` for the deterministic scenario contract.
 
 ## Lab / Simulation Engine
 
@@ -108,7 +164,7 @@ agent-reliability
 agent-loop
 ```
 
-See `docs/LAB_ENGINE.md` for the engine contract and `docs/ROADMAP.md` for the development sequence.
+See `docs/LAB_ENGINE.md` for the engine contract.
 
 ## Routes
 
@@ -139,6 +195,8 @@ scripts/ahaframe/                 page-specific static-site build modules
   agent_reliability.py            Agent Reliability Lab page builder
 scripts/build_site.py             build entrypoint
 scripts/test_lab_engine.js        Lab Engine behavioral regression suite
+docs/CURRICULUM.md                curriculum + source mapping
+docs/EVALUATION_FAILURE_LAB.md    next Lab product/simulation spec
 docs/LAB_ENGINE.md                Lab Engine architecture contract
 docs/ROADMAP.md                   content / auth / Live Mode roadmap
 site/                             generated output (ignored)
@@ -207,7 +265,7 @@ The Lab Engine keeps engine-level analytics opt-in so high-frequency state actio
 
 ## Authentication policy
 
-No account is required for public content-MVP learning.
+No account is required for public Content MVP learning.
 
 Authentication should be introduced when it enables durable value such as:
 
