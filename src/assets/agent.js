@@ -20,11 +20,11 @@
   lab.subscribe(({state,derived})=>{
     nodes.forEach((node,i)=>{
       node.classList.toggle('done',i<state.step);
-      node.classList.toggle('active',i===state.step&&!state.failure);
+      node.classList.toggle('active',i===state.step);
     });
     timeline.forEach((item,i)=>{
       item.classList.toggle('done',i<state.step);
-      item.classList.toggle('active',i===state.step&&!state.failure);
+      item.classList.toggle('active',i===state.step);
     });
     status.textContent=derived.status;
     result.textContent=derived.result;
