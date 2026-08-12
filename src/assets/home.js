@@ -32,11 +32,11 @@
 
   slider.addEventListener('input',()=>{
     render();
-    window.SeeAI?.track('hero_temperature_changed',{temperature:Number(slider.value)});
+    window.AhaFrame?.track('hero_temperature_changed',{temperature:Number(slider.value)});
   });
   sampling?.addEventListener('change',()=>{
     render();
-    window.SeeAI?.track('hero_sampling_changed',{strategy:sampling.value});
+    window.AhaFrame?.track('hero_sampling_changed',{strategy:sampling.value});
   });
   render();
 })();
