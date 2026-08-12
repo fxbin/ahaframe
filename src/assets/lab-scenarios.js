@@ -191,6 +191,109 @@
     },
   });
 
+  const AGENT_RELIABILITY_PRESET={maxSteps:8,retryLimit:2,timeoutSec:6,validation:true,humanApproval:true,termination:'goal-aware'};
+
+  AhaFrame.registerLabScenario({
+    id:'agent-reliability',
+    version:'1.0.0',
+    title:'Agent Reliability Lab',
+    initialState:{maxSteps:14,retryLimit:4,timeoutSec:12,validation:false,humanApproval:false,termination:'weak'},
+    reduce(state,action){
+      switch(action.type){
+        case 'SET_MAX_STEPS': {
+          const value=Number(action.payload?.value);
+          if(!Number.isInteger(value)||value<4||value>20)throw new RangeError('Max steps must be an integer between 4 and 20.');
+          return {...state,maxSteps:value};
+        }
+        case 'SET_RETRY_LIMIT': {
+          const value=Number(action.payload?.value);
+          if(!Number.isInteger(value)||value<0||value>5)throw new RangeError('Retry limit must be an integer between 0 and 5.');
+          return {...state,retryLimit:value};
+        }
+        case 'SET_TIMEOUT': {
+          const value=Number(action.payload?.value);
+          if(!Number.isInteger(value)||value<2||value>20)throw new RangeError('Timeout must be an integer between 2 and 20 seconds.');
+          return {...state,timeoutSec:value};
+        }
+        case 'SET_VALIDATION':
+          return {...state,validation:Boolean(action.payload?.value)};
+        case 'SET_HUMAN_APPROVAL':
+          return {...state,humanApproval:Boolean(action.payload?.value)};
+        case 'SET_TERMINATION': {
+          const value=action.payload?.value;
+          if(!['weak','bounded','goal-aware'].includes(value))throw new RangeError('Termination must be weak, bounded, or goal-aware.');
+          return {...state,termination:value};
+        }
+        case 'APPLY_RELIABILITY_PRESET':
+          return {...AGENT_RELIABILITY_PRESET};
+        default:
+          throw new Error(`Unsupported agent-reliability action: ${action.type}`);
+      }
+    },
+    derive(state){
+      const stepCoverage=Math.min(state.maxSteps,8)*0.0225;
+      const retryGain=Math.min(state.retryLimit,2)*0.05+Math.max(0,state.retryLimit-2)*0.015;
+      const timeoutGain=clamp((state.timeoutSec-2)/10,0,1)*0.07;
+      const terminationSuccess={weak:0,bounded:0.03,'goal-aware':0.07}[state.termination];
+      const successRate=clamp(0.40+stepCoverage+retryGain+timeoutGain+terminationSuccess+(state.validation?0.10:0)+(state.humanApproval?0.03:0),0.35,0.98);
+
+      const terminationRisk={weak:0.14,bounded:-0.10,'goal-aware':-0.18}[state.termination];
+      const runawayRisk=clamp(0.08+Math.max(0,state.maxSteps-6)*0.025+state.retryLimit*0.025+Math.max(0,state.timeoutSec-6)*0.004+terminationRisk-(state.validation?0.05:0)-(state.humanApproval?0.02:0),0.01,0.75);
+
+      const terminationSafety={weak:0.03,bounded:0,'goal-aware':-0.02}[state.termination];
+      const unsafeActionRisk=clamp(0.22+state.retryLimit*0.015+Math.max(0,state.maxSteps-10)*0.01+terminationSafety-(state.validation?0.10:0)-(state.humanApproval?0.14:0),0.01,0.60);
+
+      const terminationSteps={weak:1.6,bounded:0.5,'goal-aware':0}[state.termination];
+      const expectedSteps=clamp(3.6+state.retryLimit*0.75+Math.max(0,state.maxSteps-8)*0.18+terminationSteps+(state.validation?0.4:0)+(state.humanApproval?0.3:0),3.5,state.maxSteps);
+      const latencySeconds=expectedSteps*(0.75+state.timeoutSec*0.14)+(state.validation?1.5:0)+(state.humanApproval?6:0);
+      const costIndex=expectedSteps*7+state.retryLimit*3+(state.validation?10:0)+(state.humanApproval?6:0)+Math.max(0,state.maxSteps-12)*1.5;
+      const humanReviewsPer100=state.humanApproval?Math.round(28+successRate*12+state.retryLimit*2):0;
+      const reliabilityScore=clamp((successRate*0.55+(1-runawayRisk)*0.25+(1-unsafeActionRisk)*0.20)*100,0,100);
+
+      let failureType='healthy';
+      let diagnosis='Healthy control policy: task completion, execution bounds, and safety checks are balanced.';
+      if(runawayRisk>0.25){
+        failureType='runaway-loop';
+        diagnosis='Runaway risk is too high: retries and step budget give a confused agent too much room to repeat work.';
+      }else if(unsafeActionRisk>0.15){
+        failureType='unsafe-action';
+        diagnosis='Unsafe-action risk is too high: irreversible tool calls need stronger validation or an approval boundary.';
+      }else if(successRate<0.82){
+        failureType='task-failure';
+        diagnosis='Task success is too low: the policy is stopping or timing out before enough valid recovery can happen.';
+      }else if(latencySeconds>28){
+        failureType='slow-policy';
+        diagnosis='The policy is reliable but slow: timeout and review overhead are dominating the execution path.';
+      }else if(costIndex>80){
+        failureType='expensive-policy';
+        diagnosis='The policy works, but too many steps or retries make the expected run unnecessarily expensive.';
+      }
+
+      return {
+        successRate,
+        runawayRisk,
+        unsafeActionRisk,
+        expectedSteps,
+        latencySeconds,
+        costIndex,
+        humanReviewsPer100,
+        reliabilityScore,
+        failureType,
+        diagnosis,
+        metrics:{
+          successPercent:successRate*100,
+          runawayPercent:runawayRisk*100,
+          unsafeActionPercent:unsafeActionRisk*100,
+          expectedSteps,
+          latencySeconds,
+          costIndex,
+          humanReviewsPer100,
+          reliabilityScore,
+        },
+      };
+    },
+  });
+
   const AGENT_LABELS=[
     'The agent reads the user task and identifies missing information.',
     'The agent selects the weather tool.',
