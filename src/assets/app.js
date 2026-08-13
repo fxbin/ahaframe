@@ -4,10 +4,80 @@
   const lessons=['token-playground','context-window','agent-loop'];
   const readProgress=()=>{try{return JSON.parse(localStorage.getItem(progressKey)||'{}')}catch(_){return {}}};
   const saveProgress=(p)=>{try{localStorage.setItem(progressKey,JSON.stringify(p))}catch(_){}};
-  window.AhaFrame.track=function(name,props={}){const payload={name,props,path:location.pathname,ts:new Date().toISOString()};console.info('[AhaFrame event]',payload);const endpoint=window.AHAFRAME_CONFIG?.analyticsEndpoint;if(endpoint){try{navigator.sendBeacon(endpoint,new Blob([JSON.stringify(payload)],{type:'application/json'}))}catch(_){}}window.dispatchEvent(new CustomEvent('ahaframe:event',{detail:payload}))};
-  window.AhaFrame.completeLesson=function(slug){const p=readProgress();p[slug]={completed:true,completedAt:new Date().toISOString()};saveProgress(p);window.AhaFrame.track('lesson_completed',{lesson:slug});paintProgress()};
-  function paintProgress(){const p=readProgress();const count=lessons.filter(x=>p[x]?.completed).length;document.querySelectorAll('[data-progress-count]').forEach(el=>el.textContent=`${count}/3`);document.querySelectorAll('[data-progress-ring]').forEach(el=>el.style.setProperty('--progress',`${Math.round(count/3*100)}%`));document.querySelectorAll('[data-lesson-status]').forEach(el=>{const done=!!p[el.dataset.lessonStatus]?.completed;el.textContent=done?'Completed':'Not started';el.classList.toggle('done',done)});document.querySelectorAll('[data-complete-lesson]').forEach(btn=>{const done=!!p[btn.dataset.completeLesson]?.completed;btn.textContent=done?'Completed ✓':'Mark lesson complete';btn.classList.toggle('subtle',done)})}
-  document.addEventListener('click',(e)=>{const eventEl=e.target.closest('[data-event]');if(eventEl)window.AhaFrame.track(eventEl.dataset.event,{label:(eventEl.textContent||'').trim().slice(0,80)});const complete=e.target.closest('[data-complete-lesson]');if(complete)window.AhaFrame.completeLesson(complete.dataset.completeLesson);const share=e.target.closest('[data-share]');if(share){const url=location.href;if(navigator.share){navigator.share({title:document.title,url}).catch(()=>{})}else if(navigator.clipboard){navigator.clipboard.writeText(url).then(()=>{const old=share.textContent;share.textContent='Link copied ✓';setTimeout(()=>share.textContent=old,1500)})}window.AhaFrame.track('lesson_share',{url})}});
-  document.querySelectorAll('[data-waitlist-form]').forEach(form=>form.addEventListener('submit',async(e)=>{e.preventDefault();const email=new FormData(form).get('email');const status=form.parentElement.querySelector('[data-status]')||form.querySelector('[data-status]');if(!email||!/^\S+@\S+\.\S+$/.test(email)){if(status){status.textContent='Enter a valid email address.';status.className='status'}return}const queryIntent=new URLSearchParams(location.search).get('intent');const intent=queryIntent||form.dataset.intent||'waitlist';const row={email,intent,source:location.pathname,createdAt:new Date().toISOString()};const endpoint=window.AHAFRAME_CONFIG?.waitlistEndpoint;if(endpoint){try{const res=await fetch(endpoint,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(row)});if(!res.ok)throw new Error('waitlist failed')}catch(_){if(status){status.textContent='Could not join right now. Please try again.';status.className='status'}return}}else{try{const prior=JSON.parse(localStorage.getItem('ahaframe_waitlist')||'[]');prior.push(row);localStorage.setItem('ahaframe_waitlist',JSON.stringify(prior))}catch(_){}window.AhaFrame.track('waitlist_demo_saved',{intent});form.reset();if(status){status.textContent='Demo mode: no waitlist backend is configured, so this email was saved only in this browser.';status.className='status'}return}window.AhaFrame.track('waitlist_submit',{intent});form.reset();if(status){status.textContent="You're in. We'll notify you when the next labs are ready.";status.className='status ok'}}));
+  const eventId=()=>window.crypto&&typeof window.crypto.randomUUID==='function'?window.crypto.randomUUID():`evt_${Date.now().toString(36)}_${Math.random().toString(36).slice(2,10)}`;
+
+  window.AhaFrame.track=function(name,props={}){
+    const validation=window.AhaFrame.getValidationContext?.()||{};
+    const payload={schemaVersion:1,eventId:eventId(),name,props,path:location.pathname,ts:new Date().toISOString(),...validation};
+    console.info('[AhaFrame event]',payload);
+    const endpoint=window.AHAFRAME_CONFIG?.analyticsEndpoint;
+    if(endpoint){
+      const body=JSON.stringify(payload);
+      let sent=false;
+      try{if(navigator.sendBeacon)sent=navigator.sendBeacon(endpoint,new Blob([body],{type:'application/json'}));}catch(_){}
+      if(!sent){try{fetch(endpoint,{method:'POST',headers:{'content-type':'application/json'},body,keepalive:true}).catch(()=>{});}catch(_){}}
+    }
+    window.dispatchEvent(new CustomEvent('ahaframe:event',{detail:payload}));
+    return payload;
+  };
+
+  window.AhaFrame.completeLesson=function(slug){
+    const p=readProgress();
+    p[slug]={completed:true,completedAt:new Date().toISOString()};
+    saveProgress(p);
+    window.AhaFrame.track('lesson_completed',{lesson:slug});
+    paintProgress();
+  };
+
+  function paintProgress(){
+    const p=readProgress();
+    const count=lessons.filter(x=>p[x]?.completed).length;
+    document.querySelectorAll('[data-progress-count]').forEach(el=>el.textContent=`${count}/3`);
+    document.querySelectorAll('[data-progress-ring]').forEach(el=>el.style.setProperty('--progress',`${Math.round(count/3*100)}%`));
+    document.querySelectorAll('[data-lesson-status]').forEach(el=>{const done=!!p[el.dataset.lessonStatus]?.completed;el.textContent=done?'Completed':'Not started';el.classList.toggle('done',done)});
+    document.querySelectorAll('[data-complete-lesson]').forEach(btn=>{const done=!!p[btn.dataset.completeLesson]?.completed;btn.textContent=done?'Completed ✓':'Mark lesson complete';btn.classList.toggle('subtle',done)});
+  }
+
+  document.addEventListener('click',(e)=>{
+    const eventEl=e.target.closest('[data-event]');
+    if(eventEl)window.AhaFrame.track(eventEl.dataset.event,{label:(eventEl.textContent||'').trim().slice(0,80)});
+    const complete=e.target.closest('[data-complete-lesson]');
+    if(complete)window.AhaFrame.completeLesson(complete.dataset.completeLesson);
+    const share=e.target.closest('[data-share]');
+    if(share){
+      const url=location.href;
+      if(navigator.share){navigator.share({title:document.title,url}).catch(()=>{})}
+      else if(navigator.clipboard){navigator.clipboard.writeText(url).then(()=>{const old=share.textContent;share.textContent='Link copied ✓';setTimeout(()=>share.textContent=old,1500)})}
+      window.AhaFrame.track('lesson_share',{url});
+    }
+  });
+
+  document.querySelectorAll('[data-waitlist-form]').forEach(form=>form.addEventListener('submit',async(e)=>{
+    e.preventDefault();
+    const email=new FormData(form).get('email');
+    const status=form.parentElement.querySelector('[data-status]')||form.querySelector('[data-status]');
+    if(!email||!/^\S+@\S+\.\S+$/.test(email)){if(status){status.textContent='Enter a valid email address.';status.className='status'}return}
+    const queryIntent=new URLSearchParams(location.search).get('intent');
+    const intent=queryIntent||form.dataset.intent||'waitlist';
+    const validation=window.AhaFrame.getValidationContext?.()||{};
+    const row={email,intent,source:location.pathname,createdAt:new Date().toISOString(),...validation};
+    const endpoint=window.AHAFRAME_CONFIG?.waitlistEndpoint;
+    if(endpoint){
+      try{
+        const res=await fetch(endpoint,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(row)});
+        if(!res.ok)throw new Error('waitlist failed');
+      }catch(_){if(status){status.textContent='Could not join right now. Please try again.';status.className='status'}return}
+    }else{
+      try{const prior=JSON.parse(localStorage.getItem('ahaframe_waitlist')||'[]');prior.push(row);localStorage.setItem('ahaframe_waitlist',JSON.stringify(prior))}catch(_){}
+      window.AhaFrame.track('waitlist_demo_saved',{intent});
+      form.reset();
+      if(status){status.textContent='Demo mode: no waitlist backend is configured, so this email was saved only in this browser.';status.className='status'}
+      return;
+    }
+    window.AhaFrame.track('waitlist_submitted',{intent});
+    form.reset();
+    if(status){status.textContent="You're in. We'll notify you when the next labs are ready.";status.className='status ok'}
+  }));
+
   paintProgress();
 })();
