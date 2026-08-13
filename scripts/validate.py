@@ -25,6 +25,7 @@ EXPECTED_HTML = {
     "en/labs/agent-reliability/index.html",
     "en/labs/evaluation-failure/index.html",
     "en/labs/context-compression/index.html",
+    "en/labs/instruction-conflict/index.html",
 }
 INTERACTIVE_HTML = {
     "en/index.html",
@@ -35,6 +36,7 @@ INTERACTIVE_HTML = {
     "en/labs/agent-reliability/index.html",
     "en/labs/evaluation-failure/index.html",
     "en/labs/context-compression/index.html",
+    "en/labs/instruction-conflict/index.html",
 }
 errors: list[str] = []
 
@@ -102,6 +104,13 @@ for file in html_files:
                 errors.append(f"{rel}: missing Context Compression scenario or adapter")
             elif not (scripts.index(scenarios) < scripts.index(compression_scenario) < scripts.index(compression_adapter)):
                 errors.append(f"{rel}: Context Compression scripts must load scenario before adapter after the base scenario registry")
+        if rel == "en/labs/instruction-conflict/index.html":
+            prompt_scenario = "/assets/instruction-conflict-scenario.js"
+            prompt_adapter = "/assets/prompt-authority.js"
+            if prompt_scenario not in scripts or prompt_adapter not in scripts:
+                errors.append(f"{rel}: missing Instruction Conflict scenario or adapter")
+            elif not (scripts.index(scenarios) < scripts.index(prompt_scenario) < scripts.index(prompt_adapter)):
+                errors.append(f"{rel}: Instruction Conflict scripts must load scenario before adapter after the base scenario registry")
 
     if rel.startswith("en/lessons/"):
         h1 = soup.find_all("h1")
@@ -146,6 +155,8 @@ for file in html_files:
             errors.append(f"{rel}: missing Evaluation Failure Lab mount point")
         if rel == "en/labs/context-compression/index.html" and not soup.select_one("[data-context-compression-lab]"):
             errors.append(f"{rel}: missing Context Compression Lab mount point")
+        if rel == "en/labs/instruction-conflict/index.html" and not soup.select_one("[data-instruction-conflict-lab]"):
+            errors.append(f"{rel}: missing Instruction Conflict Lab mount point")
 
     for anchor in soup.find_all("a", href=True):
         href = anchor["href"]
@@ -169,8 +180,8 @@ try:
     ns = {"s": "http://www.sitemaps.org/schemas/sitemap/0.9"}
     locs = [node.text for node in root.findall("s:url/s:loc", ns)]
     lastmods = [node.text for node in root.findall("s:url/s:lastmod", ns)]
-    if len(locs) != 10:
-        errors.append(f"sitemap: expected 10 URLs, got {len(locs)}")
+    if len(locs) != 11:
+        errors.append(f"sitemap: expected 11 URLs, got {len(locs)}")
     if not any((value or "").endswith("/en/labs/rag-failure/") for value in locs):
         errors.append("sitemap: missing RAG Failure Lab URL")
     if not any((value or "").endswith("/en/labs/agent-reliability/") for value in locs):
@@ -179,6 +190,8 @@ try:
         errors.append("sitemap: missing Evaluation Failure Lab URL")
     if not any((value or "").endswith("/en/labs/context-compression/") for value in locs):
         errors.append("sitemap: missing Context Compression Lab URL")
+    if not any((value or "").endswith("/en/labs/instruction-conflict/") for value in locs):
+        errors.append("sitemap: missing Instruction Conflict Lab URL")
     if len(lastmods) != len(locs) or any(value != CONTENT["meta"]["updated"] for value in lastmods):
         errors.append("sitemap: lastmod must match the explicit content update date")
 except Exception as exc:
@@ -188,7 +201,7 @@ css = (SITE / "assets/styles.css").read_text(encoding="utf-8").lower()
 if "#4f46e5" in css or "#6d38f7" in css:
     errors.append("legacy blue-purple brand colors remain in CSS")
 
-for required in ["lab-engine.js", "lab-scenarios.js", "rag.js", "agent-reliability.js", "evaluation-scenario.js", "evaluation.js", "context-compression-scenario.js", "context-compression.js"]:
+for required in ["lab-engine.js", "lab-scenarios.js", "rag.js", "agent-reliability.js", "evaluation-scenario.js", "evaluation.js", "context-compression-scenario.js", "context-compression.js", "instruction-conflict-scenario.js", "prompt-authority.js"]:
     if not (SITE / "assets" / required).exists():
         errors.append(f"assets/{required}: missing generated Lab asset")
 
@@ -202,6 +215,12 @@ lab_test = subprocess.run(
 )
 if lab_test.returncode:
     errors.append(f"Lab Engine behavioral tests failed\n{lab_test.stdout}\n{lab_test.stderr}")
+
+prompt_test = subprocess.run(
+    ["node", str(ROOT / "scripts/test_instruction_conflict.js")], capture_output=True, text=True
+)
+if prompt_test.returncode:
+    errors.append(f"Instruction Conflict behavioral tests failed\n{prompt_test.stdout}\n{prompt_test.stderr}")
 
 try:
     vercel = json.loads((ROOT / "vercel.json").read_text(encoding="utf-8"))
@@ -219,5 +238,5 @@ if errors:
 print(
     f"PASS v0.3: {len(html_files)} HTML pages; routes, links, metadata, JSON-LD, "
     "accessibility basics, sitemap, theme, Lab Engine, RAG Failure Lab, Agent Reliability Lab, "
-    "Evaluation Failure Lab, Context Compression Lab, JS and deployment config validated."
+    "Evaluation Failure Lab, Context Compression Lab, Instruction Conflict Lab, JS and deployment config validated."
 )
