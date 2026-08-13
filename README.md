@@ -4,7 +4,7 @@ AhaFrame is an English-first **Interactive AI Engineering Lab** for software dev
 
 > **Understand AI by seeing it work.**
 
-The repository is a static, dependency-light validation product. Version control contains source files only; `site/` is generated build output and intentionally ignored.
+The current implementation is a static, dependency-light validation product. Version control contains source files only; `site/` is generated build output and intentionally ignored. A SaaS platform migration is now planned separately so current Lab behavior and SEO are preserved before Auth/Billing are added.
 
 ## Product direction
 
@@ -26,19 +26,36 @@ Core architecture principle:
 
 > **Simulate the concept. Spend compute only to validate reality.**
 
-## Curriculum
+## Curriculum v1.1
 
 AhaFrame has a formal curriculum map rather than adding Labs topic-by-topic.
 
 See:
 
-- `docs/CURRICULUM.md` — AhaFrame Curriculum v1.0, prerequisites, tracks, Lab backlog, source-reference policy, and free/paid boundary.
+- `docs/CURRICULUM.md` — Curriculum v1.1, engineering layers, system domains, prerequisites, Lab backlog, source-reference policy, and free/paid boundary.
 - `docs/EVALUATION_FAILURE_LAB.md` — implemented Evaluation Failure Lab product + simulation specification.
-- `docs/ROADMAP.md` — Content MVP stop line, Soft Alpha, identity, payment, Live Mode, and sandbox sequence.
+- `docs/ROADMAP.md` — Content MVP + end-to-end Platform Launch sequence.
+- GitHub issue `#22` — execution master for the public-platform chain.
 
-The curriculum uses **AI Engineering from Scratch** as a broad dependency-map reference and **AI Agent Book** as an Agent/Evaluation engineering-depth reference. AhaFrame does not copy their lessons; it independently re-models useful engineering concepts into original failure-first simulations.
+External references:
 
-Eight curriculum tracks:
+- **AI Engineering from Scratch** — broad AI-engineering dependency map.
+- **AI Agent Book** — Agent / Evaluation engineering depth.
+
+AhaFrame independently re-models useful concepts into original failure-first simulations.
+
+### AI Engineering Layers
+
+```text
+Prompt shapes behavior.
+Context shapes knowledge.
+Harness shapes reliability.
+Loop shapes iteration.
+Graph shapes orchestration.
+Evaluation proves whether it works.
+```
+
+These layers cross-cut the eight system domains:
 
 ```text
 01 LLM Mental Models
@@ -50,6 +67,8 @@ Eight curriculum tracks:
 07 Multi-Agent Systems
 08 Build Systems
 ```
+
+Prompt and Graph are explicit curriculum gaps, but `Instruction Conflict Lab` and `Agent Workflow Graph Lab` stay in the post-Alpha backlog unless the capstone proves they are required.
 
 The learning method is:
 
@@ -67,25 +86,13 @@ SEE → PLAY → BREAK → AHA → BUILD
 
 ### Production Lab previews
 
-- **RAG Failure Lab** — start from a broken retrieval configuration and tune chunk size, overlap, Top-K, retrieval strategy, and reranking while watching recall, precision, context pressure, latency, cost index, and answer-quality score.
-- **Agent Reliability Lab** — start from a weak customer-support agent control policy and tune max steps, retry limits, timeouts, result validation, human approval, and termination while watching success, runaway risk, unsafe-action risk, latency, cost, and review load.
-- **Evaluation Failure Lab** — start from a demo-biased release evaluation where Agent v2 appears better, then change dataset composition, threshold, safety veto, sample size, judge strategy, and cost gate while observing slice regressions, evidence strength, and `SHIP / BLOCK / INCONCLUSIVE` decisions.
+- **RAG Failure Lab** — Context Engineering: tune retrieval while watching recall, precision, context pressure, latency, cost, and answer quality.
+- **Agent Reliability Lab** — Harness + Loop Engineering: tune steps, retries, timeouts, validation, approval, and termination while watching reliability and operational risk.
+- **Evaluation Failure Lab** — Evaluation Engineering: debug a demo-biased release process and move among `SHIP / BLOCK / INCONCLUSIVE` based on slices, evidence strength, safety vetoes, and cost gates.
 
 All Production Labs use synthetic deterministic metrics for teaching. They are not presented as benchmark measurements from live models, retrieval systems, tools, LLM judges, customer-support traffic, or human-review systems.
 
-### Pricing validation
-
-```text
-Free                       $0
-AI Engineer Foundations    $49 one-time hypothesis
-Production Labs            $12/month future hypothesis
-```
-
-No payment is collected yet. The pricing page records intent only.
-
 ## Content MVP stop line
-
-AhaFrame is not launching broadly yet. The closed-development target is a small coherent journey rather than a large course catalog:
 
 ```text
 RAG Failure Lab                 done
@@ -93,38 +100,55 @@ Agent Reliability Lab           done
 Evaluation Failure Lab          done
 Context Compression Lab         next
 Reliable Support Agent Build    next
-        ↓
-UX / content review
-        ↓
-Soft Alpha with 20–50 developers
 ```
 
-`Tool Contract Failure Lab` is an optional bridge only if the Build Challenge reveals a real missing Tools & Protocols concept.
+The immediate content goal remains a coherent 60–120 minute journey, not a large catalog.
 
-Authentication, payment, Live Mode, and sandbox infrastructure stay behind this content-validation work unless a concrete feature requires them.
+## Platform Launch plan
 
-## Evaluation Failure Lab
-
-The learner starts with a candidate that appears better on the aggregate score and then discovers that the evaluation design is hiding safety-critical and long-horizon regressions.
-
-Controls:
+AhaFrame is not considered a public platform merely because pages are deployed. The complete chain must work:
 
 ```text
-Dataset preset
-Pass threshold
-Safety veto
-Sample size
-Judge mode
-Cost gate
+Content
+→ optional identity
+→ durable progress / checkpoints
+→ entitlement
+→ payment
+→ verified webhook
+→ access control
+→ analytics
+→ production deployment
+→ E2E / security
+→ Soft Alpha
+→ Public Beta decision
 ```
 
-Release outcome:
+Tracked in GitHub issue `#22`.
+
+Planned platform foundation:
 
 ```text
-SHIP / BLOCK / INCONCLUSIVE
+Raphael StarterKit   reusable development skeleton
+Supabase             identity + application data
+Waffo Pancake        billing provider
+AhaFrame Lab Engine  deterministic simulation runtime
 ```
 
-The Lab teaches that **evaluation is a decision system, not a single score**. The production preset deliberately does not “fix” Agent v2; it improves the evaluation policy enough to block a candidate with an unresolved critical regression.
+Public lessons and Labs stay no-login. Sign-in appears when the learner chooses **Save / Purchase / Build Project / Live Mode**.
+
+Application access is represented by `Entitlement`, not by a Waffo or subscription object directly.
+
+## Pricing validation
+
+```text
+Free                       $0
+AI Engineer Foundations    $49 one-time hypothesis
+Production Labs            $12/month future hypothesis
+```
+
+The current public pricing UI is still validation-first. Real checkout is introduced through the Platform Launch work, with Waffo as the selected billing provider.
+
+Compute credits are reserved for real compute only and must not be sold before at least one metered Live Mode exists.
 
 ## Lab / Simulation Engine
 
@@ -196,15 +220,12 @@ src/assets/                       browser JavaScript + favicon
   evaluation.js                   Evaluation Failure DOM adapter
 src/styles/                       CSS modules
 scripts/ahaframe/                 page-specific static-site build modules
-  rag.py                          RAG Failure Lab page builder
-  agent_reliability.py            Agent Reliability Lab page builder
-  evaluation.py                   Evaluation Failure Lab page builder
 scripts/build_site.py             build entrypoint
 scripts/test_lab_engine.js        Lab Engine behavioral regression suite
-docs/CURRICULUM.md                curriculum + source mapping
+docs/CURRICULUM.md                curriculum v1.1 + engineering layers
 docs/EVALUATION_FAILURE_LAB.md    Evaluation Failure product/simulation spec
 docs/LAB_ENGINE.md                Lab Engine architecture contract
-docs/ROADMAP.md                   content / auth / Live Mode roadmap
+docs/ROADMAP.md                   content + platform launch roadmap
 site/                             generated output (ignored)
 ```
 
@@ -233,7 +254,7 @@ This updates canonical URLs, JSON-LD URLs, sitemap URLs, robots.txt, and `llms.t
 
 ## Waitlist and analytics integration
 
-Public runtime endpoint URLs are generated at build time:
+Current static runtime endpoint URLs are generated at build time:
 
 ```bash
 AHAFRAME_WAITLIST_ENDPOINT=https://your-api.example.com/waitlist \
@@ -244,44 +265,13 @@ python3 scripts/build_site.py
 
 Do **not** put API secrets in these variables; endpoint URLs are written to public browser JavaScript.
 
-When no waitlist endpoint is configured, the UI explicitly reports demo mode and saves the address only in that browser.
-
-## Analytics events
-
-Examples:
-
-```text
-hero_start_learning_click
-interaction_slider_changed
-interaction_strategy_selected
-lesson_step_completed
-tool_error_simulated
-rag_parameter_changed
-rag_balanced_preset_applied
-rag_failure_baseline_reset
-agent_reliability_parameter_changed
-agent_reliability_preset_applied
-agent_reliability_baseline_reset
-evaluation_parameter_changed
-evaluation_dataset_preset_changed
-evaluation_safety_veto_changed
-evaluation_sample_size_changed
-evaluation_judge_mode_changed
-evaluation_cost_gate_changed
-evaluation_production_preset_applied
-evaluation_naive_baseline_reset
-pricing_foundations_click
-pricing_pro_click
-waitlist_submit
-```
-
-The Lab Engine keeps engine-level analytics opt-in so high-frequency state actions do not automatically duplicate product events.
+Production analytics and durable waitlist storage are tracked separately in the Platform Launch plan.
 
 ## Authentication policy
 
-No account is required for public Content MVP learning.
+No account is required for public learning.
 
-Authentication should be introduced when it enables durable value such as:
+Authentication exists to unlock durable value:
 
 - cross-device Lab history/checkpoints;
 - paid entitlements;
@@ -289,7 +279,7 @@ Authentication should be introduced when it enables durable value such as:
 - Build Project submissions;
 - persistent progress.
 
-The intended UX is to ask for sign-in only when the learner chooses **Save / Purchase / Live Mode / Build Project**. See `docs/ROADMAP.md`.
+The intended UX asks for sign-in only when the learner chooses **Save / Purchase / Live Mode / Build Project**.
 
 ## Validation
 
@@ -299,41 +289,21 @@ python3 scripts/validate.py
 node scripts/test_lab_engine.js
 ```
 
-Validation covers:
-
-- exact route set and internal links;
-- metadata / canonical / JSON-LD;
-- answer-first learning blocks;
-- accessibility basics;
-- sitemap accuracy;
-- Lab Engine asset order;
-- Token / Context / RAG / Agent Reliability / Evaluation Failure / Agent Loop behavioral invariants;
-- JavaScript syntax;
-- deployment configuration.
+Validation covers route/SEO invariants, accessibility basics, sitemap accuracy, Lab asset ordering, JavaScript syntax, and deterministic Lab behavior.
 
 ## Deployment
 
-### Vercel
+The current static build supports Vercel or Cloudflare Pages. The target SaaS runtime will be chosen through the platform architecture ADR before migration.
 
-Deploy the repository root. `vercel.json` runs `python3 scripts/build_site.py` and publishes `site/`.
+## Current intentional non-goals
 
-### Cloudflare Pages
-
-```text
-Build command: python3 scripts/build_site.py
-Output directory: site
-```
-
-## Intentional non-goals for the Content MVP
-
-- mandatory accounts;
-- billing;
-- real LLM / vector database inference;
-- real LLM-as-judge evaluation;
-- code sandbox;
-- CMS / admin console;
-- certificates;
+- mandatory accounts before public learning;
+- unlimited AI compute;
+- real LLM-as-judge by default;
+- code sandbox before it is justified;
+- large LMS/CMS/admin systems;
 - community;
+- certificates;
 - AI tutor.
 
-The goal remains **validation before platform**.
+The goal is **validation before unnecessary platform complexity**, while still running the full identity/payment/entitlement/operations chain before Public Beta.
