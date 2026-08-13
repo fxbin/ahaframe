@@ -1,6 +1,6 @@
 # AhaFrame Curriculum v1.0
 
-Date: 2026-08-12
+Date: 2026-08-13
 Status: active curriculum source of truth
 
 ## Purpose
@@ -166,7 +166,7 @@ This graph is a content dependency model, not a requirement that every node beco
 | RAG configuration | context | high recall but noisy/overflowed context | RAG Failure Lab | Preview | Done |
 | Chunking | context, retrieval | chunks too large/small for task | Chunking Trade-off Lab | Foundations | Backlog |
 | Reranking | retrieval | recall improves while precision/cost degrade | Reranker Trade-off Lab | Foundations | Backlog |
-| Context compression | context | lower token use but information loss | Context Compression Lab | Preview | Next after Evaluation |
+| Context compression | context | lower token use but information loss | Context Compression Lab | Preview | **Next** |
 | Retrieval memory | embeddings, retrieval | stale or irrelevant memory wins | Memory Retrieval Lab | Production | Backlog |
 | Knowledge structure | retrieval | vector-only search misses structured relationships | Retrieval Strategy Lab | Production | Later |
 
@@ -208,13 +208,15 @@ Reference emphasis:
 
 | Concept | Prerequisites | Failure mode | Candidate Lab | Tier | Status |
 |---|---|---|---|---|---|
-| Evaluation design | RAG or Agent | aggregate score hides critical regression | Evaluation Failure Lab | Preview | **Next** |
-| Dataset coverage | evaluation | demo-biased set gives false confidence | Dataset Coverage Lab | Foundations | Backlog |
-| Rubrics / judge | evaluation | grader noise / rubric ambiguity | LLM Judge Bias Lab | Production | Backlog |
-| Regression testing | evaluation | average improves while slice regresses | Regression Detection Lab | Foundations | Fold into Evaluation Failure first |
-| Statistical confidence | evaluation | underpowered experiment treated as proof | Statistical Significance Lab | Production | Fold into Evaluation Failure first |
-| Cost-aware eval | evaluation | quality win loses on cost-per-success | Cost-per-Success Lab | Production | Backlog |
+| Evaluation design | RAG or Agent | aggregate score hides critical regression | Evaluation Failure Lab | Preview | **Done** |
+| Dataset coverage | evaluation | demo-biased set gives false confidence | Dataset Coverage Lab | Foundations | Partly covered in Evaluation Failure |
+| Rubrics / judge | evaluation | grader noise / rubric ambiguity | LLM Judge Bias Lab | Production | Partly covered in Evaluation Failure |
+| Regression testing | evaluation | average improves while slice regresses | Regression Detection Lab | Foundations | Covered in Evaluation Failure v1 |
+| Statistical confidence | evaluation | underpowered experiment treated as proof | Statistical Significance Lab | Production | Intro covered in Evaluation Failure v1 |
+| Cost-aware eval | evaluation | quality win loses on cost-per-success | Cost-per-Success Lab | Production | Intro covered in Evaluation Failure v1 |
 | Tracing / trajectory eval | agent loop, evaluation | final answer passes while process violates policy | Trajectory Evaluation Lab | Production | Backlog |
+
+Evaluation Failure v1 now makes four evaluation-design decisions concrete: dataset composition can hide regressions, a safety veto can override an aggregate improvement, small samples can make a release `INCONCLUSIVE`, and a cost gate can independently block a candidate. The values are deterministic teaching data rather than live benchmark evidence.
 
 ## Track 06 — Production AI
 
@@ -273,7 +275,7 @@ Agent Loop Simulator           done
 
 RAG Failure Lab                done
 Agent Reliability Lab          done
-Evaluation Failure Lab         next
+Evaluation Failure Lab         done
 Context Compression Lab        next
 Reliable Support Agent Build   next
 

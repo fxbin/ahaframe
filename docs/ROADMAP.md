@@ -1,6 +1,6 @@
 # AhaFrame Development Roadmap
 
-Date: 2026-08-12
+Date: 2026-08-13
 
 ## Product direction
 
@@ -27,7 +27,7 @@ Architecture principle:
 Curriculum source of truth:
 
 - `docs/CURRICULUM.md` — track map, prerequisites, candidate Labs, free/paid boundary, source-reference policy.
-- `docs/EVALUATION_FAILURE_LAB.md` — approved design target for the next Production Lab.
+- `docs/EVALUATION_FAILURE_LAB.md` — implemented Evaluation Failure Lab product/simulation specification.
 
 ## Phase 0 — Foundation complete
 
@@ -44,6 +44,7 @@ Status: complete
 - pricing hypothesis reset to `$49 one-time Foundations` + future `$12/month Production Labs`
 - RAG Failure Lab
 - Agent Reliability Lab
+- Evaluation Failure Lab
 
 ## Phase 1 — Curriculum v1 + Content MVP
 
@@ -53,7 +54,7 @@ The goal is not a large course catalog. The goal is a coherent 60–120 minute j
 
 ### Curriculum v1 — complete
 
-AhaFrame now uses two external projects as research references without turning them into runtime or content dependencies:
+AhaFrame uses two external projects as research references without turning them into runtime or content dependencies:
 
 ```text
 AI Engineering from Scratch
@@ -92,7 +93,7 @@ Do not implement every mapped topic. The map exists to prevent curriculum drift 
 ```text
 RAG Failure Lab                 done
 Agent Reliability Lab           done
-Evaluation Failure Lab          next
+Evaluation Failure Lab          done
 Context Compression Lab         next
 Reliable Support Agent Build    next
 ```
@@ -132,23 +133,21 @@ Pressure-tests agent control-policy decisions:
 
 The scenario intentionally demonstrates that an agent can have a reasonable completion rate while still being operationally unsafe or expensive.
 
-### Evaluation Failure Lab — next
+### Evaluation Failure Lab — complete
 
 Primary product question:
 
 > **How do you know a new AI-system version is actually better, rather than merely better on an aggregate score or a convenient demo set?**
 
-The learner starts from an apparently strong candidate:
+Implemented route:
 
 ```text
-System A overall: 82
-System B overall: 88
-Suggested decision: SHIP B
+/en/labs/evaluation-failure/
 ```
 
-Then changes the evaluation policy and discovers hidden long-horizon and safety-critical regressions.
+The learner starts from a demo-biased release evaluation where Agent v2 appears stronger overall even though long-horizon and safety-critical refund slices regressed.
 
-Initial controls:
+Controls:
 
 ```text
 Dataset preset
@@ -162,21 +161,23 @@ Cost gate
 Derived signals:
 
 ```text
-Aggregate score
+Aggregate score — v1 / v2
 Slice regressions
 Critical regression count
-Confidence width
-Judge noise
-Eval cost
-Cost per success
+Evidence width
+Judge noise index
+Evaluation cost index
+Cost per successful task
 SHIP / BLOCK / INCONCLUSIVE
 ```
 
-The full deterministic scenario contract is specified in `docs/EVALUATION_FAILURE_LAB.md`.
+The naive baseline can say `SHIP`; the production preset intentionally changes the **evaluation policy**, not the candidate system, and correctly produces `BLOCK` while the critical regression remains unresolved.
 
-The key teaching outcome is not metric vocabulary. It is understanding that **evaluation itself can fail**.
+The Lab also proves a third release state: `INCONCLUSIVE` when the apparent improvement is smaller than the modeled evidence width.
 
-### Context Compression Lab — after Evaluation
+The deterministic scenario contract remains documented in `docs/EVALUATION_FAILURE_LAB.md`.
+
+### Context Compression Lab — next
 
 Narrow the previously broad “Context Engineering Lab” into a concrete trade-off:
 
@@ -202,6 +203,8 @@ Protected instructions / facts
 ```
 
 The learner should discover that reducing context cost can silently remove task-critical information.
+
+The next design step should decide whether this Lab focuses on a support-agent working context, a coding-agent context, or a neutral synthetic task. Prefer continuity with the support-agent world if it strengthens the final capstone rather than feeling repetitive.
 
 ### Reliable Support Agent Build — Content MVP capstone
 
@@ -351,6 +354,6 @@ The next feature should answer a product question, not merely make the platform 
 
 Current question:
 
-> **Can AhaFrame make a developer discover that an evaluation process is giving a false release signal—and understand how to repair the decision policy—faster than a tutorial can?**
+> **Can AhaFrame make the cost-vs-information-loss trade-off of context compression visible enough that a developer can choose a defensible context policy instead of simply maximizing or minimizing tokens?**
 
-Evaluation Failure Lab is the next required Content MVP test.
+Context Compression Lab is the next required Content MVP test.

@@ -4,7 +4,7 @@
     "title": "AhaFrame — Understand AI by seeing it work",
     "description": "Interactive visual lessons for AI engineering: tokens, context windows, RAG, agents, evaluation, and production AI.",
     "headline": "Understand AI by seeing it work.",
-    "subheadline": "Interactive lessons for AI engineering. Explore token generation, context windows, RAG, and agent workflows through visual simulations."
+    "subheadline": "Interactive lessons for AI engineering. Explore token generation, context windows, RAG, agents, and release evaluation through visual simulations."
   },
   "lessons": {
     "token-playground": {
@@ -33,6 +33,6 @@
     }
   },
   "meta": {
-    "updated": "2026-08-12"
+    "updated": "2026-08-13"
   }
 }

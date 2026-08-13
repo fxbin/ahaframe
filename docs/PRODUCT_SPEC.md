@@ -1,6 +1,6 @@
 # AhaFrame Product Spec — v0.3 Content MVP
 
-Date: 2026-08-12
+Date: 2026-08-13
 
 ## Product thesis
 
@@ -82,6 +82,7 @@ If a topic does not satisfy these criteria, prefer a guide or reference instead 
 /en/lessons/agent-loop/
 /en/labs/rag-failure/
 /en/labs/agent-reliability/
+/en/labs/evaluation-failure/
 /en/pricing/
 /en/early-access/
 ```
@@ -162,28 +163,11 @@ Failure Diagnosis
 
 The baseline intentionally demonstrates that a policy can complete many tasks while remaining operationally unsafe: generous retries and step budget raise success, but also allow loops and repeated actions. The reliability preset introduces bounded execution, goal-aware termination, validation, and approval around the irreversible tool boundary.
 
-Both Production Lab previews use deterministic educational metrics. They are not presented as benchmark results from live models, tools, vector stores, customer-support traffic, or human-review queues.
+### Evaluation Failure Lab
 
-## Next Production Lab — Evaluation Failure
+The learner starts from a demo-biased release evaluation for the same customer-support agent world. Agent v2 has a higher aggregate score even though long-horizon and safety-critical refund cases regress.
 
-The next implementation target is specified in `docs/EVALUATION_FAILURE_LAB.md`.
-
-Core scenario:
-
-```text
-System A overall: 82
-System B overall: 88
-        ↓
-Naive conclusion: SHIP B
-        ↓
-Inspect evaluation slices / gates
-        ↓
-Safety-critical regression discovered
-        ↓
-Release decision changes
-```
-
-The learner controls:
+Controls:
 
 ```text
 Dataset preset
@@ -194,25 +178,29 @@ Judge mode
 Cost gate
 ```
 
-The deterministic model should derive:
+Derived signals:
 
 ```text
-Aggregate scores
-Slice regressions
-Critical regression count
-Confidence width
-Judge-noise index
-Estimated evaluation cost
-Cost per success
+Aggregate Score — v1
+Aggregate Score — v2
+Aggregate Delta
+Slice Regressions
+Critical Regression Count
+Evidence Width
+Judge Noise Index
+Evaluation Cost Index
+Cost per Successful Task
 SHIP / BLOCK / INCONCLUSIVE
-Failure diagnosis
+Failure Diagnosis
 ```
+
+The naive baseline is allowed to produce `SHIP` because the evaluation policy is weak. The production preset changes the evaluation design—not the candidate system—and intentionally produces `BLOCK` while the safety regression remains unresolved. Smaller sample sizes can produce `INCONCLUSIVE`, teaching that insufficient evidence is a valid release outcome.
 
 The core lesson is:
 
 > **Evaluation is a decision system, not a single score.**
 
-A better evaluation preset is allowed to block the candidate. AhaFrame presets do not need to magically “fix” every system; they should reveal the correct engineering decision.
+All Production Lab previews use deterministic educational metrics. They are not presented as benchmark results from live models, tools, vector stores, LLM judges, customer-support traffic, or human-review queues.
 
 ## Content MVP stop line
 
@@ -221,7 +209,7 @@ Do not launch broadly after only one or two Production Labs. The first coherent 
 ```text
 RAG Failure Lab                 done
 Agent Reliability Lab           done
-Evaluation Failure Lab          next
+Evaluation Failure Lab          done
 Context Compression Lab         next
 Reliable Support Agent Build    next
         ↓
@@ -334,11 +322,12 @@ context-window
 rag-failure
 agent-reliability
 agent-loop
+evaluation-failure
 ```
 
-RAG Failure validates multi-parameter optimization and comparison. Agent Reliability adds a second pressure test focused on policy trade-offs: execution bounds, retry behavior, safety controls, termination, latency, and cost.
+RAG Failure validates multi-parameter optimization and comparison. Agent Reliability adds a second pressure test focused on execution policy, safety, latency, and cost. Evaluation Failure adds a third pressure test focused on dataset policy, evidence strength, release gates, and three-state decision logic.
 
-Evaluation Failure should become the third pressure test, focused on dataset policy, release gates, evidence strength, and decision logic.
+The Evaluation Failure scenario is loaded as a page-specific scenario module after the shared base registry and before its DOM adapter. This keeps the generic Engine unchanged and avoids putting evaluation-specific logic in the DOM layer.
 
 See `docs/LAB_ENGINE.md` for the architecture contract.
 
@@ -388,12 +377,20 @@ agent_reliability_parameter_changed
 agent_reliability_preset_applied
 agent_reliability_baseline_reset
 agent_reliability_paid_intent_click
+evaluation_parameter_changed
+evaluation_dataset_preset_changed
+evaluation_safety_veto_changed
+evaluation_sample_size_changed
+evaluation_judge_mode_changed
+evaluation_cost_gate_changed
+evaluation_production_preset_applied
+evaluation_naive_baseline_reset
+evaluation_build_challenge_started
+evaluation_paid_intent_click
 pricing_foundations_click
 pricing_pro_click
 waitlist_submit
 ```
-
-The next Evaluation Failure adapter should own semantic evaluation events described in `docs/EVALUATION_FAILURE_LAB.md`.
 
 The Lab Engine itself keeps analytics opt-in so high-frequency simulation actions do not automatically duplicate product events.
 
@@ -402,6 +399,8 @@ The Lab Engine itself keeps analytics opt-in so high-frequency simulation action
 - mandatory authentication;
 - real billing;
 - real LLM/retrieval inference;
+- real LLM-as-judge calls;
+- real benchmark ingestion;
 - code sandbox;
 - full LMS/CMS/admin systems;
 - community;
@@ -417,7 +416,7 @@ Before Soft Alpha, complete the small coherent content path and review the end-t
 - successful-tuning or correct-diagnosis rate;
 - second-lab rate;
 - parameter interaction depth;
-- baseline-vs-current improvement behavior;
+- baseline-vs-current comparison behavior;
 - pricing intent;
 - waitlist conversion;
 - qualitative feedback that simulations improve understanding;
