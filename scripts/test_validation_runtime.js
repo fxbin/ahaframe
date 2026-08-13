@@ -15,7 +15,7 @@ global.localStorage=new MemoryStorage();
 global.sessionStorage=new MemoryStorage();
 global.location={pathname:'/en/labs/instruction-conflict/',search:'?utm_source=reddit&utm_medium=post&utm_campaign=alpha'};
 global.document={referrer:'https://example.dev/thread',addEventListener(){},querySelectorAll(){return []}};
-global.navigator={sendBeacon(){return false;}};
+Object.defineProperty(global,'navigator',{value:{sendBeacon(){return false;}},configurable:true});
 global.CustomEvent=class CustomEvent{constructor(name,options){this.type=name;this.detail=options?.detail;}};
 global.dispatchEvent=()=>true;
 global.AHAFRAME_CONFIG={analyticsEndpoint:'',feedbackEndpoint:''};
