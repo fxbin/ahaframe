@@ -1,5 +1,19 @@
 # AhaFrame Changelog
 
+## Content MVP — Evaluation Failure Lab — 2026-08-13
+
+- Added `/en/labs/evaluation-failure/` as the third Production Lab preview.
+- Reused the customer-support agent world so evaluation follows naturally from RAG and Agent Reliability rather than becoming an isolated metrics lesson.
+- Added a deterministic `evaluation-failure` scenario with demo-biased / production-like / safety-heavy datasets, threshold, safety veto, sample size, judge mode, and cost gate controls.
+- Added fixed synthetic slice performance where v2 improves common FAQ, retrieval, and tool calling while regressing on long-horizon and safety-critical refund cases.
+- Added `SHIP / BLOCK / INCONCLUSIVE` release decisions so insufficient evidence is represented explicitly instead of forcing every comparison into a binary answer.
+- Added a naive checkpoint where the aggregate recommends shipping v2 and a production preset that correctly blocks the unresolved safety regression without pretending the preset fixes the candidate.
+- Added deterministic evidence-width, judge-noise, evaluation-cost, and cost-per-success signals.
+- Added engine-level regression coverage for aggregate-score traps, safety vetoes, underpowered evaluation, cost gates, invalid configuration, and checkpoint comparison.
+- Added the Lab to homepage discovery, pricing sequence, sitemap, `llms.txt`, README, product spec, roadmap, and validation.
+- Advanced the Content MVP stop line: Context Compression Lab is now the next Production Lab before the Reliable Support Agent Build.
+- Kept real LLM judges, benchmark ingestion, accounts, backend persistence, billing, and live compute out of this implementation.
+
 ## Curriculum v1.0 — 2026-08-12
 
 - Added `docs/CURRICULUM.md` as the curriculum source of truth.
