@@ -5,14 +5,15 @@ const path=require('node:path');
 
 require(path.join(__dirname,'..','src','assets','lab-engine.js'));
 require(path.join(__dirname,'..','src','assets','lab-scenarios.js'));
+require(path.join(__dirname,'..','src','assets','evaluation-scenario.js'));
 
 const AhaFrame=globalThis.AhaFrame;
 const approx=(actual,expected,epsilon=1e-9)=>assert.ok(Math.abs(actual-expected)<=epsilon,`${actual} != ${expected}`);
 
 assert.deepEqual(
   AhaFrame.listLabScenarios().map(({id})=>id),
-  ['token-playground','context-window','rag-failure','agent-reliability','agent-loop'],
-  'expected the five deterministic scenarios to be registered',
+  ['token-playground','context-window','rag-failure','agent-reliability','agent-loop','evaluation-failure'],
+  'expected the six deterministic scenarios to be registered',
 );
 
 const token=AhaFrame.createLab('token-playground',{track:false});
@@ -105,6 +106,52 @@ assert.ok(reliabilityDiff.metrics.runawayPercent.after<reliabilityDiff.metrics.r
 assert.ok(reliabilityDiff.metrics.unsafeActionPercent.after<reliabilityDiff.metrics.unsafeActionPercent.before);
 assert.ok(reliabilityDiff.metrics.costIndex.after<reliabilityDiff.metrics.costIndex.before);
 
+const evaluation=AhaFrame.createLab('evaluation-failure',{track:false});
+frame=evaluation.getFrame();
+assert.equal(frame.state.datasetPreset,'demo-biased');
+assert.equal(frame.state.sampleSize,50);
+assert.ok(frame.derived.aggregateV2>frame.derived.aggregateV1,'naive aggregate should make v2 look better');
+assert.equal(frame.derived.criticalRegressions.length,1,'candidate must contain a critical safety regression');
+assert.equal(frame.derived.sliceScores.find((slice)=>slice.critical).delta,-28);
+assert.equal(frame.derived.decision,'SHIP','naive evaluation should ship because no safety or cost gate is enabled');
+assert.equal(frame.derived.failureType,'demo-biased-dataset');
+evaluation.checkpoint('naive-eval');
+const naiveConfidence=frame.derived.confidenceWidth;
+frame=evaluation.dispatch('APPLY_PRODUCTION_PRESET');
+assert.equal(frame.state.datasetPreset,'production-like');
+assert.equal(frame.state.passThreshold,82);
+assert.equal(frame.state.safetyVeto,true);
+assert.equal(frame.state.sampleSize,200);
+assert.equal(frame.state.judgeMode,'mixed');
+assert.equal(frame.state.costGate,true);
+assert.equal(frame.derived.decision,'BLOCK','production evaluation should catch the safety regression');
+assert.equal(frame.derived.failureType,'aggregate-score-trap');
+assert.ok(frame.derived.confidenceWidth<naiveConfidence,'larger evaluation set should reduce modeled evidence width');
+const evaluationDiff=evaluation.compare('naive-eval');
+assert.equal(evaluationDiff.state.safetyVeto.after,true);
+assert.ok(evaluationDiff.metrics.confidenceWidth.after<evaluationDiff.metrics.confidenceWidth.before);
+
+const underpowered=AhaFrame.createLab('evaluation-failure',{track:false});
+underpowered.dispatch('SET_DATASET_PRESET',{value:'production-like'});
+frame=underpowered.getFrame();
+assert.equal(frame.derived.decision,'INCONCLUSIVE','smaller production-like delta should be inconclusive at 50 cases');
+assert.equal(frame.derived.failureType,'underpowered-eval');
+underpowered.dispatch('SET_SAMPLE_SIZE',{value:500});
+assert.equal(underpowered.getFrame().derived.decision,'SHIP','more evidence can resolve an otherwise underpowered comparison when no gate is violated');
+
+const safetyGate=AhaFrame.createLab('evaluation-failure',{track:false});
+safetyGate.dispatch('SET_SAMPLE_SIZE',{value:500});
+assert.equal(safetyGate.getFrame().derived.decision,'SHIP');
+safetyGate.dispatch('SET_SAFETY_VETO',{value:true});
+assert.equal(safetyGate.getFrame().derived.decision,'BLOCK','safety veto must override aggregate improvement');
+
+const costGateEval=AhaFrame.createLab('evaluation-failure',{track:false});
+costGateEval.dispatch('SET_SAMPLE_SIZE',{value:200});
+assert.equal(costGateEval.getFrame().derived.decision,'SHIP');
+costGateEval.dispatch('SET_COST_GATE',{value:true});
+assert.equal(costGateEval.getFrame().derived.decision,'BLOCK','cost gate must be able to block an otherwise acceptable candidate');
+assert.equal(costGateEval.getFrame().derived.failureType,'economic-regression');
+
 const agent=AhaFrame.createLab('agent-loop',{track:false});
 frame=agent.dispatch('NEXT');
 assert.equal(frame.state.step,1);
@@ -125,6 +172,10 @@ assert.throws(()=>rag.dispatch('SET_OVERLAP',{value:1300}),/smaller than chunk s
 assert.throws(()=>reliability.dispatch('SET_MAX_STEPS',{value:3}),/between 4 and 20/);
 assert.throws(()=>reliability.dispatch('SET_RETRY_LIMIT',{value:6}),/between 0 and 5/);
 assert.throws(()=>reliability.dispatch('SET_TERMINATION',{value:'forever'}),/weak, bounded, or goal-aware/);
+assert.throws(()=>evaluation.dispatch('SET_PASS_THRESHOLD',{value:69}),/between 70 and 95/);
+assert.throws(()=>evaluation.dispatch('SET_SAMPLE_SIZE',{value:75}),/one of 50, 100, 200, or 500/);
+assert.throws(()=>evaluation.dispatch('SET_DATASET_PRESET',{value:'marketing-only'}),/demo-biased, production-like, or safety-heavy/);
+assert.throws(()=>evaluation.dispatch('SET_JUDGE_MODE',{value:'magic'}),/deterministic, rubric, or mixed/);
 assert.throws(()=>AhaFrame.createLab('missing-scenario'),/Unknown lab scenario/);
 
-console.log('PASS Lab Engine: registry, Token, Context, RAG failure simulation, Agent Reliability, Agent Loop, history, checkpoints, compare, replay, reset, validation.');
+console.log('PASS Lab Engine: registry, Token, Context, RAG failure simulation, Agent Reliability, Evaluation Failure decisions, Agent Loop, history, checkpoints, compare, replay, reset, validation.');
