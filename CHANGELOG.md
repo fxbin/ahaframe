@@ -1,5 +1,17 @@
 # AhaFrame Changelog
 
+## Curriculum v1.1 + Platform Launch planning — 2026-08-13
+
+- Added a first-class AI Engineering Layers model: **Prompt, Context, Harness, Loop, Graph, Evaluation**.
+- Locked the mental model: `Prompt shapes behavior; Context shapes knowledge; Harness shapes reliability; Loop shapes iteration; Graph shapes orchestration; Evaluation proves whether it works.`
+- Reframed the existing eight curriculum tracks as **system domains** that cross-cut the six engineering layers instead of competing top-level taxonomies.
+- Mapped existing AhaFrame Labs to the engineering layers.
+- Added **Instruction Conflict Lab** and **Agent Workflow Graph Lab** as explicit post-Alpha backlog candidates without expanding the pre-Alpha Content MVP stop line.
+- Kept **Context Compression Lab** and **Reliable Support Agent Build** as the remaining Content MVP requirements.
+- Added GitHub issue `#22` as the end-to-end Platform Launch execution source of truth, with child issues for curriculum, content, Raphael/SaaS architecture, Supabase identity/data, Waffo billing, atomic compute credits, analytics, production deployment, launch-gate QA, Soft Alpha, Live Mode, and Public Beta.
+- Selected Raphael StarterKit as a reusable development skeleton, Supabase as the intended identity/data foundation, and Waffo Pancake as the intended billing provider, pending the implementation ADR and migration work.
+- Updated the public-platform definition so deployment alone is insufficient: identity, saved state, entitlement, verified payment state, access control, analytics, operations, and E2E/security must form one coherent chain before Public Beta.
+
 ## Content MVP — Evaluation Failure Lab — 2026-08-13
 
 - Added `/en/labs/evaluation-failure/` as the third Production Lab preview.
