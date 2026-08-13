@@ -32,6 +32,7 @@ generate_og(SITE/'assets'/'og-ahaframe.png')
 runtime_config={
     'waitlistEndpoint':os.environ.get('AHAFRAME_WAITLIST_ENDPOINT',''),
     'analyticsEndpoint':os.environ.get('AHAFRAME_ANALYTICS_ENDPOINT',''),
+    'feedbackEndpoint':os.environ.get('AHAFRAME_FEEDBACK_ENDPOINT',''),
 }
 (SITE/'assets/config.js').write_text('window.AHAFRAME_CONFIG = '+json.dumps(runtime_config,separators=(',',':'))+';\n',encoding='utf-8')
 
@@ -57,7 +58,7 @@ def page(title,desc,path,body,active='',schemas=None,scripts='',robots=None):
     base_schema={'@context':'https://schema.org','@type':'Organization','@id':BASE+'/#organization','name':'AhaFrame','url':BASE,'description':'Interactive visual lessons for understanding and building AI systems.'}
     head+=jsonld(base_schema)
     for s in schemas or []: head+=jsonld(s)
-    return f'''<!doctype html><html lang="en"><head>{head}</head><body>{header(active)}<main>{body}</main>{footer()}<script src="/assets/config.js" defer></script><script src="/assets/app.js" defer></script><script src="/assets/lab-engine.js" defer></script><script src="/assets/lab-scenarios.js" defer></script>{scripts}</body></html>'''
+    return f'''<!doctype html><html lang="en"><head>{head}</head><body>{header(active)}<main>{body}</main>{footer()}<script src="/assets/config.js" defer></script><script src="/assets/validation-context.js" defer></script><script src="/assets/app.js" defer></script><script src="/assets/validation-ui.js" defer></script><script src="/assets/lab-engine.js" defer></script><script src="/assets/lab-scenarios.js" defer></script>{scripts}</body></html>'''
 
 def breadcrumb(items):
     return {'@context':'https://schema.org','@type':'BreadcrumbList','itemListElement':[{'@type':'ListItem','position':i+1,'name':name,'item':BASE+url} for i,(name,url) in enumerate(items)]}
