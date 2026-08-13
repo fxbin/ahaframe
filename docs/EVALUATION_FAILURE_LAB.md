@@ -1,13 +1,12 @@
 # Evaluation Failure Lab — Product & Simulation Spec
 
-Date: 2026-08-12
-Status: approved next Production Lab design target
+Date: 2026-08-13
+Status: implemented in v0.3 Content MVP
+Route: `/en/labs/evaluation-failure/`
 
 ## Why this Lab exists
 
-RAG Failure Lab teaches how a retrieval system can look plausible while wasting context and reducing answer quality.
-
-Agent Reliability Lab teaches how an agent can complete many tasks while remaining operationally unsafe or expensive.
+RAG Failure Lab teaches how retrieval can look functional while wasting context and degrading answer quality. Agent Reliability Lab teaches how an agent can complete tasks while remaining operationally unsafe or expensive.
 
 Evaluation Failure Lab completes the next part of the engineering loop:
 
@@ -27,72 +26,24 @@ The product question is:
 
 > **How do you know a new AI-system version is actually better, rather than merely better on an aggregate score or a convenient demo set?**
 
-## Core aha
-
-The learner should experience this trap directly:
-
-```text
-System A overall score: 82
-System B overall score: 88
-
-Conclusion at first glance:
-SHIP B
-
-Then inspect slices:
-
-Simple / common cases      improve
-Retrieval cases            improve
-Tool-calling cases         improve
-Safety-critical cases      regress badly
-Long-horizon cases         regress
-
-Real conclusion:
-DO NOT SHIP YET
-```
-
 The durable mental model is:
 
-> **Evaluation is a decision system, not a single score. Dataset coverage, slices, verifiers, uncertainty, and veto conditions determine whether an apparent improvement is trustworthy.**
+> **Evaluation is a decision system, not a single score. Dataset coverage, slices, evidence strength, judge coverage, veto conditions, and economics determine whether an apparent improvement is trustworthy.**
 
 ## Reference synthesis
 
-The Lab is informed by, but should not copy, two references:
+The Lab is informed by, but does not copy, two public references:
 
-### AI Engineering from Scratch
+- AI Engineering from Scratch — Phase 11 / Evaluation: representative datasets, automated scoring, rubric judging, regression testing, evidence strength, cost, and deployment gates.
+- AI Agent Book — Chapter 6: repeatable evaluation environments, trajectories, verifiers, multidimensional rubrics, statistical comparison, cost evidence, and failure analysis.
 
-`https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/11-llm-engineering/10-evaluation`
-
-Relevant ideas to re-model independently:
-
-- representative evaluation datasets;
-- deterministic checks, semantic/rubric judging, and human calibration;
-- baseline-vs-candidate regression testing;
-- confidence / sample-size awareness;
-- cost and latency as evaluation dimensions;
-- deployment gates rather than vibes-based review.
-
-### AI Agent Book — Chapter 6
-
-`https://github.com/bojieli/ai-agent-book/tree/main/chapter6`
-
-Relevant ideas to re-model independently:
-
-- evaluation environment and repeatable task execution;
-- trajectories and process evidence, not only final answers;
-- multidimensional rubrics;
-- explicit verifiers and veto rules;
-- statistical comparison;
-- cost evidence and failure analysis.
-
-AhaFrame will write original copy, use original synthetic data, and implement an original deterministic simulation.
+AhaFrame uses original English copy, original synthetic data, and an original deterministic simulation.
 
 ## Scenario
 
-Use the same product world as Agent Reliability Lab so the Content MVP feels connected rather than episodic.
+The Lab continues the customer-support product world used by Agent Reliability Lab.
 
-### System under evaluation
-
-A customer-support AI uses:
+The support AI uses:
 
 ```text
 Customer/account lookup
@@ -101,218 +52,65 @@ Tool calling
 Refund recommendation / action
 ```
 
-The team has created **Agent v2** after tuning retrieval and execution behavior.
+The team has produced **Agent v2** after tuning retrieval and execution behavior. A headline dashboard says v2 is better, but that conclusion depends on the evaluation policy.
 
-A dashboard shows that v2's aggregate score is higher than v1, encouraging a fast ship decision.
+## Fixed synthetic slice model
 
-The learner's job is to decide whether that conclusion survives a better evaluation design.
-
-## Fixed system performance model
-
-The first version should use a fixed deterministic slice matrix rather than live model outputs.
-
-Suggested synthetic slice scores:
-
-| Evaluation slice | v1 | v2 | Change | Interpretation |
+| Evaluation slice | v1 | v2 | Delta | Role |
 |---|---:|---:|---:|---|
 | Common FAQ | 88 | 95 | +7 | clear improvement |
 | Retrieval-heavy | 79 | 91 | +12 | strong improvement |
 | Tool calling | 82 | 94 | +12 | strong improvement |
 | Long-horizon | 76 | 64 | -12 | hidden regression |
-| Safety-critical refund | 89 | 61 | -28 | release-blocking regression |
+| Safety-critical refund | 89 | 61 | -28 | critical regression |
 
-These are teaching values, not benchmark results.
+These values are teaching data, not benchmark results.
 
-The default evaluation-set mix should be intentionally demo-biased so the aggregate favors v2.
-
-Suggested default mix:
+### Dataset presets
 
 ```text
+Demo-biased
 Common FAQ              45%
 Retrieval-heavy         30%
 Tool calling            15%
 Long-horizon             7%
 Safety-critical refund   3%
-```
 
-A more production-representative mix can reveal the risk:
-
-```text
+Production-like
 Common FAQ              30%
 Retrieval-heavy         25%
 Tool calling            20%
 Long-horizon            15%
 Safety-critical refund  10%
+
+Safety-heavy
+20% each slice
 ```
 
-Exact percentages may be tuned during implementation as long as the invariant remains: the default aggregate says “ship” while the critical slice says “block.”
+The naive demo-biased aggregate makes v2 look clearly stronger even though the critical refund slice regresses by 28 points.
 
 ## Learner controls
 
-Keep v1 focused. The Lab should teach several evaluation dimensions without becoming an analytics dashboard simulator.
-
-### 1. Dataset composition
-
-Preset selector:
-
 ```text
-Demo-biased
-Production-like
-Safety-heavy
+Dataset preset       Demo-biased / Production-like / Safety-heavy
+Pass threshold       70–95
+Safety veto          OFF / ON
+Sample size          50 / 100 / 200 / 500
+Judge mode           Deterministic / Rubric / Mixed
+Cost gate            OFF / ON
 ```
 
-Optional later enhancement: direct slice-weight controls.
+The controls change the release-evaluation policy. They do not mutate the fixed v1/v2 slice scores.
 
-### 2. Pass threshold
+## Implemented state contract
 
-Range:
-
-```text
-70–95
-```
-
-Shows why arbitrary global thresholds do not replace per-slice requirements.
-
-### 3. Safety veto
-
-```text
-OFF / ON
-```
-
-When enabled, a critical safety slice below its floor blocks shipment regardless of the aggregate score.
-
-### 4. Evaluation sample size
-
-```text
-50
-100
-200
-500
-```
-
-Used to derive a pedagogical confidence-width estimate.
-
-The Lab should not claim statistical significance from real stochastic trials; it simulates why small samples provide weaker evidence.
-
-### 5. Judge mode
-
-```text
-Deterministic checks
-Semantic / rubric judge
-Mixed evaluation
-```
-
-This should change the modeled coverage/noise trade-off rather than pretending one judge is universally best.
-
-### 6. Cost constraint
-
-Toggle or threshold:
-
-```text
-Ignore cost
-Enforce cost-per-success budget
-```
-
-This connects evaluation quality to production economics.
-
-## Derived metrics
-
-The Scenario should derive at least:
-
-```text
-Aggregate Score — v1
-Aggregate Score — v2
-Aggregate Delta
-Critical Safety Score — v2
-Regression Count
-Critical Regression Count
-Evaluation Confidence Width
-Judge Noise Index
-Estimated Eval Cost
-Cost per Successful Task
-Ship Decision
-Failure Diagnosis
-```
-
-Optional second iteration:
-
-```text
-Long-horizon score
-Worst-slice score
-Process-policy violation rate
-```
-
-## Decision model
-
-The decision result should be one of:
-
-```text
-SHIP
-BLOCK
-INCONCLUSIVE
-```
-
-### SHIP
-
-Only when:
-
-- candidate meets aggregate threshold;
-- no enabled veto is violated;
-- no critical regression exceeds the allowed budget;
-- evidence strength is adequate;
-- cost constraint is satisfied when enabled.
-
-### BLOCK
-
-When a critical condition is clearly violated.
-
-### INCONCLUSIVE
-
-When the observed candidate appears better but the configured evidence is too weak for a confident release decision.
-
-This third state is important. The lesson should not teach that every evaluation must force a binary answer.
-
-## Failure diagnoses
-
-The simulation should expose named failure modes instead of only changing numbers.
-
-### `aggregate-score-trap`
-
-The overall metric improves while a critical slice materially regresses.
-
-### `demo-biased-dataset`
-
-The evaluation distribution overweights easy/common cases and underweights consequential production cases.
-
-### `underpowered-eval`
-
-Sample size is too small to support the release decision confidently.
-
-### `judge-mismatch`
-
-The chosen evaluation method cannot reliably capture important semantic or process-level quality dimensions.
-
-### `missing-veto`
-
-A safety-critical dimension is averaged away rather than treated as a release gate.
-
-### `economic-regression`
-
-Quality improves but cost-per-success violates the configured production budget.
-
-### `healthy`
-
-The candidate improves meaningfully and passes all active release conditions.
-
-## Lab Engine contract
-
-Recommended scenario id:
+Scenario id:
 
 ```text
 evaluation-failure
 ```
 
-### State
+Initial state:
 
 ```js
 {
@@ -325,7 +123,7 @@ evaluation-failure
 }
 ```
 
-### Actions
+Actions:
 
 ```text
 SET_DATASET_PRESET
@@ -337,7 +135,7 @@ SET_COST_GATE
 APPLY_PRODUCTION_PRESET
 ```
 
-### Derived
+Derived data:
 
 ```text
 sliceScores
@@ -347,7 +145,9 @@ aggregateDelta
 regressions
 criticalRegressions
 confidenceWidth
+evidenceAdequate
 judgeNoise
+judgeCoverage
 estimatedEvalCost
 costPerSuccessV1
 costPerSuccessV2
@@ -357,131 +157,184 @@ diagnosis
 metrics
 ```
 
-### Checkpoint
+Runtime files:
 
-On mount:
+```text
+src/assets/evaluation-scenario.js   deterministic scenario
+src/assets/evaluation.js            DOM adapter + analytics
+scripts/ahaframe/evaluation.py      static page builder
+```
+
+The scenario is page-specific: the generic Lab Engine loads first, the shared scenario registry loads second, then `evaluation-scenario.js`, then the adapter. No generic Engine change was required.
+
+## Decision model
+
+Release outcome is one of:
+
+```text
+SHIP
+BLOCK
+INCONCLUSIVE
+```
+
+### SHIP
+
+Used when the candidate clears the configured aggregate threshold, no active hard gate is violated, and modeled evidence is strong enough.
+
+### BLOCK
+
+Used when a configured hard condition is clearly violated. In v1 this includes:
+
+- safety-veto violation;
+- cost-per-success gate violation;
+- failure to meet the aggregate release condition.
+
+### INCONCLUSIVE
+
+Used when the candidate appears better but the modeled evidence width is too large relative to the improvement.
+
+This third state is deliberate: an evaluation process should be able to say **“we do not know yet.”**
+
+## Pedagogical evidence model
+
+Evidence width is deterministic and decreases with larger sample size. Judge mode adds a modeled coverage/noise penalty.
+
+This is not a real confidence interval calculated from stochastic model trials. It is a teaching mechanism for the principle that:
+
+```text
+more representative evidence + more samples
+            ↓
+stronger release confidence
+```
+
+while also showing that more samples do not repair a biased dataset.
+
+Judge modes model three trade-offs:
+
+```text
+Deterministic checks   cheap / stable / narrower coverage
+Rubric judge           broader semantics / noisier / more costly
+Mixed evaluation       strongest modeled coverage / additional cost
+```
+
+No live LLM judge is invoked.
+
+## Economics model
+
+The simulation exposes:
+
+```text
+Estimated evaluation cost index
+Cost per successful task — v1
+Cost per successful task — v2
+```
+
+Synthetic v2 task cost is intentionally higher, allowing the cost gate to block a candidate that might otherwise clear the quality policy.
+
+The values are cost units, not vendor pricing.
+
+## Failure diagnoses
+
+Implemented failure types:
+
+```text
+aggregate-score-trap
+  a critical regression invalidates the headline aggregate
+
+demo-biased-dataset
+  easy/common cases dominate the evaluation distribution
+
+underpowered-eval
+  apparent improvement is smaller than the modeled evidence width
+
+judge-mismatch
+  selected judge strategy has insufficient modeled coverage
+
+missing-veto
+  critical regression is averaged away rather than gated
+
+economic-regression
+  quality is acceptable but cost-per-success violates the active budget
+
+healthy
+  active release conditions and evidence support the decision
+```
+
+## Baseline and production preset
+
+On mount, the adapter saves:
 
 ```text
 checkpoint('naive-eval')
 ```
 
-The learner should compare the improved evaluation policy to the initial naive evaluation setup.
-
-## Recommended production preset
-
-A one-click preset should teach the intended shape of a safer evaluation design:
+The naive baseline uses:
 
 ```text
-Dataset preset       Production-like
-Pass threshold       82
-Safety veto          ON
-Sample size          200
-Judge mode           Mixed evaluation
-Cost gate            ON
+Dataset             Demo-biased
+Threshold           80
+Safety veto         OFF
+Sample size         50
+Judge               Rubric
+Cost gate           OFF
 ```
 
-The preset does **not** need to make v2 pass. In fact, the intended first version should reveal that a better evaluation policy correctly blocks v2 until the safety and long-horizon regressions are fixed.
+It intentionally returns:
 
-This is pedagogically stronger than every AhaFrame preset magically “solving” the system.
+```text
+v2 aggregate > v1 aggregate
+critical safety regression exists
+Decision: SHIP
+```
+
+The one-click production preset uses:
+
+```text
+Dataset             Production-like
+Threshold           82
+Safety veto         ON
+Sample size         200
+Judge               Mixed
+Cost gate           ON
+```
+
+It intentionally returns:
+
+```text
+Decision: BLOCK
+```
+
+because a better evaluation policy correctly exposes the unresolved critical regression. The preset improves the **decision process**, not the candidate system.
 
 ## Interaction flow
 
 ### SEE
 
-Show a summary card:
-
-```text
-v1 overall: 82
-v2 overall: 88
-Recommendation: SHIP v2
-```
+The learner sees a candidate that appears better overall.
 
 ### PLAY
 
-Let the learner change dataset composition, threshold, sample size, judge strategy, and gates.
+The learner changes dataset composition, threshold, sample size, judge strategy, and release gates.
 
 ### BREAK
 
-Reveal that the naive evaluation setup itself is broken.
-
-The system being debugged is not only the agent; it is the **evaluation process**.
+The learner discovers that the naive evaluation process itself is broken.
 
 ### AHA
 
-Expose slice-level regressions and explain why the aggregate hid them.
+Slice-level regressions, evidence strength, vetoes, and economics explain why the release decision changes.
 
 ### BUILD
 
-End with a release-gate challenge:
+The page ends with a policy challenge:
 
-> Define the minimum evaluation policy you would require before shipping a customer-support agent that can perform refunds.
+> Define the minimum release gate you would require before shipping a customer-support agent that can perform refunds.
 
-The learner should choose a policy, not write boilerplate code.
+The task is to choose a defensible policy, not copy boilerplate code.
 
-## UI composition
+## Analytics boundary
 
-Suggested page layout:
-
-```text
-Hero / quick answer
-
-┌──────────────────────────────┬─────────────────────────┐
-│ Eval policy controls         │ Release decision        │
-│                              │ SHIP / BLOCK / ?        │
-│ Dataset preset               │                         │
-│ Threshold                    │ Aggregate delta         │
-│ Safety veto                  │ Critical regression     │
-│ Sample size                  │ Confidence              │
-│ Judge mode                   │ Cost per success        │
-│ Cost gate                    │                         │
-└──────────────────────────────┴─────────────────────────┘
-
-Slice comparison
-v1 vs v2
-
-Naive eval checkpoint
-vs
-Current evaluation policy
-
-Failure diagnosis
-
-Concept explanation
-
-Build challenge
-```
-
-On mobile, controls and metrics must collapse to a single column.
-
-## Copy guardrails
-
-The page must explicitly say that:
-
-- all scores and costs are synthetic educational values;
-- confidence behavior is pedagogical, not a result from actual repeated model runs;
-- no live LLM judge is being invoked;
-- the point is to understand evaluation design, not memorize universal thresholds;
-- real production releases require representative data, validated graders/verifiers, and organization-specific risk criteria.
-
-Do not publish volatile vendor pricing or model-specific claims as fixed facts inside the deterministic simulation.
-
-## Regression-test invariants
-
-`scripts/test_lab_engine.js` should verify at least:
-
-1. `evaluation-failure` is registered;
-2. initial demo-biased configuration gives v2 a higher aggregate score;
-3. initial configuration contains a critical safety regression;
-4. naive configuration can recommend SHIP because the veto is disabled;
-5. enabling a production-like preset reveals / blocks the critical regression;
-6. increasing sample size reduces modeled confidence width;
-7. safety veto can override aggregate improvement;
-8. cost gate can block an otherwise acceptable candidate when the synthetic budget is exceeded;
-9. invalid thresholds, sample sizes, presets, and judge modes throw explicit errors;
-10. checkpoint / compare works against `naive-eval`.
-
-## Analytics events
-
-Adapter-owned events:
+Adapter-owned events include:
 
 ```text
 evaluation_parameter_changed
@@ -496,16 +349,42 @@ evaluation_build_challenge_started
 evaluation_paid_intent_click
 ```
 
-Do not emit every Engine action twice through engine-level tracking.
+The generic Engine remains analytics opt-in and does not duplicate high-frequency control events.
 
-## What not to build in v1
+## Regression-test invariants
 
-Do not add yet:
+`scripts/test_lab_engine.js` now verifies:
+
+1. `evaluation-failure` is registered;
+2. demo-biased baseline gives v2 a higher aggregate;
+3. the candidate contains a -28 critical safety regression;
+4. naive evaluation can return `SHIP` when hard gates are disabled;
+5. production preset returns `BLOCK` because the safety regression remains;
+6. increasing sample size reduces modeled evidence width;
+7. production-like evaluation at small sample size can return `INCONCLUSIVE`;
+8. a safety veto overrides aggregate improvement;
+9. a cost gate can independently block an otherwise acceptable candidate;
+10. invalid threshold, sample size, dataset preset, and judge mode fail explicitly;
+11. checkpoint / compare works against `naive-eval`.
+
+## Copy and claims guardrails
+
+The page explicitly communicates that:
+
+- slice scores and costs are synthetic educational values;
+- evidence-width behavior is pedagogical, not the result of real repeated model runs;
+- no live LLM judge is invoked;
+- there are no universal thresholds embedded in the Lab;
+- production releases require representative data, validated graders/verifiers, and organization-specific risk criteria.
+
+Do not publish volatile vendor pricing or imply these synthetic values are benchmark evidence.
+
+## v1 non-goals
 
 ```text
 real LLM-as-judge calls
 real benchmark ingestion
-real confidence tests over live stochastic outputs
+real statistical tests over live stochastic outputs
 user-uploaded datasets
 CSV analytics tooling
 full tracing backend
@@ -514,12 +393,8 @@ cloud persistence
 billing
 ```
 
-Those become candidates only after the deterministic experience proves useful.
+## Exit result
 
-## Exit criteria
+The implemented Lab satisfies the intended experience when a learner can:
 
-Evaluation Failure Lab is ready for implementation when the following statement is true:
-
-> A learner can start from an apparently better candidate, modify the evaluation design, discover a hidden critical regression, and explain why the release decision changed.
-
-If the page only teaches metric definitions, it has failed the AhaFrame product thesis.
+> Start from an apparently better candidate, modify the evaluation design, discover a hidden critical regression, and explain why the release decision changes from `SHIP` to `BLOCK` or `INCONCLUSIVE`.
