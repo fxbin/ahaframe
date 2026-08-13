@@ -6,14 +6,15 @@ const path=require('node:path');
 require(path.join(__dirname,'..','src','assets','lab-engine.js'));
 require(path.join(__dirname,'..','src','assets','lab-scenarios.js'));
 require(path.join(__dirname,'..','src','assets','evaluation-scenario.js'));
+require(path.join(__dirname,'..','src','assets','context-compression-scenario.js'));
 
 const AhaFrame=globalThis.AhaFrame;
 const approx=(actual,expected,epsilon=1e-9)=>assert.ok(Math.abs(actual-expected)<=epsilon,`${actual} != ${expected}`);
 
 assert.deepEqual(
   AhaFrame.listLabScenarios().map(({id})=>id),
-  ['token-playground','context-window','rag-failure','agent-reliability','agent-loop','evaluation-failure'],
-  'expected the six deterministic scenarios to be registered',
+  ['token-playground','context-window','rag-failure','agent-reliability','agent-loop','evaluation-failure','context-compression'],
+  'expected the seven deterministic scenarios to be registered',
 );
 
 const token=AhaFrame.createLab('token-playground',{track:false});
@@ -152,6 +153,57 @@ costGateEval.dispatch('SET_COST_GATE',{value:true});
 assert.equal(costGateEval.getFrame().derived.decision,'BLOCK','cost gate must be able to block an otherwise acceptable candidate');
 assert.equal(costGateEval.getFrame().derived.failureType,'economic-regression');
 
+const compression=AhaFrame.createLab('context-compression',{track:false});
+frame=compression.getFrame();
+assert.equal(frame.state.compressionRatio,72);
+assert.equal(frame.state.summaryDepth,'shallow');
+assert.equal(frame.state.retrievalBudget,1600);
+assert.equal(frame.state.memoryBudget,600);
+assert.equal(frame.state.protectCritical,false);
+assert.equal(frame.derived.originalTokens,25500);
+assert.equal(frame.derived.contextBudget,16000);
+assert.equal(frame.derived.activeContextTokens,7414);
+assert.equal(frame.derived.overflowTokens,0);
+assert.equal(frame.derived.failureType,'critical-information-loss');
+assert.ok(frame.derived.savingsPercent>70,'baseline should look very efficient on tokens');
+assert.ok(frame.derived.criticalRetentionPercent<40,'baseline should silently lose most critical information');
+assert.ok(frame.derived.taskQuality<40,'over-compressed baseline should fail the task-quality objective');
+compression.checkpoint('baseline');
+frame=compression.dispatch('APPLY_BALANCED_PRESET');
+assert.equal(frame.state.compressionRatio,58);
+assert.equal(frame.state.summaryDepth,'balanced');
+assert.equal(frame.state.retrievalBudget,3000);
+assert.equal(frame.state.memoryBudget,900);
+assert.equal(frame.state.protectCritical,true);
+assert.equal(frame.derived.activeContextTokens,14531);
+assert.equal(frame.derived.overflowTokens,0);
+assert.equal(frame.derived.failureType,'healthy');
+assert.ok(frame.derived.savingsPercent>42,'balanced policy should still save meaningful tokens');
+assert.ok(frame.derived.criticalRetentionPercent>85,'balanced policy should retain task-critical meaning');
+assert.ok(frame.derived.taskQuality>85,'balanced policy should restore dependable task quality');
+assert.ok(frame.derived.hallucinationRisk<15,'balanced policy should sharply reduce modeled hallucination risk');
+const compressionDiff=compression.compare('baseline');
+assert.ok(compressionDiff.metrics.activeContextTokens.after>compressionDiff.metrics.activeContextTokens.before,'safer compression should spend more context than the broken baseline');
+assert.ok(compressionDiff.metrics.criticalRetentionPercent.after>compressionDiff.metrics.criticalRetentionPercent.before);
+assert.ok(compressionDiff.metrics.taskQuality.after>compressionDiff.metrics.taskQuality.before);
+assert.ok(compressionDiff.metrics.hallucinationRisk.after<compressionDiff.metrics.hallucinationRisk.before);
+
+const starvedContext=AhaFrame.createLab('context-compression',{track:false});
+starvedContext.dispatch('APPLY_BALANCED_PRESET');
+frame=starvedContext.dispatch('SET_RETRIEVAL_BUDGET',{value:800});
+assert.equal(frame.derived.failureType,'retrieval-budget-starvation','critical protection cannot recover evidence excluded by retrieval budget');
+assert.ok(frame.derived.evidenceCoveragePercent<60);
+
+const overRetainedContext=AhaFrame.createLab('context-compression',{track:false});
+overRetainedContext.dispatch('SET_COMPRESSION_RATIO',{value:25});
+overRetainedContext.dispatch('SET_SUMMARY_DEPTH',{value:'deep'});
+overRetainedContext.dispatch('SET_RETRIEVAL_BUDGET',{value:4200});
+overRetainedContext.dispatch('SET_MEMORY_BUDGET',{value:2400});
+frame=overRetainedContext.dispatch('SET_PROTECT_CRITICAL',{value:true});
+assert.equal(frame.derived.failureType,'context-budget-overflow','retaining nearly everything should violate the fixed context budget');
+assert.ok(frame.derived.overflowTokens>7000);
+assert.equal(frame.derived.taskQuality,100);
+
 const agent=AhaFrame.createLab('agent-loop',{track:false});
 frame=agent.dispatch('NEXT');
 assert.equal(frame.state.step,1);
@@ -176,6 +228,10 @@ assert.throws(()=>evaluation.dispatch('SET_PASS_THRESHOLD',{value:69}),/between 
 assert.throws(()=>evaluation.dispatch('SET_SAMPLE_SIZE',{value:75}),/one of 50, 100, 200, or 500/);
 assert.throws(()=>evaluation.dispatch('SET_DATASET_PRESET',{value:'marketing-only'}),/demo-biased, production-like, or safety-heavy/);
 assert.throws(()=>evaluation.dispatch('SET_JUDGE_MODE',{value:'magic'}),/deterministic, rubric, or mixed/);
+assert.throws(()=>compression.dispatch('SET_COMPRESSION_RATIO',{value:90}),/between 20 and 85/);
+assert.throws(()=>compression.dispatch('SET_SUMMARY_DEPTH',{value:'infinite'}),/shallow, balanced, or deep/);
+assert.throws(()=>compression.dispatch('SET_RETRIEVAL_BUDGET',{value:500}),/between 800 and 4200/);
+assert.throws(()=>compression.dispatch('SET_MEMORY_BUDGET',{value:3300}),/between 0 and 3000/);
 assert.throws(()=>AhaFrame.createLab('missing-scenario'),/Unknown lab scenario/);
 
-console.log('PASS Lab Engine: registry, Token, Context, RAG failure simulation, Agent Reliability, Evaluation Failure decisions, Agent Loop, history, checkpoints, compare, replay, reset, validation.');
+console.log('PASS Lab Engine: registry, Token, Context, RAG failure simulation, Agent Reliability, Evaluation Failure decisions, Context Compression trade-offs, Agent Loop, history, checkpoints, compare, replay, reset, validation.');
