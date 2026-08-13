@@ -1,4 +1,4 @@
-# AhaFrame Product Spec — v0.3 Content MVP
+# AhaFrame Product Spec — v0.3 Content MVP + Platform Launch
 
 Date: 2026-08-13
 
@@ -36,7 +36,7 @@ SEE → PLAY → BREAK → AHA → BUILD
 - **Aha** — connect cause and effect into a durable mental model;
 - **Build** — apply the mental model to architecture, debugging, evaluation, and production trade-offs.
 
-## Curriculum v1
+## Curriculum v1.1
 
 `docs/CURRICULUM.md` is the curriculum source of truth.
 
@@ -47,7 +47,24 @@ AhaFrame uses external material as research references, not runtime or content d
 
 AhaFrame transforms those references into original failure-first experiences instead of copying source lessons.
 
-The curriculum is organized into eight tracks:
+### AI Engineering Layers
+
+Curriculum v1.1 introduces a first-class six-layer mental model:
+
+```text
+Prompt Engineering      — shapes behavior
+Context Engineering     — shapes knowledge
+Harness Engineering     — shapes reliability
+Loop Engineering        — shapes iteration
+Graph Engineering       — shapes orchestration
+Evaluation Engineering  — proves whether it works
+```
+
+These are cross-cutting engineering layers, not six separate catalogs.
+
+### Curriculum domains
+
+The existing eight tracks remain as system/dependency domains:
 
 ```text
 01 LLM Mental Models
@@ -60,7 +77,7 @@ The curriculum is organized into eight tracks:
 08 Build Systems
 ```
 
-The map is intentionally larger than the current product. It is a prioritization and dependency tool, not a commitment to build every topic.
+The layers answer **what kind of engineering decision is being made**; the domains answer **where in the AI system the decision appears**.
 
 A new full Lab should normally require:
 
@@ -72,6 +89,13 @@ A new full Lab should normally require:
 - a connection to another Lab or Build Challenge.
 
 If a topic does not satisfy these criteria, prefer a guide or reference instead of manufacturing an interactive Lab.
+
+Prompt and Graph are explicit curriculum gaps, but their candidate Labs do not expand the pre-Alpha Content MVP:
+
+```text
+Instruction Conflict Lab      backlog after Alpha
+Agent Workflow Graph Lab      backlog after Alpha
+```
 
 ## Public routes
 
@@ -101,7 +125,7 @@ Teaches finite working context and the trade-offs between truncation, summarizat
 
 ### Agent Loop Simulator
 
-Teaches task interpretation, action selection, tool use, observation, retry/error recovery, and final response. Error simulation must never race with Reset or manual progression.
+Teaches task interpretation, action selection, tool use, observation, retry/error recovery, and final response. It is the first explicit Loop Engineering mental model. Error simulation must never race with Reset or manual progression.
 
 ## Production Lab previews
 
@@ -117,20 +141,7 @@ Retrieval Strategy
 Reranker
 ```
 
-The deterministic model derives:
-
-```text
-Recall
-Precision
-Context Usage
-Overflow
-Latency
-Cost Index
-Answer Quality Score
-Failure Diagnosis
-```
-
-The lab uses Engine checkpoints and comparison so the learner can compare the current configuration against the broken baseline.
+The deterministic model derives recall, precision, context usage, overflow, latency, cost index, answer quality, and failure diagnosis. Primary layer: **Context Engineering**.
 
 ### Agent Reliability Lab
 
@@ -147,21 +158,9 @@ Human Approval
 Termination Rule
 ```
 
-Derived metrics:
+Derived metrics include success rate, reliability score, runaway risk, unsafe-action risk, expected steps, simulated latency, cost index, review load, and failure diagnosis.
 
-```text
-Success Rate
-Reliability Score
-Runaway Risk
-Unsafe-Action Risk
-Expected Steps
-Simulated Latency
-Cost Index
-Human Reviews / 100 Runs
-Failure Diagnosis
-```
-
-The baseline intentionally demonstrates that a policy can complete many tasks while remaining operationally unsafe: generous retries and step budget raise success, but also allow loops and repeated actions. The reliability preset introduces bounded execution, goal-aware termination, validation, and approval around the irreversible tool boundary.
+Primary layer: **Harness Engineering**. Secondary layer: **Loop Engineering**.
 
 ### Evaluation Failure Lab
 
@@ -178,25 +177,9 @@ Judge mode
 Cost gate
 ```
 
-Derived signals:
+Derived signals include aggregate score, slice regressions, evidence width, judge noise, evaluation cost, cost per success, and `SHIP / BLOCK / INCONCLUSIVE`.
 
-```text
-Aggregate Score — v1
-Aggregate Score — v2
-Aggregate Delta
-Slice Regressions
-Critical Regression Count
-Evidence Width
-Judge Noise Index
-Evaluation Cost Index
-Cost per Successful Task
-SHIP / BLOCK / INCONCLUSIVE
-Failure Diagnosis
-```
-
-The naive baseline is allowed to produce `SHIP` because the evaluation policy is weak. The production preset changes the evaluation design—not the candidate system—and intentionally produces `BLOCK` while the safety regression remains unresolved. Smaller sample sizes can produce `INCONCLUSIVE`, teaching that insufficient evidence is a valid release outcome.
-
-The core lesson is:
+Primary layer: **Evaluation Engineering**. The core lesson is:
 
 > **Evaluation is a decision system, not a single score.**
 
@@ -204,7 +187,7 @@ All Production Lab previews use deterministic educational metrics. They are not 
 
 ## Content MVP stop line
 
-Do not launch broadly after only one or two Production Labs. The first coherent external-alpha target is:
+The Content MVP remains intentionally small:
 
 ```text
 RAG Failure Lab                 done
@@ -212,15 +195,110 @@ Agent Reliability Lab           done
 Evaluation Failure Lab          done
 Context Compression Lab         next
 Reliable Support Agent Build    next
-        ↓
-UX / content review
-        ↓
-20–50 developer Soft Alpha
 ```
 
-`Tool Contract Failure Lab` is an optional bridge if the Build Challenge exposes a missing Tools & Protocols concept. It does not delay Soft Alpha by default.
+`Instruction Conflict Lab`, `Agent Workflow Graph Lab`, and `Tool Contract Failure Lab` are backlog candidates and do not delay Soft Alpha unless the capstone reveals a real prerequisite gap.
 
-The objective is a 60–120 minute product journey that demonstrates the AhaFrame method before investing in full account, payment, or sandbox infrastructure.
+The objective is a coherent 60–120 minute journey, not maximum lesson count.
+
+## Platform launch definition
+
+AhaFrame is not considered a public platform merely because the static pages are deployed. Before Public Beta, the complete product chain must be demonstrably coherent:
+
+```text
+Content
+→ optional identity
+→ durable progress / checkpoints
+→ entitlement
+→ payment
+→ verified webhook
+→ access control
+→ analytics
+→ production deployment
+→ E2E / security verification
+→ Soft Alpha
+→ Public Beta decision
+```
+
+Execution is tracked in GitHub issue `#22`.
+
+## Platform direction
+
+Current runtime:
+
+```text
+Python static generator
++ HTML / CSS / dependency-light browser JS
++ generic AhaFrame Lab Engine
+```
+
+Target SaaS foundation is being designed in a dedicated architecture step before migration:
+
+```text
+Raphael StarterKit   reusable development skeleton
+Supabase             identity + application data
+Waffo Pancake        billing provider
+AhaFrame Lab Engine  simulation runtime
+```
+
+The runtime migration must preserve current URLs, SEO guarantees, visual identity, and deterministic Lab behavior.
+
+### Identity policy
+
+Public learning remains no-login.
+
+Ask for identity only when the learner chooses a durable capability such as:
+
+```text
+Save
+Purchase
+Build Project
+Live Mode
+Cross-device progress
+```
+
+Supabase is the intended identity/data foundation. GitHub sign-in is the preferred first OAuth path for the developer audience, with an email fallback.
+
+### Entitlement policy
+
+Application access must not be derived directly from a payment provider response.
+
+The domain model separates:
+
+```text
+Purchase
+Subscription
+Entitlement
+PaymentEvent
+```
+
+`Entitlement` is the canonical application access truth so one-time Foundations access and recurring Production Labs access can coexist without coupling product logic to Waffo.
+
+### Billing policy
+
+Waffo Pancake is the intended payment provider.
+
+Initial product types:
+
+```text
+AI Engineer Foundations    one-time purchase hypothesis
+Production Labs            recurring subscription hypothesis
+```
+
+The server/webhook path is authoritative. A browser success redirect alone must never grant access. Duplicate payment/webhook events must be idempotent.
+
+### Compute-credit policy
+
+Credits are for real compute only:
+
+```text
+Simulation / learning   no credits
+Saved progress          no credits
+Live model / agent run  credits
+Sandbox execution       credits later
+```
+
+A transaction-safe credit ledger may be implemented before Live Mode, but credit packages must not be sold publicly until a real metered compute capability exists.
 
 ## Pricing hypothesis
 
@@ -231,6 +309,8 @@ Free                       $0
 AI Engineer Foundations    $49 one-time hypothesis
 Production Labs            $12/month future hypothesis
 ```
+
+The exact public price remains a validation hypothesis until real checkout evidence exists.
 
 ### Free boundary
 
@@ -248,8 +328,6 @@ Production Labs            $12/month future hypothesis
 - evaluation challenges;
 - later: saved cloud experiments and Live Mode capabilities.
 
-The MVP still collects no payment. Pricing clicks and waitlist intent are validation signals only.
-
 ## Conversion model
 
 ```text
@@ -259,33 +337,20 @@ Start free lesson / lab
   ↓
 Interact with parameters
   ↓
-Improve or correctly diagnose a failed scenario
+Diagnose or repair a failed scenario
   ↓
 Start another lab
   ↓
-View paid capability
+Start capstone / view paid capability
   ↓
-Select realistic pricing intent
+Optional sign-in
   ↓
-Waitlist
+Checkout
+  ↓
+Verified entitlement
+  ↓
+Return / retain progress
 ```
-
-If no production waitlist endpoint is configured, the UI must explicitly identify demo mode and must not claim that a remote signup succeeded.
-
-## Technical strategy
-
-The site remains a small static Python generator with dependency-light browser JavaScript.
-
-Principles:
-
-- simulation first, real model second;
-- **simulate the concept; spend compute only to validate reality**;
-- source and generated output are separate;
-- `site/` is disposable build output;
-- public conceptual content is available without JavaScript or authentication;
-- local builds fail closed for search indexing;
-- no API secrets are shipped client-side;
-- framework migration should be driven by product/content scale, not aesthetics.
 
 ## Lab / Simulation Engine
 
@@ -325,25 +390,9 @@ agent-loop
 evaluation-failure
 ```
 
-RAG Failure validates multi-parameter optimization and comparison. Agent Reliability adds a second pressure test focused on execution policy, safety, latency, and cost. Evaluation Failure adds a third pressure test focused on dataset policy, evidence strength, release gates, and three-state decision logic.
-
-The Evaluation Failure scenario is loaded as a page-specific scenario module after the shared base registry and before its DOM adapter. This keeps the generic Engine unchanged and avoids putting evaluation-specific logic in the DOM layer.
+The Lab Engine remains framework-independent. Platform migration must wrap it rather than rewrite it without a demonstrated reason.
 
 See `docs/LAB_ENGINE.md` for the architecture contract.
-
-## Authentication boundary
-
-Authentication is **not** required for public Content MVP learning.
-
-Do not introduce a login wall in front of lessons or simulations. Identity becomes justified when users need one of these durable capabilities:
-
-1. save experiment history/checkpoints across devices;
-2. own a paid entitlement;
-3. receive and meter Live Mode credits;
-4. submit Build Projects;
-5. persist learning progress beyond local browser storage.
-
-The intended UX is optional sign-in at the moment the learner chooses **Save / Purchase / Live Mode / Build Project**.
 
 ## Visual direction
 
@@ -357,50 +406,32 @@ Use warm white, graphite, and teal. Avoid generic blue-purple AI gradients, deco
 
 ## SEO / generative-search posture
 
-The canonical HTML page is the content source of truth. Lessons and public lab previews use stable URLs, crawlable explanations, answer-first definitions, semantic structured data, sitemap/robots, and explicit modification dates.
+Public conceptual pages use stable URLs, crawlable explanations, answer-first definitions, semantic structured data, sitemap/robots, and explicit modification dates. A platform migration must preserve or improve these guarantees.
 
-## Validation events
+## Analytics boundary
 
-Core events include:
+Product events belong to the product adapters/workflows. The Lab Engine keeps engine-level analytics opt-in so high-frequency simulation actions do not automatically duplicate semantic events.
+
+The production funnel eventually includes:
 
 ```text
-lesson_started
-lesson_step_completed
-lesson_completed
-interaction_slider_changed
-interaction_strategy_selected
-tool_error_simulated
-rag_parameter_changed
-rag_balanced_preset_applied
-rag_failure_baseline_reset
-agent_reliability_parameter_changed
-agent_reliability_preset_applied
-agent_reliability_baseline_reset
-agent_reliability_paid_intent_click
-evaluation_parameter_changed
-evaluation_dataset_preset_changed
-evaluation_safety_veto_changed
-evaluation_sample_size_changed
-evaluation_judge_mode_changed
-evaluation_cost_gate_changed
-evaluation_production_preset_applied
-evaluation_naive_baseline_reset
-evaluation_build_challenge_started
-evaluation_paid_intent_click
-pricing_foundations_click
-pricing_pro_click
-waitlist_submit
+landing
+lab start
+parameter interaction
+second lab
+capstone
+pricing
+sign in
+checkout start
+purchase / subscription
+return usage
 ```
 
-The Lab Engine itself keeps analytics opt-in so high-frequency simulation actions do not automatically duplicate product events.
-
-## Intentional non-goals for the Content MVP
+## Intentional non-goals for the current Content MVP
 
 - mandatory authentication;
-- real billing;
-- real LLM/retrieval inference;
-- real LLM-as-judge calls;
-- real benchmark ingestion;
+- unlimited real AI usage;
+- live LLM-as-judge by default;
 - code sandbox;
 - full LMS/CMS/admin systems;
 - community;
@@ -408,16 +439,8 @@ The Lab Engine itself keeps analytics opt-in so high-frequency simulation action
 - AI tutor;
 - multi-language UI beyond an i18n-ready content layout.
 
+These non-goals do not block building the minimal platform foundation required for a coherent public product.
+
 ## Exit criteria
 
-Before Soft Alpha, complete the small coherent content path and review the end-to-end UX. After external use starts, expansion should be justified by behavior:
-
-- lesson/lab start rate;
-- successful-tuning or correct-diagnosis rate;
-- second-lab rate;
-- parameter interaction depth;
-- baseline-vs-current comparison behavior;
-- pricing intent;
-- waitlist conversion;
-- qualitative feedback that simulations improve understanding;
-- eventually, actual payment rather than only intent.
+AhaFrame reaches Public Beta only when a new external user can discover the product, learn without registration, optionally create an account, retain progress, purchase the intended product, receive correct access through verified server-side billing state, use paid capabilities, and return later with consistent account state — while the operator can observe product behavior and failures safely.
