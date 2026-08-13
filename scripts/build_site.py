@@ -1,6 +1,6 @@
 """Build the AhaFrame static validation site."""
 
-from ahaframe import agent, agent_reliability, context, context_compression, discovery, evaluation, graph, home, instruction_conflict, marketing, rag, token
+from ahaframe import agent, agent_reliability, context, context_compression, discovery, evaluation, graph, home, instruction_conflict, integrated_build, marketing, rag, token
 
 
 def main():
@@ -14,6 +14,7 @@ def main():
     context_compression.build()
     instruction_conflict.build()
     graph.build()
+    integrated_build.build()
     marketing.build()
     discovery.build()
 
