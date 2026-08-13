@@ -1,11 +1,12 @@
 # AhaFrame Development Roadmap
 
-Date: 2026-08-13
+Date: 2026-08-13  
+Version: v0.4 — Validation First  
 Status: active execution roadmap
 
 ## Product direction
 
-AhaFrame is an **Interactive AI Engineering Lab** for experienced software developers becoming AI engineers.
+AhaFrame is an English-first **Interactive AI Engineering Lab** for experienced software developers becoming AI engineers.
 
 ```text
 AI Engineering Learning
@@ -14,24 +15,39 @@ Interactive Mental Models
         ↓
 Failure Simulations
         ↓
-Production Labs
+Engineering Judgment
         ↓
 Build Projects
         ↓
 Paid capability
 ```
 
+Core learning loop:
+
+```text
+SEE → PLAY → BREAK → AHA → BUILD
+```
+
 Architecture principle:
 
 > **Simulate the concept. Spend compute only to validate reality.**
 
+Product principle:
+
+> **Validate learning value before building platform completeness.**
+
+AhaFrame is not validated because the Labs work technically. The next milestone is to prove that real developers interact deeply, experience a measurable Aha, continue into additional Labs, and show enough return / payment intent to justify SaaS investment.
+
 Execution sources of truth:
 
-- `docs/CURRICULUM.md` — Curriculum v1.1 and Lab backlog.
-- `docs/adr/0001-saas-platform-runtime.md` — accepted SaaS runtime/migration architecture.
+- `docs/CURRICULUM.md` — curriculum and Lab backlog.
+- `docs/adr/0001-saas-platform-runtime.md` — accepted future SaaS runtime/migration architecture.
 - `docs/CONTEXT_COMPRESSION_LAB.md` — implemented Context Compression specification.
 - `docs/EVALUATION_FAILURE_LAB.md` — implemented Evaluation Failure specification.
-- GitHub issue `#22` — end-to-end Platform Launch master plan.
+- `docs/PRODUCT_SPEC.md` — current product / pricing hypotheses.
+- This roadmap — **current execution order and validation gates**.
+
+GitHub issue `#22` predates this validation-first sequencing and must be reconciled before platform implementation resumes.
 
 ## AI Engineering Layers
 
@@ -44,37 +60,441 @@ Graph shapes orchestration.
 Evaluation proves whether it works.
 ```
 
-Dedicated Prompt and Graph Labs are backlog items and do not block the first Alpha.
+Dedicated Prompt, Graph, Tools, and additional Production Labs remain backlog candidates. They do not block Validation Alpha.
 
-## Phase 0 — Product foundation
+---
 
-Status: complete
+# Phase 0 — Product Foundation
 
-- AhaFrame brand + `ahaframe.com`
-- warm-white / graphite / teal visual system
-- Token Playground
-- Context Window Lab
-- Agent Loop Simulator
-- generic Lab / Simulation Engine
-- history / checkpoint / compare / replay
-- RAG Failure Lab
-- Agent Reliability Lab
-- Evaluation Failure Lab
-- Context Compression Lab
-- CI / static validation
-- pricing hypothesis: `$49 one-time Foundations` + future `$12/month Production Labs`
+**Status: COMPLETE**
 
-## Phase 1A — Content MVP
+Existing product assets are sufficient for the first external validation cohort.
 
-Status: one item remaining
+Completed experiences:
 
 ```text
-#7 Curriculum v1.1                 done
-#8 Context Compression Lab         done
-#9 Reliable Support Agent Build    NEXT
+Token Playground               done
+Context Window Lab             done
+Agent Loop Simulator           done
+RAG Failure Lab                done
+Agent Reliability Lab          done
+Evaluation Failure Lab         done
+Context Compression Lab        done
 ```
 
-The capstone combines:
+Completed foundation:
+
+- AhaFrame brand + `ahaframe.com`;
+- warm-white / graphite / teal visual system;
+- generic deterministic Lab / Simulation Engine;
+- History / Checkpoint / Compare / Replay / Reset primitives;
+- static build + validation + CI;
+- crawlable no-login educational content;
+- pricing hypothesis: `$49 one-time Foundations` + future `$12/month Production Labs`.
+
+### Validation MVP freeze
+
+The seven implemented experiences are the **Validation MVP**.
+
+Until the Product Gate is completed, do not add Labs merely to make the catalog look complete.
+
+The following are explicitly **not required** before Validation Alpha:
+
+```text
+#9 Reliable Support Agent Build
+Instruction Conflict Lab
+Agent Workflow Graph Lab
+Tool Contract Failure Lab
+Embedding / Attention explorers
+additional Production Labs
+```
+
+`#9 Reliable Support Agent Build` remains strategically useful, but is now conditional post-validation work unless a user study reveals that lack of a capstone prevents us from testing the core thesis.
+
+---
+
+# Phase 1 — Validation Instrumentation
+
+**Status: NEXT**
+
+Goal:
+
+> Instrument the current no-login product well enough to explain what users did, where they dropped, whether they experienced an Aha, whether they explored another Lab, and whether they showed return / payment intent.
+
+This phase has higher priority than Supabase identity, billing, entitlement, credit ledgers, or full Next.js migration.
+
+## 1.1 Analytics event model
+
+Track at minimum:
+
+```text
+landing_viewed
+lab_viewed
+lab_started
+parameter_changed
+preset_applied
+failure_triggered
+checkpoint_created
+compare_used
+reset_used
+lab_completed
+aha_feedback_submitted
+next_lab_clicked
+second_lab_started
+pricing_viewed
+paid_intent_clicked
+waitlist_submitted
+return_visit
+```
+
+High-frequency UI events should be sampled or avoided unless they answer a concrete product question.
+
+Every relevant event should carry enough experiment context to support cohort analysis:
+
+```text
+anonymous_user_id
+session_id
+lab_id
+lab_version
+experiment_id / variant (when applicable)
+utm_source
+utm_medium
+utm_campaign
+referrer
+timestamp
+device class
+```
+
+Country / region may be collected only when available through a privacy-appropriate analytics mechanism; do not add invasive fingerprinting.
+
+### `lab_version` is required
+
+Do not combine behavior from materially different Lab experiences into one metric. When instructional flow, default scenario, scoring model, controls, or copy changes enough to affect learning behavior, increment the Lab version used in analytics.
+
+## 1.2 Meaningful interaction definition
+
+A `lab_started` event alone does not prove the user played with the system.
+
+For Validation Alpha, define **Meaningful Interaction** as a user performing at least one causal Lab action beyond opening the page, such as:
+
+```text
+parameter change
+preset apply
+failure trigger
+checkpoint
+compare
+scenario action that changes derived state
+```
+
+We may tighten this definition after observing real sessions.
+
+## 1.3 Aha measurement
+
+AhaFrame's core outcome is not page completion. It is changed engineering understanding.
+
+After selected Labs, ask:
+
+> **Did this change how you think about this system?**
+
+Suggested answers:
+
+```text
+No
+A little
+Yes
+Oh, I finally get it.
+```
+
+Define:
+
+```text
+Strong Aha = Yes + Oh, I finally get it.
+```
+
+Also collect one optional qualitative prompt:
+
+> **What do you understand differently now?**
+
+This open-text answer is high-value research evidence and should be stored separately from anonymous event telemetry where practical.
+
+## 1.4 “Want more” signal
+
+After a meaningful Lab experience, optionally ask:
+
+> **Would you use more Labs like this for production AI topics?**
+
+This distinguishes a good single interactive article from a product with multi-Lab demand.
+
+---
+
+# Phase 2 — Validation Deployment
+
+**Status: AFTER PHASE 1**
+
+Goal:
+
+> Put the current Validation MVP in front of real users with production analytics and feedback capture, without first building the full SaaS platform.
+
+Reuse / advance the intent of existing work items where possible:
+
+```text
+#16 Analytics + waitlist storage      move forward
+#17 ahaframe.com deployment           move forward
+#19 Developer Alpha                   move forward as Validation Alpha
+```
+
+Required before recruiting users:
+
+- `ahaframe.com` production deployment;
+- HTTPS / DNS;
+- canonical / robots / sitemap / structured data intact;
+- analytics events verifiably arriving;
+- anonymous-user and session continuity;
+- real waitlist / feedback persistence;
+- basic error monitoring;
+- mobile + desktop smoke test;
+- privacy-safe analytics disclosure where required;
+- rollback path.
+
+Not required:
+
+```text
+Supabase account system
+cross-device saved progress
+Waffo billing
+Entitlement
+Subscription
+CreditLedger
+full SaaS runtime migration
+Live Mode compute
+```
+
+Public learning must remain no-login.
+
+---
+
+# Phase 3 — Validation Alpha
+
+**Status: AFTER PHASE 2**
+
+Recruit **20–30 qualified developers** before broad public launch.
+
+## 3.1 Primary ICP
+
+Experienced software developers who:
+
+- are comfortable with APIs, backend/frontend systems, debugging, or production engineering;
+- already use tools such as ChatGPT, Claude, Cursor, Copilot, or AI APIs;
+- are actively moving toward AI engineering;
+- have not yet built or owned multiple production LLM / agent systems end-to-end.
+
+Prefer a mix of:
+
+```text
+Backend / Java
+Python
+Frontend
+DevOps / Platform
+Data / Full-stack
+```
+
+Do not optimize the first cohort for absolute beginners or ML researchers.
+
+## 3.2 Validation journey
+
+The shortest useful funnel is:
+
+```text
+Landing
+↓
+First Lab
+↓
+Meaningful Interaction
+↓
+Failure / Trade-off Observed
+↓
+Aha Feedback
+↓
+Second Lab
+↓
+Pricing / More-Labs Intent
+↓
+Return Visit
+```
+
+The Capstone is not required for this funnel.
+
+## 3.3 Core dashboard
+
+The first decision dashboard should emphasize a small number of product metrics rather than vanity traffic:
+
+| Metric | Product question |
+|---|---|
+| Landing → Lab Start | Does positioning create enough intent to try? |
+| Meaningful Interaction Rate | Do users actually PLAY rather than just read? |
+| Failure / Trade-off Trigger Rate | Do users reach the BREAK part of the loop? |
+| Lab Completion Rate | Is the experience understandable and usable? |
+| **Strong Aha Rate** | Does the Lab actually change understanding? |
+| **Second Lab Rate** | Is this a product, not just one good page? |
+| D7 Return | Is there continuing value? |
+| Paid / Founding Intent | Is there commercial potential? |
+
+Supporting analysis should include source / campaign, Lab, Lab version, and cohort breakdowns.
+
+## 3.4 Internal validation thresholds
+
+These are **internal experimental decision rules, not industry benchmarks**.
+
+| Metric | Initial target |
+|---|---:|
+| Landing → Lab Start | ≥ 40% |
+| Meaningful Interaction | ≥ 60% of Lab starters |
+| Failure / Trade-off Trigger | ≥ 40% of Lab starters |
+| First Lab → Second Lab | ≥ 30% |
+| Users completing ≥2 Labs | ≥ 25% |
+| **Strong Aha Rate** | **≥ 60%** |
+| “Want more Labs like this” | ≥ 40% |
+| Pricing page visit | ≥ 10% |
+| Paid / Founding intent | ≥ 3% |
+| D7 Return | ≥ 15% initially; ≥ 20% is strong |
+
+Do not tune the product to hit a metric mechanically. Use qualitative feedback to understand why a metric moved.
+
+## 3.5 Qualitative review
+
+For the first cohort, review representative sessions / feedback manually.
+
+Look specifically for statements like:
+
+```text
+“I finally understand why ...”
+“I thought X was always better, but now I see ...”
+“I would use this before designing / debugging ...”
+“I want a Lab for ...”
+```
+
+Weak evidence includes generic praise such as:
+
+```text
+“Nice UI”
+“Cool demo”
+“Looks polished”
+```
+
+AhaFrame is validated by changed mental models and repeat demand, not aesthetic approval.
+
+---
+
+# Phase 4 — Product Gate
+
+**Status: REQUIRED BEFORE PLATFORM EXPANSION**
+
+After the first 20–30 qualified users, write an explicit Product Gate decision.
+
+Possible outcomes:
+
+```text
+GO PLATFORM
+VALIDATE AGAIN
+REFRAME
+CONTENT / BRAND ASSET
+STOP
+```
+
+## 4.1 Interpretation matrix
+
+### Case A — Interaction low
+
+```text
+Lab Start          acceptable
+Meaningful Action  low
+```
+
+Likely problem:
+
+> UX / onboarding / control discoverability.
+
+Action:
+
+> Fix interaction design before changing curriculum or building platform features.
+
+### Case B — Interaction high, Aha low
+
+```text
+Interaction  high
+Aha          low
+```
+
+Likely problem:
+
+> The simulation is interesting but the teaching model does not create understanding.
+
+Action:
+
+> Rework scenario design, causal explanation, defaults, or debrief. Do not solve with more Labs.
+
+### Case C — Aha high, Second Lab low
+
+```text
+Aha         high
+Second Lab  low
+```
+
+Likely problem:
+
+> Strong single-page educational asset; weak platform / curriculum pull.
+
+Action:
+
+> Test better next-Lab routing and topic demand. Consider content / acquisition asset positioning if repeat demand remains weak.
+
+### Case D — Aha + multi-Lab strong, paid intent weak
+
+```text
+Aha          high
+Second Lab   high
+Paid Intent  low
+```
+
+Likely problem:
+
+> Product value exists, monetization boundary or buyer may be wrong.
+
+Action:
+
+> Test paid Build Projects, Production Labs, team / employer value, or alternative pricing before building extensive billing infrastructure.
+
+### Case E — Aha + multi-Lab + return + paid intent strong
+
+This is the desired signal:
+
+> **GO PLATFORM.**
+
+Resume the accepted SaaS architecture and build durable identity / state / revenue infrastructure.
+
+## 4.2 Minimum GO condition
+
+Do not treat any one metric as sufficient. A GO PLATFORM decision should normally require:
+
+- Strong Aha at or above the internal target;
+- meaningful multi-Lab behavior;
+- evidence of return or explicit future-use intent;
+- non-zero credible payment intent;
+- no unresolved severe comprehension / trust problem in deterministic metrics.
+
+---
+
+# Phase 5 — Conditional Content Expansion
+
+**Status: ONLY AFTER PRODUCT GATE OR WHEN REQUIRED BY VALIDATION**
+
+Candidate next item:
+
+```text
+#9 Reliable Support Agent Build
+```
+
+The Capstone should combine existing mental models:
 
 ```text
 Task / prompt contract
@@ -92,19 +512,35 @@ Architecture decision
 + Release decision
 ```
 
-Backlog candidates that do not delay Alpha:
+The Build should reward defensible engineering judgment, not framework boilerplate.
+
+Additional Labs are chosen from observed demand and failure patterns, not curriculum completeness.
+
+Possible backlog:
 
 ```text
 Instruction Conflict Lab
-Agent Workflow Graph Lab
 Tool Contract Failure Lab
+Retry & Idempotency Lab
+Agent Workflow Graph Lab
+Model Routing Lab
+Trace Diagnosis Lab
+Guardrail Failure Lab
 ```
 
-## Phase 1B — SaaS platform migration
+Decision rule:
 
-Architecture decision: **accepted in ADR-0001**.
+> **Every new Lab must answer either a demonstrated user demand or a missing dependency required for a validated paid outcome.**
 
-Target runtime:
+---
+
+# Phase 6 — SaaS Platform Migration
+
+**Status: PAUSED UNTIL GO PLATFORM**
+
+Architecture decision in ADR-0001 remains accepted. The validation-first roadmap changes **when** we execute it, not the target architecture.
+
+Future target runtime:
 
 ```text
 Next.js App Router + TypeScript
@@ -118,37 +554,15 @@ Waffo billing adapter
 AhaFrame Lab Engine preserved as framework-independent simulation runtime
 ```
 
-Migration strategy:
+Migration principle:
 
 > **Parity first. Platform features second.**
 
-The migration is staged but **not a permanent hybrid**.
-
-### #10 Architecture ADR — complete when merged
-
-Locked decisions:
-
-- Next.js is the target long-term application runtime;
-- Raphael StarterKit is the allowed reusable development skeleton;
-- create the Next.js application in a temporary `web/` migration boundary;
-- keep the existing static application as behavior/SEO reference until parity;
-- do not redesign Labs during migration;
-- preserve exact `/en/...` public URLs;
-- preserve crawlable server-rendered educational content;
-- mount existing deterministic Lab Engine/scenarios from client boundaries rather than rewriting scenario math into React;
-- Supabase owns identity/data, with RLS on user-owned tables;
-- Waffo is a billing adapter, never the authorization model;
-- `Entitlement` is AhaFrame's access truth;
-- secrets are server-only;
-- Vercel preview → parity gate → production cutover is the target deployment flow.
-
-See `docs/adr/0001-saas-platform-runtime.md`.
-
-### #11 SaaS runtime migration — next platform implementation
-
-Implementation phases:
+Planned implementation remains:
 
 ```text
+#11 SaaS runtime migration
+
 M1 Bootstrap Next.js under web/
  ↓
 M2 Port public routes without redesign
@@ -160,9 +574,13 @@ M4 Route + visual + SEO + behavior parity gate
 M5 Production runtime cutover
 ```
 
-During M1–M4, the existing static build remains a regression oracle, not a second long-term production runtime.
+Do not rewrite deterministic scenario math into React merely because the shell changes.
 
-## Phase 2 — Identity + durable state
+---
+
+# Phase 7 — Identity + Durable State
+
+**Status: AFTER GO PLATFORM + MIGRATION PARITY**
 
 Tracked work:
 
@@ -171,12 +589,12 @@ Tracked work:
 #13 Progress / checkpoints / entitlement model
 ```
 
-Identity UX:
+Identity UX must preserve the no-login acquisition experience:
 
 ```text
 Visit
  ↓
-Learn / use public Labs anonymously
+Learn / use Labs immediately
  ↓
 Choose Save / Purchase / Build / Live Mode
  ↓
@@ -198,82 +616,55 @@ Entitlement
 PaymentEvent
 ```
 
-Future:
+Future only when real metered compute exists:
 
 ```text
 CreditLedger
 UsageRecord
 ```
 
-`Entitlement` is the canonical application access truth. It is not identical to a subscription row and must not require a synchronous Waffo lookup for each request.
+`Entitlement` remains the canonical application access truth.
 
-## Phase 3 — Revenue chain
+---
+
+# Phase 8 — Revenue Chain
+
+**Status: AFTER PRODUCT VALUE + PAYMENT INTENT ARE VALIDATED**
 
 Tracked work:
 
 ```text
 #14 Waffo one-time + subscription billing
-#15 Atomic compute-credit ledger / purchase foundation
+#15 Compute-credit foundation only when needed
 ```
 
-Commercial model:
+Current commercial hypothesis:
 
 ```text
 Free                       $0
-AI Engineer Foundations    one-time purchase
-Production Labs            recurring subscription
+AI Engineer Foundations    $49 one-time hypothesis
+Production Labs            $12/month future hypothesis
 Compute Credits            real compute only
 ```
 
-Waffo integration rules:
+Pricing remains unvalidated until users make real payment decisions.
 
-- use a server-owned API/SDK adapter;
-- keep Merchant/private credentials server-side;
+Billing invariants:
+
+- private credentials remain server-side;
 - success redirects never grant access;
-- verify Webhook signatures;
-- deduplicate provider events with a unique event ID;
-- reconcile Purchase / Subscription / Entitlement from verified server-side events;
-- explicitly handle cancellation, past-due, refund, and retry behavior;
-- use test mode for the complete chain before production.
+- verified server / webhook state updates Purchase / Subscription / Entitlement;
+- duplicate events are idempotent;
+- cancellation / expiry / refund reconcile access correctly;
+- provider IDs remain adapter metadata rather than the domain model.
 
-Credits rule:
+Do not build or sell compute credits before a real metered capability exists.
 
-```text
-Simulation / learning   no credits
-Saved progress          no credits
-Live model / agent run  credits
-Sandbox execution       credits later
-```
+---
 
-Do not sell credits before a real metered compute capability exists.
+# Phase 9 — Platform Launch Gate
 
-## Phase 4 — Measurement + production operations
-
-Tracked work:
-
-```text
-#16 Production analytics + waitlist storage
-#17 ahaframe.com deployment + observability
-```
-
-Target funnel:
-
-```text
-Landing
-→ Lab start
-→ Parameter interaction
-→ Second Lab
-→ Capstone
-→ Pricing
-→ Sign in
-→ Checkout
-→ Entitlement
-→ Return usage
-```
-
-Production operations must cover HTTPS/DNS, canonical/robots/sitemap/structured data, safe secrets, error monitoring, uptime visibility, preview-to-production promotion, and rollback.
-
-## Phase 5 — Launch Gate
+**Status: AFTER PLATFORM + REVENUE IMPLEMENTATION**
 
 Tracked work:
 
@@ -295,36 +686,28 @@ session expiry / sign out
 mobile + desktop smoke path
 ```
 
-Security review includes Supabase RLS, Waffo signature/idempotency, server-side access control, secret exposure, dependency/configuration hygiene, and failure handling.
+Security review includes:
 
-AhaFrame is not externally launch-ready merely because pages are online.
+- Supabase RLS;
+- Waffo signature / idempotency;
+- server-side access control;
+- secret handling;
+- input / error handling;
+- dependency / configuration hygiene.
 
-## Phase 6 — Soft Alpha
+---
 
-Tracked work:
+# Phase 10 — Metered Live Mode
 
-```text
-#19 20–50 developer Soft Alpha
-```
-
-Preconditions:
-
-- Content MVP complete;
-- account/save flow works;
-- payment/entitlement chain works;
-- production analytics and error monitoring active;
-- `ahaframe.com` deployed;
-- #18 Launch Gate passes.
-
-This is not yet a broad Product Hunt / Hacker News / Reddit launch.
-
-## Phase 7 — Metered Live Mode
+**Status: POST-VALIDATION EXPANSION**
 
 Tracked work:
 
 ```text
 #20 One bounded Live Mode path
 ```
+
+Product loop:
 
 ```text
 Simulation prediction
@@ -336,9 +719,22 @@ Observed result
 Compare
 ```
 
-One Lab first; no unlimited compute; hard budgets; server-side provider adapter; atomic credit debit; auditable usage/cost evidence.
+Rules:
 
-## Phase 8 — Public Beta
+- one high-value Lab first;
+- no unlimited model compute;
+- hard per-run and per-user budgets;
+- server-side provider adapter;
+- auditable provider/model/usage/latency/cost evidence;
+- atomic credit debit only when credits are actually necessary.
+
+Live Mode should validate or challenge the simulation's mental model; it should not turn AhaFrame into a generic model playground.
+
+---
+
+# Phase 11 — Public Beta
+
+**Status: CONDITIONAL**
 
 Tracked work:
 
@@ -346,31 +742,71 @@ Tracked work:
 #21 Public Beta GO / NO-GO
 ```
 
-Public Beta requires a deliberate written release decision based on Soft Alpha evidence and platform reliability.
-
-## Current execution state
+Public Beta requires two separate proofs:
 
 ```text
-DONE         #7  Curriculum v1.1
-DONE         #8  Context Compression Lab
-NEXT         #9  Reliable Support Agent Build
-ADR          #10 Platform architecture (accepted; merge pending in this branch)
-NEXT PLATFORM #11 SaaS runtime migration after #10
+Product proof
++ Platform reliability proof
 ```
 
-Execution lanes:
+A technically reliable SaaS with weak Product Gate evidence does not qualify.
+
+---
+
+# Current Execution State
 
 ```text
-CONTENT              PLATFORM
-#9 Capstone           #10 ADR
-                        ↓
-                      #11 Migration
-       \                /
-        \              /
-         → #12 / #13 → #14 → #16/#17 → #18 → #19
+DONE    Product Foundation
+DONE    7 Validation-MVP experiences
+DONE    #10 SaaS architecture direction / ADR
+
+NEXT    Phase 1 — Validation instrumentation
+NEXT    Phase 2 — Validation deployment
+NEXT    Phase 3 — 20–30 developer Validation Alpha
+NEXT    Phase 4 — Product Gate
+
+HOLD    #9 Capstone unless validation requires it
+PAUSE   #11 SaaS migration until GO PLATFORM
+PAUSE   #12–#15 identity / billing / credits until GO PLATFORM
 ```
 
-## Engineering workflow
+Current execution flow:
+
+```text
+Existing 7 Labs
+      ↓
+Analytics + Aha Feedback
+      ↓
+Production Validation Deployment
+      ↓
+20–30 Qualified Developers
+      ↓
+Funnel + Aha + Multi-Lab + Return + Paid Intent
+      ↓
+PRODUCT GATE
+   ↙        ↓          ↘
+REFRAME   VALIDATE     GO PLATFORM
+                         ↓
+                 Content / Capstone as needed
+                         ↓
+                    #11 Migration
+                         ↓
+                   #12 / #13
+                         ↓
+                   #14 Revenue
+                         ↓
+                   #18 Launch Gate
+                         ↓
+                   #20 Live Mode
+                         ↓
+                   #21 Public Beta
+```
+
+---
+
+# Engineering Workflow
+
+Every implementation item still follows:
 
 ```text
 Issue
@@ -382,17 +818,29 @@ Issue
 → review
 → squash merge
 → close Issue
-→ update #22
+→ update roadmap / master issue
 ```
 
-## Decision rule
+But engineering completeness is subordinate to evidence gathering during Validation Alpha.
 
-The next feature should answer a product or platform question, not merely make AhaFrame look more complete.
+---
 
-Current content question:
+# Decision Rules
 
-> **Can the capstone make a developer combine retrieval, context, harness, loop, approval, evaluation, and economics into one defensible architecture?**
+## Current product question
 
-Current platform question:
+> **Do experienced software developers gain meaningfully stronger AI-engineering intuition from AhaFrame's interactive failure simulations, and do enough of them want additional Labs / return / paid capability to justify a platform?**
 
-> **Can the Next.js parity migration preserve AhaFrame's no-login learning experience, SEO, visual system, and deterministic Lab behavior before we add Auth and Billing?**
+## Current analytics question
+
+> **Can we reliably connect anonymous acquisition → Lab behavior → Aha → second-Lab behavior → return / payment intent without adding login friction?**
+
+## Deferred platform question
+
+> **Can the accepted Next.js + Supabase + Waffo architecture preserve AhaFrame's no-login learning experience, SEO, visual system, and deterministic Lab behavior?**
+
+This question becomes active only after `GO PLATFORM`.
+
+## Final principle
+
+> **Do not build the next layer because it is architecturally elegant. Build it because validated user behavior makes it necessary.**
