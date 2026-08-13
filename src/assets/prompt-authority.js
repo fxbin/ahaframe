@@ -33,11 +33,15 @@
   }
   lab.subscribe(render);
 
-  controls.authority.addEventListener('change',()=>lab.dispatch('SET_AUTHORITY_MODEL',{value:controls.authority.value}));
-  controls.specificity.addEventListener('change',()=>lab.dispatch('SET_SYSTEM_SPECIFICITY',{value:controls.specificity.value}));
-  controls['retrieval-mode'].addEventListener('change',()=>lab.dispatch('SET_RETRIEVED_CONTENT_MODE',{value:controls['retrieval-mode'].value}));
-  controls.schema.addEventListener('change',()=>lab.dispatch('SET_SCHEMA_MODE',{value:controls.schema.value}));
-  controls.ambiguity.addEventListener('change',()=>lab.dispatch('SET_POLICY_AMBIGUITY',{value:controls.ambiguity.value}));
-  document.querySelector('[data-instruction-preset]').addEventListener('click',()=>lab.dispatch('APPLY_PROMPT_PRESET'));
-  document.querySelector('[data-instruction-reset]').addEventListener('click',()=>lab.reset());
+  const tracked=(node,eventName,action,parameter)=>node.addEventListener('change',()=>{
+    lab.dispatch(action,{value:node.value});
+    window.AhaFrame?.track(eventName,{parameter,value:node.value});
+  });
+  tracked(controls.authority,'instruction_conflict_parameter_changed','SET_AUTHORITY_MODEL','authority_model');
+  tracked(controls.specificity,'instruction_conflict_parameter_changed','SET_SYSTEM_SPECIFICITY','system_specificity');
+  tracked(controls['retrieval-mode'],'instruction_conflict_parameter_changed','SET_RETRIEVED_CONTENT_MODE','retrieved_content_mode');
+  tracked(controls.schema,'instruction_conflict_parameter_changed','SET_SCHEMA_MODE','schema_mode');
+  tracked(controls.ambiguity,'instruction_conflict_parameter_changed','SET_POLICY_AMBIGUITY','policy_ambiguity');
+  document.querySelector('[data-instruction-preset]').addEventListener('click',()=>{lab.dispatch('APPLY_PROMPT_PRESET');window.AhaFrame?.track('instruction_conflict_prompt_preset_applied');});
+  document.querySelector('[data-instruction-reset]').addEventListener('click',()=>{lab.reset();window.AhaFrame?.track('instruction_conflict_baseline_reset');});
 })();
