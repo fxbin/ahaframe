@@ -1,26 +1,25 @@
 # AhaFrame Development Roadmap
 
 Date: 2026-08-13  
-Version: v0.4 — Validation First  
+Version: v0.5 — Conceptual Closure + Validation First  
 Status: active execution roadmap
 
 ## Product direction
 
 AhaFrame is an English-first **Interactive AI Engineering Lab** for experienced software developers becoming AI engineers.
 
+The product is not organized around a catalog of fashionable AI terms. It teaches a durable engineering model for understanding and building production AI systems.
+
 ```text
-AI Engineering Learning
-        ↓
-Interactive Mental Models
-        ↓
-Failure Simulations
-        ↓
-Engineering Judgment
-        ↓
-Build Projects
-        ↓
-Paid capability
+Prompt shapes behavior.
+Context shapes knowledge.
+Harness shapes reliability.
+Loop shapes iteration.
+Graph shapes orchestration.
+Evaluation proves whether it works.
 ```
+
+These six layers form the **AhaFrame AI Engineering Stack**.
 
 Core learning loop:
 
@@ -32,43 +31,67 @@ Architecture principle:
 
 > **Simulate the concept. Spend compute only to validate reality.**
 
+Current execution principle:
+
+> **Finish the mental model, not the platform.**
+
 Product principle:
 
-> **Validate learning value before building platform completeness.**
+> **Reach conceptual closure first; then validate learning value before building platform completeness.**
 
-AhaFrame is not validated because the Labs work technically. The next milestone is to prove that real developers interact deeply, experience a measurable Aha, continue into additional Labs, and show enough return / payment intent to justify SaaS investment.
+AhaFrame is not validated because individual Labs work technically. Before the first formal Validation Alpha, the product should expose the smallest coherent mental model of a production AI system from Prompt through Evaluation, then integrate those layers in one Build experience.
+
+After that closure is achieved, content expansion stops by default and real-user evidence becomes the priority.
 
 Execution sources of truth:
 
-- `docs/CURRICULUM.md` — curriculum and Lab backlog.
-- `docs/adr/0001-saas-platform-runtime.md` — accepted future SaaS runtime/migration architecture.
-- `docs/CONTEXT_COMPRESSION_LAB.md` — implemented Context Compression specification.
-- `docs/EVALUATION_FAILURE_LAB.md` — implemented Evaluation Failure specification.
-- `docs/PRODUCT_SPEC.md` — current product / pricing hypotheses.
-- This roadmap — **current execution order and validation gates**.
+- `docs/CURRICULUM.md` — curriculum and Lab backlog;
+- `docs/PRODUCT_SPEC.md` — product / pricing hypotheses;
+- `docs/adr/0001-saas-platform-runtime.md` — accepted future SaaS runtime architecture;
+- `docs/CONTEXT_COMPRESSION_LAB.md` — Context Compression implementation spec;
+- `docs/EVALUATION_FAILURE_LAB.md` — Evaluation Failure implementation spec;
+- this roadmap — **current execution order, stop lines, and validation gates**.
 
-GitHub issue `#22` predates this validation-first sequencing and must be reconciled before platform implementation resumes.
+GitHub issue `#22` predates this v0.5 sequencing and must be reconciled before platform implementation resumes.
 
-## AI Engineering Layers
+---
 
-```text
-Prompt shapes behavior.
-Context shapes knowledge.
-Harness shapes reliability.
-Loop shapes iteration.
-Graph shapes orchestration.
-Evaluation proves whether it works.
-```
+# 1. The AhaFrame AI Engineering Stack
 
-Dedicated Prompt, Graph, Tools, and additional Production Labs remain backlog candidates. They do not block Validation Alpha.
+AhaFrame teaches engineering responsibilities rather than framework names.
+
+| Layer | Responsibility | Canonical question | Minimum closure experience |
+|---|---|---|---|
+| **Prompt** | Behavior | What should the model do, under which instructions and constraints? | Instruction Conflict Lab |
+| **Context** | Knowledge | What should the model know now, in what form, and within what budget? | Context Window + RAG + Compression |
+| **Harness** | Reliability | What tools, permissions, validation, approvals, limits, and runtime controls make the model safe enough to operate? | Agent Reliability Lab |
+| **Loop** | Iteration | How should the system act, observe, verify, recover, retry, escalate, and stop? | Agent Loop Simulator |
+| **Graph** | Orchestration | How should deterministic steps, tools, branches, joins, agents, and human gates form a workflow topology? | Agent Workflow Graph Lab |
+| **Evaluation** | Evidence | What evidence is sufficient to decide that the system is better, safe enough, and economically acceptable to release? | Evaluation Failure Lab |
+
+The stack is intended to remain useful even when individual models, SDKs, agent frameworks, or protocols change.
+
+It is **not** a claim that every AI system must literally execute these layers in a fixed linear runtime order. It is a mental model for engineering responsibility and diagnosis.
+
+## 1.1 Conceptual closure definition
+
+AhaFrame reaches **Conceptual Closure v1** when a qualified developer can:
+
+1. distinguish the responsibility of all six layers;
+2. observe at least one meaningful failure / trade-off in each layer;
+3. explain why one layer cannot substitute for another;
+4. combine the layers into one defensible production architecture decision;
+5. use Evaluation to decide `SHIP / BLOCK / INCONCLUSIVE` rather than treating system construction as the endpoint.
+
+Conceptual closure is **not curriculum completeness**.
+
+Do not interpret it as permission to build dozens of lessons per layer.
 
 ---
 
 # Phase 0 — Product Foundation
 
 **Status: COMPLETE**
-
-Existing product assets are sufficient for the first external validation cohort.
 
 Completed experiences:
 
@@ -92,43 +115,287 @@ Completed foundation:
 - crawlable no-login educational content;
 - pricing hypothesis: `$49 one-time Foundations` + future `$12/month Production Labs`.
 
-### Validation MVP freeze
-
-The seven implemented experiences are the **Validation MVP**.
-
-Until the Product Gate is completed, do not add Labs merely to make the catalog look complete.
-
-The following are explicitly **not required** before Validation Alpha:
-
-```text
-#9 Reliable Support Agent Build
-Instruction Conflict Lab
-Agent Workflow Graph Lab
-Tool Contract Failure Lab
-Embedding / Attention explorers
-additional Production Labs
-```
-
-`#9 Reliable Support Agent Build` remains strategically useful, but is now conditional post-validation work unless a user study reveals that lack of a capstone prevents us from testing the core thesis.
+The existing seven experiences are strong product assets, but the six-layer stack is not yet conceptually closed because Prompt and Graph lack first-class experiences and the full stack has not yet been integrated in one Build.
 
 ---
 
-# Phase 1 — Validation Instrumentation
+# Phase 1 — Conceptual Closure
 
 **Status: NEXT**
 
 Goal:
 
-> Instrument the current no-login product well enough to explain what users did, where they dropped, whether they experienced an Aha, whether they explored another Lab, and whether they showed return / payment intent.
+> Complete the smallest coherent Prompt → Context → Harness → Loop → Graph → Evaluation mental model, then integrate it once.
+
+This phase is about **closure**, not catalog expansion.
+
+## 1.1 Prompt — Instruction Conflict Lab
+
+**Status: REQUIRED BEFORE FORMAL VALIDATION ALPHA**
+
+Working concept:
+
+> **Prompt shapes behavior, but Prompt is not Context, Permission, Runtime Control, or Evaluation.**
+
+Candidate scenario: refund-capable support agent with conflicting instruction sources.
+
+Example inputs:
+
+```text
+System policy
+Developer instruction
+Retrieved policy / context
+User request
+Tool capability
+Output schema
+```
+
+Candidate controls:
+
+```text
+instruction source / precedence
+instruction wording / specificity
+retrieved instruction-like content
+output schema strictness
+policy ambiguity
+```
+
+Candidate derived signals:
+
+```text
+instruction adherence
+conflict / ambiguity risk
+policy violation risk
+output validity
+unresolved conflict diagnosis
+```
+
+Required Aha:
+
+> A better prompt can shape behavior, but it cannot replace permission boundaries, reliable context assembly, runtime validation, or release evaluation.
+
+Do **not** turn this into a prompt-tip collection.
+
+## 1.2 Context — existing coverage
+
+**Status: CLOSED FOR v1**
+
+Current coverage:
+
+```text
+Context Window Lab
+RAG Failure Lab
+Context Compression Lab
+```
+
+Together they should teach:
+
+- working context is finite;
+- retrieval decides what evidence enters the system;
+- more context is not always better;
+- lower token count is not automatically better;
+- compression can remove task-critical information;
+- quality, latency, evidence coverage, and cost interact.
+
+Do not add another Context Lab before Validation Alpha unless a real dependency blocks conceptual closure.
+
+## 1.3 Harness — existing coverage
+
+**Status: CLOSED FOR v1**
+
+Primary experience:
+
+```text
+Agent Reliability Lab
+```
+
+Core responsibility:
+
+> Tools, schemas, validation, limits, approval boundaries, permissions, timeouts, and runtime safeguards make model behavior operationally reliable enough to use.
+
+Required Aha:
+
+> A system can complete tasks successfully while still being unsafe, expensive, or operationally unreliable.
+
+## 1.4 Loop — existing coverage
+
+**Status: CLOSED FOR v1**
+
+Primary experience:
+
+```text
+Agent Loop Simulator
+```
+
+Core responsibility:
+
+> Act → Observe → Verify → Recover / Retry → Escalate → Stop.
+
+Required Aha:
+
+> An agent is not just a single model call; reliability depends on bounded iteration and explicit termination / recovery behavior.
+
+## 1.5 Graph — Agent Workflow Graph Lab
+
+**Status: REQUIRED BEFORE FORMAL VALIDATION ALPHA**
+
+Working concept:
+
+> **Graph shapes orchestration. Loop shapes local iteration. They are related but not the same thing.**
+
+Candidate architecture presets:
+
+```text
+Single Agent
+Sequential Pipeline
+Branched Workflow
+Parallel Workflow
+Coordinator + Workers
+Human-Gated Workflow
+```
+
+Candidate controls:
+
+```text
+branching
+parallelism
+shared vs isolated state
+retry boundary
+deterministic vs agentic node
+human approval placement
+agent count
+join strategy
+```
+
+Candidate derived signals:
+
+```text
+latency
+coordination cost
+state complexity
+failure propagation
+reliability
+human review load
+cost index
+```
+
+Required Aha:
+
+> More agents and more graph complexity do not automatically produce a better system.
+
+Secondary Aha:
+
+> Graph is workflow topology; Loop is how a step / agent iterates within that topology.
+
+Do **not** make the lesson framework-specific to LangGraph, CrewAI, AutoGen, or another current SDK.
+
+## 1.6 Evaluation — existing coverage
+
+**Status: CLOSED FOR v1**
+
+Primary experience:
+
+```text
+Evaluation Failure Lab
+```
+
+Required Aha:
+
+> Evaluation is a decision system, not a single score.
+
+A candidate system may improve average quality while still requiring `BLOCK` because safety-critical slices, cost, reliability, or evidence remain unresolved.
+
+## 1.7 Integration — Reliable Support Agent Build
+
+**Status: REQUIRED FOR CONCEPTUAL CLOSURE**
+
+This becomes the **integration endpoint**, not merely another lesson.
+
+The learner must combine:
+
+```text
+Prompt / task contract
++ Context / retrieval policy
++ Context compression policy
++ Harness controls
++ Loop / termination policy
++ Graph topology
++ Human approval boundary
++ Evaluation / release gate
++ Cost / latency budget
+        ↓
+Architecture decision
++ Trade-off explanation
++ SHIP / BLOCK / INCONCLUSIVE
+```
+
+The Build should reward **engineering judgment**, not framework boilerplate.
+
+The target final Aha is:
+
+> **A production AI agent is not a prompt plus a model. It is an engineered system whose behavior, knowledge, reliability, iteration, orchestration, and evidence must work together.**
+
+## 1.8 Closure Gate
+
+Before moving to formal Validation Alpha, verify:
+
+```text
+Prompt experience implemented
+Context coverage coherent
+Harness coverage coherent
+Loop coverage coherent
+Graph experience implemented
+Evaluation coverage coherent
+Integration Build usable end-to-end
+```
+
+Also verify that the homepage / curriculum can communicate the six-layer stack without requiring the user to infer it from separate pages.
+
+### Content stop line
+
+After Closure Gate passes:
+
+> **STOP CONTENT EXPANSION BY DEFAULT.**
+
+The following remain backlog and do not block validation:
+
+```text
+Tool Contract Failure Lab
+Retry & Idempotency Lab
+MCP Permission Lab
+Embedding Similarity Lab
+Attention Budget Explorer
+Model Routing Lab
+Trace Diagnosis Lab
+Guardrail Failure Lab
+Multi-Agent deep dives
+additional framework-specific tutorials
+```
+
+A new Lab after Closure Gate must be justified by validated user demand, a missing dependency for a paid outcome, or evidence that a current mental model is incomplete.
+
+---
+
+# Phase 2 — Validation Instrumentation
+
+**Status: PREPARE DURING PHASE 1; COMPLETE BEFORE EXTERNAL ALPHA**
+
+Instrumentation may be implemented in parallel with Prompt / Graph / Capstone work because it does not require the SaaS platform.
+
+Goal:
+
+> Explain what users did, where they dropped, whether the stack created Aha moments, whether they crossed layers, whether they completed the integration experience, whether they returned, and whether they showed payment intent.
 
 This phase has higher priority than Supabase identity, billing, entitlement, credit ledgers, or full Next.js migration.
 
-## 1.1 Analytics event model
+## 2.1 Analytics event model
 
 Track at minimum:
 
 ```text
 landing_viewed
+stack_viewed
+layer_entered
 lab_viewed
 lab_started
 parameter_changed
@@ -141,19 +408,25 @@ lab_completed
 aha_feedback_submitted
 next_lab_clicked
 second_lab_started
+cross_layer_started
+capstone_started
+capstone_completed
+architecture_decision_submitted
+release_decision_submitted
 pricing_viewed
 paid_intent_clicked
 waitlist_submitted
 return_visit
 ```
 
-High-frequency UI events should be sampled or avoided unless they answer a concrete product question.
+High-frequency events should be sampled or omitted unless they answer a concrete product question.
 
-Every relevant event should carry enough experiment context to support cohort analysis:
+Relevant events should carry experiment context:
 
 ```text
 anonymous_user_id
 session_id
+layer_id
 lab_id
 lab_version
 experiment_id / variant (when applicable)
@@ -165,17 +438,19 @@ timestamp
 device class
 ```
 
-Country / region may be collected only when available through a privacy-appropriate analytics mechanism; do not add invasive fingerprinting.
+Country / region may be collected only through a privacy-appropriate analytics mechanism. Do not add invasive fingerprinting.
 
 ### `lab_version` is required
 
-Do not combine behavior from materially different Lab experiences into one metric. When instructional flow, default scenario, scoring model, controls, or copy changes enough to affect learning behavior, increment the Lab version used in analytics.
+Do not mix behavior from materially different Lab experiences into the same metric without version context.
 
-## 1.2 Meaningful interaction definition
+Increment the version when instructional flow, default scenario, scoring model, controls, or copy changes enough to affect learning behavior.
 
-A `lab_started` event alone does not prove the user played with the system.
+## 2.2 Meaningful Interaction
 
-For Validation Alpha, define **Meaningful Interaction** as a user performing at least one causal Lab action beyond opening the page, such as:
+A `lab_started` event alone does not prove the user engaged with the mental model.
+
+For Validation Alpha, **Meaningful Interaction** requires at least one causal action beyond opening the page, for example:
 
 ```text
 parameter change
@@ -186,13 +461,11 @@ compare
 scenario action that changes derived state
 ```
 
-We may tighten this definition after observing real sessions.
+## 2.3 Aha measurement
 
-## 1.3 Aha measurement
+AhaFrame's core outcome is changed engineering understanding.
 
-AhaFrame's core outcome is not page completion. It is changed engineering understanding.
-
-After selected Labs, ask:
+After selected experiences, ask:
 
 > **Did this change how you think about this system?**
 
@@ -211,39 +484,47 @@ Define:
 Strong Aha = Yes + Oh, I finally get it.
 ```
 
-Also collect one optional qualitative prompt:
+Optional qualitative prompt:
 
 > **What do you understand differently now?**
 
-This open-text answer is high-value research evidence and should be stored separately from anonymous event telemetry where practical.
+## 2.4 Stack comprehension signal
 
-## 1.4 “Want more” signal
+After the user has crossed multiple layers or completed the Capstone, test the stack itself rather than only individual Labs.
 
-After a meaningful Lab experience, optionally ask:
+Example question:
+
+> **If this AI system behaves correctly but can still execute an unsafe refund, which engineering layer would you inspect first?**
+
+The goal is not certification. It is to test whether users can correctly distinguish Prompt / Context / Harness / Loop / Graph / Evaluation responsibilities.
+
+## 2.5 “Want more” signal
+
+After a meaningful experience, optionally ask:
 
 > **Would you use more Labs like this for production AI topics?**
 
-This distinguishes a good single interactive article from a product with multi-Lab demand.
+This distinguishes a strong interactive article from a product with repeat learning demand.
 
 ---
 
-# Phase 2 — Validation Deployment
+# Phase 3 — Validation Deployment
 
-**Status: AFTER PHASE 1**
+**Status: AFTER CLOSURE GATE + INSTRUMENTATION**
 
 Goal:
 
-> Put the current Validation MVP in front of real users with production analytics and feedback capture, without first building the full SaaS platform.
+> Put the conceptually closed, no-login product in front of real users with production analytics and feedback capture, without first building the full SaaS platform.
 
-Reuse / advance the intent of existing work items where possible:
+Advance the intent of existing work items where possible:
 
 ```text
 #16 Analytics + waitlist storage      move forward
 #17 ahaframe.com deployment           move forward
-#19 Developer Alpha                   move forward as Validation Alpha
+#19 Developer Alpha                   redefine as Validation Alpha
 ```
 
-Required before recruiting users:
+Required before recruiting the formal cohort:
 
 - `ahaframe.com` production deployment;
 - HTTPS / DNS;
@@ -254,7 +535,8 @@ Required before recruiting users:
 - basic error monitoring;
 - mobile + desktop smoke test;
 - privacy-safe analytics disclosure where required;
-- rollback path.
+- rollback path;
+- Prompt / Graph / Capstone routes working at validation quality.
 
 Not required:
 
@@ -269,17 +551,17 @@ full SaaS runtime migration
 Live Mode compute
 ```
 
-Public learning must remain no-login.
+Public learning remains no-login.
 
 ---
 
-# Phase 3 — Validation Alpha
+# Phase 4 — Validation Alpha
 
-**Status: AFTER PHASE 2**
+**Status: AFTER PHASE 3**
 
 Recruit **20–30 qualified developers** before broad public launch.
 
-## 3.1 Primary ICP
+## 4.1 Primary ICP
 
 Experienced software developers who:
 
@@ -300,9 +582,11 @@ Data / Full-stack
 
 Do not optimize the first cohort for absolute beginners or ML researchers.
 
-## 3.2 Validation journey
+## 4.2 Validation journey
 
-The shortest useful funnel is:
+Two funnels matter.
+
+### Fast-value funnel
 
 ```text
 Landing
@@ -315,33 +599,55 @@ Failure / Trade-off Observed
 ↓
 Aha Feedback
 ↓
-Second Lab
+Second Lab / Another Layer
 ↓
 Pricing / More-Labs Intent
 ↓
 Return Visit
 ```
 
-The Capstone is not required for this funnel.
+### Stack-value funnel
 
-## 3.3 Core dashboard
+```text
+AI Engineering Stack
+↓
+Multiple Layers
+↓
+Capstone
+↓
+Architecture Decision
+↓
+Release Decision
+↓
+Stack Comprehension / Aha
+```
 
-The first decision dashboard should emphasize a small number of product metrics rather than vanity traffic:
+The first funnel tests immediate product value.
+
+The second tests the stronger thesis:
+
+> **Does AhaFrame create a coherent AI-engineering mental model rather than a collection of good demos?**
+
+Do not require every Alpha participant to finish all six layers in one session.
+
+## 4.3 Core dashboard
 
 | Metric | Product question |
 |---|---|
 | Landing → Lab Start | Does positioning create enough intent to try? |
 | Meaningful Interaction Rate | Do users actually PLAY rather than just read? |
-| Failure / Trade-off Trigger Rate | Do users reach the BREAK part of the loop? |
+| Failure / Trade-off Trigger Rate | Do users reach BREAK? |
 | Lab Completion Rate | Is the experience understandable and usable? |
-| **Strong Aha Rate** | Does the Lab actually change understanding? |
-| **Second Lab Rate** | Is this a product, not just one good page? |
+| **Strong Aha Rate** | Does the experience change understanding? |
+| **Second Lab / Cross-Layer Rate** | Is this a product rather than one good page? |
+| **Stack Comprehension** | Does the six-layer model transfer? |
+| Capstone Start / Completion | Does the integrated model create pull? |
 | D7 Return | Is there continuing value? |
 | Paid / Founding Intent | Is there commercial potential? |
 
-Supporting analysis should include source / campaign, Lab, Lab version, and cohort breakdowns.
+Supporting analysis should include source / campaign, layer, Lab, Lab version, and cohort breakdowns.
 
-## 3.4 Internal validation thresholds
+## 4.4 Internal validation thresholds
 
 These are **internal experimental decision rules, not industry benchmarks**.
 
@@ -350,7 +656,7 @@ These are **internal experimental decision rules, not industry benchmarks**.
 | Landing → Lab Start | ≥ 40% |
 | Meaningful Interaction | ≥ 60% of Lab starters |
 | Failure / Trade-off Trigger | ≥ 40% of Lab starters |
-| First Lab → Second Lab | ≥ 30% |
+| First Lab → Second Lab / Layer | ≥ 30% |
 | Users completing ≥2 Labs | ≥ 25% |
 | **Strong Aha Rate** | **≥ 60%** |
 | “Want more Labs like this” | ≥ 40% |
@@ -358,22 +664,24 @@ These are **internal experimental decision rules, not industry benchmarks**.
 | Paid / Founding intent | ≥ 3% |
 | D7 Return | ≥ 15% initially; ≥ 20% is strong |
 
-Do not tune the product to hit a metric mechanically. Use qualitative feedback to understand why a metric moved.
+For Stack Comprehension and Capstone metrics, the first Alpha is primarily exploratory. Establish a baseline before turning them into hard gates.
 
-## 3.5 Qualitative review
+Do not tune the product to hit a metric mechanically. Use qualitative evidence to explain metric movement.
 
-For the first cohort, review representative sessions / feedback manually.
+## 4.5 Qualitative review
 
-Look specifically for statements like:
+Look for evidence such as:
 
 ```text
 “I finally understand why ...”
 “I thought X was always better, but now I see ...”
+“I understand the difference between Loop and Graph now.”
+“I was trying to solve a Harness problem with a better Prompt.”
 “I would use this before designing / debugging ...”
 “I want a Lab for ...”
 ```
 
-Weak evidence includes generic praise such as:
+Weak evidence includes:
 
 ```text
 “Nice UI”
@@ -381,13 +689,13 @@ Weak evidence includes generic praise such as:
 “Looks polished”
 ```
 
-AhaFrame is validated by changed mental models and repeat demand, not aesthetic approval.
+AhaFrame is validated by changed mental models, transferred engineering judgment, multi-experience demand, and credible commercial intent.
 
 ---
 
-# Phase 4 — Product Gate
+# Phase 5 — Product Gate
 
-**Status: REQUIRED BEFORE PLATFORM EXPANSION**
+**Status: REQUIRED BEFORE SAAS PLATFORM EXPANSION**
 
 After the first 20–30 qualified users, write an explicit Product Gate decision.
 
@@ -401,7 +709,7 @@ CONTENT / BRAND ASSET
 STOP
 ```
 
-## 4.1 Interpretation matrix
+## 5.1 Interpretation matrix
 
 ### Case A — Interaction low
 
@@ -433,28 +741,33 @@ Action:
 
 > Rework scenario design, causal explanation, defaults, or debrief. Do not solve with more Labs.
 
-### Case C — Aha high, Second Lab low
+### Case C — Individual Aha high, stack comprehension low
 
 ```text
-Aha         high
-Second Lab  low
+Lab Aha              high
+Cross-layer behavior acceptable
+Stack comprehension  low
 ```
 
 Likely problem:
 
-> Strong single-page educational asset; weak platform / curriculum pull.
+> Strong Labs, weak unifying mental model.
 
 Action:
 
-> Test better next-Lab routing and topic demand. Consider content / acquisition asset positioning if repeat demand remains weak.
+> Improve stack framing, transitions, comparisons between layers, and Capstone integration. Do not add unrelated content.
 
-### Case D — Aha + multi-Lab strong, paid intent weak
+### Case D — Aha high, Second Lab / Cross-Layer low
 
-```text
-Aha          high
-Second Lab   high
-Paid Intent  low
-```
+Likely problem:
+
+> Strong single-page educational assets; weak platform / curriculum pull.
+
+Action:
+
+> Test better next-Lab routing and topic demand. Consider content / acquisition positioning if repeat demand remains weak.
+
+### Case E — Aha + multi-Lab strong, paid intent weak
 
 Likely problem:
 
@@ -462,83 +775,66 @@ Likely problem:
 
 Action:
 
-> Test paid Build Projects, Production Labs, team / employer value, or alternative pricing before building extensive billing infrastructure.
+> Test paid Build Projects, Production Labs, team / employer value, or alternative pricing before extensive billing infrastructure.
 
-### Case E — Aha + multi-Lab + return + paid intent strong
+### Case F — Aha + stack + multi-Lab + return + paid intent strong
 
-This is the desired signal:
+Desired signal:
 
 > **GO PLATFORM.**
 
 Resume the accepted SaaS architecture and build durable identity / state / revenue infrastructure.
 
-## 4.2 Minimum GO condition
+## 5.2 Minimum GO condition
 
-Do not treat any one metric as sufficient. A GO PLATFORM decision should normally require:
+Do not treat any one metric as sufficient.
+
+A `GO PLATFORM` decision should normally require:
 
 - Strong Aha at or above the internal target;
-- meaningful multi-Lab behavior;
+- meaningful multi-Lab / cross-layer behavior;
+- evidence that the six-layer stack improves comprehension rather than merely naming categories;
 - evidence of return or explicit future-use intent;
 - non-zero credible payment intent;
-- no unresolved severe comprehension / trust problem in deterministic metrics.
+- no unresolved severe trust problem in deterministic educational metrics.
 
 ---
 
-# Phase 5 — Conditional Content Expansion
+# Phase 6 — Evidence-Driven Content Expansion
 
-**Status: ONLY AFTER PRODUCT GATE OR WHEN REQUIRED BY VALIDATION**
+**Status: AFTER PRODUCT GATE OR WHEN VALIDATION REVEALS A SPECIFIC GAP**
 
-Candidate next item:
+Conceptual Closure v1 is not permission to stop evolving the curriculum forever.
 
-```text
-#9 Reliable Support Agent Build
-```
+It means the next Lab is selected from evidence rather than taxonomy completion.
 
-The Capstone should combine existing mental models:
+Candidate backlog:
 
 ```text
-Task / prompt contract
-+ Retrieval configuration
-+ Context compression policy
-+ Harness controls
-+ Loop / termination policy
-+ Graph topology where useful
-+ Human approval boundary
-+ Evaluation / release gate
-+ Cost / latency budget
-        ↓
-Architecture decision
-+ Trade-off explanation
-+ Release decision
-```
-
-The Build should reward defensible engineering judgment, not framework boilerplate.
-
-Additional Labs are chosen from observed demand and failure patterns, not curriculum completeness.
-
-Possible backlog:
-
-```text
-Instruction Conflict Lab
 Tool Contract Failure Lab
 Retry & Idempotency Lab
-Agent Workflow Graph Lab
+MCP Permission Lab
+Embedding Similarity Lab
+Attention Budget Explorer
+Planning Strategy Lab
 Model Routing Lab
 Trace Diagnosis Lab
 Guardrail Failure Lab
+Agent Budget Lab
+Multi-Agent coordination labs
 ```
 
 Decision rule:
 
-> **Every new Lab must answer either a demonstrated user demand or a missing dependency required for a validated paid outcome.**
+> **Every new Lab must answer demonstrated user demand, repair a validated comprehension gap, or enable a validated paid outcome.**
 
 ---
 
-# Phase 6 — SaaS Platform Migration
+# Phase 7 — SaaS Platform Migration
 
 **Status: PAUSED UNTIL GO PLATFORM**
 
-Architecture decision in ADR-0001 remains accepted. The validation-first roadmap changes **when** we execute it, not the target architecture.
+ADR-0001 remains accepted. v0.5 changes **when** the architecture is executed, not the target architecture.
 
 Future target runtime:
 
@@ -578,7 +874,7 @@ Do not rewrite deterministic scenario math into React merely because the shell c
 
 ---
 
-# Phase 7 — Identity + Durable State
+# Phase 8 — Identity + Durable State
 
 **Status: AFTER GO PLATFORM + MIGRATION PARITY**
 
@@ -589,7 +885,7 @@ Tracked work:
 #13 Progress / checkpoints / entitlement model
 ```
 
-Identity UX must preserve the no-login acquisition experience:
+Identity UX must preserve no-login acquisition:
 
 ```text
 Visit
@@ -627,7 +923,7 @@ UsageRecord
 
 ---
 
-# Phase 8 — Revenue Chain
+# Phase 9 — Revenue Chain
 
 **Status: AFTER PRODUCT VALUE + PAYMENT INTENT ARE VALIDATED**
 
@@ -662,7 +958,7 @@ Do not build or sell compute credits before a real metered capability exists.
 
 ---
 
-# Phase 9 — Platform Launch Gate
+# Phase 10 — Platform Launch Gate
 
 **Status: AFTER PLATFORM + REVENUE IMPLEMENTATION**
 
@@ -697,7 +993,7 @@ Security review includes:
 
 ---
 
-# Phase 10 — Metered Live Mode
+# Phase 11 — Metered Live Mode
 
 **Status: POST-VALIDATION EXPANSION**
 
@@ -725,14 +1021,14 @@ Rules:
 - no unlimited model compute;
 - hard per-run and per-user budgets;
 - server-side provider adapter;
-- auditable provider/model/usage/latency/cost evidence;
-- atomic credit debit only when credits are actually necessary.
+- auditable provider / model / usage / latency / cost evidence;
+- atomic credit debit only when credits are necessary.
 
-Live Mode should validate or challenge the simulation's mental model; it should not turn AhaFrame into a generic model playground.
+Live Mode should validate or challenge the simulation mental model; it should not turn AhaFrame into a generic model playground.
 
 ---
 
-# Phase 11 — Public Beta
+# Phase 12 — Public Beta
 
 **Status: CONDITIONAL**
 
@@ -757,15 +1053,20 @@ A technically reliable SaaS with weak Product Gate evidence does not qualify.
 
 ```text
 DONE    Product Foundation
-DONE    7 Validation-MVP experiences
+DONE    7 existing experiences
+DONE    Context / Harness / Loop / Evaluation v1 coverage
 DONE    #10 SaaS architecture direction / ADR
 
-NEXT    Phase 1 — Validation instrumentation
-NEXT    Phase 2 — Validation deployment
-NEXT    Phase 3 — 20–30 developer Validation Alpha
-NEXT    Phase 4 — Product Gate
+NEXT    Instruction Conflict Lab          → Prompt closure
+NEXT    Agent Workflow Graph Lab          → Graph closure
+NEXT    Reliable Support Agent Build      → Integration closure
+PARALLEL Validation instrumentation       → analytics / Aha / stack metrics
 
-HOLD    #9 Capstone unless validation requires it
+THEN    Closure Gate
+THEN    Validation deployment
+THEN    20–30 developer Validation Alpha
+THEN    Product Gate
+
 PAUSE   #11 SaaS migration until GO PLATFORM
 PAUSE   #12–#15 identity / billing / credits until GO PLATFORM
 ```
@@ -773,40 +1074,45 @@ PAUSE   #12–#15 identity / billing / credits until GO PLATFORM
 Current execution flow:
 
 ```text
-Existing 7 Labs
-      ↓
-Analytics + Aha Feedback
-      ↓
-Production Validation Deployment
-      ↓
+Existing 7 Experiences
+        ↓
+Instruction Conflict Lab
+        ↓
+Agent Workflow Graph Lab
+        ↓
+Reliable Support Agent Build
+        ↓
+CONCEPTUAL CLOSURE GATE
+        ↓
+Instrumented Production Deployment
+        ↓
 20–30 Qualified Developers
-      ↓
-Funnel + Aha + Multi-Lab + Return + Paid Intent
-      ↓
+        ↓
+Aha + Cross-Layer + Stack Comprehension
++ Return + Paid Intent
+        ↓
 PRODUCT GATE
-   ↙        ↓          ↘
-REFRAME   VALIDATE     GO PLATFORM
-                         ↓
-                 Content / Capstone as needed
-                         ↓
-                    #11 Migration
-                         ↓
-                   #12 / #13
-                         ↓
-                   #14 Revenue
-                         ↓
-                   #18 Launch Gate
-                         ↓
-                   #20 Live Mode
-                         ↓
-                   #21 Public Beta
+   ↙          ↓           ↘
+REFRAME   VALIDATE AGAIN   GO PLATFORM
+                           ↓
+                     #11 Migration
+                           ↓
+                     #12 / #13
+                           ↓
+                     #14 Revenue
+                           ↓
+                     #18 Launch Gate
+                           ↓
+                     #20 Live Mode
+                           ↓
+                     #21 Public Beta
 ```
 
 ---
 
 # Engineering Workflow
 
-Every implementation item still follows:
+Every implementation item follows:
 
 ```text
 Issue
@@ -821,19 +1127,25 @@ Issue
 → update roadmap / master issue
 ```
 
-But engineering completeness is subordinate to evidence gathering during Validation Alpha.
+During Phase 1, engineering effort is justified by conceptual closure.
+
+After Closure Gate, engineering completeness is subordinate to evidence gathering until Product Gate.
 
 ---
 
 # Decision Rules
 
-## Current product question
+## Current content question
 
-> **Do experienced software developers gain meaningfully stronger AI-engineering intuition from AhaFrame's interactive failure simulations, and do enough of them want additional Labs / return / paid capability to justify a platform?**
+> **Can Prompt → Context → Harness → Loop → Graph → Evaluation form one coherent, durable engineering mental model rather than six labels?**
+
+## Current integration question
+
+> **Can the Reliable Support Agent Build make a developer combine the six layers into one defensible architecture and release decision?**
 
 ## Current analytics question
 
-> **Can we reliably connect anonymous acquisition → Lab behavior → Aha → second-Lab behavior → return / payment intent without adding login friction?**
+> **Can we reliably connect anonymous acquisition → Lab behavior → Aha → cross-layer behavior → stack comprehension → return / payment intent without adding login friction?**
 
 ## Deferred platform question
 
@@ -841,6 +1153,8 @@ But engineering completeness is subordinate to evidence gathering during Validat
 
 This question becomes active only after `GO PLATFORM`.
 
-## Final principle
+## Final principles
 
-> **Do not build the next layer because it is architecturally elegant. Build it because validated user behavior makes it necessary.**
+> **Finish the mental model, not the platform.**
+
+> **Do not build the next layer because it is architecturally elegant. Build it because conceptual closure or validated user behavior makes it necessary.**
