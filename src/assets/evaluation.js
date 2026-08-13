@@ -51,10 +51,23 @@
 
   function renderSlices(derived){
     outputs.slices.innerHTML=derived.sliceScores.map((slice)=>{
-      const deltaClass=slice.delta<0?'eval-negative':'eval-positive';
-      const critical=slice.critical?' <span class="badge eval-critical">Critical</span>':'';
-      return `<tr><td><strong>${slice.label}</strong>${critical}</td><td>${(slice.weight*100).toFixed(0)}%</td><td>${slice.v1.toFixed(0)}</td><td>${slice.v2.toFixed(0)}</td><td class="${deltaClass}">${signed(slice.delta,0)}</td></tr>`;
+      const deltaStyle=slice.delta<0?'color:var(--danger);font-weight:800':'color:var(--success);font-weight:800';
+      const critical=slice.critical?' <span class="badge" style="color:var(--danger);border-color:#efd0cc;background:#fffafa">Critical</span>':'';
+      return `<tr><td><strong>${slice.label}</strong>${critical}</td><td>${(slice.weight*100).toFixed(0)}%</td><td>${slice.v1.toFixed(0)}</td><td>${slice.v2.toFixed(0)}</td><td style="${deltaStyle}">${signed(slice.delta,0)}</td></tr>`;
     }).join('');
+  }
+
+  function renderDecision(decision){
+    const styles={
+      SHIP:{color:'var(--success)',background:'#edf8f3',border:'#d9ece4'},
+      BLOCK:{color:'var(--danger)',background:'#fff4f2',border:'#efd0cc'},
+      INCONCLUSIVE:{color:'var(--warning)',background:'#fffaf0',border:'#ecd9af'},
+    }[decision];
+    outputs.decision.textContent=decision;
+    outputs.decision.dataset.decision=decision;
+    outputs.decision.style.color=styles.color;
+    outputs.decision.style.background=styles.background;
+    outputs.decision.style.borderColor=styles.border;
   }
 
   function render(frame){
@@ -80,8 +93,7 @@
     outputs.evalCost.textContent=derived.estimatedEvalCost.toFixed(1);
     outputs.costV1.textContent=derived.costPerSuccessV1.toFixed(3);
     outputs.costV2.textContent=derived.costPerSuccessV2.toFixed(3);
-    outputs.decision.textContent=derived.decision;
-    outputs.decision.dataset.decision=derived.decision;
+    renderDecision(derived.decision);
     outputs.diagnosis.textContent=derived.diagnosis;
     outputs.diagnosis.dataset.failureType=derived.failureType;
     renderSlices(derived);
@@ -125,9 +137,5 @@
   reset.addEventListener('click',()=>{
     lab.reset();
     window.AhaFrame?.track('evaluation_naive_baseline_reset');
-  });
-
-  root.querySelector('[data-evaluation-build]')?.addEventListener('click',()=>{
-    window.AhaFrame?.track('evaluation_build_challenge_started');
   });
 })();
