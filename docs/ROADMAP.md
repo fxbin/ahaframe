@@ -24,10 +24,26 @@ Architecture principle:
 
 > **Simulate the concept. Spend compute only to validate reality.**
 
-Curriculum source of truth:
+Execution source of truth:
 
-- `docs/CURRICULUM.md` — track map, prerequisites, candidate Labs, free/paid boundary, source-reference policy.
-- `docs/EVALUATION_FAILURE_LAB.md` — implemented Evaluation Failure Lab product/simulation specification.
+- `docs/CURRICULUM.md` — curriculum v1.1, engineering layers, system domains, prerequisites, backlog, free/paid boundary.
+- `docs/EVALUATION_FAILURE_LAB.md` — implemented Evaluation Failure Lab specification.
+- GitHub issue `#22` — end-to-end Platform Launch execution plan.
+
+## AI Engineering Layers
+
+AhaFrame now uses this six-layer mental model:
+
+```text
+Prompt shapes behavior.
+Context shapes knowledge.
+Harness shapes reliability.
+Loop shapes iteration.
+Graph shapes orchestration.
+Evaluation proves whether it works.
+```
+
+These layers cross-cut the curriculum domains. Prompt and Graph gaps are explicit, but their dedicated candidate Labs stay outside the pre-Alpha critical path unless the capstone proves they are required.
 
 ## Phase 0 — Foundation complete
 
@@ -46,47 +62,19 @@ Status: complete
 - Agent Reliability Lab
 - Evaluation Failure Lab
 
-## Phase 1 — Curriculum v1 + Content MVP
+## Phase 1A — Curriculum v1.1 + remaining Content MVP
 
 Status: current
 
-The goal is not a large course catalog. The goal is a coherent 60–120 minute journey that proves the AhaFrame method before broad external promotion.
+The goal is a coherent 60–120 minute journey, not a large catalog.
 
-### Curriculum v1 — complete
-
-AhaFrame uses two external projects as research references without turning them into runtime or content dependencies:
+Tracked work:
 
 ```text
-AI Engineering from Scratch
-        ↓
-broad AI-engineering dependency map
-
-AI Agent Book
-        ↓
-Agent / Evaluation engineering depth
-
-        ↓
-AhaFrame original treatment
-
-SEE → PLAY → BREAK → AHA → BUILD
+#7  Curriculum v1.1                    in progress
+#8  Context Compression Lab            next
+#9  Reliable Support Agent Build       next
 ```
-
-The mapping is documented in `docs/CURRICULUM.md`.
-
-The eight curriculum tracks are:
-
-```text
-01 LLM Mental Models
-02 Context & Retrieval
-03 Tools & Protocols
-04 Agent Engineering
-05 Evaluation & Reliability
-06 Production AI
-07 Multi-Agent Systems
-08 Build Systems
-```
-
-Do not implement every mapped topic. The map exists to prevent curriculum drift and identify the highest-value failure simulations.
 
 ### Content MVP stop line
 
@@ -98,99 +86,19 @@ Context Compression Lab         next
 Reliable Support Agent Build    next
 ```
 
-Optional bridge if user testing or the Build Challenge reveals a missing tools concept:
+Backlog candidates that do **not** delay Soft Alpha by default:
 
 ```text
-Tool Contract Failure Lab       optional
+Instruction Conflict Lab
+Agent Workflow Graph Lab
+Tool Contract Failure Lab
 ```
-
-It must not delay Soft Alpha by default.
-
-### RAG Failure Lab
-
-Pressure-tests retrieval decisions:
-
-- chunk size;
-- overlap;
-- Top-K;
-- vector vs hybrid retrieval;
-- reranking;
-- recall / precision / context / latency / cost / answer quality;
-- broken-baseline checkpoint and compare.
-
-### Agent Reliability Lab
-
-Pressure-tests agent control-policy decisions:
-
-- max steps;
-- retry limits;
-- tool timeout;
-- result validation;
-- human approval before an irreversible action;
-- weak / bounded / goal-aware termination;
-- success, runaway risk, unsafe-action risk, latency, cost, review load;
-- unreliable-baseline checkpoint and compare.
-
-The scenario intentionally demonstrates that an agent can have a reasonable completion rate while still being operationally unsafe or expensive.
-
-### Evaluation Failure Lab — complete
-
-Primary product question:
-
-> **How do you know a new AI-system version is actually better, rather than merely better on an aggregate score or a convenient demo set?**
-
-Implemented route:
-
-```text
-/en/labs/evaluation-failure/
-```
-
-The learner starts from a demo-biased release evaluation where Agent v2 appears stronger overall even though long-horizon and safety-critical refund slices regressed.
-
-Controls:
-
-```text
-Dataset preset
-Pass threshold
-Safety veto
-Sample size
-Judge mode
-Cost gate
-```
-
-Derived signals:
-
-```text
-Aggregate score — v1 / v2
-Slice regressions
-Critical regression count
-Evidence width
-Judge noise index
-Evaluation cost index
-Cost per successful task
-SHIP / BLOCK / INCONCLUSIVE
-```
-
-The naive baseline can say `SHIP`; the production preset intentionally changes the **evaluation policy**, not the candidate system, and correctly produces `BLOCK` while the critical regression remains unresolved.
-
-The Lab also proves a third release state: `INCONCLUSIVE` when the apparent improvement is smaller than the modeled evidence width.
-
-The deterministic scenario contract remains documented in `docs/EVALUATION_FAILURE_LAB.md`.
 
 ### Context Compression Lab — next
 
-Narrow the previously broad “Context Engineering Lab” into a concrete trade-off:
+Primary product question:
 
-```text
-Original context
-      ↓
-Compression / retrieval / summary policy
-      ↓
-Token budget ↓
-Latency / cost ↓
-Information loss ?
-Task quality ?
-```
+> **When context compression saves tokens, latency, and cost, what task-critical information gets lost?**
 
 Candidate controls:
 
@@ -202,158 +110,309 @@ Memory allocation
 Protected instructions / facts
 ```
 
-The learner should discover that reducing context cost can silently remove task-critical information.
-
-The next design step should decide whether this Lab focuses on a support-agent working context, a coding-agent context, or a neutral synthetic task. Prefer continuity with the support-agent world if it strengthens the final capstone rather than feeling repetitive.
-
-### Reliable Support Agent Build — Content MVP capstone
-
-Connect the existing Labs into one architecture decision:
-
-> Design a customer-support agent with RAG, bounded execution, evaluation gates, and approval before irreversible actions under fixed cost and latency budgets.
-
-The challenge should require explicit trade-offs rather than boilerplate code copying.
-
-Candidate inputs:
+Candidate signals:
 
 ```text
-Context budget
-Retrieval configuration
-Tool retry policy
-Approval boundary
-Evaluation policy
-Cost / latency budget
+Active context tokens
+Compression savings
+Critical-information retention
+Task quality
+Latency / cost index
+Failure diagnosis
 ```
 
-Candidate output:
+The Lab should continue the support-agent world if that strengthens the final capstone without becoming repetitive.
+
+### Reliable Support Agent Build — capstone
+
+The capstone combines the engineering layers into one architecture decision:
 
 ```text
-Architecture decision
-Trade-off explanation
-Release gate
+Prompt
++ Context / RAG
++ Harness
++ Loop
++ Graph/topology where relevant
++ Evaluation
+        ↓
+Reliable Support Agent
 ```
 
-## Phase 2 — UX review + Soft Alpha
+The learner must design a customer-support agent with fixed safety, latency, and cost constraints and explain the trade-offs.
 
-Only after the Content MVP stop line is complete:
+## Phase 1B — Platform architecture
 
-1. review all English copy and technical claims;
-2. verify the dependency path and cross-Lab navigation;
-3. verify synthetic metrics are clearly labeled and internally coherent;
-4. deploy the reviewed build to `ahaframe.com`;
-5. connect real analytics and waitlist storage;
-6. invite approximately **20–50 software developers** for a Soft Alpha;
-7. observe where users stop, what they tune, which Labs create the strongest “aha,” and whether paid-capability intent appears.
+This work can begin in parallel with the remaining Content MVP after curriculum v1.1 is locked.
 
-This is not a broad Product Hunt / Hacker News / Reddit launch yet.
+Tracked work:
 
-## Phase 3 — optional identity, not mandatory login
+```text
+#10 Raphael → AhaFrame architecture / migration ADR
+#11 SaaS runtime migration
+```
 
-Do **not** put a login wall in front of public lessons or simulations.
+Inputs:
 
-Authentication becomes justified when identity unlocks durable value.
+```text
+Raphael StarterKit  → reusable development skeleton
+Supabase             → identity + application data
+Waffo Pancake        → payment provider
+AhaFrame Lab Engine  → deterministic simulation runtime
+```
 
-### Triggers
+The architecture ADR must decide whether migration is full Next.js or staged/hybrid, and must preserve current public URLs, SEO, visual identity, and Lab behavior.
 
-Start the identity layer when at least one of these is ready:
+Platform rule:
 
-1. save Lab checkpoints and experiment history across devices;
-2. attach paid entitlements to a user;
-3. meter Live Mode credits;
-4. persist Build Project submissions;
-5. persist progress beyond local browser storage.
+> **Borrow the SaaS foundation; do not overwrite the product.**
 
-### Intended UX
+AhaFrame keeps ownership of its brand, learning UX, curriculum, Lab Engine, scenarios, pricing model, and entitlement semantics.
+
+## Phase 2 — Identity + durable state
+
+Tracked work:
+
+```text
+#12 Optional Supabase identity
+#13 Progress / checkpoints / entitlement model
+```
+
+### Identity UX
+
+Do not put a login wall in front of public lessons or simulations.
 
 ```text
 Visit AhaFrame
     ↓
-Use free lessons/labs immediately
+Learn / use Labs immediately
     ↓
-User chooses Save / Purchase / Live Mode / Build Project
+Choose Save / Purchase / Build / Live Mode
     ↓
-Ask for sign-in
+Sign in
 ```
 
-GitHub sign-in should be considered first for the developer audience, with email magic-link as a fallback. The authentication vendor remains intentionally unlocked.
+Preferred first OAuth path: GitHub. Email is fallback.
 
-Minimal account model:
+### Minimum durable domain model
 
 ```text
 User
 LabRun
 Checkpoint
 Progress
+Purchase
+Subscription
 Entitlement
-UsageCredit (only when Live Mode exists)
+PaymentEvent
 ```
 
-Do not build profiles, social features, teams, organizations, certificates, or a large LMS model at this stage.
-
-## Phase 4 — payment validation and Foundations product
-
-Only after behavior supports the hypothesis:
-
-- introduce real checkout / preorder or launch purchase;
-- implement entitlements;
-- package **AI Engineer Foundations** around a compact set of high-quality labs;
-- include failure simulations and meaningful Build Projects;
-- test the `$49 one-time` offer with actual payment, not only intent clicks.
-
-The larger candidate backlog is maintained in `docs/CURRICULUM.md` rather than duplicated here.
-
-The exact Foundations count should follow observed user behavior rather than a fixed curriculum promise.
-
-## Phase 5 — Live Mode
-
-Add real compute only where it validates the simulation against reality.
+Future-ready:
 
 ```text
-Simulation Mode
-    ↓
-Predicted trade-off
-    ↓
-Live Mode
-    ↓
-Real retrieval / model result
-    ↓
-Compare predicted vs actual
+CreditLedger
+UsageRecord
+```
+
+`Entitlement` is the canonical access truth; it must not be identical to a subscription row.
+
+## Phase 3 — Revenue chain
+
+Tracked work:
+
+```text
+#14 Waffo one-time + subscription billing
+#15 Atomic compute-credit ledger / purchase foundation
+```
+
+### Billing provider
+
+Waffo Pancake is the selected payment provider.
+
+Product mapping:
+
+```text
+AI Engineer Foundations    one-time purchase
+Production Labs            recurring subscription
+Compute Credits            real compute only
+```
+
+### Billing invariants
+
+- payment private keys stay server-side;
+- browser success redirects do not grant access;
+- verified server/webhook state updates purchases/subscriptions/entitlements;
+- duplicate webhook events are idempotent;
+- canceled/refunded/expired states reconcile correctly;
+- provider IDs do not become the application domain model.
+
+### Credits rule
+
+```text
+Simulation / learning   no credits
+Saved progress          no credits
+Live model / agent run  credits
+Sandbox execution       credits later
+```
+
+Credit packages must not be sold publicly until a real metered compute capability exists.
+
+## Phase 4 — Measurement + production operations
+
+Tracked work:
+
+```text
+#16 Production analytics + waitlist storage
+#17 ahaframe.com deployment + observability
+```
+
+Production funnel:
+
+```text
+Landing
+→ Lab start
+→ Parameter interaction
+→ Second Lab
+→ Capstone
+→ Pricing
+→ Sign in
+→ Checkout start
+→ Purchase / subscription
+→ Return usage
+```
+
+Deployment must include correct HTTPS/domain configuration, canonical URLs, sitemap/robots/structured data, safe secrets, error visibility, and rollback documentation.
+
+## Phase 5 — Launch Gate
+
+Tracked work:
+
+```text
+#18 Full E2E / security / billing verification
+```
+
+The platform is not ready for external users until these critical paths pass:
+
+```text
+anonymous learning
+signed-in save/restore
+Foundations purchase → entitlement
+Production subscription → entitlement
+failed payment → no access
+duplicate webhook → no duplicate grant
+session expiry / sign out
+mobile + desktop critical path
+```
+
+Security review includes Supabase RLS, payment webhook signature/idempotency, server-side access control, secret exposure, dependency hygiene, and failure handling.
+
+## Phase 6 — Soft Alpha
+
+Tracked work:
+
+```text
+#19 20–50 developer Soft Alpha
+```
+
+Preconditions:
+
+- Content MVP complete;
+- account/save flow works;
+- payment/entitlement chain works;
+- production analytics and error monitoring active;
+- `ahaframe.com` deployed;
+- Launch Gate passes.
+
+Observe:
+
+- Lab start/completion and second-Lab rate;
+- parameter interaction depth;
+- which Labs create the strongest “aha”;
+- sign-in/save demand;
+- pricing/checkout behavior;
+- technical/content confusion.
+
+This is still not a broad Product Hunt / Hacker News / Reddit launch.
+
+## Phase 7 — One metered Live Mode path
+
+Tracked work:
+
+```text
+#20 One bounded Live Mode validation path
+```
+
+Add real compute only where it validates the simulation against reality:
+
+```text
+Simulation prediction
+        ↓
+Live run
+        ↓
+Observed result
+        ↓
+Compare
 ```
 
 Rules:
 
-- never sell unlimited model compute;
-- meter AhaFrame-funded runs with credits;
-- consider BYOK for advanced developer users;
-- keep model/API keys out of static client persistence;
-- record cost, latency, model, tokens, and evaluation results per run.
+- one Lab first;
+- no unlimited model compute;
+- hard usage/budget limits;
+- server-side provider adapter;
+- atomic credit debit;
+- record model/provider, usage, latency, and cost evidence.
 
-## Phase 6 — Build Projects + sandbox
+## Phase 8 — Public Beta decision
 
-Code execution is the most expensive and security-sensitive tier.
-
-Prefer:
+Tracked work:
 
 ```text
-submit project
-    ↓
-short-lived isolated runner
-    ↓
-run tests / evaluation
-    ↓
-return result
-    ↓
-destroy runner
+#21 Public Beta GO / NO-GO
 ```
 
-Avoid long-lived per-user VMs in the early product.
+Public Beta requires a deliberate written release decision based on Soft Alpha evidence and platform reliability.
+
+If compute credits are publicly sold, a real metered Live Mode must already exist.
+
+## GitHub execution workflow
+
+Master tracking issue: `#22`.
+
+Every implementation item follows:
+
+```text
+Issue
+→ feature branch
+→ implementation
+→ behavioral / security validation
+→ PR
+→ CI
+→ review
+→ squash merge
+→ close Issue
+→ update master checklist
+```
+
+The current GitHub connector does not expose GitHub Projects V2 mutations. A Project can be created in the GitHub UI and populated with issues `#7–#21`; the Issues/PRs/Actions remain directly manageable through the connected tool.
+
+Recommended Project fields:
+
+```text
+Status       Backlog / Ready / In Progress / Review / Done
+Phase        Content / Platform / Auth & Data / Billing / Ops / Launch / Live
+Priority     P0 / P1 / P2
+Type         Curriculum / Content / Platform / Auth / Data / Billing / Ops / QA / Launch
+Launch Gate  Required / Post-Alpha
+```
 
 ## Decision rule
 
 The next feature should answer a product question, not merely make the platform look more complete.
 
-Current question:
+Current content question:
 
 > **Can AhaFrame make the cost-vs-information-loss trade-off of context compression visible enough that a developer can choose a defensible context policy instead of simply maximizing or minimizing tokens?**
 
-Context Compression Lab is the next required Content MVP test.
+Current platform question:
+
+> **Can AhaFrame preserve its fast no-login learning experience while adding durable identity, entitlement, Waffo billing, and observability as a coherent production chain?**
