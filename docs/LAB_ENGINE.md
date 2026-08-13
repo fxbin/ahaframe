@@ -1,14 +1,15 @@
 # AhaFrame Lab / Simulation Engine — v0.3
 
 Date: 2026-08-13
+Status: active architecture contract
 
 ## Purpose
 
-AhaFrame should not implement every interactive lesson as a one-off JavaScript demo. The Lab Engine provides a small deterministic runtime that lets many AI-engineering labs share the same execution model while keeping the visual layer independent.
+AhaFrame should not implement every interactive lesson as a one-off JavaScript demo. The Lab Engine provides a small deterministic runtime that lets many AI-engineering Labs share the same execution model while keeping the visual layer independent.
 
 > **Simulate the concept. Spend compute only to validate reality.**
 
-The engine is intentionally client-side and dependency-free. It does not require a model API, database, server process, or application framework.
+The Engine is client-side and dependency-free. It does not require a model API, database, server process, or application framework.
 
 ## Core model
 
@@ -28,7 +29,7 @@ Derived View / Metrics
 Adapter renders the DOM
 ```
 
-A Lab can also use:
+Reusable primitives:
 
 ```text
 History
@@ -42,20 +43,26 @@ Failure Injection
 ## Runtime files
 
 ```text
-src/assets/lab-engine.js             generic state/simulation runtime
-src/assets/lab-scenarios.js          shared deterministic scenarios
-src/assets/token.js                  Token Playground adapter
-src/assets/context.js                Context Window adapter
-src/assets/agent.js                  Agent Loop adapter
-src/assets/rag.js                    RAG Failure adapter
-src/assets/agent-reliability.js      Agent Reliability adapter
-src/assets/evaluation-scenario.js    Evaluation Failure page-specific scenario
-src/assets/evaluation.js             Evaluation Failure adapter
-src/assets/home.js                   homepage Token adapter
-scripts/test_lab_engine.js           behavioral regression tests
+src/assets/lab-engine.js                    generic state/simulation runtime
+src/assets/lab-scenarios.js                 shared deterministic scenarios
+
+src/assets/token.js                         Token adapter
+src/assets/context.js                       Context Window adapter
+src/assets/agent.js                         Agent Loop adapter
+src/assets/rag.js                           RAG Failure adapter
+src/assets/agent-reliability.js             Agent Reliability adapter
+
+src/assets/evaluation-scenario.js           Evaluation page-specific scenario
+src/assets/evaluation.js                    Evaluation adapter
+
+src/assets/context-compression-scenario.js  Context Compression page-specific scenario
+src/assets/context-compression.js           Context Compression adapter
+
+src/assets/home.js                          homepage Token adapter
+scripts/test_lab_engine.js                  behavioral regression tests
 ```
 
-The standard page builder loads:
+Standard load order:
 
 ```text
 lab-engine.js
@@ -67,11 +74,9 @@ page-specific scenario module (when needed)
 page adapter
 ```
 
-Evaluation Failure is the first Lab to use a page-specific scenario module. This lets the common scenario registry stay compact without modifying the generic Engine contract.
+Page-specific scenarios keep the common registry compact without changing the generic Engine contract.
 
 ## Scenario contract
-
-A scenario is registered with:
 
 ```js
 AhaFrame.registerLabScenario({
@@ -82,7 +87,7 @@ AhaFrame.registerLabScenario({
     parameter: 1,
   },
   reduce(state, action) {
-    // Return the next plain state object.
+    return {...state};
   },
   derive(state) {
     return {
@@ -97,21 +102,21 @@ AhaFrame.registerLabScenario({
 
 Rules:
 
-- `state` must be a plain serializable object;
-- reducers return a new valid state object for every supported action;
-- reducers must not access the DOM;
-- deterministic Labs produce the same state/derived output for the same initial state and action sequence;
-- `derive` computes display data and metrics without mutating state;
-- external API calls, timers, browser events, and rendering belong outside the reducer;
-- unknown or invalid actions fail explicitly.
+- `state` is a plain serializable object;
+- reducers return a new valid state object;
+- reducers do not access DOM, timers, network, or browser effects;
+- deterministic Labs return the same output for the same initial state and action sequence;
+- `derive()` computes display data and metrics without mutating state;
+- invalid / unsupported actions fail explicitly;
+- browser timers, external APIs, rendering, and product analytics live outside the reducer.
 
 ## Engine API
 
 ```js
-const lab = AhaFrame.createLab('context-window');
+const lab=AhaFrame.createLab('context-window');
 
-lab.dispatch('SELECT_STRATEGY', {strategy: 'rag'});
-lab.subscribe(({state, derived}) => render(state, derived));
+lab.dispatch('SELECT_STRATEGY',{strategy:'rag'});
+lab.subscribe(({state,derived})=>render(state,derived));
 lab.getFrame();
 lab.getHistory();
 lab.reset();
@@ -131,33 +136,31 @@ action
 historyLength
 ```
 
-`compare()` compares top-level state fields and `derived.metrics` by default. A scenario may provide a custom domain-specific compare function later.
+`compare()` compares top-level state fields and `derived.metrics` by default.
 
 ## Adapter responsibilities
 
 A DOM adapter may:
 
-- read sliders, buttons, selects, or other controls;
+- read sliders / buttons / selects;
 - dispatch semantic actions;
-- render state and derived data;
-- manage browser-only effects such as timers;
-- emit semantic product analytics events.
+- render scenario-derived data;
+- own browser-only effects such as timers;
+- emit semantic product analytics.
 
-It must not duplicate the scenario's calculations or state transitions.
-
-The Token probability transform exists once in the Token scenario and is shared by both the homepage demo and the full Token lesson. The same rule applies to Production Labs: domain calculations belong in scenarios, not HTML adapters.
+It must not duplicate scenario calculations or state transitions.
 
 ## Analytics boundary
 
-The Lab Engine does **not** emit analytics by default. Product events remain owned by adapters.
+The Lab Engine does **not** emit analytics by default.
 
-Engine-level `lab_action` / `lab_reset` events are opt-in:
+Product events remain adapter-owned. Optional low-level tracking can be enabled explicitly:
 
 ```js
-AhaFrame.createLab('example-lab', {track: true});
+AhaFrame.createLab('example-lab',{track:true});
 ```
 
-This avoids duplicate high-frequency events from controls such as sliders.
+This prevents high-frequency controls from creating duplicate analytics noise.
 
 ## Current scenarios
 
@@ -177,6 +180,8 @@ candidate probabilities
 selected token
 entropy
 ```
+
+The homepage Token preview and full lesson share the same scenario math.
 
 ### Context Window Lab
 
@@ -198,7 +203,7 @@ strategy explanation
 
 ### RAG Failure Lab
 
-The first Production Lab pressure test.
+First Production Lab pressure test.
 
 State:
 
@@ -211,17 +216,6 @@ reranker
 contextBudget
 ```
 
-Actions include:
-
-```text
-SET_CHUNK_SIZE
-SET_OVERLAP
-SET_TOP_K
-SET_RETRIEVAL
-SET_RERANKER
-APPLY_BALANCED_PRESET
-```
-
 Derived:
 
 ```text
@@ -229,19 +223,18 @@ recall
 precision
 noise
 context tokens
-overflow tokens
-context utilization
-latency estimate
+overflow
+latency
 cost index
-answer-quality score
+answer quality
 failure diagnosis
 ```
 
-The adapter saves the intentionally broken starting state as `baseline` and continuously compares the current configuration against it.
+The adapter checkpoints the broken baseline and compares the learner's current retrieval policy against it.
 
 ### Agent Reliability Lab
 
-The second Production Lab pressure test and the first focused on execution-policy and safety trade-offs.
+Second Production Lab pressure test.
 
 State:
 
@@ -254,18 +247,6 @@ humanApproval
 termination
 ```
 
-Actions include:
-
-```text
-SET_MAX_STEPS
-SET_RETRY_LIMIT
-SET_TIMEOUT
-SET_VALIDATION
-SET_HUMAN_APPROVAL
-SET_TERMINATION
-APPLY_RELIABILITY_PRESET
-```
-
 Derived:
 
 ```text
@@ -273,26 +254,24 @@ success rate
 runaway risk
 unsafe-action risk
 expected steps
-simulated latency
+latency
 cost index
 human reviews / 100 runs
 reliability score
 failure diagnosis
 ```
 
-The scenario demonstrates that more retries and step budget can raise completion while also increasing loop risk and cost. Validation and approval reduce safety risk but add overhead. The adapter saves `baseline` and compares every policy against the unreliable starting state.
+The scenario demonstrates that retries and step budgets can improve completion while increasing loop risk and cost; validation / approval reduce safety risk but add overhead.
 
 ### Evaluation Failure Lab
 
-The third Production Lab pressure test. Unlike RAG and Agent Reliability, the learner is not primarily tuning the candidate system; the learner is debugging the **decision process used to evaluate it**.
+Third Production Lab pressure test and first page-specific scenario.
 
 Scenario id:
 
 ```text
 evaluation-failure
 ```
-
-Implementation is page-specific in `src/assets/evaluation-scenario.js` and is loaded after the shared registry.
 
 State:
 
@@ -305,18 +284,6 @@ judgeMode
 costGate
 ```
 
-Actions:
-
-```text
-SET_DATASET_PRESET
-SET_PASS_THRESHOLD
-SET_SAFETY_VETO
-SET_SAMPLE_SIZE
-SET_JUDGE_MODE
-SET_COST_GATE
-APPLY_PRODUCTION_PRESET
-```
-
 Derived:
 
 ```text
@@ -324,23 +291,95 @@ slice scores / weights
 aggregate v1 / v2 / delta
 regressions
 critical regressions
-modeled evidence width
+evidence width
 judge noise / coverage
-estimated evaluation cost
+evaluation cost
 cost per success
 SHIP / BLOCK / INCONCLUSIVE
 failure diagnosis
 ```
 
-On mount, the adapter saves:
+On mount:
 
 ```js
 lab.checkpoint('naive-eval');
 ```
 
-The initial evaluation can say `SHIP` even though a critical safety slice regresses, illustrating a demo-biased / missing-gate failure. The production preset changes dataset composition, sample size, judge strategy, and hard gates; it intentionally produces `BLOCK` while the candidate's critical regression remains.
+The Lab proves that a better evaluation policy can improve the **release decision** without improving the candidate system itself.
 
-This Lab also establishes that a preset does not have to optimize the simulated system. It can improve the **quality of an engineering decision**.
+### Context Compression Lab
+
+Fourth Production Lab pressure test and second page-specific scenario.
+
+Scenario id:
+
+```text
+context-compression
+```
+
+Implementation:
+
+```text
+src/assets/context-compression-scenario.js
+src/assets/context-compression.js
+```
+
+State:
+
+```text
+compressionRatio
+summaryDepth
+retrievalBudget
+memoryBudget
+protectCritical
+```
+
+Actions:
+
+```text
+SET_COMPRESSION_RATIO
+SET_SUMMARY_DEPTH
+SET_RETRIEVAL_BUDGET
+SET_MEMORY_BUDGET
+SET_PROTECT_CRITICAL
+APPLY_BALANCED_PRESET
+```
+
+Derived:
+
+```text
+original tokens
+active context tokens
+fixed context budget
+token savings
+per-segment token retention
+per-segment semantic retention
+critical-information retention
+evidence coverage
+instruction retention
+task quality
+hallucination-risk index
+latency index
+cost index
+overflow tokens
+failure diagnosis
+```
+
+On mount:
+
+```js
+lab.checkpoint('over-compressed-baseline');
+```
+
+The initial state deliberately compresses the 25.5k synthetic working set to about 7.4k tokens. That looks cheap but destroys modeled task-critical information.
+
+The balanced preset intentionally **increases active context** relative to the broken baseline while remaining below 16k and restoring modeled critical retention and task quality.
+
+A separate invariant demonstrates the opposite failure: retaining nearly everything can maximize modeled quality while overflowing the fixed working-context budget.
+
+This Lab adds no generic Engine primitive. It uses State → Reducer → Derived Metrics → checkpoint / compare exactly as the previous scenarios do.
+
+See `docs/CONTEXT_COMPRESSION_LAB.md`.
 
 ### Agent Loop Simulator
 
@@ -364,7 +403,7 @@ Browser timers remain in the adapter so reset and recovery effects cannot leak i
 
 ## Current pressure-test coverage
 
-The Engine has now been exercised by three distinct Production Lab shapes:
+The Engine has now been exercised by four distinct Production Lab shapes:
 
 ```text
 RAG Failure
@@ -374,8 +413,8 @@ RAG Failure
 
 Agent Reliability
   execution policy
-  risk / safety trade-offs
-  human-in-the-loop cost
+  safety / risk trade-offs
+  human-in-the-loop overhead
   baseline comparison
 
 Evaluation Failure
@@ -384,39 +423,57 @@ Evaluation Failure
   hard gates
   evidence strength
   three-state release outcome
-  naive-evaluation comparison
+
+Context Compression
+  resource allocation
+  per-segment semantic retention
+  admission budget vs summarization
+  quality / capacity / cost trade-off
+  safer policy can intentionally spend more resources
 ```
 
-No new generic Engine primitive was needed for Evaluation Failure. This is evidence that the current abstraction remains sufficient; do not expand the Engine speculatively.
+No new generic Engine feature was needed for these pressure tests. Do not expand the Engine speculatively.
 
 ## Determinism and claims
 
-Production Lab metrics are synthetic and pedagogical unless a future Live Mode explicitly reports real executions.
+Production Lab metrics are synthetic and pedagogical unless a future Live Mode explicitly reports real execution evidence.
 
 The deterministic layer should:
 
 - make causal relationships repeatable;
 - use internally coherent arithmetic;
-- label simulated rates/costs/evidence clearly;
+- label simulated rates / costs / evidence clearly;
 - never present synthetic data as external benchmark evidence.
 
-A future Live Mode can compare predicted trade-offs against real model/retrieval/tool results without replacing the simulation-first learning path.
+A future Live Mode may compare simulation predictions with real model / retrieval / tool behavior without replacing the simulation-first learning path.
 
 ## Testing contract
 
 `scripts/test_lab_engine.js` verifies:
 
 - scenario registration;
-- core Token / Context invariants;
+- Token / Context invariants;
 - RAG broken-baseline and balanced-preset behavior;
 - Agent Reliability baseline and reliability-preset behavior;
-- Evaluation Failure `SHIP / BLOCK / INCONCLUSIVE` decision invariants;
-- safety and cost gates;
-- modeled evidence-width behavior;
-- invalid input rejection;
-- history, checkpoints, compare, replay, and reset.
+- Evaluation `SHIP / BLOCK / INCONCLUSIVE` invariants;
+- safety / cost gates and evidence width;
+- Context Compression over-compressed baseline;
+- Context Compression balanced policy;
+- retrieval-budget starvation despite critical protection;
+- context overflow when too much information is retained;
+- invalid parameter rejection;
+- history, checkpoint, compare, replay, and reset.
 
-`scripts/validate.py` additionally checks generated routes, semantic HTML/JSON-LD, asset presence/order, JavaScript syntax, sitemap discovery, and deployment configuration.
+`scripts/validate.py` additionally checks:
+
+- generated routes;
+- semantic HTML / JSON-LD;
+- mount points;
+- page-specific script ordering;
+- asset presence;
+- JavaScript syntax;
+- sitemap discovery;
+- deployment configuration.
 
 ## Extension rule
 
@@ -433,4 +490,4 @@ replay
 adapter-owned effects
 ```
 
-The next Product Lab should pressure-test the existing contract before the Engine grows again.
+The next Content MVP item is the **Reliable Support Agent Build** capstone. It should reuse existing scenario logic where practical rather than forcing new Engine infrastructure prematurely.
