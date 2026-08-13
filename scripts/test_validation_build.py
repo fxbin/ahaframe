@@ -1,6 +1,8 @@
 from pathlib import Path
 import json
 import re
+import subprocess
+import sys
 from bs4 import BeautifulSoup
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -50,4 +52,8 @@ for token in ['schemaVersion','eventId','getValidationContext','waitlist_submitt
     if token not in app_source:
         raise SystemExit(f'app.js missing validation integration token {token}')
 
-print(f'PASS Validation Build: {len(pages)} generated pages load anonymous context, semantic analytics, Aha feedback, and Lab Engine in the required order.')
+backend=subprocess.run([sys.executable,str(ROOT/'scripts/test_validation_backend.py')],capture_output=True,text=True)
+if backend.returncode:
+    raise SystemExit(f'validation backend contract failed\n{backend.stdout}\n{backend.stderr}')
+
+print(f'PASS Validation Build: {len(pages)} generated pages load anonymous context, semantic analytics, Aha feedback, Lab Engine, and the storage backend contract.')
