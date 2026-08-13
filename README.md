@@ -28,12 +28,12 @@ Core architecture principle:
 
 ## Curriculum
 
-AhaFrame now has a formal curriculum map rather than adding Labs topic-by-topic.
+AhaFrame has a formal curriculum map rather than adding Labs topic-by-topic.
 
 See:
 
 - `docs/CURRICULUM.md` — AhaFrame Curriculum v1.0, prerequisites, tracks, Lab backlog, source-reference policy, and free/paid boundary.
-- `docs/EVALUATION_FAILURE_LAB.md` — next Production Lab product + simulation specification.
+- `docs/EVALUATION_FAILURE_LAB.md` — implemented Evaluation Failure Lab product + simulation specification.
 - `docs/ROADMAP.md` — Content MVP stop line, Soft Alpha, identity, payment, Live Mode, and sandbox sequence.
 
 The curriculum uses **AI Engineering from Scratch** as a broad dependency-map reference and **AI Agent Book** as an Agent/Evaluation engineering-depth reference. AhaFrame does not copy their lessons; it independently re-models useful engineering concepts into original failure-first simulations.
@@ -69,8 +69,9 @@ SEE → PLAY → BREAK → AHA → BUILD
 
 - **RAG Failure Lab** — start from a broken retrieval configuration and tune chunk size, overlap, Top-K, retrieval strategy, and reranking while watching recall, precision, context pressure, latency, cost index, and answer-quality score.
 - **Agent Reliability Lab** — start from a weak customer-support agent control policy and tune max steps, retry limits, timeouts, result validation, human approval, and termination while watching success, runaway risk, unsafe-action risk, latency, cost, and review load.
+- **Evaluation Failure Lab** — start from a demo-biased release evaluation where Agent v2 appears better, then change dataset composition, threshold, safety veto, sample size, judge strategy, and cost gate while observing slice regressions, evidence strength, and `SHIP / BLOCK / INCONCLUSIVE` decisions.
 
-Both labs use synthetic deterministic metrics for teaching. They are not presented as benchmark measurements from live model, retrieval, tool, or human-review systems.
+All Production Labs use synthetic deterministic metrics for teaching. They are not presented as benchmark measurements from live models, retrieval systems, tools, LLM judges, customer-support traffic, or human-review systems.
 
 ### Pricing validation
 
@@ -89,7 +90,7 @@ AhaFrame is not launching broadly yet. The closed-development target is a small 
 ```text
 RAG Failure Lab                 done
 Agent Reliability Lab           done
-Evaluation Failure Lab          next
+Evaluation Failure Lab          done
 Context Compression Lab         next
 Reliable Support Agent Build    next
         ↓
@@ -102,11 +103,11 @@ Soft Alpha with 20–50 developers
 
 Authentication, payment, Live Mode, and sandbox infrastructure stay behind this content-validation work unless a concrete feature requires them.
 
-## Next Lab: Evaluation Failure
+## Evaluation Failure Lab
 
 The learner starts with a candidate that appears better on the aggregate score and then discovers that the evaluation design is hiding safety-critical and long-horizon regressions.
 
-Core controls:
+Controls:
 
 ```text
 Dataset preset
@@ -117,13 +118,13 @@ Judge mode
 Cost gate
 ```
 
-Core outcome:
+Release outcome:
 
 ```text
 SHIP / BLOCK / INCONCLUSIVE
 ```
 
-The Lab teaches that **evaluation is a decision system, not a single score**. See `docs/EVALUATION_FAILURE_LAB.md` for the deterministic scenario contract.
+The Lab teaches that **evaluation is a decision system, not a single score**. The production preset deliberately does not “fix” Agent v2; it improves the evaluation policy enough to block a candidate with an unresolved critical regression.
 
 ## Lab / Simulation Engine
 
@@ -162,6 +163,7 @@ context-window
 rag-failure
 agent-reliability
 agent-loop
+evaluation-failure
 ```
 
 See `docs/LAB_ENGINE.md` for the engine contract.
@@ -176,6 +178,7 @@ See `docs/LAB_ENGINE.md` for the engine contract.
     ├── /lessons/agent-loop/
     ├── /labs/rag-failure/
     ├── /labs/agent-reliability/
+    ├── /labs/evaluation-failure/
     ├── /pricing/
     └── /early-access/
 ```
@@ -186,17 +189,20 @@ See `docs/LAB_ENGINE.md` for the engine contract.
 content/                          English content model
 src/assets/                       browser JavaScript + favicon
   lab-engine.js                   generic deterministic Lab runtime
-  lab-scenarios.js                scenario definitions
+  lab-scenarios.js                shared deterministic scenarios
   rag.js                          RAG Failure Lab DOM adapter
   agent-reliability.js            Agent Reliability Lab DOM adapter
+  evaluation-scenario.js          Evaluation Failure deterministic scenario
+  evaluation.js                   Evaluation Failure DOM adapter
 src/styles/                       CSS modules
 scripts/ahaframe/                 page-specific static-site build modules
   rag.py                          RAG Failure Lab page builder
   agent_reliability.py            Agent Reliability Lab page builder
+  evaluation.py                   Evaluation Failure Lab page builder
 scripts/build_site.py             build entrypoint
 scripts/test_lab_engine.js        Lab Engine behavioral regression suite
 docs/CURRICULUM.md                curriculum + source mapping
-docs/EVALUATION_FAILURE_LAB.md    next Lab product/simulation spec
+docs/EVALUATION_FAILURE_LAB.md    Evaluation Failure product/simulation spec
 docs/LAB_ENGINE.md                Lab Engine architecture contract
 docs/ROADMAP.md                   content / auth / Live Mode roadmap
 site/                             generated output (ignored)
@@ -256,6 +262,14 @@ rag_failure_baseline_reset
 agent_reliability_parameter_changed
 agent_reliability_preset_applied
 agent_reliability_baseline_reset
+evaluation_parameter_changed
+evaluation_dataset_preset_changed
+evaluation_safety_veto_changed
+evaluation_sample_size_changed
+evaluation_judge_mode_changed
+evaluation_cost_gate_changed
+evaluation_production_preset_applied
+evaluation_naive_baseline_reset
 pricing_foundations_click
 pricing_pro_click
 waitlist_submit
@@ -293,7 +307,7 @@ Validation covers:
 - accessibility basics;
 - sitemap accuracy;
 - Lab Engine asset order;
-- Token / Context / RAG / Agent Reliability / Agent Loop behavioral invariants;
+- Token / Context / RAG / Agent Reliability / Evaluation Failure / Agent Loop behavioral invariants;
 - JavaScript syntax;
 - deployment configuration.
 
@@ -315,6 +329,7 @@ Output directory: site
 - mandatory accounts;
 - billing;
 - real LLM / vector database inference;
+- real LLM-as-judge evaluation;
 - code sandbox;
 - CMS / admin console;
 - certificates;
