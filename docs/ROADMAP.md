@@ -28,6 +28,7 @@ Architecture principle:
 Execution sources of truth:
 
 - `docs/CURRICULUM.md` — Curriculum v1.1 and Lab backlog.
+- `docs/adr/0001-saas-platform-runtime.md` — accepted SaaS runtime/migration architecture.
 - `docs/CONTEXT_COMPRESSION_LAB.md` — implemented Context Compression specification.
 - `docs/EVALUATION_FAILURE_LAB.md` — implemented Evaluation Failure specification.
 - GitHub issue `#22` — end-to-end Platform Launch master plan.
@@ -43,7 +44,7 @@ Graph shapes orchestration.
 Evaluation proves whether it works.
 ```
 
-Dedicated Prompt and Graph Labs are backlog items; they do not block the first Alpha.
+Dedicated Prompt and Graph Labs are backlog items and do not block the first Alpha.
 
 ## Phase 0 — Product foundation
 
@@ -56,6 +57,10 @@ Status: complete
 - Agent Loop Simulator
 - generic Lab / Simulation Engine
 - history / checkpoint / compare / replay
+- RAG Failure Lab
+- Agent Reliability Lab
+- Evaluation Failure Lab
+- Context Compression Lab
 - CI / static validation
 - pricing hypothesis: `$49 one-time Foundations` + future `$12/month Production Labs`
 
@@ -63,19 +68,28 @@ Status: complete
 
 Status: one item remaining
 
-Completed Production Labs:
-
 ```text
-RAG Failure Lab                 done
-Agent Reliability Lab           done
-Evaluation Failure Lab          done
-Context Compression Lab         done
+#7 Curriculum v1.1                 done
+#8 Context Compression Lab         done
+#9 Reliable Support Agent Build    NEXT
 ```
 
-Remaining Content MVP capstone:
+The capstone combines:
 
 ```text
-#9 Reliable Support Agent Build  NEXT
+Task / prompt contract
++ Retrieval configuration
++ Context compression policy
++ Harness controls
++ Loop / termination policy
++ Graph topology where useful
++ Human approval boundary
++ Evaluation / release gate
++ Cost / latency budget
+        ↓
+Architecture decision
++ Trade-off explanation
++ Release decision
 ```
 
 Backlog candidates that do not delay Alpha:
@@ -86,110 +100,67 @@ Agent Workflow Graph Lab
 Tool Contract Failure Lab
 ```
 
-### Context Compression Lab — complete
+## Phase 1B — SaaS platform migration
 
-Implemented route:
+Architecture decision: **accepted in ADR-0001**.
 
-```text
-/en/labs/context-compression/
-```
-
-Product question:
-
-> **When context compression saves tokens, latency, and cost, what task-critical information gets lost?**
-
-Implemented controls:
+Target runtime:
 
 ```text
-Compression ratio
-Summary depth
-Retrieval budget
-Memory budget
-Critical-fact protection
-```
-
-Implemented signals:
-
-```text
-Active context tokens
-Token savings
-Critical-information retention
-Evidence coverage
-Task quality
-Hallucination risk
-Latency index
-Cost index
-Context overflow
-Failure diagnosis
-```
-
-The Lab starts from a deliberately over-compressed support-agent context. Its balanced preset intentionally spends more tokens than the broken baseline while restoring critical information and remaining inside a fixed 16k working-context budget.
-
-It also demonstrates the opposite failure: retaining nearly everything can preserve excellent modeled quality while overflowing the production context budget.
-
-See `docs/CONTEXT_COMPRESSION_LAB.md`.
-
-### Reliable Support Agent Build — next
-
-The capstone should connect the existing Labs into one production decision:
-
-```text
-Prompt / task contract
-+ Retrieval configuration
-+ Context compression policy
-+ Harness controls
-+ Loop / termination policy
-+ Graph topology where useful
-+ Human approval boundary
-+ Evaluation / release gate
-+ Cost / latency budget
+Next.js App Router + TypeScript
         ↓
-Reliable Support Agent
+Raphael StarterKit SaaS foundation
+        ↓
+Supabase identity + application data
+        ↓
+Waffo billing adapter
+        ↓
+AhaFrame Lab Engine preserved as framework-independent simulation runtime
 ```
 
-Expected output:
+Migration strategy:
+
+> **Parity first. Platform features second.**
+
+The migration is staged but **not a permanent hybrid**.
+
+### #10 Architecture ADR — complete when merged
+
+Locked decisions:
+
+- Next.js is the target long-term application runtime;
+- Raphael StarterKit is the allowed reusable development skeleton;
+- create the Next.js application in a temporary `web/` migration boundary;
+- keep the existing static application as behavior/SEO reference until parity;
+- do not redesign Labs during migration;
+- preserve exact `/en/...` public URLs;
+- preserve crawlable server-rendered educational content;
+- mount existing deterministic Lab Engine/scenarios from client boundaries rather than rewriting scenario math into React;
+- Supabase owns identity/data, with RLS on user-owned tables;
+- Waffo is a billing adapter, never the authorization model;
+- `Entitlement` is AhaFrame's access truth;
+- secrets are server-only;
+- Vercel preview → parity gate → production cutover is the target deployment flow.
+
+See `docs/adr/0001-saas-platform-runtime.md`.
+
+### #11 SaaS runtime migration — next platform implementation
+
+Implementation phases:
 
 ```text
-Architecture decision
-Trade-off explanation
-Release gate
+M1 Bootstrap Next.js under web/
+ ↓
+M2 Port public routes without redesign
+ ↓
+M3 Mount existing Lab Engine / scenarios
+ ↓
+M4 Route + visual + SEO + behavior parity gate
+ ↓
+M5 Production runtime cutover
 ```
 
-The challenge should reward defensible architecture rather than boilerplate framework code.
-
-## Phase 1B — Platform architecture
-
-Status: ready to begin in parallel with #9
-
-Tracked work:
-
-```text
-#10 Raphael → AhaFrame architecture / migration ADR
-#11 SaaS runtime migration
-```
-
-Platform inputs:
-
-```text
-Raphael StarterKit  → reusable SaaS development skeleton
-Supabase             → identity + application data
-Waffo Pancake        → payment provider
-AhaFrame Lab Engine  → deterministic simulation runtime
-```
-
-Architecture rule:
-
-> **Borrow the SaaS foundation; do not overwrite the product.**
-
-AhaFrame keeps ownership of:
-
-- brand and visual system;
-- curriculum and learning UX;
-- Lab Engine and scenarios;
-- pricing / entitlement semantics;
-- public route and SEO behavior.
-
-The ADR must decide full Next.js migration vs staged transition and define how current static routes, Lab behavior, SEO, and tests survive the move.
+During M1–M4, the existing static build remains a regression oracle, not a second long-term production runtime.
 
 ## Phase 2 — Identity + durable state
 
@@ -212,12 +183,12 @@ Choose Save / Purchase / Build / Live Mode
 Sign in
 ```
 
-Preferred OAuth: GitHub first for the developer audience; email fallback.
+Preferred OAuth: GitHub first; email fallback.
 
 Minimum domain model:
 
 ```text
-User
+User (auth.users)
 LabRun
 Checkpoint
 Progress
@@ -227,14 +198,14 @@ Entitlement
 PaymentEvent
 ```
 
-Future-ready:
+Future:
 
 ```text
 CreditLedger
 UsageRecord
 ```
 
-`Entitlement` is the canonical application access truth. It must not be identical to a subscription or payment-provider row.
+`Entitlement` is the canonical application access truth. It is not identical to a subscription row and must not require a synchronous Waffo lookup for each request.
 
 ## Phase 3 — Revenue chain
 
@@ -254,14 +225,16 @@ Production Labs            recurring subscription
 Compute Credits            real compute only
 ```
 
-Billing invariants:
+Waffo integration rules:
 
-- Waffo private credentials stay server-side;
-- browser success redirects do not grant access;
-- verified server/webhook state updates Purchase / Subscription / Entitlement;
-- duplicate webhook events are idempotent;
-- refund / cancellation / expiry reconcile access correctly;
-- provider IDs remain adapter metadata rather than the domain model.
+- use a server-owned API/SDK adapter;
+- keep Merchant/private credentials server-side;
+- success redirects never grant access;
+- verify Webhook signatures;
+- deduplicate provider events with a unique event ID;
+- reconcile Purchase / Subscription / Entitlement from verified server-side events;
+- explicitly handle cancellation, past-due, refund, and retry behavior;
+- use test mode for the complete chain before production.
 
 Credits rule:
 
@@ -272,7 +245,7 @@ Live model / agent run  credits
 Sandbox execution       credits later
 ```
 
-Do not sell credits publicly before a real metered compute capability exists.
+Do not sell credits before a real metered compute capability exists.
 
 ## Phase 4 — Measurement + production operations
 
@@ -298,14 +271,7 @@ Landing
 → Return usage
 ```
 
-Production deployment must cover:
-
-- HTTPS and DNS;
-- canonical / robots / sitemap / structured data;
-- server-safe secrets;
-- error monitoring / uptime visibility;
-- preview-to-production workflow;
-- rollback procedure.
+Production operations must cover HTTPS/DNS, canonical/robots/sitemap/structured data, safe secrets, error monitoring, uptime visibility, preview-to-production promotion, and rollback.
 
 ## Phase 5 — Launch Gate
 
@@ -324,21 +290,14 @@ Foundations purchase → entitlement
 Production subscription → entitlement
 failed payment → no access
 duplicate webhook → no duplicate grant
-cancel / expiry → correct access change
+cancel / expiry / refund reconciliation
 session expiry / sign out
 mobile + desktop smoke path
 ```
 
-Security review includes:
+Security review includes Supabase RLS, Waffo signature/idempotency, server-side access control, secret exposure, dependency/configuration hygiene, and failure handling.
 
-- Supabase RLS;
-- Waffo signature / idempotency;
-- server-side access control;
-- secret exposure;
-- input / error handling;
-- dependency / configuration hygiene.
-
-AhaFrame is not externally launch-ready merely because the pages are online.
+AhaFrame is not externally launch-ready merely because pages are online.
 
 ## Phase 6 — Soft Alpha
 
@@ -351,20 +310,11 @@ Tracked work:
 Preconditions:
 
 - Content MVP complete;
-- account / save flow works;
-- payment / entitlement chain works;
-- analytics / error monitoring active;
+- account/save flow works;
+- payment/entitlement chain works;
+- production analytics and error monitoring active;
 - `ahaframe.com` deployed;
 - #18 Launch Gate passes.
-
-Observe:
-
-- Lab start / completion / second-Lab rate;
-- parameter interaction depth;
-- strongest “aha” experiences;
-- sign-in / save demand;
-- pricing / checkout behavior;
-- technical and content confusion.
 
 This is not yet a broad Product Hunt / Hacker News / Reddit launch.
 
@@ -386,14 +336,7 @@ Observed result
 Compare
 ```
 
-Rules:
-
-- one high-value Lab first;
-- no unlimited model compute;
-- hard per-run and per-user budgets;
-- server-side provider adapter;
-- atomic credit debit;
-- record provider / model / usage / latency / cost evidence.
+One Lab first; no unlimited compute; hard budgets; server-side provider adapter; atomic credit debit; auditable usage/cost evidence.
 
 ## Phase 8 — Public Beta
 
@@ -408,26 +351,26 @@ Public Beta requires a deliberate written release decision based on Soft Alpha e
 ## Current execution state
 
 ```text
-DONE   #7  Curriculum v1.1
-DONE   #8  Context Compression Lab
-NEXT   #9  Reliable Support Agent Build
-READY  #10 Raphael → AhaFrame architecture ADR
+DONE         #7  Curriculum v1.1
+DONE         #8  Context Compression Lab
+NEXT         #9  Reliable Support Agent Build
+ADR          #10 Platform architecture (accepted; merge pending in this branch)
+NEXT PLATFORM #11 SaaS runtime migration after #10
 ```
 
-Recommended parallel execution after #8:
+Execution lanes:
 
 ```text
-Content lane:   #9
-Platform lane:  #10
-                   ↓
-                 #11
+CONTENT              PLATFORM
+#9 Capstone           #10 ADR
+                        ↓
+                      #11 Migration
+       \                /
+        \              /
+         → #12 / #13 → #14 → #16/#17 → #18 → #19
 ```
 
-The lanes converge before identity, billing, production operations, and Launch Gate.
-
 ## Engineering workflow
-
-Every implementation item follows:
 
 ```text
 Issue
@@ -452,4 +395,4 @@ Current content question:
 
 Current platform question:
 
-> **Can AhaFrame preserve its fast no-login learning experience while adding durable identity, entitlement, Waffo billing, and observability as one coherent production chain?**
+> **Can the Next.js parity migration preserve AhaFrame's no-login learning experience, SEO, visual system, and deterministic Lab behavior before we add Auth and Billing?**

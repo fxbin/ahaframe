@@ -125,7 +125,7 @@ Evaluation Failure and Context Compression use page-specific scenario modules wh
 
 See `docs/LAB_ENGINE.md`.
 
-## Source architecture
+## Current source architecture
 
 ```text
 content/                           English content model
@@ -151,10 +151,11 @@ docs/LAB_ENGINE.md                 Engine architecture contract
 docs/EVALUATION_FAILURE_LAB.md     Evaluation product/simulation spec
 docs/CONTEXT_COMPRESSION_LAB.md    Context Compression product/simulation spec
 docs/ROADMAP.md                    Content + platform execution roadmap
+docs/adr/0001-saas-platform-runtime.md  accepted SaaS runtime ADR
 site/                              generated output (ignored)
 ```
 
-## Run locally
+## Run current static product locally
 
 ```bash
 python3 scripts/build_site.py
@@ -167,7 +168,7 @@ Open:
 http://localhost:8080/en/
 ```
 
-## Production build
+## Current production-style static build
 
 Local builds fail closed for search indexing. Configure a production origin explicitly:
 
@@ -196,6 +197,8 @@ Validation covers:
 - Token / Context / RAG / Agent Reliability / Evaluation Failure / Context Compression / Agent Loop invariants;
 - JavaScript syntax;
 - deployment configuration.
+
+These tests remain the parity oracle during the Next.js migration.
 
 ## Pricing hypothesis
 
@@ -230,25 +233,42 @@ Content
 → Public Beta decision
 ```
 
-Platform inputs:
+## Accepted SaaS architecture
+
+ADR: `docs/adr/0001-saas-platform-runtime.md`.
+
+Target architecture:
 
 ```text
-Raphael StarterKit  → reusable SaaS skeleton
-Supabase             → identity + application data
-Waffo Pancake        → billing provider
-AhaFrame Lab Engine  → simulation runtime
+Next.js App Router + TypeScript
+        ↓
+Raphael StarterKit SaaS foundation
+        ↓
+Supabase identity + application data
+        ↓
+Waffo billing adapter
+        ↓
+AhaFrame Lab Engine preserved
 ```
+
+Migration rule:
+
+> **Parity first. Platform features second.**
+
+The migration is staged but not a permanent hybrid. Issue #11 should bootstrap the Next.js application under `web/`, port current public routes without redesign, mount the existing deterministic Lab Engine, and prove route/SEO/visual/behavior parity before the production runtime switches.
+
+The current static application remains a regression reference during migration, not a second long-term production runtime.
 
 Public lessons and Labs stay no-login. Ask for identity only when the learner chooses durable value such as Save, Purchase, Build, or Live Mode.
 
 ## Billing / entitlement rule
 
-Waffo is a payment provider adapter, not AhaFrame's access model.
+Waffo is a payment-provider adapter, not AhaFrame's access model.
 
 Application domain:
 
 ```text
-User
+User / auth.users
 LabRun
 Checkpoint
 Progress
@@ -276,9 +296,27 @@ Live model / agent run  credits
 Sandbox execution       credits later
 ```
 
-## Deployment
+Waffo checkout and webhook credentials remain server-only. Browser success redirects never grant access. Verified/idempotent server-side events reconcile Purchase, Subscription, and Entitlement state.
 
-Current static validation build supports Vercel or Cloudflare Pages. The platform architecture ADR (#10) will decide the migration path to the SaaS runtime before Auth/Billing implementation.
+## Target deployment
+
+The accepted long-term runtime targets Vercel for the Next.js application, with Supabase for Auth/Postgres and Waffo for checkout/billing events.
+
+Migration flow:
+
+```text
+GitHub
+ ↓
+Vercel Preview
+ ↓
+route / SEO / visual / Lab parity
+ ↓
+Production cutover
+ ↓
+ahaframe.com
+```
+
+The current static Vercel/Cloudflare deployment config remains valid only as the pre-migration reference until issue #11 performs the runtime cutover.
 
 ## Next execution lanes
 
@@ -287,7 +325,9 @@ CONTENT
 #9 Reliable Support Agent Build
 
 PLATFORM
-#10 Raphael → AhaFrame architecture ADR
+#10 SaaS architecture ADR     ← current docs branch
+ ↓
+#11 Next.js parity migration
 ```
 
-These can proceed in parallel after Context Compression is merged.
+After #10 merges, #9 and #11 can proceed in parallel and converge before Auth, durable entitlement state, Waffo billing, production operations, and Launch Gate QA.

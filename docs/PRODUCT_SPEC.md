@@ -5,31 +5,26 @@ Status: active product source of truth
 
 ## Product thesis
 
-AhaFrame is an English-first **Interactive AI Engineering Lab** for software developers moving toward AI engineering.
+AhaFrame is an English-first **Interactive AI Engineering Lab** for experienced software developers moving toward AI engineering.
 
 > **Understand AI by seeing it work.**
 
-The product tests whether developers can build stronger engineering intuition by manipulating deterministic simulations, breaking systems, comparing configurations, and applying the resulting mental model to production decisions.
+AhaFrame teaches engineering intuition by making hidden AI-system behavior visible, letting learners manipulate deterministic simulations, deliberately trigger failure modes, compare policies, and apply the resulting mental models to production decisions.
 
 ## Brand
 
-- **Brand:** AhaFrame
-- **Primary domain:** `https://ahaframe.com`
-- **Category:** Interactive AI Engineering
-- **Audience:** experienced developers becoming AI engineers
-- **Primary slogan:** **Understand AI by seeing it work.**
+- Brand: **AhaFrame**
+- Primary domain: `https://ahaframe.com`
+- Category: Interactive AI Engineering
+- Audience: experienced developers becoming AI engineers
+- Visual system: warm white / graphite / teal
+- Product feel: future technical textbook, not generic AI SaaS template
 
 ## Learning model
 
 ```text
 SEE → PLAY → BREAK → AHA → BUILD
 ```
-
-- **See** — visualize hidden system behavior.
-- **Play** — change meaningful parameters.
-- **Break** — trigger failure modes intentionally.
-- **Aha** — connect cause and effect into a durable mental model.
-- **Build** — apply the model to architecture, debugging, evaluation, and production trade-offs.
 
 Architecture rule:
 
@@ -48,9 +43,11 @@ Graph shapes orchestration.
 Evaluation proves whether it works.
 ```
 
-These layers cross-cut system domains such as RAG, tools, agents, production, and multi-agent systems. They do not imply six duplicated course catalogs.
+These layers cross-cut system domains such as RAG, tools, agents, production, and multi-agent systems. They are not six duplicated course catalogs.
 
-## Public routes
+## Public route contract
+
+Current public URLs are contractual during the SaaS migration:
 
 ```text
 /en/
@@ -65,25 +62,25 @@ These layers cross-cut system domains such as RAG, tools, agents, production, an
 /en/early-access/
 ```
 
-The root route redirects to `/en/`.
+Root `/` resolves/redirects to `/en/` unless a later localization decision explicitly changes the contract.
 
 ## Foundation lessons
 
 ### Token Playground
 
-Teaches next-token prediction, visible candidate probabilities, sampling, greedy decoding, and temperature using a deterministic teaching model.
+Deterministic teaching model for next-token prediction, candidate probabilities, sampling, greedy decoding, and temperature.
 
 ### Context Window Lab
 
-Teaches finite working context and the trade-offs between truncation, summarization, retrieval, and longer-term memory.
+Finite working context and the trade-offs among truncation, summarization, retrieval, and longer-term memory.
 
 ### Agent Loop Simulator
 
-Teaches task interpretation, action selection, tool use, observation, retry/error recovery, and termination.
+Task interpretation, action selection, tool use, observation, retry/recovery, and termination.
 
 ## Production Lab previews
 
-All current Production Lab metrics are deterministic educational quantities. They are not presented as benchmark measurements from live models, retrieval systems, tools, LLM judges, or customer traffic.
+All current metrics are deterministic educational quantities, not live benchmark evidence.
 
 ### RAG Failure Lab
 
@@ -97,7 +94,7 @@ Retrieval Strategy
 Reranker
 ```
 
-Derived signals:
+Signals:
 
 ```text
 Recall
@@ -110,7 +107,7 @@ Answer Quality
 Failure Diagnosis
 ```
 
-The learner starts from a broken retrieval configuration and compares the current policy against the baseline.
+The learner repairs a deliberately broken retrieval policy and compares it with the baseline.
 
 ### Agent Reliability Lab
 
@@ -127,7 +124,7 @@ Human Approval
 Termination Rule
 ```
 
-Derived signals:
+Signals:
 
 ```text
 Success Rate
@@ -141,11 +138,11 @@ Human Review Load
 Failure Diagnosis
 ```
 
-The Lab demonstrates that a system can have a reasonable completion rate while remaining operationally unsafe or expensive.
+The Lab demonstrates that completion rate alone does not make an Agent production-safe.
 
 ### Evaluation Failure Lab
 
-The learner starts from a demo-biased evaluation where Agent v2 appears stronger overall even though long-horizon and safety-critical refund slices regress.
+The learner starts from a demo-biased evaluation where Agent v2 looks better overall while long-horizon and safety-critical refund slices regress.
 
 Controls:
 
@@ -168,17 +165,15 @@ Core lesson:
 
 > **Evaluation is a decision system, not a single score.**
 
-A better evaluation policy can correctly block an unresolved regression; it does not magically fix the candidate system.
-
 ### Context Compression Lab
 
-Implemented route:
+Route:
 
 ```text
 /en/labs/context-compression/
 ```
 
-Scenario: the same support-agent world, but now the failure is in context assembly. The original synthetic working set contains 25,500 tokens and production allows a 16,000-token active context.
+The synthetic working set contains 25,500 tokens and the teaching production budget allows 16,000 active tokens.
 
 Controls:
 
@@ -190,7 +185,7 @@ Memory budget
 Critical-fact protection
 ```
 
-Derived signals:
+Signals:
 
 ```text
 Active context tokens
@@ -206,11 +201,7 @@ Context overflow
 Failure diagnosis
 ```
 
-The initial policy is deliberately over-compressed: it saves more than 70% of tokens but loses most task-critical information.
-
-The balanced preset intentionally **spends more context** than the broken baseline while remaining inside 16k and restoring modeled task quality. This prevents the Lab from teaching “lower token count = better.”
-
-The Lab also demonstrates the opposite failure: retaining nearly everything can preserve excellent information while violating the working-context budget.
+The baseline saves more than 70% of tokens while destroying critical information. The balanced preset intentionally spends more context than the broken baseline, restores modeled quality, and stays inside 16k. Retaining nearly everything can also fail by overflowing the budget.
 
 See `docs/CONTEXT_COMPRESSION_LAB.md`.
 
@@ -228,11 +219,11 @@ Context Compression Lab        done
 Reliable Support Agent Build   NEXT
 ```
 
-Dedicated Prompt, Graph, and Tools Labs remain backlog candidates and do not delay the first Alpha unless the capstone exposes a real missing dependency.
+Prompt, Graph, and Tools-specific Labs remain backlog candidates unless the capstone exposes a real missing dependency.
 
 ### Reliable Support Agent Build
 
-The capstone must integrate the mental models already taught:
+The capstone must integrate:
 
 ```text
 Task / prompt contract
@@ -240,6 +231,7 @@ Task / prompt contract
 + Context policy
 + Harness controls
 + Loop / termination policy
++ Graph topology where useful
 + Approval boundary
 + Evaluation / release gate
 + Cost / latency budget
@@ -249,17 +241,13 @@ Architecture decision
 + Release decision
 ```
 
-The goal is not to copy LangChain/LangGraph boilerplate. The learner should make a defensible production architecture decision under explicit constraints.
+The product should reward defensible architecture, not framework boilerplate copying.
 
 ## Pricing hypothesis
 
-The retired `$19/month Pro` and `$39/month Founding` hypotheses remain retired.
-
-Current hypothesis:
-
 ```text
 Free                       $0
-AI Engineer Foundations    $49 one-time
+AI Engineer Foundations    $49 one-time hypothesis
 Production Labs            $12/month future hypothesis
 ```
 
@@ -279,13 +267,11 @@ Production Labs            $12/month future hypothesis
 - evaluation challenges;
 - later: durable cloud checkpoints and Live Mode capabilities.
 
-Pricing is not considered validated until users make real payment decisions.
+Pricing remains a hypothesis until users make real payment decisions.
 
 ## Platform Launch definition
 
-AhaFrame is not “launched” merely because static pages are online.
-
-The public-platform chain is:
+AhaFrame is not launch-ready merely because pages are online.
 
 ```text
 Content
@@ -304,106 +290,46 @@ Content
 
 Execution master: GitHub issue `#22`.
 
-## SaaS foundation
+## Accepted SaaS architecture
 
-Approved platform inputs:
+Architecture decision: `docs/adr/0001-saas-platform-runtime.md`.
 
-```text
-Raphael StarterKit  → reusable SaaS development skeleton
-Supabase             → identity + application data
-Waffo Pancake        → billing provider
-AhaFrame Lab Engine  → deterministic simulation runtime
-```
-
-Raphael may be used directly as a development skeleton, but AhaFrame keeps ownership of product behavior, visual system, curriculum, Lab Engine, pricing semantics, and access model.
-
-The platform architecture ADR must define whether migration is full Next.js or staged/hybrid before runtime migration begins.
-
-## Authentication boundary
-
-Public learning must remain no-login.
-
-Intended UX:
+Target runtime:
 
 ```text
-Visit
- ↓
-Learn / use Labs immediately
- ↓
-Choose Save / Purchase / Build / Live Mode
- ↓
-Sign in
+Next.js App Router + TypeScript
+        ↓
+Raphael StarterKit SaaS foundation
+        ↓
+Supabase Auth + application data
+        ↓
+Waffo billing adapter
+        ↓
+AhaFrame Lab Engine preserved as framework-independent runtime
 ```
 
-Identity becomes useful for:
+Migration strategy:
 
-1. cross-device progress;
-2. saved Lab runs and checkpoints;
-3. paid entitlements;
-4. Build submissions;
-5. Live Mode credits.
+> **Parity first. Platform features second.**
 
-Preferred first OAuth path: GitHub. Email fallback remains available.
+The target is one Next.js production runtime. The migration is staged, not a permanent hybrid.
 
-Do not build social profiles, teams, organizations, certificates, or a large LMS model for the first platform version.
+Issue #11 initially creates the Next.js application under `web/` while the current static application remains a behavior/SEO regression reference. Production switches only after route, visual, SEO, and Lab behavior parity passes.
 
-## Durable domain model
+Raphael may be reused directly for generic SaaS foundation. Creem and Raphael product-specific business logic are replaced; AhaFrame keeps its brand, learning UX, curriculum, Lab Engine, pricing, and entitlement semantics.
 
-Minimum application model:
+## Rendering boundary
+
+Public educational content should remain server-rendered/static where possible.
 
 ```text
-User
-LabRun
-Checkpoint
-Progress
-Purchase
-Subscription
-Entitlement
-PaymentEvent
+Explanation / SEO content   → server/static rendering
+Interactive Lab controls    → client boundary
+Account / entitlement       → server-aware application state
+Billing / secrets / webhook → server only
 ```
 
-Future Live Mode:
-
-```text
-CreditLedger
-UsageRecord
-```
-
-`Entitlement` is the canonical access truth. It must not be derived by synchronously calling the payment provider on every request.
-
-## Billing
-
-Selected provider: **Waffo Pancake**.
-
-Product mapping:
-
-```text
-AI Engineer Foundations    one-time purchase
-Production Labs            recurring subscription
-Compute Credits            one-time purchase only when real compute exists
-```
-
-Billing invariants:
-
-- private credentials remain server-side;
-- a browser success redirect never grants access;
-- verified server/webhook state updates Purchase / Subscription / Entitlement;
-- duplicate webhook events are idempotent;
-- cancellation, expiry, and refund states reconcile access correctly;
-- provider IDs remain adapter metadata rather than the application domain model.
-
-## Compute credits
-
-Credits are **compute credits**, not learning tokens.
-
-```text
-Simulation / learning   no credits
-Saved progress          no credits
-Live model / agent run  credits
-Sandbox execution       credits later
-```
-
-Do not sell credits publicly until at least one real metered Live Mode capability exists.
+The migration must not move scenario calculations into React components.
 
 ## Lab / Simulation Engine
 
@@ -418,7 +344,7 @@ Reducer
   ↓
 Derived Metrics
   ↓
-DOM Adapter
+Adapter / UI boundary
 ```
 
 Reusable primitives:
@@ -432,7 +358,7 @@ Reset
 Failure Injection
 ```
 
-Registered deterministic scenarios:
+Current scenarios:
 
 ```text
 token-playground
@@ -444,43 +370,191 @@ evaluation-failure
 context-compression
 ```
 
-Evaluation Failure and Context Compression load scenario-specific deterministic modules after the shared scenario registry and before their DOM adapters. The generic Engine remains unchanged.
+The Next.js migration preserves these scenario definitions and the Node behavioral regression suite. A future ESM/TypeScript packaging refactor is optional and must not be coupled to route migration.
 
 See `docs/LAB_ENGINE.md`.
 
-## Measurement
+## Authentication boundary
 
-Current semantic events include lesson interactions and Lab-specific controls. Context Compression adds:
+Public learning remains no-login.
 
 ```text
-context_compression_parameter_changed
-context_compression_summary_depth_changed
-context_compression_protection_changed
-context_compression_balanced_preset_applied
-context_compression_baseline_reset
-context_compression_build_challenge_started
-context_compression_paid_intent_click
+Visit
+ ↓
+Learn / use Labs immediately
+ ↓
+Choose Save / Purchase / Build / Live Mode
+ ↓
+Sign in
 ```
 
-The Engine itself keeps tracking opt-in to avoid duplicating high-frequency adapter-owned product events.
+Identity is justified for:
 
-## Visual direction
+1. cross-device progress;
+2. saved Lab runs/checkpoints;
+3. paid entitlements;
+4. Build submissions;
+5. Live Mode credits.
 
-Canonical visual system: `docs/VISUAL_SYSTEM.md`.
+Preferred first OAuth path: GitHub. Email fallback remains available. Do not build social profiles, teams, organizations, certificates, or a large LMS model for the first platform version.
 
-Core positioning:
+## Supabase data boundary
 
-> Future technical textbook, not AI startup template.
+`auth.users` owns identity. AhaFrame application tables own product state.
 
-Use warm white, graphite, and teal. Avoid generic blue-purple gradients, unexplained glow effects, or decorative “AI magic.”
+Minimum durable domain:
 
-## SEO / discovery
+```text
+LabRun
+Checkpoint
+Progress
+Purchase
+Subscription
+Entitlement
+PaymentEvent
+```
 
-Public conceptual pages use stable crawlable URLs, answer-first copy, semantic structured data, sitemap / robots, explicit modification dates, and canonical HTML as the source of truth.
+Future:
+
+```text
+CreditLedger
+UsageRecord
+```
+
+User-owned tables require production-reviewed RLS. Privileged Supabase credentials remain server-only.
+
+## Entitlement boundary
+
+`Entitlement` is the canonical access truth.
+
+Do not equate access with `Subscription` because AhaFrame needs multiple grant types:
+
+```text
+Foundations one-time purchase      → lifetime entitlement
+Production Labs subscription      → time-bounded entitlement
+future explicit support/admin grant → entitlement
+Compute Credits                    → ledger balance, not entitlement
+```
+
+Application access checks read AhaFrame-owned entitlement state and do not synchronously call Waffo on every request.
+
+## Billing — Waffo Pancake
+
+Waffo is a payment-provider adapter behind AhaFrame-owned server APIs.
+
+Product mapping:
+
+```text
+AI Engineer Foundations    → one-time Waffo product
+Production Labs            → subscription Waffo product
+Compute Credits            → one-time/dynamic purchase only after Live Mode exists
+```
+
+Authoritative flow:
+
+```text
+UI
+ ↓
+AhaFrame server checkout endpoint
+ ↓
+Waffo adapter / checkout
+ ↓
+customer payment
+ ↓
+verified Waffo webhook
+ ↓
+PaymentEvent
+ ↓
+Purchase / Subscription
+ ↓
+Entitlement
+```
+
+Billing invariants:
+
+- Waffo private credentials remain server-only;
+- browser success redirects never grant access;
+- Webhook signatures are verified;
+- provider event IDs are deduplicated with a uniqueness guarantee;
+- retries cannot duplicate purchases, entitlements, or future credits;
+- cancellation, past-due, refund, and paid-through behavior is explicit and tested;
+- Waffo provider IDs remain adapter metadata, not domain identity.
+
+Issue #14 must confirm the exact provider-supported mechanism for correlating a server-created checkout/order with an authenticated AhaFrame user; if provider metadata/reference is insufficient, use an AhaFrame-owned pending-checkout record.
+
+## Compute credits
+
+Credits are **compute credits**, not learning tokens.
+
+```text
+Simulation / learning   no credits
+Saved progress          no credits
+Live model / agent run  credits
+Sandbox execution       credits later
+```
+
+Do not publicly sell credits until a real metered capability exists.
+
+When enabled, use an append-only ledger or transaction-safe equivalent with atomic debits, idempotent grants, and auditable UsageRecords. Do not port a simple read-modify-write mutable balance as the source of truth.
+
+## Environment / secrets
+
+Browser-safe values are limited to intentionally public configuration.
+
+Server-only examples:
+
+```text
+Supabase privileged/service credential
+Waffo Merchant/private credential
+Waffo webhook verification material
+future model-provider keys
+internal reconciliation credentials
+```
+
+Private values never use `NEXT_PUBLIC_*`, never enter client bundles, and never enter version control. Test/preview/production environments remain separated.
+
+## Deployment topology
+
+Target:
+
+```text
+GitHub
+ ↓
+Vercel Preview
+ ↓
+CI + route/SEO/visual/Lab parity
+ ↓
+Vercel Production
+ ↓
+ahaframe.com
+
+Supabase → Auth + PostgreSQL
+Waffo    → Checkout + billing events
+```
+
+The current static build remains the migration regression oracle until issue #11 cuts production over to Next.js.
+
+## SEO / discovery invariants
+
+The migration must preserve or improve:
+
+- exact current public paths;
+- canonical URLs;
+- one H1 per educational page;
+- crawlable explanation content without client JS;
+- LearningResource/WebPage structured data;
+- sitemap and robots behavior;
+- Open Graph metadata;
+- synthetic-metric disclosure;
+- preview/local indexing safeguards.
+
+## Measurement
+
+Semantic analytics remain adapter/product owned rather than high-frequency Engine owned. The platform phase will connect production analytics and durable waitlist storage in issue #16.
 
 ## Launch Gate
 
-Before inviting external Alpha users, the complete critical path must pass:
+Before external Alpha users are invited, issue #18 must prove:
 
 ```text
 anonymous learning
@@ -489,25 +563,23 @@ one-time purchase → entitlement
 subscription → entitlement
 failed payment → no access
 duplicate webhook → no duplicate grant
-cancel / expiry reconciliation
+cancel / expiry / refund reconciliation
 session expiry / sign out
 mobile + desktop smoke tests
 ```
 
-Security review includes Supabase RLS, Waffo webhook signature/idempotency, server-side access control, secret handling, and dependency/configuration hygiene.
+Security review includes Supabase RLS, Waffo signature/idempotency, server-side access control, secret handling, input/error behavior, and dependency/configuration hygiene.
 
-## Current next steps
-
-Two lanes can now run in parallel:
+## Current execution lanes
 
 ```text
 CONTENT
 #9 Reliable Support Agent Build
 
 PLATFORM
-#10 Raphael → AhaFrame architecture ADR
-        ↓
-#11 SaaS runtime migration
+#10 SaaS architecture ADR
+ ↓
+#11 Next.js parity migration
 ```
 
-They converge before identity, billing, production operations, Launch Gate, and the 20–50 developer Soft Alpha.
+After #10 merges, #9 and #11 can proceed in parallel and converge before Auth, durable state, Waffo billing, production operations, Launch Gate QA, and the 20–50 developer Soft Alpha.
