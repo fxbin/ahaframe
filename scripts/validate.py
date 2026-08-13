@@ -24,6 +24,7 @@ EXPECTED_HTML = {
     "en/labs/rag-failure/index.html",
     "en/labs/agent-reliability/index.html",
     "en/labs/evaluation-failure/index.html",
+    "en/labs/context-compression/index.html",
 }
 INTERACTIVE_HTML = {
     "en/index.html",
@@ -33,6 +34,7 @@ INTERACTIVE_HTML = {
     "en/labs/rag-failure/index.html",
     "en/labs/agent-reliability/index.html",
     "en/labs/evaluation-failure/index.html",
+    "en/labs/context-compression/index.html",
 }
 errors: list[str] = []
 
@@ -93,6 +95,13 @@ for file in html_files:
                 errors.append(f"{rel}: missing Evaluation Failure scenario or adapter")
             elif not (scripts.index(scenarios) < scripts.index(evaluation_scenario) < scripts.index(evaluation_adapter)):
                 errors.append(f"{rel}: Evaluation Failure scripts must load scenario before adapter after the base scenario registry")
+        if rel == "en/labs/context-compression/index.html":
+            compression_scenario = "/assets/context-compression-scenario.js"
+            compression_adapter = "/assets/context-compression.js"
+            if compression_scenario not in scripts or compression_adapter not in scripts:
+                errors.append(f"{rel}: missing Context Compression scenario or adapter")
+            elif not (scripts.index(scenarios) < scripts.index(compression_scenario) < scripts.index(compression_adapter)):
+                errors.append(f"{rel}: Context Compression scripts must load scenario before adapter after the base scenario registry")
 
     if rel.startswith("en/lessons/"):
         h1 = soup.find_all("h1")
@@ -135,6 +144,8 @@ for file in html_files:
             errors.append(f"{rel}: missing Agent Reliability Lab mount point")
         if rel == "en/labs/evaluation-failure/index.html" and not soup.select_one("[data-evaluation-lab]"):
             errors.append(f"{rel}: missing Evaluation Failure Lab mount point")
+        if rel == "en/labs/context-compression/index.html" and not soup.select_one("[data-context-compression-lab]"):
+            errors.append(f"{rel}: missing Context Compression Lab mount point")
 
     for anchor in soup.find_all("a", href=True):
         href = anchor["href"]
@@ -158,14 +169,16 @@ try:
     ns = {"s": "http://www.sitemaps.org/schemas/sitemap/0.9"}
     locs = [node.text for node in root.findall("s:url/s:loc", ns)]
     lastmods = [node.text for node in root.findall("s:url/s:lastmod", ns)]
-    if len(locs) != 9:
-        errors.append(f"sitemap: expected 9 URLs, got {len(locs)}")
+    if len(locs) != 10:
+        errors.append(f"sitemap: expected 10 URLs, got {len(locs)}")
     if not any((value or "").endswith("/en/labs/rag-failure/") for value in locs):
         errors.append("sitemap: missing RAG Failure Lab URL")
     if not any((value or "").endswith("/en/labs/agent-reliability/") for value in locs):
         errors.append("sitemap: missing Agent Reliability Lab URL")
     if not any((value or "").endswith("/en/labs/evaluation-failure/") for value in locs):
         errors.append("sitemap: missing Evaluation Failure Lab URL")
+    if not any((value or "").endswith("/en/labs/context-compression/") for value in locs):
+        errors.append("sitemap: missing Context Compression Lab URL")
     if len(lastmods) != len(locs) or any(value != CONTENT["meta"]["updated"] for value in lastmods):
         errors.append("sitemap: lastmod must match the explicit content update date")
 except Exception as exc:
@@ -175,7 +188,7 @@ css = (SITE / "assets/styles.css").read_text(encoding="utf-8").lower()
 if "#4f46e5" in css or "#6d38f7" in css:
     errors.append("legacy blue-purple brand colors remain in CSS")
 
-for required in ["lab-engine.js", "lab-scenarios.js", "rag.js", "agent-reliability.js", "evaluation-scenario.js", "evaluation.js"]:
+for required in ["lab-engine.js", "lab-scenarios.js", "rag.js", "agent-reliability.js", "evaluation-scenario.js", "evaluation.js", "context-compression-scenario.js", "context-compression.js"]:
     if not (SITE / "assets" / required).exists():
         errors.append(f"assets/{required}: missing generated Lab asset")
 
@@ -206,5 +219,5 @@ if errors:
 print(
     f"PASS v0.3: {len(html_files)} HTML pages; routes, links, metadata, JSON-LD, "
     "accessibility basics, sitemap, theme, Lab Engine, RAG Failure Lab, Agent Reliability Lab, "
-    "Evaluation Failure Lab, JS and deployment config validated."
+    "Evaluation Failure Lab, Context Compression Lab, JS and deployment config validated."
 )
