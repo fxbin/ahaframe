@@ -1,22 +1,22 @@
-# AhaFrame v0.3 Content MVP
+# AhaFrame — Interactive AI Engineering
 
-AhaFrame is an English-first **Interactive AI Engineering Lab** for software developers moving toward AI engineering.
+AhaFrame is an English-first interactive learning product for experienced software developers becoming AI engineers.
 
 > **Understand AI by seeing it work.**
 
-Core learning model:
+Learning loop:
 
 ```text
 SEE → PLAY → BREAK → AHA → BUILD
 ```
 
-Core architecture principle:
+Architecture principle:
 
 > **Simulate the concept. Spend compute only to validate reality.**
 
 ## AI Engineering Stack
 
-AhaFrame organizes its mental models around six cross-cutting engineering layers:
+AhaFrame organizes production AI responsibilities into six cross-cutting layers:
 
 ```text
 Prompt shapes behavior.
@@ -27,58 +27,135 @@ Graph shapes orchestration.
 Evaluation proves whether it works.
 ```
 
-See `docs/CURRICULUM.md` for the curriculum map and backlog.
+The v1 Conceptual Closure Gate is complete. The current execution phase is **Validation First**, not content expansion or SaaS-platform completion.
 
-## Current product
+## Current experiences
 
-### Foundation lessons
+### Foundations
 
-- **Token Playground** — next-token prediction, sampling, greedy decoding, temperature.
+- **Token Playground** — next-token prediction, sampling, temperature.
 - **Context Window Lab** — context budgets, overflow, summarization, retrieval, memory.
 - **Agent Loop Simulator** — act, observe, retry, recover, terminate.
 
-### Production Lab previews
+### Failure / trade-off Labs
 
-- **RAG Failure Lab** — tune chunk size, overlap, Top-K, retrieval strategy, and reranking while observing recall, precision, context pressure, quality, latency, and cost.
-- **Agent Reliability Lab** — tune steps, retries, timeout, validation, approval, and termination while observing success, runaway risk, unsafe-action risk, latency, cost, and review load.
-- **Evaluation Failure Lab** — debug dataset composition, slice regressions, safety vetoes, evidence strength, judge strategy, cost gates, and `SHIP / BLOCK / INCONCLUSIVE` release decisions.
-- **Context Compression Lab** — compress a 25.5k-token synthetic support-agent working context under a 16k budget while balancing token savings, critical-information retention, evidence coverage, quality, hallucination risk, latency, and cost.
+- **Instruction Conflict Lab** — Prompt authority, specificity, retrieved-context boundaries, output contracts, and the point where Prompt must hand off to Harness / Evaluation.
+- **RAG Failure Lab** — retrieval configuration, recall, precision, context pressure, latency, cost, and quality.
+- **Context Compression Lab** — token savings versus critical-information retention, evidence coverage, hallucination risk, latency, and cost.
+- **Agent Reliability Lab** — retries, limits, validation, approval, termination, safety, latency, cost, and review load.
+- **Agent Workflow Graph Lab** — topology, state boundaries, retry scope, joins, parallelism, coordination cost, and failure propagation.
+- **Evaluation Failure Lab** — dataset coverage, regressions, safety vetoes, evidence strength, cost gates, and `SHIP / BLOCK / INCONCLUSIVE`.
 
-All Production Lab metrics are deterministic educational quantities unless a future Live Mode explicitly reports real execution evidence.
+### Integrated Build
 
-## Content MVP status
+- **Reliable Support Agent Build** — composes Prompt, Context, Harness, Loop, Graph, and Evaluation into one release architecture challenge.
 
-```text
-Token Playground               done
-Context Window Lab             done
-Agent Loop Simulator           done
+All modeled metrics are deterministic educational quantities unless a future Live Mode explicitly reports real execution evidence.
 
-RAG Failure Lab                done
-Agent Reliability Lab          done
-Evaluation Failure Lab         done
-Context Compression Lab        done
-Reliable Support Agent Build   NEXT
-```
-
-The capstone is the final Content MVP item before full UX/content review and the platform Launch Gate.
-
-Dedicated Prompt, Graph, and Tools Labs remain backlog candidates and do not block the first Alpha by default.
-
-## Routes
+## Current routes
 
 ```text
-/
-└── /en/
-    ├── /lessons/token-playground/
-    ├── /lessons/context-window/
-    ├── /lessons/agent-loop/
-    ├── /labs/rag-failure/
-    ├── /labs/agent-reliability/
-    ├── /labs/evaluation-failure/
-    ├── /labs/context-compression/
-    ├── /pricing/
-    └── /early-access/
+/en/
+/en/lessons/token-playground/
+/en/lessons/context-window/
+/en/lessons/agent-loop/
+/en/labs/instruction-conflict/
+/en/labs/rag-failure/
+/en/labs/context-compression/
+/en/labs/agent-reliability/
+/en/labs/agent-workflow-graph/
+/en/labs/evaluation-failure/
+/en/build/reliable-support-agent/
+/en/pricing/
+/en/early-access/
 ```
+
+## Validation First
+
+Current issue: **#16 — anonymous analytics, Aha feedback, and durable validation storage**.
+
+The first formal cohort is approximately 20–30 qualified software developers moving toward AI engineering.
+
+Primary outcome:
+
+> **Did this change how you think about this system?**
+
+```text
+No
+A little
+Yes
+Oh, I finally get it.
+
+Strong Aha = Yes + Oh, I finally get it.
+```
+
+Validation funnel:
+
+```text
+landing_viewed
+→ lab_started
+→ meaningful_interaction
+→ failure_tradeoff_observed
+→ aha_feedback_submitted
+→ second_lab_started
+→ capstone_started / completed
+→ pricing / paid intent
+→ waitlist
+→ return_visit
+```
+
+See `docs/VALIDATION.md` for the event contract, privacy boundary, Supabase storage schema, Edge Function contract, dashboard queries, and Product Gate.
+
+## Anonymous validation runtime
+
+Every semantic event is enriched with provider-neutral context:
+
+```text
+anonymousUserId
+sessionId
+visitCount / returnVisit
+pageType
+layer
+labId / labVersion
+UTM attribution
+referrer
+deviceClass
+```
+
+Public build-time endpoint URLs:
+
+```bash
+AHAFRAME_ANALYTICS_ENDPOINT=https://<validation-endpoint> \
+AHAFRAME_FEEDBACK_ENDPOINT=https://<validation-endpoint> \
+AHAFRAME_WAITLIST_ENDPOINT=https://<validation-endpoint> \
+AHAFRAME_BASE_URL=https://ahaframe.com \
+python3 scripts/build_site.py
+```
+
+These variables are endpoint URLs, never secrets.
+
+If no feedback or waitlist backend is configured, the UI explicitly reports **Demo mode** and never claims that browser-local storage was remotely persisted.
+
+## Validation storage
+
+The first Alpha backend is designed for Supabase Postgres + one anonymous ingest Edge Function:
+
+```text
+supabase/migrations/202608130001_validation_alpha.sql
+supabase/functions/validation-ingest/index.ts
+```
+
+Tables:
+
+```text
+validation_events
+aha_feedback
+validation_waitlist
+```
+
+Direct browser table access is denied. Row Level Security is enabled, public roles are revoked, and the service credential belongs only in the server-side Edge Function.
+
+The repository contains the deployable schema/function contract; the dedicated AhaFrame Supabase project is provisioned separately before validation deployment.
 
 ## Lab / Simulation Engine
 
@@ -109,53 +186,11 @@ Reset
 Failure Injection
 ```
 
-Registered scenarios:
-
-```text
-token-playground
-context-window
-rag-failure
-agent-reliability
-agent-loop
-evaluation-failure
-context-compression
-```
-
-Evaluation Failure and Context Compression use page-specific scenario modules while keeping the generic Engine unchanged.
+The integrated Build reuses existing layer scenarios rather than duplicating their formulas.
 
 See `docs/LAB_ENGINE.md`.
 
-## Current source architecture
-
-```text
-content/                           English content model
-src/assets/                        browser JavaScript + favicon
-  lab-engine.js                    generic deterministic Lab runtime
-  lab-scenarios.js                 shared deterministic scenarios
-  rag.js                           RAG Failure adapter
-  agent-reliability.js             Agent Reliability adapter
-  evaluation-scenario.js           Evaluation deterministic scenario
-  evaluation.js                    Evaluation adapter
-  context-compression-scenario.js  Context Compression deterministic scenario
-  context-compression.js           Context Compression adapter
-src/styles/                        CSS modules
-scripts/ahaframe/                  static page builders
-  rag.py
-  agent_reliability.py
-  evaluation.py
-  context_compression.py
-scripts/build_site.py              build entrypoint
-scripts/test_lab_engine.js         Lab Engine behavioral regression suite
-docs/CURRICULUM.md                 curriculum + source mapping
-docs/LAB_ENGINE.md                 Engine architecture contract
-docs/EVALUATION_FAILURE_LAB.md     Evaluation product/simulation spec
-docs/CONTEXT_COMPRESSION_LAB.md    Context Compression product/simulation spec
-docs/ROADMAP.md                    Content + platform execution roadmap
-docs/adr/0001-saas-platform-runtime.md  accepted SaaS runtime ADR
-site/                              generated output (ignored)
-```
-
-## Run current static product locally
+## Run locally
 
 ```bash
 python3 scripts/build_site.py
@@ -168,37 +203,26 @@ Open:
 http://localhost:8080/en/
 ```
 
-## Current production-style static build
-
-Local builds fail closed for search indexing. Configure a production origin explicitly:
+Local builds intentionally fail closed for indexing. Production-style static build:
 
 ```bash
 AHAFRAME_BASE_URL=https://ahaframe.com python3 scripts/build_site.py
 ```
 
-This updates canonical URLs, JSON-LD URLs, sitemap URLs, robots.txt, and `llms.txt`.
-
-## Validation
+## Validation / CI
 
 ```bash
+node scripts/test_lab_engine.js
+node scripts/test_instruction_conflict.js
+node scripts/test_agent_workflow_graph.js
+node scripts/test_integrated_build.js
+node scripts/test_validation_runtime.js
 python3 scripts/build_site.py
 python3 scripts/validate.py
-node scripts/test_lab_engine.js
+python3 scripts/test_validation_build.py
 ```
 
-Validation covers:
-
-- exact route set and internal links;
-- metadata / canonical / JSON-LD;
-- answer-first learning blocks;
-- accessibility basics;
-- sitemap accuracy;
-- Lab Engine / scenario asset order;
-- Token / Context / RAG / Agent Reliability / Evaluation Failure / Context Compression / Agent Loop invariants;
-- JavaScript syntax;
-- deployment configuration.
-
-These tests remain the parity oracle during the Next.js migration.
+Validation covers Lab behavior, six-layer integration, anonymous identity/session/attribution, Strong Aha payloads, generated runtime order, validation storage security contracts, route/SEO/schema checks, JavaScript syntax, and the paused Next.js migration shell.
 
 ## Pricing hypothesis
 
@@ -208,126 +232,34 @@ AI Engineer Foundations    $49 one-time hypothesis
 Production Labs            $12/month future hypothesis
 ```
 
-The product should not confuse basic knowledge access with paid value. Paid capability centers on failure simulations, Production Labs, Build Projects, durable state, and later Live Mode validation.
+No real payment is collected during Validation Alpha.
 
-## Public-platform plan
+## Platform architecture — accepted but paused
 
-AhaFrame is not launch-ready merely because static pages can be deployed.
-
-Master execution issue: **#22 — AhaFrame Platform Launch**.
-
-Required chain:
-
-```text
-Content
-→ Identity
-→ Saved state
-→ Entitlement
-→ Payment
-→ Verified webhook
-→ Access control
-→ Analytics
-→ Production deployment
-→ E2E / security
-→ Soft Alpha
-→ Public Beta decision
-```
-
-## Accepted SaaS architecture
-
-ADR: `docs/adr/0001-saas-platform-runtime.md`.
-
-Target architecture:
+Accepted future architecture:
 
 ```text
 Next.js App Router + TypeScript
-        ↓
-Raphael StarterKit SaaS foundation
-        ↓
-Supabase identity + application data
-        ↓
-Waffo billing adapter
-        ↓
-AhaFrame Lab Engine preserved
+→ Raphael StarterKit reusable SaaS foundation
+→ Supabase identity + application data
+→ Waffo billing adapter
+→ AhaFrame Lab Engine remains framework-independent
 ```
 
-Migration rule:
+The `web/` Next.js bootstrap is preserved and kept green in CI, but full migration, Auth, entitlement, Waffo billing, and compute credits remain paused until the Product Gate produces **GO PLATFORM**.
 
-> **Parity first. Platform features second.**
-
-The migration is staged but not a permanent hybrid. Issue #11 should bootstrap the Next.js application under `web/`, port current public routes without redesign, mount the existing deterministic Lab Engine, and prove route/SEO/visual/behavior parity before the production runtime switches.
-
-The current static application remains a regression reference during migration, not a second long-term production runtime.
-
-Public lessons and Labs stay no-login. Ask for identity only when the learner chooses durable value such as Save, Purchase, Build, or Live Mode.
-
-## Billing / entitlement rule
-
-Waffo is a payment-provider adapter, not AhaFrame's access model.
-
-Application domain:
+## Current execution order
 
 ```text
-User / auth.users
-LabRun
-Checkpoint
-Progress
-Purchase
-Subscription
-Entitlement
-PaymentEvent
+Conceptual Closure         DONE
+#16 Validation evidence    CURRENT
+#17 Validation deployment  NEXT
+#19 Developer Alpha        THEN
+Product Gate               THEN
+
+GO PLATFORM ?
+  yes → resume SaaS platform path
+  no  → validate again / reframe / stop
 ```
 
-Future compute:
-
-```text
-CreditLedger
-UsageRecord
-```
-
-`Entitlement` is the canonical access truth.
-
-Credits are reserved for real compute:
-
-```text
-Simulation / learning   no credits
-Saved progress          no credits
-Live model / agent run  credits
-Sandbox execution       credits later
-```
-
-Waffo checkout and webhook credentials remain server-only. Browser success redirects never grant access. Verified/idempotent server-side events reconcile Purchase, Subscription, and Entitlement state.
-
-## Target deployment
-
-The accepted long-term runtime targets Vercel for the Next.js application, with Supabase for Auth/Postgres and Waffo for checkout/billing events.
-
-Migration flow:
-
-```text
-GitHub
- ↓
-Vercel Preview
- ↓
-route / SEO / visual / Lab parity
- ↓
-Production cutover
- ↓
-ahaframe.com
-```
-
-The current static Vercel/Cloudflare deployment config remains valid only as the pre-migration reference until issue #11 performs the runtime cutover.
-
-## Next execution lanes
-
-```text
-CONTENT
-#9 Reliable Support Agent Build
-
-PLATFORM
-#10 SaaS architecture ADR     ← current docs branch
- ↓
-#11 Next.js parity migration
-```
-
-After #10 merges, #9 and #11 can proceed in parallel and converge before Auth, durable entitlement state, Waffo billing, production operations, and Launch Gate QA.
+See `docs/ROADMAP.md` and GitHub master issue #22 for the active execution plan.

@@ -29,12 +29,16 @@ jobs:
           fi
       - name: Test Lab Engine
         run: node scripts/test_lab_engine.js
+      - name: Test Validation Runtime
+        run: node scripts/test_validation_runtime.js
       - name: Build static site
         env:
           AHAFRAME_BASE_URL: https://ahaframe.com
         run: python3 scripts/build_site.py
       - name: Validate
         run: python3 scripts/validate.py
+      - name: Validate instrumentation build
+        run: python3 scripts/test_validation_build.py
       - name: Verify generated brand migration
         run: |
           if grep -R -n -E 'SeeAI|SEEAI_|window\.SeeAI|seeai_' site; then
