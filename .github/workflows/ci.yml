@@ -41,3 +41,15 @@ jobs:
             echo 'Legacy SeeAI branding remains in generated output.'
             exit 1
           fi
+      - name: Install Next.js migration dependencies
+        working-directory: web
+        run: npm install --no-audit --no-fund
+      - name: Lint Next.js migration app
+        working-directory: web
+        run: npm run lint
+      - name: Typecheck Next.js migration app
+        working-directory: web
+        run: npm run typecheck
+      - name: Build Next.js migration app
+        working-directory: web
+        run: npm run build
