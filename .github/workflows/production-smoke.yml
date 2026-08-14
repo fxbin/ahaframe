@@ -11,21 +11,29 @@ on:
         description: Supabase validation-ingest endpoint
         required: true
         default: https://swzddvprnyjrrgpzcsgp.supabase.co/functions/v1/validation-ingest
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
 
 permissions:
   contents: read
 
 jobs:
   smoke:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
       - uses: actions/setup-python@v5
         with:
           python-version: '3.13'
       - name: Run production smoke
         run: >-
           python3 scripts/smoke_production.py
-          --base-url "${{ inputs.base_url }}"
-          --validation-endpoint "${{ inputs.validation_endpoint }}"
+          --base-url "${{ inputs.base_url || 'https://ahaframe.com' }}"
+          --validation-endpoint "${{ inputs.validation_endpoint || 'https://swzddvprnyjrrgpzcsgp.supabase.co/functions/v1/validation-ingest' }}"
           --run-id "github-${{ github.run_id }}"
