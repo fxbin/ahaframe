@@ -12,7 +12,8 @@ def generate_og(output: Path = DEFAULT_OUTPUT) -> Path:
     output = Path(output)
     output.parent.mkdir(parents=True, exist_ok=True)
 
-    data = base64.b64decode(SOURCE.read_text(encoding="ascii"), validate=True)
+    encoded = SOURCE.read_text(encoding="ascii").strip()
+    data = base64.b64decode(encoded, validate=True)
     if not data.startswith(PNG_SIGNATURE):
         raise ValueError("og-ahaframe.png.b64 does not contain a valid PNG")
 
