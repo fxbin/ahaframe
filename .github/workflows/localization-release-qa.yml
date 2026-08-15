@@ -1,0 +1,32 @@
+name: Localization Release QA
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  zh-cn-release-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install validation dependencies
+        run: pip install -r requirements-dev.txt
+      - name: Test bilingual validation runtime
+        run: node scripts/test_validation_runtime.js
+      - name: Build bilingual static site
+        env:
+          AHAFRAME_BASE_URL: https://ahaframe.com
+        run: python3 scripts/build_site.py
+      - name: Run localization release QA
+        run: python3 scripts/test_release_localization_qa.py
+      - name: Compile production smoke harness
+        run: python3 -m py_compile scripts/smoke_production.py
