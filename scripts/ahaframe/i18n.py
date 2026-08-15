@@ -8,6 +8,7 @@ metrics, presets, checkpoints, or analytics event names.
 from __future__ import annotations
 
 from functools import lru_cache
+import html
 import json
 from pathlib import Path
 from typing import Any
@@ -96,6 +97,11 @@ def localized_path(path: str, locale: str) -> str:
 
 def equivalent_paths(path: str) -> dict[str, str]:
     return {locale: localized_path(path, locale) for locale in SUPPORTED_LOCALES}
+
+
+def json_attr(value: Any) -> str:
+    """Serialize localized presentation data safely for a quoted data-* attribute."""
+    return html.escape(json.dumps(value,ensure_ascii=False,separators=(',',':')),quote=True)
 
 
 @lru_cache(maxsize=None)

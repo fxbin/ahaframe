@@ -3,11 +3,14 @@
   if(!root)return;
   const lab=window.AhaFrame.createLab('instruction-conflict');
   lab.checkpoint('broken-prompt');
+  let copy={};
+  try{copy=JSON.parse(root.dataset.instructionCopy||'{}');}catch(_error){copy={};}
   const ids=['authority','specificity','retrieval-mode','schema','ambiguity'];
   const controls=Object.fromEntries(ids.map((id)=>[id,document.querySelector(`#instruction-${id}`)]));
   const out=(name)=>document.querySelector(`[data-instruction-${name}]`);
   const signed=(value)=>{const n=Number(value)||0;return `${n>=0?'+':''}${n.toFixed(0)}`;};
   const delta=(diff,key)=>{const item=diff.metrics?.[key];return item?Number(item.after)-Number(item.before):0;};
+  const escapeHtml=(value)=>String(value??'').replace(/[&<>"']/g,(char)=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
 
   function render(frame){
     const {state,derived}=frame;
@@ -23,13 +26,18 @@
     out('prompt-quality').textContent=`${derived.promptQuality}%`;
     out('conflict-count').textContent=String(derived.conflictCount);
     out('harness-risk').textContent=`${derived.harnessRisk}%`;
-    out('release-evidence').textContent=derived.releaseEvidence;
-    out('diagnosis').textContent=derived.diagnosis;
-    out('next-layer').textContent=derived.nextLayer;
-    out('state-label').textContent=derived.stateLabel;
-    out('source-stack').innerHTML=derived.sourceStack.map((source)=>`<div class="takeaway"><strong>${source.label}</strong><span>${source.authority}</span><small class="subtle">${source.text}</small></div>`).join('');
+    out('release-evidence').textContent=copy.releaseEvidence||derived.releaseEvidence;
+    out('diagnosis').textContent=copy.diagnosis?.[derived.failureType]||derived.diagnosis;
+    out('next-layer').textContent=copy.nextLayer?.[derived.failureType]||derived.nextLayer;
+    out('state-label').textContent=copy.stateLabel?.[derived.promptClosed?'fixed':'failure']||derived.stateLabel;
+    out('source-stack').innerHTML=derived.sourceStack.map((source)=>{
+      const localized=copy.sources?.[source.id]||{};
+      const text=derived.promptClosed?localized.fixed:localized.baseline;
+      return `<div class="takeaway"><strong>${escapeHtml(localized.label||source.label)}</strong><span>${escapeHtml(localized.authority||source.authority)}</span><small class="subtle">${escapeHtml(text||source.text)}</small></div>`;
+    }).join('');
     const diff=lab.compare('broken-prompt');
-    out('compare').innerHTML=`<strong>Vs. baseline</strong><span>Prompt quality ${signed(delta(diff,'promptQuality'))} pts</span><span>Adherence ${signed(delta(diff,'instructionAdherence'))} pts</span><span>Policy risk ${signed(delta(diff,'policyViolationRisk'))} pts</span><span>Conflicts ${signed(delta(diff,'conflictCount'))}</span>`;
+    const labels=copy.compare||{};
+    out('compare').innerHTML=`<strong>${escapeHtml(labels.title||'Vs. baseline')}</strong><span>${escapeHtml(labels.promptQuality||'Prompt quality')} ${signed(delta(diff,'promptQuality'))} pts</span><span>${escapeHtml(labels.adherence||'Adherence')} ${signed(delta(diff,'instructionAdherence'))} pts</span><span>${escapeHtml(labels.policyRisk||'Policy risk')} ${signed(delta(diff,'policyViolationRisk'))} pts</span><span>${escapeHtml(labels.conflicts||'Conflicts')} ${signed(delta(diff,'conflictCount'))}</span>`;
   }
   lab.subscribe(render);
 
