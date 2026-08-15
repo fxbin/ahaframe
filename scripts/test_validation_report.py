@@ -51,6 +51,7 @@ class ValidationReportTests(unittest.TestCase):
         self.assertEqual(locale_counts, {"en": 3, "zh-CN": 3})
         self.assertEqual(self.model["quality_errors"], 0)
         self.assertEqual(self.model["quality_warnings"], 1)
+        self.assertEqual(self.model["unattributed_quality_count"], 1)
         self.assertEqual(self.model["quality_summary"][0]["issue_code"], "feedback_without_start")
         self.assertEqual(self.model["want_more_labs"], "NOT DIRECTLY MEASURABLE")
         self.assertEqual(self.model["smoke_exclusion"], "PASS")
@@ -58,6 +59,7 @@ class ValidationReportTests(unittest.TestCase):
     def test_low_sample_and_operator_warnings_are_visible(self):
         self.assertTrue(any("interpret percentages cautiously" in item for item in self.model["report_warnings"]))
         self.assertTrue(any("WARNING" in item for item in self.model["report_warnings"]))
+        self.assertTrue(any("unattributed/global" in item for item in self.model["report_warnings"]))
         self.assertTrue(all(row["low_sample"] for row in self.model["aha_by_lab"]))
 
     def test_qualitative_notes_can_be_redacted(self):
@@ -87,9 +89,46 @@ class ValidationReportTests(unittest.TestCase):
         empty = validation_report.EvidenceBundle(metrics=[], participants=[], feedback=[], quality=[])
         model = validation_report.build_model(empty, "empty-alpha", self.start, self.end, self.now)
         self.assertEqual(next(row for row in model["metrics"] if row["key"] == "unique_cohort_visitors")["numerator"], 0)
+        self.assertEqual(model["smoke_exclusion"], "NOT CHECKED")
         self.assertTrue(any("No Product Gate evidence" in item for item in model["report_warnings"]))
         self.assertIn("No qualitative notes", validation_report.render_markdown(model))
-        self.assertIn("No data-quality issues", validation_report.render_html(model))
+        self.assertIn("No cohort-specific or unattributed data-quality issues", validation_report.render_html(model))
+
+    def test_unattributed_quality_does_not_fake_cohort_freshness(self):
+        global_only = validation_report.EvidenceBundle(
+            metrics=[],
+            participants=[],
+            feedback=[],
+            quality=[{
+                "severity": "WARNING",
+                "issue_code": "feedback_without_start",
+                "cohort_id": "",
+                "lab_id": "legacy",
+                "observed_at": "2026-08-12T11:59:00Z",
+                "detail": "global warning",
+            }],
+        )
+        model = validation_report.build_model(global_only, "empty-alpha", self.start, self.end, self.now)
+        self.assertIsNone(model["latest_evidence_at"])
+        self.assertEqual(model["unattributed_quality_count"], 1)
+
+    def test_smoke_probe_fails_when_reserved_evidence_reaches_metrics(self):
+        contaminated = validation_report.EvidenceBundle(
+            metrics=[],
+            participants=[],
+            feedback=[],
+            quality=[],
+            smoke_metrics=[{
+                "metric_key": "unique_cohort_visitors",
+                "numerator": 1,
+                "denominator": None,
+                "rate": None,
+            }],
+            smoke_raw_present=True,
+        )
+        model = validation_report.build_model(contaminated, "empty-alpha", self.start, self.end, self.now)
+        self.assertEqual(model["smoke_exclusion"], "FAIL")
+        self.assertTrue(any("Smoke exclusion probe FAILED" in item for item in model["report_warnings"]))
 
     def test_reserved_smoke_cohort_is_explicitly_warned(self):
         empty = validation_report.EvidenceBundle(metrics=[], participants=[], feedback=[], quality=[])
@@ -111,6 +150,7 @@ class ValidationReportTests(unittest.TestCase):
             self.assertTrue(md.exists())
             self.assertTrue(report_html.exists())
             self.assertIn("Landing → Lab start", md.read_text(encoding="utf-8"))
+            self.assertIn("Smoke exclusion probe", md.read_text(encoding="utf-8"))
             self.assertIn("AhaFrame Validation Alpha Report", report_html.read_text(encoding="utf-8"))
 
     def test_invalid_cohort_fails_closed(self):
