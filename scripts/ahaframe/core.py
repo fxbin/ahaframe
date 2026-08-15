@@ -72,26 +72,41 @@ def jsonld(obj):
 def page(title,desc,path,body,active='',schemas=None,scripts='',robots=None,locale='en'):
     if locale not in SUPPORTED_LOCALES:
         raise ValueError(f'Unsupported page locale: {locale}')
-    expected_prefix=f'/{route_prefix(locale)}/'
-    if not path.startswith(expected_prefix):
-        raise ValueError(f'Page path {path!r} does not match locale {locale!r}')
-    if not route_available(path,locale):
-        raise ValueError(f'Page route {path!r} is not declared available for locale {locale!r}')
+
+    locale_prefixes=tuple(f'/{route_prefix(loc)}/' for loc in SUPPORTED_LOCALES)
+    is_localized_content=path.startswith(locale_prefixes)
+    if is_localized_content:
+        expected_prefix=f'/{route_prefix(locale)}/'
+        if not path.startswith(expected_prefix):
+            raise ValueError(f'Page path {path!r} does not match locale {locale!r}')
+        if not route_available(path,locale):
+            raise ValueError(f'Page route {path!r} is not declared available for locale {locale!r}')
+    elif path != '/404.html':
+        raise ValueError(f'Global page route {path!r} is not an approved utility route')
+
     url=BASE+path
     if robots is None:
         robots='noindex,nofollow' if IS_LOCAL else 'index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1'
-    alternates=equivalent_paths(path)
-    alternate_links=''.join(
-        f'<link rel="alternate" hreflang="{HREFLANG[loc]}" href="{BASE+alt}">'
-        for loc,alt in alternates.items()
-        if route_available(path,loc)
-    )
-    alternate_links+=f'<link rel="alternate" hreflang="x-default" href="{BASE+alternates["en"]}">'
+
+    alternate_links=''
+    shell_path=path
+    if is_localized_content:
+        alternates=equivalent_paths(path)
+        alternate_links=''.join(
+            f'<link rel="alternate" hreflang="{HREFLANG[loc]}" href="{BASE+alt}">'
+            for loc,alt in alternates.items()
+            if route_available(path,loc)
+        )
+        alternate_links+=f'<link rel="alternate" hreflang="x-default" href="{BASE+alternates["en"]}">'
+    else:
+        # Utility pages are global, not members of the localized content graph.
+        shell_path=localized_path('/en/','en')
+
     head=f'''<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{html.escape(title)}</title><meta name="description" content="{html.escape(desc,quote=True)}"><link rel="canonical" href="{url}">{alternate_links}<meta name="robots" content="{robots}"><meta property="og:type" content="website"><meta property="og:site_name" content="AhaFrame"><meta property="og:title" content="{html.escape(title,quote=True)}"><meta property="og:description" content="{html.escape(desc,quote=True)}"><meta property="og:url" content="{url}"><meta property="og:image" content="{BASE}/assets/og-ahaframe.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="AhaFrame — interactive visual learning for AI engineering"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="{html.escape(title,quote=True)}"><meta name="twitter:description" content="{html.escape(desc,quote=True)}"><meta name="twitter:image" content="{BASE}/assets/og-ahaframe.png"><meta name="theme-color" content="#fbfbf8"><link rel="icon" href="/assets/favicon.svg"><link rel="manifest" href="/manifest.webmanifest"><link rel="stylesheet" href="/assets/styles.css">'''
     base_schema={'@context':'https://schema.org','@type':'Organization','@id':BASE+'/#organization','name':'AhaFrame','url':BASE,'description':'Interactive visual lessons for understanding and building AI systems.'}
     head+=jsonld(base_schema)
     for s in schemas or []: head+=jsonld(s)
-    return f'''<!doctype html><html lang="{locale}"><head>{head}</head><body>{header(active,locale,path)}<main>{body}</main>{footer(locale)}<script src="/assets/config.js" defer></script><script src="/assets/validation-context.js" defer></script><script src="/assets/app.js" defer></script><script src="/assets/validation-ui.js" defer></script><script src="/assets/lab-engine.js" defer></script><script src="/assets/lab-scenarios.js" defer></script>{scripts}</body></html>'''
+    return f'''<!doctype html><html lang="{locale}"><head>{head}</head><body>{header(active,locale,shell_path)}<main>{body}</main>{footer(locale)}<script src="/assets/config.js" defer></script><script src="/assets/validation-context.js" defer></script><script src="/assets/app.js" defer></script><script src="/assets/validation-ui.js" defer></script><script src="/assets/lab-engine.js" defer></script><script src="/assets/lab-scenarios.js" defer></script>{scripts}</body></html>'''
 
 def breadcrumb(items):
     return {'@context':'https://schema.org','@type':'BreadcrumbList','itemListElement':[{'@type':'ListItem','position':i+1,'name':name,'item':BASE+url} for i,(name,url) in enumerate(items)]}
