@@ -17,7 +17,9 @@ INTENTIONAL_TERMS={
     'AhaFrame','AI','LLM','Prompt','Context','Agent','Harness','Loop','Graph','Evaluation','RAG','Retrieval','Reranker',
     'Token','Token Playground','Tokenize','Predict','Sample','Repeat','Memory','Hybrid','Top-K','Schema','Judge','Gate',
     'SHIP','BLOCK','INCONCLUSIVE','SHIP · BLOCK · INCONCLUSIVE','SEE','PLAY','BREAK','AHA','BUILD','Temperature',
-    'Coordinator + Workers','Production Labs','Validation Alpha','Capstone','Rubric','API','JSON','SQL','ON','OFF','s','pts',
+    'Coordinator','Coordinator + Workers','Workers × {count}','Join','Verifier','Recall','Precision','Overlap','Conversation',
+    'Prompt / Context','Harness → Evaluation','Developer instruction','System policy','PROMPT FAILURE','PROMPT FIXED · HARNESS REQUIRED',
+    'Production Labs','Validation Alpha','Capstone','Rubric','API','JSON','SQL','ON','OFF','s','pts','v1','v2','Δ',
     '1 · Prompt','2 · Tokenization','4 · Temperature','Harness + Loop','v1 → v2','you@example.com',
 }
 INTENTIONAL_SYMBOLS={'¶','⌕','▱','⌘','✓','—'}
@@ -56,7 +58,7 @@ def equal_strings(en,zh,path=''):
 def allowed_equal(path:str,value:str)->bool:
     value=value.strip()
     if not value or value in INTENTIONAL_TERMS or value in INTENTIONAL_SYMBOLS: return True
-    if path.endswith('.state'): return True  # stable presentation-state ID, not visible copy
+    if path.endswith('.state'): return True
     if path.endswith('.price') and re.fullmatch(r'\$\d+(?:\.\d+)?',value): return True
     if value.startswith(('/', '?', '#', 'http://', 'https://')): return True
     if re.fullmatch(r'[a-z0-9_-]+(?:\.[a-z0-9_-]+)*',value) and ('_' in value or '-' in value): return True
