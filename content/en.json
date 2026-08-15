@@ -1,6 +1,21 @@
 {
   "locale": "en",
   "routePrefix": "en",
+  "availableRoutes": [
+    "",
+    "pricing/",
+    "early-access/",
+    "lessons/token-playground/",
+    "lessons/context-window/",
+    "lessons/agent-loop/",
+    "labs/instruction-conflict/",
+    "labs/rag-failure/",
+    "labs/context-compression/",
+    "labs/agent-reliability/",
+    "labs/agent-workflow-graph/",
+    "labs/evaluation-failure/",
+    "build/reliable-support-agent/"
+  ],
   "brand": "AhaFrame",
   "ui": {
     "nav": {
@@ -12,6 +27,7 @@
       "menu": "Menu"
     },
     "footer": {
+      "tagline": "Interactive visual learning for AI engineering.",
       "sitemap": "Sitemap",
       "about": "About",
       "early_access": "Early Access"
