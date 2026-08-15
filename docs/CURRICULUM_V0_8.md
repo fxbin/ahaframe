@@ -215,182 +215,77 @@ Primary experiences:
 - Mission: structured-output contract failure;
 - Foundation: evidence/trace anatomy — model claim vs runtime fact.
 
-Learner leaves able to distinguish:
-
-- model behavior;
-- application state;
-- runtime guarantees;
-- observed evidence;
-- evidence of correctness.
-
----
+Learner leaves able to distinguish model behavior, application state, runtime guarantees, observed evidence, and evidence of correctness.
 
 ## Chapter 02 — Build Retrieval You Can Trust
 
 **Promise:** move from “we added RAG” to an evidence pipeline that can be debugged and evaluated.
 
-Primary concepts:
-
-- hybrid retrieval;
-- evidence granularity;
-- reranking;
-- freshness and authority;
-- context budget / compression;
-- memory vs authoritative knowledge;
-- retrieval trace and evaluation.
-
-Flagship Incident:
+Primary concepts: hybrid retrieval, evidence granularity, reranking, freshness/authority, context budget/compression, memory vs authoritative knowledge, retrieval trace and evaluation.
 
 > **The Broken RAG Pipeline** — the support Agent answers with yesterday's truth even though today's policy exists.
 
 Issue: #86
 
----
-
 ## Chapter 03 — Give the System Tools
 
 **Promise:** understand that giving a model a function means adding capabilities and side effects to a runtime.
 
-Primary concepts:
-
-- tool contract / schema;
-- result validation;
-- reversible vs irreversible actions;
-- least privilege;
-- MCP capability boundaries;
-- approval gates;
-- parallel execution and state races.
+Primary concepts: tool contract/schema, result validation, reversible vs irreversible actions, least privilege, MCP capability boundaries, approval gates, parallel execution and state races.
 
 This chapter prepares #87 and #88.
-
----
 
 ## Chapter 04 — Turn Tool Use Into an Agent
 
 **Promise:** understand when a tool-using loop becomes an Agent runtime and what must bound it.
 
-Primary concepts:
-
-- act → observe → verify;
-- planning vs direct execution;
-- state and checkpoints;
-- retry / recovery;
-- termination / escalation;
-- interruption / cancellation;
-- traceable execution;
-- budgeted autonomy.
+Primary concepts: act → observe → verify, planning vs direct execution, checkpoints, retry/recovery, termination/escalation, interruption/cancellation, traceable execution and budgeted autonomy.
 
 Existing Agent Loop Simulator becomes a foundation/sandbox unless #90 decides to reframe it.
 
----
-
 ## Chapter 05 — Make the Agent Reliable
-
-**Promise:** make reliability a system property rather than a prompt property.
-
-Flagship Incident:
 
 > **The $47,000 Retry** — a timeout triggers retries around an irreversible payment/refund action.
 
 Issue: #87
 
-Primary concepts:
-
-- timeout ambiguity;
-- retry amplification;
-- idempotency;
-- approval boundaries;
-- compensation;
-- execution trace / auditability;
-- cost / latency / automation trade-offs.
-
----
+Primary concepts: timeout ambiguity, retry amplification, idempotency, approval boundaries, compensation, execution trace/auditability and cost/latency/automation trade-offs.
 
 ## Chapter 06 — Survive a Security Incident
-
-**Promise:** understand why the model cannot be the sole authorization or trust boundary.
-
-Flagship Incident:
 
 > **The Prompt Injection Attack** — untrusted retrieved content tries to turn legitimate tools into an exfiltration path.
 
 Issue: #88
 
-Primary concepts:
-
-- instruction provenance;
-- trusted vs untrusted context;
-- capability scoping;
-- least privilege;
-- runtime policy enforcement;
-- security-decision trace;
-- false-positive / false-negative trade-offs;
-- defense in depth.
-
----
+Primary concepts: instruction provenance, trusted/untrusted context, capability scoping, least privilege, runtime policy enforcement, security-decision trace, false-positive/false-negative trade-offs and defense in depth.
 
 ## Chapter 07 — Evaluate Before Shipping
 
 **Promise:** replace “the demo looks better” with evidence sufficient for a release decision.
 
-Primary concepts:
+Primary concepts: evaluation environment, deterministic verifier vs model judge, task success vs trajectory violation, slice coverage, regression, uncertainty/sample size, cost per success and release vetoes.
 
-- evaluation environment;
-- deterministic verifier vs model judge;
-- task success vs trajectory/process violation;
-- dataset / slice coverage;
-- regression detection;
-- uncertainty and sample size;
-- cost per success;
-- release vetoes.
-
-Candidate follow-up after v0.8:
+Later candidate:
 
 > **The Evaluation That Lied** — aggregate score improves while an enterprise-critical slice regresses.
 
 Do not add this as a fourth flagship Mission before #92 unless one of #86/#87/#88 is explicitly replaced.
 
----
-
 ## Chapter 08 — Coordinate Multiple Agents
 
-**Promise:** learn when decomposition helps and when more Agents only create more failure surfaces.
+Knowledge-map coverage: delegation, manager/worker topology, context sharing/isolation, independent verification, coordination cost, shared-state races and correlated-error/consensus failure.
 
-Knowledge-map coverage:
-
-- delegation boundary;
-- manager/worker topology;
-- context sharing vs isolation;
-- independent verification;
-- parallelism vs coordination overhead;
-- shared-state races;
-- correlated-error / consensus failure.
-
-Candidate later Incident:
+Later candidate:
 
 > **The Agents Agreed. They Were Both Wrong.**
 
-Chapter 08 belongs to the canonical Knowledge Graph but **does not block the first Content Preview**.
-
----
+This chapter belongs to the canonical Knowledge Graph but does not block the first Content Preview.
 
 ## Chapter 09 — Final Boss: Ship the Production Support Agent
 
 Issue: #89
 
-The learner inherits a production candidate with:
-
-```text
-Retrieval
-+ context policy
-+ tools
-+ retry / termination
-+ approval boundaries
-+ security policy
-+ traces / evidence
-+ evaluation gates
-+ cost / latency budget
-```
+The learner inherits a production candidate with retrieval, context policy, tools, retry/termination, approvals, security policy, traces/evidence, evaluation gates and cost/latency limits.
 
 They inspect evidence, spend a limited intervention budget, compare architectures and submit one release decision:
 
@@ -400,7 +295,7 @@ BLOCK
 INCONCLUSIVE
 ```
 
-The Final Boss succeeds only if knowledge from earlier Missions materially changes the learner's decision quality.
+The Final Boss succeeds only if knowledge from earlier Missions materially changes learner decision quality.
 
 ---
 
@@ -410,17 +305,11 @@ The Knowledge Graph contains **38 core mental models**. “Core” means the con
 
 Scope labels:
 
-- `SHIP` — must be represented in the first v0.8 Content Preview through an existing experience, one of #86/#87/#88, #89, or a small prerequisite Mission;
+- `SHIP` — must be represented in the first v0.8 Content Preview through an existing experience, #86/#87/#88, #89, or a small prerequisite Mission;
 - `MAP` — canonical knowledge model, but implementation may wait until after #92;
 - `LATER` — explicitly deferred.
 
-Format labels:
-
-- `F` — Foundation / interactive guide;
-- `M` — focused Mission;
-- `I` — flagship Incident;
-- `B` — Boss / integrated challenge;
-- `R` — Reference / sandbox.
+Format labels: `F` Foundation, `M` focused Mission, `I` flagship Incident, `B` Boss, `R` Reference/Sandbox.
 
 ## A. Behavior and contracts
 
@@ -470,7 +359,7 @@ Format labels:
 | 27 | Bounded autonomy / termination | When must the runtime stop, escalate or declare inconclusive? | Loop, Harness | M/I | SHIP |
 | 28 | Checkpoint / recovery state | What state is safe to resume after a failure? | Loop, Harness | M/B | SHIP |
 | 29 | Interrupt / cancellation semantics | Can new high-priority evidence safely stop stale work? | Loop, Graph | M | MAP |
-| 30 | Traceability / causal execution history | Can we reconstruct what the Agent believed, called, observed and decided? | Harness, Loop, Eval | F/M + all Incidents | SHIP |
+| 30 | Traceability / causal execution history | Can we reconstruct what the Agent believed, called, observed and decided? | Harness, Loop, Eval | F/M + Incidents | SHIP |
 | 31 | Observability as a diagnosis interface | Which metrics/logs/traces distinguish competing failure hypotheses? | Harness, Eval | I/B | SHIP |
 
 ## E. Evaluation and production decisions
@@ -487,8 +376,6 @@ Format labels:
 
 ### Explicitly deferred knowledge areas
 
-These remain useful research domains but are not required by v0.8 Content Preview:
-
 - full model-routing curriculum;
 - detailed prompt/KV caching economics;
 - inference serving / goodput optimization;
@@ -500,7 +387,7 @@ These remain useful research domains but are not required by v0.8 Content Previe
 - robotics;
 - GPU kernels / full serving orchestration.
 
-They may later become reference content or Missions only when product evidence justifies them.
+These may later become references or Missions only when product evidence justifies them.
 
 ---
 
@@ -508,15 +395,7 @@ They may later become reference content or Missions only when product evidence j
 
 Multi-Agent belongs in the canonical Knowledge Graph but does not inflate the first preview scope.
 
-Mapped concepts:
-
-1. delegation boundary / specialist selection;
-2. manager-worker topology;
-3. context sharing vs isolation;
-4. independent verifier / correlated-error control;
-5. communication and coordination cost;
-6. shared-state race / settlement semantics;
-7. consensus failure.
+Mapped concepts: delegation/specialist selection; manager-worker topology; context sharing/isolation; independent verification; coordination cost; shared-state race/settlement semantics; consensus failure.
 
 Future Incident:
 
@@ -530,26 +409,13 @@ Several concepts should be learned in one system failure rather than becoming se
 
 ## Foundation
 
-Use when a learner needs a mental picture before an Incident.
-
-- 3–8 minutes;
-- one primary mental model;
-- interactive only when interaction reveals behavior;
-- no artificial story required.
+Use when a learner needs a mental picture before an Incident: 3–8 minutes, one primary mental model, interactive only when interaction reveals behavior.
 
 ## Mission
 
-Use when one focused engineering skill can be practiced through a bounded decision.
-
-Examples:
-
-- repair a structured-output contract;
-- choose an approval boundary;
-- interpret a trace and select a verifier.
+Use when one focused engineering skill can be practiced through a bounded decision, e.g. repair a structured-output contract, choose an approval boundary, interpret a trace or design a verifier.
 
 ## Incident
-
-Use when failure diagnosis and trade-offs are the learning mechanism.
 
 Required sequence:
 
@@ -566,7 +432,7 @@ failure visible
 
 ## Boss / Build
 
-Use for cross-layer architecture and release decisions where no single configuration is universally optimal.
+Use for cross-layer architecture/release decisions where no single configuration is universally optimal.
 
 ## Reference / Sandbox
 
@@ -578,87 +444,27 @@ Use when broad exploration remains useful for SEO, prerequisite intuition or dee
 
 ## #86 — The Broken RAG Pipeline
 
-Primary models:
-
-```text
-#5   finite context budget
-#7   compression vs retention
-#8   evidence granularity
-#9   dense vs sparse retrieval
-#10  hybrid retrieval
-#11  reranking
-#12  freshness / authority
-#30  traceability / causal history
-#31  observability as diagnosis
-#32  evaluation environment / verifier
-#34  slice coverage (intro)
-#37  cost / latency / quality
-```
-
-Optional first-release model:
-
-```text
-#15 memory vs source-of-truth conflict
-```
+Primary models: #5, #7–#12, #30–#32, #34 (intro), #37. Optional first release: #15.
 
 ## #87 — The $47,000 Retry
 
-Primary models:
-
-```text
-#16 tool contract
-#17 result validation
-#19 irreversible actions
-#20 timeout ambiguity
-#21 idempotency
-#22 retry policy
-#23 human approval boundary
-#27 termination / escalation
-#28 recovery state
-#30 causal execution trace
-#31 observability / diagnosis
-#37 cost / latency / quality
-```
+Primary models: #16–#17, #19–#23, #27–#28, #30–#31, #37.
 
 ## #88 — The Prompt Injection Attack
 
-Primary models:
-
-```text
-#2  instruction authority / provenance
-#4  runtime enforcement
-#18 least privilege / capability boundary
-#19 irreversible / sensitive actions
-#23 approval boundary
-#30 provenance-aware execution trace
-#31 policy-decision observability
-#33 trajectory/process evaluation
-#38 release/security veto
-```
+Primary models: #2, #4, #18–#19, #23, #30–#31, #33, #38.
 
 ## #89 — Final Boss
 
-Integrates rather than reteaches:
+Integrates rather than reteaches retrieval evidence, context policy, capability/tool policy, retry/idempotency, approval/escalation, security boundary, tracing/observability, release evaluation and cost/latency budget.
 
-```text
-retrieval evidence
-context policy
-capability / tool policy
-retry / idempotency
-approval / escalation
-security boundary
-trace / observability
-release evaluation
-cost / latency budget
-```
-
-The Boss should reward transfer: someone who completed #86/#87/#88 should make better architecture decisions without the Boss explicitly telling them the answer.
+The Boss should reward transfer from #86/#87/#88 without telling the learner which answer to select.
 
 ---
 
 # 11. Preliminary migration of current AhaFrame experiences
 
-Final classification belongs to #90. This table prevents #84 from assuming every current Lab remains primary navigation.
+Final classification belongs to #90.
 
 | Current experience | Preliminary v0.8 role |
 |---|---|
@@ -667,36 +473,32 @@ Final classification belongs to #90. This table prevents #84 from assuming every
 | Agent Loop Simulator | KEEP AS FOUNDATION / prerequisite node |
 | RAG Failure Lab | MERGE / REFRAME into #86 |
 | Context Compression Lab | MERGE mechanics into #86; retain public sandbox route |
-| Agent Reliability Lab | reuse mechanics in #87/#89; remove from primary discovery if flagship is stronger |
+| Agent Reliability Lab | reuse mechanics in #87/#89; likely remove from primary discovery |
 | Evaluation Failure Lab | KEEP/REFRAME as Chapter 07 Mission; later Incident candidate |
 | Instruction Conflict | merge provenance/authority mechanics into #88; keep route for SEO/reference |
 | Agent Workflow Graph | secondary Graph foundation; not flagship before #92 |
 | Reliable Support Agent Build | REFRAME as Final Boss #89 |
 
-Route deletion is not implied. Existing indexed URLs should remain unless #90 records an explicit canonical/redirect/archive policy.
+Route deletion is not implied. Indexed URLs should remain unless #90 records an explicit canonical/redirect/archive policy.
 
-Stable `lab_id` and validation semantics should not be silently repurposed for new Missions. Mission identifiers should be additive unless a reviewed versioning plan says otherwise.
+Stable `lab_id` and validation semantics must not be silently repurposed for new Missions. Mission IDs should be additive unless a reviewed versioning plan says otherwise.
 
 ---
 
 # 12. Journey prerequisites
 
-The Campaign should not impose a rigid “complete every lesson first” gate.
-
 Use soft prerequisites:
 
 - Incident pages link to 1–3 short Foundations when necessary;
 - experienced users may enter an Incident directly;
-- evidence/debrief can route a learner backward to a missing mental model;
-- Final Boss may recommend relevant prerequisites after weak decisions without requiring account infrastructure.
+- evidence/debrief can route a learner backward to a missing model;
+- Final Boss may recommend relevant prerequisites after weak decisions without requiring accounts.
 
-A future placement system may route users through the Knowledge Graph, but placement is not required for v0.8 Preview.
+Placement/routing may come later but is not required for v0.8 Preview.
 
 ---
 
 # 13. Knowledge completeness vs product scope
-
-AhaFrame should understand more AI Engineering topics than it implements in the first Campaign.
 
 ```text
 External AI Engineering universe
@@ -712,30 +514,23 @@ SHIP subset represented in v0.8
 Final Boss
 ```
 
-This distinction prevents:
-
-1. **coverage anxiety** — creating a page for every concept;
-2. **product shallowness** — attractive incidents with no coherent knowledge model underneath;
-3. **scope ambiguity** — treating every mapped concept as a pre-Alpha engineering requirement.
+This prevents coverage anxiety, product shallowness and scope ambiguity.
 
 ---
 
 # 14. v0.8 implementation boundary
 
-Before formal #19 recruitment, the required product set is bounded to:
+Before formal #19 recruitment:
 
 ```text
 #84 Knowledge Graph / Journey              approved
 #85 Mission gameplay contract              implemented for flagship use
-
 #86 Broken RAG Pipeline                    usable
 #87 $47,000 Retry                          usable
 #88 Prompt Injection Attack                usable
-
 #90 Existing Lab reconciliation            complete enough for discovery
 #91 Homepage / Campaign discovery          live
 #89 Final Boss                             integrated preview usable
-
         ↓
 #92 3–5 developer Content Preview
         ↓
@@ -761,7 +556,7 @@ Do not add a fourth flagship Incident before #92 unless one of #86/#87/#88 is ex
 
 # 15. Content quality rubric
 
-A Foundation/Mission/Incident is worth building when most answers are **yes**:
+Build a Mission/Incident only when most answers are yes:
 
 1. Is there a real engineering decision?
 2. Can failure or uncertainty be made visible?
@@ -770,11 +565,11 @@ A Foundation/Mission/Incident is worth building when most answers are **yes**:
 5. Does one plausible fix create a meaningful trade-off elsewhere?
 6. Can v1 be deterministic and cheap?
 7. Does the learner leave with a reusable mental model?
-8. Does the experience connect to another Mission or the Final Boss?
+8. Does it connect to another Mission or Final Boss?
 9. Is it materially better than reading a tutorial or asking a chatbot?
-10. Can a working engineer understand why the scenario matters in <10 seconds?
-11. Does evidence/tracing support the diagnosis instead of merely decorating the page?
-12. Is the experience still useful without badges, streaks or leaderboard mechanics?
+10. Can a working engineer understand why it matters in <10 seconds?
+11. Does evidence/tracing support diagnosis rather than decorate the page?
+12. Is it still useful without badges, streaks or leaderboards?
 
 If mostly no, make it a guide/reference, not a Mission.
 
@@ -782,18 +577,18 @@ If mostly no, make it a guide/reference, not a Mission.
 
 # 16. Promotion decision for #84
 
-This candidate is ready to replace the old learner-facing direction when reviewers agree on all of the following:
+This candidate is ready to become the v0.8 curriculum truth source when reviewers agree that:
 
 - the 38-model Knowledge Graph has no obvious production-critical blind spot for AhaFrame's target audience;
-- `SHIP` vs `MAP` makes the first preview scope unambiguous;
-- #86/#87/#88 represent three distinct and attractive failure families;
-- Trace/Observability is treated as a learning primitive rather than hidden implementation detail;
-- the six-layer model remains an internal cognitive framework instead of the primary marketing hierarchy;
-- existing Lab routes have an explicit preliminary migration hypothesis for #90;
+- `SHIP` vs `MAP` makes the preview scope unambiguous;
+- #86/#87/#88 are distinct, compelling failure families;
+- Trace/Observability is a learning primitive, not hidden implementation detail;
+- the six-layer model remains an internal cognitive framework rather than primary marketing hierarchy;
+- current Lab routes have an explicit preliminary migration hypothesis for #90;
 - Final Boss #89 requires transfer from earlier Missions;
-- source repositories are used for coverage/methodology, not copied as lesson sequences;
-- the batch remains bounded through #92.
+- reference repositories are used for coverage/methodology, not copied as lesson sequences;
+- the batch stays bounded through #92.
 
-If accepted, promote this document as the v0.8 curriculum truth source and close #84. Implementation details then belong to #85/#86/#87/#88/#89/#90/#91.
+**Promotion action:** after this PR is approved/green, merge it, update `docs/CURRICULUM.md` to point to v0.8 as the canonical learner-facing direction in the same release train or a small truth-sync follow-up, then close #84. Do not block #85 implementation details on copy editing beyond these semantic decisions.
 
 Refs: #83 #84 #85 #86 #87 #88 #89 #90 #91 #92 #19
