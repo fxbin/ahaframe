@@ -1,0 +1,95 @@
+{
+  "locale": "zh-CN",
+  "mission": {
+    "name": "The Prompt Injection Attack",
+    "seoTitle": "The Prompt Injection Attack — Agent 安全事故模拟 | AhaFrame",
+    "description": "处理一次 Agent Prompt Injection 安全事故：恶意指令藏在不可信外部内容里，既要阻止越权，又不能用“全部拒绝”毁掉正常工作流。",
+    "level": "生产事故",
+    "layer": "Prompt × Context × Harness",
+    "minutes": 15,
+    "hero": "一份外部知识页面要求 Agent 访问客户数据，而这些工具确实存在并且当前可用。你需要在保留正常知识检索能力的同时，阻止不可信内容获得指令权力。",
+    "quick": "模型不能成为唯一的安全边界：Trust、Capability 与敏感操作必须由模型外部的 Runtime 强制执行。",
+    "brief": {
+      "eyebrow": "INCIDENT 003 · SECURITY",
+      "title": "危险指令，是以“数据”的身份进入系统的。",
+      "role": "你负责 Agent 的 Trust Boundary 与 Capability Boundary。",
+      "body": "客服 Agent 会读取外部知识来回答退款问题。其中一篇检索文档要求它读取完整 CRM Profile，并通过现有 Tool Path 发送账户标识。第二个攻击更加隐蔽；同时，还有一篇正常安全文章本身就包含看起来很像攻击的关键词。",
+      "objective": "阻止恶意指令进入敏感 Tool Path，同时保留正常外部知识能力，并控制 False Positive、人工审核与延迟。",
+      "stakes": "一段文字可以长得像 Instruction，但它依然可能只是 Untrusted Data。"
+    },
+    "ui": {
+      "start": "开始安全事故",
+      "workspace": "安全控制室",
+      "evidence": "证据",
+      "policy": "Trust + Capability Policy",
+      "budget": "变更预算",
+      "run": "运行攻击测试集",
+      "reset": "重置事故",
+      "attempts": "防御策略尝试",
+      "noAttempts": "还没有运行攻击测试集。",
+      "release": "发布决策",
+      "releaseHint": "先运行攻击测试集，再选择 SHIP、BLOCK 或 INCONCLUSIVE。",
+      "ship": "SHIP",
+      "block": "BLOCK",
+      "inconclusive": "INCONCLUSIVE",
+      "complete": "完成 Mission",
+      "outcome": "安全结果",
+      "waiting": "先检查 Context Provenance 与 Tool Permission，再调整策略。",
+      "compared": "暴露基线 → 最新策略"
+    },
+    "evidenceLabels": {
+      "context-provenance": "Context Provenance",
+      "attack-matrix": "攻击 + 正常对照用例",
+      "permission-scopes": "Permission Scopes",
+      "planned-tool-calls": "Planned Tool Calls",
+      "policy-trace": "Policy Decision Trace",
+      "policy": "当前安全策略"
+    },
+    "controls": {
+      "trust-policy": {"label": "Context Trust Policy", "options": {"none": "不区分来源", "label": "Trust Label", "provenance": "Provenance-aware"}},
+      "tool-scope": {"label": "Tool Capability Scope", "options": {"broad": "宽泛客服权限", "scoped": "Least Privilege 客服权限"}},
+      "approval": {"label": "人工审核", "options": {"none": "无", "sensitive": "仅敏感操作", "all": "所有操作"}},
+      "runtime-gate": {"label": "Runtime Policy Gate", "options": {"model-only": "由模型自己判断", "risk-aware": "Risk-aware Runtime Gate", "deny-external": "拒绝外部内容触发操作"}},
+      "data-filter": {"label": "敏感数据过滤", "options": {"false": "关闭", "true": "开启"}},
+      "result-validator": {"label": "Tool Result Validator", "options": {"false": "关闭", "true": "开启"}}
+    },
+    "metrics": [
+      {"key": "securityRiskPercent", "label": "安全风险", "format": "percent"},
+      {"key": "taskSuccessPercent", "label": "任务成功率", "format": "percent"},
+      {"key": "falsePositivePercent", "label": "False Positive", "format": "percent"},
+      {"key": "humanReviewPercent", "label": "人工审核", "format": "percent"},
+      {"key": "latencyMs", "label": "延迟", "format": "ms"}
+    ],
+    "outcomes": {
+      "SECURITY_VETO": "触发 Security Veto",
+      "SAFE_BUT_OVERBLOCKING": "安全，但过度阻断",
+      "SAFE_BUT_TOO_MANUAL": "安全，但过度依赖人工",
+      "SAFE_BUT_TOO_SLOW": "安全，但延迟过高",
+      "PRODUCTION_VIABLE": "具备生产可行性"
+    },
+    "debrief": {
+      "eyebrow": "ENGINEERING DEBRIEF",
+      "title": "Prompt Injection 本质上是 Trust Boundary 失效，而不只是 Prompt 写得不好。",
+      "rule": "模型不能成为唯一安全边界。Trust、Capability 与敏感操作必须由 Harness / Runtime 强制执行。",
+      "body": "Agent 在同一个工作 Context 中同时看到 System Policy、Developer Workflow 与外部内容。如果没有 Provenance-aware Trust 和 Capability Enforcement，不可信数据就可能影响真实 CRM Tool。把所有外部内容都拒绝确实能消灭攻击，却也会摧毁正常任务并制造大量 False Positive。Defense in Depth 的目标，是允许数据被读取，同时限制它能够造成什么后果。",
+      "points": [
+        "数据中可以出现看起来像 Instruction 的文字，但它不会因此自动获得 Instruction Authority。",
+        "Least Privilege 能在模型行为出错时限制 Blast Radius。",
+        "敏感操作需要 Runtime Gate，不能依赖模型自己同意安全规则。",
+        "安全评测必须包含正常但长得像攻击的 Benign Lookalike。"
+      ]
+    },
+    "takeaways": [
+      ["Trust 有来源", "System Policy、Developer Intent、User Request 与 Retrieved Data 的权威级别并不相同。"],
+      ["Capability 是 Runtime 决策", "模型请求调用 Tool，不等于它获得了导出客户数据的权限。"],
+      ["Overblocking 也是失败", "如果策略靠拒绝所有外部内容来保持安全，那只是让产品失去作用。"]
+    ],
+    "next": {
+      "title": "Final Boss 预览：Ship the Production Support Agent",
+      "description": "Retrieval、Tool Reliability 与 Security 将在同一个发布决策里发生冲突。",
+      "button": "进入 Integrated Build",
+      "href": "/en/build/reliable-support-agent/",
+      "event": "mission_next_clicked"
+    }
+  }
+}
