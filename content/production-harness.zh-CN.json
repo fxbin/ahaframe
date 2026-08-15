@@ -97,11 +97,12 @@
         "note": "所有指标都是用于教学的合成值；真正上线前仍应使用有代表性的执行轨迹和评测集验证策略。"
       },
       "next": {
-        "title": "你已经把一个 Agent 的运行控制策略变得更可靠。",
-        "description": "下一步不要凭感觉宣布“已经更好”，而是进入 Evaluation，证明新的 Harness 策略真的改善了系统。",
-        "href": "/en/labs/evaluation-failure/",
-        "button": "继续",
-        "event": "agent_reliability_next_layer_click"
+        "title": "你已经把一个 Agent 的控制策略变得更可靠。",
+        "description": "下一个 Production Lab 会进入 Evaluation：用有代表性的评测证明新的 RAG 或 Agent 配置是否真的更好。",
+        "href": "/en/early-access/",
+        "query": "?intent=agent-reliability-production-labs",
+        "button": "获取 Production Labs",
+        "event": "agent_reliability_paid_intent_click"
       }
     }
   }
