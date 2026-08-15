@@ -1,0 +1,13 @@
+'use strict';
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const path=require('node:path');
+const text=fs.readFileSync(path.join(__dirname,'..','src','assets','47000-retry.js'),'utf8');
+assert.ok(text.includes("'agent_reliability_parameter_changed'"),'Retry Mission must preserve the stable reliability interaction event');
+assert.ok(text.includes("missionId:'47000-retry'"),'Retry Mission interaction must carry additive missionId');
+assert.ok(!text.includes("'mission_policy_changed'"),'Retry Mission must not double-count with a second generic policy-change event');
+assert.ok(text.includes("'mission_started'"));
+assert.ok(text.includes("'simulation_run'"));
+assert.ok(text.includes("'release_decision_submitted'"));
+assert.ok(text.includes("'mission_completed'"));
+console.log('PASS $47,000 Retry validation compatibility: stable route interaction event + additive Mission semantics, no double emission.');
