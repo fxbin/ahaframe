@@ -1,13 +1,24 @@
 # AhaFrame Validation Alpha
 
-Date: 2026-08-13  
+Date: 2026-08-15  
 Status: active validation source of truth
 
 ## Purpose
 
-AhaFrame has passed the v1 Conceptual Closure Gate. The next question is not whether more Labs can be built. It is whether qualified software developers actually form stronger AI-engineering mental models when they use the existing experiences.
+AhaFrame has passed the v1 Conceptual Closure Gate. The current question is not whether more Labs can be built; it is whether qualified software developers form stronger, useful AI-engineering mental models when they use the existing product.
 
-The validation system therefore measures behavior and learning outcomes before account, billing, or full SaaS platform work resumes.
+Validation therefore measures product value before account, billing, entitlement, credits, or full SaaS-platform work resumes.
+
+Current execution:
+
+```text
+M1 cohort attribution             COMPLETE
+M2 product-decision read models   COMPLETE
+M3 operator Validation Console    COMPLETE
+M4A Product Gate memo system      COMPLETE
+M5 #19 developer Alpha            READY / CURRENT
+M4B final Product Gate decision   AFTER COHORT
+```
 
 ## Primary product outcome
 
@@ -26,7 +37,7 @@ aha     = Oh, I finally get it.
 Strong Aha = yes + aha
 ```
 
-A Strong Aha is an internal product signal, not an academic learning assessment.
+Strong Aha is an internal product signal, not an academic learning assessment.
 
 ## Validation funnel
 
@@ -51,7 +62,7 @@ pricing_viewed / paid_intent_clicked
       ↓
 waitlist_submitted
       ↓
-return_visit
+return / D7
 ```
 
 ### `lab_started`
@@ -60,41 +71,41 @@ Emitted on the first actual Lab interaction, not merely on page load.
 
 ### `meaningful_interaction`
 
-Emitted once per Lab/session after either:
-
-- at least two semantic interactions; or
-- a meaningful preset / failure injection action.
+Emitted once per Lab/session after either at least two semantic state-changing interactions or a meaningful preset/failure-injection action.
 
 This is intentionally stricter than click count.
 
 ### `failure_tradeoff_observed`
 
-For Validation Alpha, this is emitted when the learner reaches the meaningful-interaction threshold in a failure/trade-off Lab. It represents exposure to the Lab's modeled trade-off, not proof that the learner understood it. Aha feedback is the separate learning-outcome signal.
+Currently emitted at the same runtime threshold as meaningful interaction in failure/trade-off Labs. It means exposure to the modeled trade-off, not proof of understanding.
+
+**Do not double-weight `meaningful_interaction` and `failure_tradeoff_observed` as independent evidence in the first Alpha.**
 
 ### `second_lab_started`
 
-Emitted when an anonymous learner starts a different Lab after previously starting at least one other Lab. The event also records whether the transition crosses an engineering layer.
+The runtime event is useful diagnostic evidence, but Product Gate continuation metrics are recomputed cohort-scoped by M2 so browser history from before the cohort cannot contaminate the result.
 
 ### `capstone_completed`
 
 Emitted once when the integrated Build first reaches its modeled `SHIP` state.
 
-## Anonymous context
+## Anonymous cohort context
 
-Every semantic analytics event receives the same shared context:
+Semantic validation context includes:
 
 ```text
 schemaVersion
 eventId
 anonymousUserId
 sessionId
-firstSeenAt
+cohortId
 visitCount
 returnVisit
 pageType
 layer
 labId
 labVersion
+locale
 utmSource
 utmMedium
 utmCampaign
@@ -105,35 +116,39 @@ path
 ts
 ```
 
-### Identity model
+`anonymousUserId` is browser-persisted; `sessionId` is session-scoped. No authentication is required.
 
-`anonymousUserId` is generated in the browser and persisted locally.
+Cohort attribution is experiment context, not identity. Stable first cohort:
 
-`sessionId` is session-scoped.
+```text
+alpha-2026-08
+```
 
-No email address is added to ordinary analytics events. Waitlist email is sent only in the dedicated waitlist payload.
+Tracked entry URLs:
 
-No authentication is required for Validation Alpha.
+```text
+https://ahaframe.com/en/?cohort=alpha-2026-08
+https://ahaframe.com/zh-cn/?cohort=alpha-2026-08
+```
+
+No email is added to ordinary analytics events. Waitlist email is confined to the dedicated waitlist payload.
 
 ## Attribution
 
-The runtime stores:
+The runtime stores cohort, locale, first-touch UTM source, current-session UTM source/medium/campaign, referrer and device class as independent dimensions.
 
-- first-touch UTM source;
-- current-session UTM source / medium / campaign;
-- referrer;
-- device class.
-
-This is sufficient for the initial small-cohort experiment. It is not intended to become a full marketing attribution system.
+This is enough for the small deliberately recruited Alpha. It is not a general marketing attribution system.
 
 ## Aha feedback payload
 
-Qualitative text is deliberately separated from ordinary event properties.
+Qualitative text is separated from ordinary analytics properties.
 
 ```text
 feedbackId
 anonymousUserId
 sessionId
+cohortId
+locale
 layer
 labId
 labVersion
@@ -146,9 +161,7 @@ deviceClass
 attribution
 ```
 
-The optional note is capped at 1,200 characters.
-
-When no remote feedback endpoint is configured, feedback is saved only in the current browser and the UI explicitly says **Demo mode**. It must never claim remote success.
+The optional note is bounded user-submitted content. Operator reporting must not expose participant IDs and generated share-safer reports may use `--redact-notes`.
 
 ## Runtime endpoints
 
@@ -160,33 +173,28 @@ AHAFRAME_FEEDBACK_ENDPOINT
 AHAFRAME_WAITLIST_ENDPOINT
 ```
 
-They are URLs, not secrets.
+They are URLs, not secrets. All three may point to `validation-ingest`; the server distinguishes event, feedback and waitlist payloads.
 
-All three can point to the same validation-ingest endpoint because the server distinguishes event, feedback, and waitlist payload shapes.
+## Production Supabase boundary
 
-## Provider boundary
-
-Browser Labs depend only on the AhaFrame endpoint contract.
+Production truth:
 
 ```text
-Lab Adapter
-     ↓
-AhaFrame.track / submitFeedback
-     ↓
-provider-neutral HTTP endpoint
-     ↓
-Validation storage
+project: ahaframe-validation
+ref:     swzddvprnyjrrgpzcsgp
+region:  ap-southeast-1
 ```
 
-The first Alpha storage implementation is Supabase Postgres + one Edge Function. A later analytics product can consume the same event contract without rewriting Lab code.
-
-## Supabase storage
-
-Migration:
+Canonical migrations:
 
 ```text
-supabase/migrations/202608130001_validation_alpha.sql
+supabase/migrations/20260814023253_validation_alpha.sql
+supabase/migrations/20260815000100_validation_locale.sql
+supabase/migrations/20260815071500_validation_cohort.sql
+supabase/migrations/20260815092200_validation_read_models.sql
 ```
+
+Do not use historical short migration names or stale project refs.
 
 Tables:
 
@@ -196,92 +204,97 @@ aha_feedback
 validation_waitlist
 ```
 
-All three tables enable Row Level Security and expose no direct `anon` or `authenticated` table access. Browser writes go through the Edge Function; the service credential remains server-side.
-
-The ingest function is:
+All tables enable RLS and expose no direct `anon`/`authenticated` access. Browser writes go through:
 
 ```text
 supabase/functions/validation-ingest/index.ts
 ```
 
-It:
+The function is intentionally deployed with JWT verification disabled because the Alpha is anonymous. Origin validation, method/payload validation, bounds and server-side service role form the public-abuse boundary. Do not move the service-role credential into Vercel browser config, GitHub CI, generated reports, or ChatGPT.
 
-- accepts only configured origins;
-- handles CORS preflight;
-- accepts POST only;
-- bounds payload size and string lengths;
-- validates required event / feedback / waitlist fields;
-- normalizes waitlist email;
-- uses event and feedback IDs for idempotent writes;
-- never returns database rows to public callers.
+## M2 Product Gate semantic layer
 
-The function must be deployed with JWT verification disabled because Validation Alpha is anonymous. Origin checks and payload validation are therefore part of the endpoint's public-abuse boundary.
+Raw tables are not the Product Gate API.
 
-## Initial dashboard queries
+Stable read models:
 
-### Unique visitors who started a Lab
-
-```sql
-select count(distinct anonymous_user_id)
-from validation_events
-where name = 'lab_started';
+```text
+validation_product_events_v1
+validation_feedback_latest_v1
+validation_user_lab_facts_v1
+validation_participant_facts_v1
+validation_data_quality_issues_v1
+validation_product_metrics_v1(...)
 ```
 
-### Meaningful interaction rate
+See `docs/VALIDATION_METRICS.md` for numerator/denominator/grain definitions and fixture-backed regression.
 
-```sql
-with starters as (
-  select distinct anonymous_user_id, lab_id from validation_events where name = 'lab_started'
-), meaningful as (
-  select distinct anonymous_user_id, lab_id from validation_events where name = 'meaningful_interaction'
-)
-select
-  count(*) filter (where meaningful.lab_id is not null)::numeric / nullif(count(*), 0) as rate
-from starters
-left join meaningful using (anonymous_user_id, lab_id);
+Key invariants:
+
+- `production-smoke` / `production_smoke_test` are excluded from Product Gate evidence;
+- D7 is based on cohort-scoped first evidence time and only users with a full seven-day opportunity are eligible;
+- second-Lab / second-layer metrics are recomputed inside the cohort;
+- latest feedback is deduplicated by the M2 semantic model;
+- waitlist contact storage is not treated as a perfect immutable attribution fact;
+- `Want more Labs` remains **not directly measurable** in the semantic event contract.
+
+## M3 operator Validation Console
+
+Use:
+
+```bash
+python3 scripts/validation_report.py \
+  --cohort alpha-2026-08 \
+  --days 14 \
+  --env-file .env.local
 ```
 
-### Strong Aha rate
+or the documented operator-equivalent evidence path where appropriate.
 
-```sql
-select
-  count(*) filter (where strong_aha)::numeric / nullif(count(*), 0) as strong_aha_rate
-from aha_feedback;
+The Console shows:
+
+- Product Gate metrics and target hypotheses;
+- numerator / denominator / rate;
+- locale/source/device mix;
+- Strong Aha by Lab/layer/locale with response counts;
+- qualitative review queue without participant identifiers;
+- data-health ERROR/WARNING;
+- evidence freshness;
+- dynamic production-smoke exclusion status.
+
+See `docs/VALIDATION_CONSOLE.md`.
+
+## Data health
+
+Product decisions must not silently ignore evidence-integrity failures.
+
+Current known production debt before formal recruitment:
+
+```text
+ERROR    0
+WARNING  1 historical unattributed feedback_without_start
 ```
 
-### Second-Lab rate
+The historical WARNING is visible evidence debt but is not a current production-contract blocker.
 
-```sql
-select
-  count(distinct anonymous_user_id) filter (where name = 'second_lab_started')::numeric
-  / nullif(count(distinct anonymous_user_id) filter (where name = 'lab_started'), 0) as second_lab_rate
-from validation_events;
+Unresolved ERROR evidence should stop Product Gate interpretation until investigated.
+
+## Production release evidence
+
+Code CI is not sufficient evidence that production is serving the same release.
+
+Production Smoke first checks:
+
+```text
+/assets/build-meta.json.gitCommitSha
+== exact triggering main SHA
 ```
 
-### Strongest / weakest Labs by Aha
+It polls every 5 seconds for at most 120 seconds and fails closed if production remains stale. Only after exact identity is proven does it execute the bilingual route and event/feedback/waitlist smoke.
 
-```sql
-select
-  lab_id,
-  count(*) as responses,
-  avg(case when strong_aha then 1 else 0 end) as strong_aha_rate
-from aha_feedback
-group by lab_id
-order by strong_aha_rate desc, responses desc;
-```
-
-### Qualitative review queue
-
-```sql
-select submitted_at, layer, lab_id, rating, note
-from aha_feedback
-where note <> ''
-order by submitted_at desc;
-```
+See `docs/PRODUCTION_RELEASE_GATE.md`.
 
 ## Initial internal decision signals
-
-These are decision rules for the first cohort, not industry benchmarks:
 
 | Signal | Initial target |
 |---|---:|
@@ -289,12 +302,14 @@ These are decision rules for the first cohort, not industry benchmarks:
 | Meaningful Interaction | ≥ 60% of Lab starters |
 | Failure / Trade-off Trigger | ≥ 40% |
 | First Lab → Second Layer | ≥ 30% |
-| Users completing ≥2 Labs | ≥ 25% |
+| Users engaging with ≥2 Labs | ≥ 25% |
 | Strong Aha Rate | ≥ 60% |
-| Want more Labs | ≥ 40% |
+| Want more Labs | ≥ 40% *(hypothesis; not directly measurable yet)* |
 | Pricing visit | ≥ 10% |
 | Paid / founding intent | ≥ 3% |
 | D7 Return | ≥ 15%; ≥20% strong |
+
+These are internal hypotheses, not industry benchmarks and not automatic pass/fail rules.
 
 ## Privacy / data-minimization boundary
 
@@ -304,15 +319,43 @@ Validation Alpha intentionally does not require:
 - social profile;
 - precise location;
 - browser fingerprinting;
-- IP storage in the application tables;
+- IP storage in application tables;
 - full clickstream capture;
 - prompt contents or user-entered Lab data in ordinary analytics events.
 
-The optional Aha note is user-submitted qualitative text and should be treated as user content.
+The optional Aha note is user content and should be handled as such.
 
-## Product Gate
+## Running the cohort
 
-After the first qualified cohort, choose one:
+The canonical operating protocol is `docs/VALIDATION_ALPHA_RUNBOOK.md` and GitHub issue #19.
+
+Core rules:
+
+- recruit deliberately, not broadly;
+- preserve natural product use instead of forcing a Lab order;
+- record cohort start/end timestamps;
+- do not change product mechanics or metric semantics mid-cohort except documented P0/P1 intervention;
+- monitor data health rather than optimizing metrics during the run;
+- allow D7 eligibility to mature before final interpretation;
+- deliberately close the cohort window.
+
+## M4 Product Gate
+
+M4A (memo process/system) is complete. The final M4B decision occurs only after #19 closes the real cohort window.
+
+Generate a draft/final memo with:
+
+```bash
+python3 scripts/product_gate_memo.py \
+  --cohort alpha-2026-08 \
+  --from <COHORT_START_ISO> \
+  --to <COHORT_END_ISO> \
+  --version 1
+```
+
+The tool pre-fills reproducible M2/M3 evidence but does **not** auto-select the business decision.
+
+The operator must review quantitative evidence, qualitative themes, contradictory evidence, data caveats, platform demand, reasons against the alternatives and next-phase plan before choosing exactly one:
 
 ```text
 GO PLATFORM
@@ -322,4 +365,4 @@ CONTENT / BRAND ASSET
 STOP
 ```
 
-A `GO PLATFORM` decision should be supported by meaningful Aha, cross-layer continuation, return/future-use intent, credible payment intent, and no unresolved trust issue around deterministic educational metrics.
+Auth, Billing, Entitlement, Credits, full Next.js production migration and Live Mode remain paused unless the reviewed decision is `GO PLATFORM`.
