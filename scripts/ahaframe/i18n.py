@@ -26,7 +26,6 @@ HREFLANG = {
     "zh-CN": "zh-CN",
 }
 
-# Public Validation Alpha route surface. Slugs stay locale-neutral in v1.
 PUBLIC_ROUTE_RELATIVES = (
     "",
     "pricing/",
@@ -43,7 +42,6 @@ PUBLIC_ROUTE_RELATIVES = (
     "build/reliable-support-agent/",
 )
 
-# Shared shell/UI keys that every locale must provide before any page can build.
 REQUIRED_UI_KEYS = (
     "nav.lessons",
     "nav.roadmap",
@@ -93,7 +91,6 @@ def route_relative(path: str) -> str:
 
 
 def localized_path(path: str, locale: str) -> str:
-    """Map an existing public route to the equivalent locale-prefixed route."""
     return f"/{route_prefix(locale)}/{route_relative(path)}"
 
 
@@ -102,9 +99,15 @@ def equivalent_paths(path: str) -> dict[str, str]:
 
 
 @lru_cache(maxsize=None)
-def load_locale_source(locale: str) -> dict[str, Any]:
+def load_content_source(locale: str, domain: str | None = None) -> dict[str, Any]:
+    """Load shared locale metadata or a domain-specific locale content file.
+
+    Shared source: `content/<locale>.json`
+    Domain source: `content/<domain>.<locale>.json`
+    """
     locale = normalize_locale(locale)
-    path = CONTENT_DIR / f"{locale}.json"
+    filename = f"{locale}.json" if domain is None else f"{domain}.{locale}.json"
+    path = CONTENT_DIR / filename
     if not path.exists():
         raise FileNotFoundError(f"Missing locale source: {path.relative_to(ROOT)}")
     data = json.loads(path.read_text(encoding="utf-8"))
@@ -113,11 +116,21 @@ def load_locale_source(locale: str) -> dict[str, Any]:
     return data
 
 
+def load_locale_source(locale: str) -> dict[str, Any]:
+    return load_content_source(locale)
+
+
 def route_available(path: str, locale: str) -> bool:
-    """Whether a localized page is intentionally available in the current release branch."""
     relative = route_relative(path)
     available = load_locale_source(locale).get("availableRoutes", [])
     return relative in available
+
+
+def localized_or_default_path(path: str, locale: str) -> str:
+    """Use the requested locale when available; otherwise keep the English route."""
+    if route_available(path, locale):
+        return localized_path(path, locale)
+    return localized_path(path, DEFAULT_LOCALE)
 
 
 def language_switch_items(path: str) -> tuple[dict[str, Any], ...]:
@@ -150,13 +163,12 @@ def ui(locale: str, key: str) -> str:
 
 
 def validate_locale_sources() -> None:
-    """Fail fast when locale identity, route availability, or shared UI keys drift."""
     errors: list[str] = []
     public = set(PUBLIC_ROUTE_RELATIVES)
     for locale in SUPPORTED_LOCALES:
         try:
             source = load_locale_source(locale)
-        except Exception as exc:  # report both locales in one build failure
+        except Exception as exc:
             errors.append(str(exc))
             continue
         if source.get("routePrefix") != ROUTE_PREFIX[locale]:
@@ -189,7 +201,6 @@ def validate_locale_sources() -> None:
 
 
 def assert_public_route_contract() -> None:
-    """Validate that every public route has deterministic en/zh-CN equivalents."""
     seen: set[str] = set()
     for relative in PUBLIC_ROUTE_RELATIVES:
         source = f"/en/{relative}"
