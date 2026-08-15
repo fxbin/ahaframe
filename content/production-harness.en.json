@@ -98,10 +98,11 @@
       },
       "next": {
         "title": "You improved one agent control policy.",
-        "description": "Next, prove whether the system is actually better with Evaluation rather than assuming a safer-looking Harness is enough.",
-        "href": "/en/labs/evaluation-failure/",
-        "button": "Continue",
-        "event": "agent_reliability_next_layer_click"
+        "description": "The next Production Lab will focus on evaluation: how to prove that a new RAG or agent configuration is actually better across a representative test set.",
+        "href": "/en/early-access/",
+        "query": "?intent=agent-reliability-production-labs",
+        "button": "Get Production Labs",
+        "event": "agent_reliability_paid_intent_click"
       }
     }
   }
