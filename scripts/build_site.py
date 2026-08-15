@@ -1,6 +1,6 @@
 """Build the AhaFrame static validation site."""
 
-from ahaframe import agent, agent_reliability, context, context_compression, discovery, evaluation, graph, home, instruction_conflict, integrated_build, marketing, rag, token
+from ahaframe import agent, agent_reliability, context, context_compression, discovery, evaluation, graph, home, instruction_conflict, integrated_build, marketing, rag, third_party_analytics, token
 from ahaframe.i18n import assert_public_route_contract, validate_locale_sources
 
 
@@ -23,6 +23,7 @@ def main():
     integrated_build.build()
     marketing.build()
     discovery.build()
+    third_party_analytics.apply()
 
 
 if __name__ == "__main__":
