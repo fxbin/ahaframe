@@ -1,0 +1,102 @@
+{
+  "locale": "en",
+  "ui": {
+    "home": "Home",
+    "build": "Build",
+    "share": "Share",
+    "inOneSentence": "In one sentence"
+  },
+  "build": {
+    "name": "Reliable Support Agent Build",
+    "seoTitle": "Reliable Support Agent Build — Six-Layer Architecture Challenge | AhaFrame",
+    "description": "Combine Prompt, Context, Harness, Loop, Graph, and Evaluation decisions into one deterministic production architecture challenge.",
+    "hero": "Stop tuning components in isolation. Build one support system whose Prompt, Context, Harness, Loop, Graph, and Evaluation policies remain coherent together.",
+    "level": "Intermediate to advanced",
+    "minutes": 35,
+    "badges": ["Conceptual Closure Capstone", "Six-layer architecture"],
+    "quick": "A production AI architecture is release-ready only when behavior, knowledge, runtime control, iteration, orchestration, and evaluation evidence agree with the same constraints.",
+    "groups": {
+      "prompt": {"label": "Prompt", "options": {"loose": "Loose instruction contract", "scoped": "Scoped authority", "typed": "Typed prompt contract"}},
+      "retrieval": {"label": "Retrieval", "options": {"cheap": "Cheap vector search", "balanced": "Balanced hybrid + rerank", "recall": "Recall-heavy hybrid"}},
+      "context": {"label": "Context", "options": {"lean": "Lean context", "balanced": "Balanced protected context", "rich": "Rich context"}},
+      "execution": {"label": "Harness + Loop", "options": {"fast": "Fast bounded loop", "autonomous": "Validated autonomous loop", "bounded": "Bounded + approval"}},
+      "graph": {"label": "Graph", "options": {"simple": "Simple single-loop graph", "bounded": "Bounded branched graph", "complex": "Coordinator-heavy graph"}},
+      "evaluation": {"label": "Evaluation", "options": {"demo": "Demo-biased evaluation", "production": "Production evaluation", "safety": "Safety-heavy evaluation"}}
+    },
+    "interactive": {
+      "title": "Six-layer architecture",
+      "badge": "Deterministic integration challenge",
+      "policySuffix": "policy",
+      "reference": "Apply reference architecture",
+      "reset": "Reset starting architecture",
+      "referenceNote": "The reference is one defensible configuration for this teaching scenario, not a universal answer key.",
+      "stack": "Integrated stack",
+      "evidence": "Evaluation evidence",
+      "release": "Release decision",
+      "metrics": ["Architecture score", "Task readiness", "Reliability", "Safety readiness", "Latency index", "Cost index"],
+      "diagnosis": "Diagnosis",
+      "blockers": "Release blockers",
+      "warnings": "Trade-off warnings",
+      "explanation": "Architecture explanation"
+    },
+    "presentation": {
+      "decision": {"SHIP": "SHIP", "BLOCK": "BLOCK", "INCONCLUSIVE": "INCONCLUSIVE"},
+      "points": "pts",
+      "evidence": "{evaluation} · evidence width {width} pts",
+      "emptyBlockers": "No modeled release blockers.",
+      "emptyWarnings": "No additional modeled warnings.",
+      "diagnosis": {
+        "healthy": "The architecture clears the modeled gate. Its remaining trade-offs are visible rather than hidden.",
+        "blocked": "Release blocked: {blocker}",
+        "inconclusive": "The architecture is plausible, but the modeled evidence margin is narrower than the evaluation evidence width."
+      },
+      "blockers": {
+        "prompt-conflicts": "Prompt contract still has {count} unresolved conflict(s).",
+        "context-overflow": "Context exceeds the fixed working budget by {tokens} tokens.",
+        "graph-propagation": "Graph failure propagation is {percent}%, above the modeled architecture limit.",
+        "loop-runaway": "Loop runaway risk is {percent}%, above the modeled execution limit.",
+        "architecture-threshold": "Architecture score {score} is below the {threshold} release threshold.",
+        "safety-floor": "Safety readiness {score} is below the {floor}-point consequential-action floor.",
+        "retrieval-recall-floor": "Retrieval recall {recall}% is below the production evidence floor.",
+        "critical-retention-floor": "Critical context retention {retention}% is below the production floor.",
+        "cost-budget": "Cost index {cost} exceeds the configured budget of {limit}."
+      },
+      "warnings": {
+        "prompt-open": "Prompt authority is not fully closed; better runtime controls cannot repair an ambiguous instruction contract.",
+        "graph-coordination": "Graph coordination overhead is {value}; simplify unless the decomposition creates measured value.",
+        "approval-load": "Approval improves control but creates about {reviews} reviews per 100 modeled runs.",
+        "demo-evaluation": "Demo evaluation underweights production-tail failures; a positive dashboard is weak release evidence.",
+        "weak-context-economics": "Context quality is strong but context economics are weak."
+      },
+      "tradeoffs": {
+        "prompt": "Prompt — {label}: {quality} quality / {risk}% policy risk.",
+        "context": "Context — {retrieval} + {context}: {recall}% recall / {retention}% critical retention.",
+        "execution": "Harness + Loop — {label}: {success}% success / {runaway}% runaway risk.",
+        "graph": "Graph — {label}: {propagation}% failure propagation / {coordination} coordination.",
+        "evaluation": "Evaluation — {label}: {width}-point evidence width / {veto}."
+      },
+      "veto": {"on": "safety veto", "off": "no safety veto"},
+      "compare": {"title": "Vs. baseline", "architecture": "Architecture", "reliability": "Reliability", "safety": "Safety", "cost": "Cost"}
+    },
+    "explainer": {
+      "eyebrow": "BUILD · Conceptual Closure",
+      "title": "Defend the system, not one metric",
+      "paragraphs": [
+        "The capstone changes the unit of reasoning from one subsystem to the whole AI system. A locally good choice can become a bad architecture when it conflicts with another layer. Strong retrieval cannot repair ambiguous instruction authority. A safe prompt cannot enforce a runtime permission boundary. A reliable loop can still live inside an unnecessarily complex graph. A good candidate can still be released under weak evidence.",
+        "Prompt Engineering defines the behavioral contract: which instructions have authority, how consequential constraints are stated, how retrieved evidence is treated, and what output shape downstream systems can validate. In this challenge, unresolved Prompt conflicts are explicit blockers rather than a small quality penalty that can be averaged away.",
+        "Context Engineering combines retrieval and working-context policy. Retrieval decides what evidence is available; compression decides what survives into the model working set. The architecture must retain enough critical information without exceeding the context budget or paying for evidence that does not improve the task.",
+        "Harness and Loop Engineering control execution. Validation, approval, retries, timeouts, termination, and local recovery change reliability, operational cost, and risk. More retries can improve completion while making repeated work and long tails worse, so the execution policy must be judged as a production control system rather than a single success-rate number.",
+        "Graph Engineering decides how responsibilities connect. A coordinator with many workers may look more advanced while increasing state coupling and failure propagation. A smaller branched workflow can preserve independent evidence, retry only the failed node, verify joins, and place review at the consequential boundary. The graph earns complexity only when that structure creates a measurable advantage.",
+        "Evaluation Engineering turns all of those design choices into a release decision. Dataset coverage, evidence width, safety vetoes, and cost gates decide what counts as ready. The same architecture can look acceptable under a demo-biased evaluation and fail a production gate. This is why evaluation is part of system architecture rather than a final dashboard added after implementation.",
+        "All values are deterministic educational abstractions composed from the existing AhaFrame Labs. They are not live model benchmarks or universal thresholds. The goal is to practice defending a coherent architecture under explicit constraints, then carry that reasoning into real systems with measured data."
+      ]
+    },
+    "next": {
+      "title": "Conceptual closure means the six responsibilities now connect.",
+      "description": "After this Build, AhaFrame stops adding content by default and moves to validation instrumentation and a small developer Alpha.",
+      "href": "/en/early-access/",
+      "query": "?intent=validation-alpha",
+      "button": "Join validation Alpha"
+    }
+  }
+}
