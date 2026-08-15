@@ -14,7 +14,8 @@ The console consumes the M2 semantic layer:
 - `validation_product_metrics_v1(...)` for Product Gate metrics;
 - `validation_participant_facts_v1` for cohort/acquisition mix and freshness;
 - `validation_feedback_latest_v1` for latest qualitative/Strong-Aha evidence;
-- `validation_data_quality_issues_v1` for evidence-health warnings.
+- `validation_data_quality_issues_v1` for evidence-health warnings;
+- the raw `validation_events` table only for a bounded `production-smoke` presence probe, never for Product Gate metric calculation.
 
 The console must not redefine the Product Gate formulas from `docs/VALIDATION_METRICS.md`.
 
@@ -99,9 +100,11 @@ Shows:
 
 - analysis window;
 - cohort visitors from the M2 metric function;
-- latest evidence timestamp;
-- smoke exclusion status;
+- latest **cohort-attributed** evidence timestamp;
+- smoke exclusion probe status;
 - data-health summary.
+
+The smoke status is not a hard-coded badge. In production mode the report checks whether raw `production-smoke` events exist in the selected window and independently calls `validation_product_metrics_v1(...)` for that reserved cohort. The probe is `PASS` only when raw smoke evidence exists while every Product Gate numerator/denominator remains zero. If no smoke event exists in the window the report says `NOT EXERCISED`; fixture/offline evidence without a probe says `NOT CHECKED`.
 
 ### Product funnel / decision metrics
 
@@ -151,6 +154,13 @@ The report intentionally does not expose anonymous-user identifiers.
 
 Surfaces M2 evidence-health issues and highlights ERROR/WARNING counts.
 
+The report includes both:
+
+- issues attributable to the selected cohort; and
+- unattributed/global issues in the selected time window.
+
+The second class is deliberate: a missing cohort can itself be the data-quality failure, so filtering it away would create a false-green report. Unattributed/global issues are counted explicitly and **do not** advance the target cohort's freshness timestamp.
+
 Product Gate decisions should stop for investigation when unresolved ERROR evidence is present.
 
 ## Required interpretation caveats
@@ -175,7 +185,9 @@ The regression covers:
 - deterministic metric presentation;
 - zero-row cohort rendering;
 - low-sample warnings;
-- data-health warnings;
+- cohort + unattributed data-health warnings;
+- global warnings not faking cohort freshness;
+- real smoke-probe PASS/FAIL semantics;
 - reserved smoke cohort handling;
 - HTML escaping of user-submitted notes;
 - qualitative redaction;
