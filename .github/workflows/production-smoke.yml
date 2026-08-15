@@ -32,9 +32,12 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.13'
-      - name: Run production smoke
+      - name: Wait for exact Vercel production commit and run smoke
         run: >-
           python3 scripts/smoke_production.py
           --base-url "${{ inputs.base_url || 'https://ahaframe.com' }}"
           --validation-endpoint "${{ inputs.validation_endpoint || 'https://swzddvprnyjrrgpzcsgp.supabase.co/functions/v1/validation-ingest' }}"
+          --expected-commit "${{ github.event.workflow_run.head_sha || github.sha }}"
+          --deployment-timeout-seconds 120
+          --deployment-poll-seconds 5
           --run-id "github-${{ github.run_id }}"

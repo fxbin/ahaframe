@@ -2,10 +2,16 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
+import time
 import urllib.error
+import urllib.parse
 import urllib.request
 from datetime import datetime, timezone
+
+SHA40 = re.compile(r'^[0-9a-f]{40}$', re.I)
+BUILD_META_PATH = '/assets/build-meta.json'
 
 
 def request(url: str, *, method: str = 'GET', body: dict | None = None, origin: str | None = None):
@@ -31,12 +37,65 @@ def expect(status: int, wanted: int, label: str, body: str = ''):
         raise SystemExit(f'{label}: expected HTTP {wanted}, got {status}: {body[:500]}')
 
 
+def wait_for_expected_commit(
+    base: str,
+    expected_commit: str,
+    *,
+    timeout_seconds: float = 120,
+    poll_seconds: float = 5,
+    requester=request,
+    sleeper=time.sleep,
+) -> dict:
+    expected = expected_commit.strip().lower()
+    if not SHA40.fullmatch(expected):
+        raise SystemExit(f'release marker: expected commit must be a full 40-character git SHA, got {expected_commit!r}')
+    if timeout_seconds < 0 or poll_seconds < 0:
+        raise SystemExit('release marker: timeout/poll seconds must be non-negative')
+
+    deadline = time.monotonic() + timeout_seconds
+    attempts = 0
+    last_diagnostic = 'marker was not checked'
+    marker_url = base.rstrip('/') + BUILD_META_PATH + '?' + urllib.parse.urlencode({'expected': expected})
+
+    while True:
+        attempts += 1
+        try:
+            status, body, _headers = requester(marker_url)
+            if status == 200:
+                try:
+                    meta = json.loads(body)
+                except json.JSONDecodeError:
+                    last_diagnostic = f'HTTP 200 but build metadata was invalid JSON: {body[:180]!r}'
+                else:
+                    actual = str(meta.get('gitCommitSha') or '').strip().lower()
+                    if actual == expected:
+                        print(f'PASS release marker exact commit {expected} attempt={attempts}')
+                        return meta
+                    last_diagnostic = f'expected {expected}, production reports {actual or "missing gitCommitSha"}'
+            else:
+                last_diagnostic = f'build marker returned HTTP {status}: {body[:180]}'
+        except Exception as exc:
+            last_diagnostic = f'build marker request failed: {exc}'
+
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            raise SystemExit(
+                'release marker timeout: production did not reach the exact main commit '
+                f'within {timeout_seconds:g}s after {attempts} attempt(s); {last_diagnostic}'
+            )
+        print(f'WAIT release marker attempt={attempts}: {last_diagnostic}')
+        sleeper(min(poll_seconds, remaining))
+
+
 def main():
     parser = argparse.ArgumentParser(description='Smoke-test the deployed bilingual AhaFrame validation surface.')
     parser.add_argument('--base-url', default='https://ahaframe.com')
     parser.add_argument('--validation-endpoint', required=True)
     parser.add_argument('--run-id', required=True)
     parser.add_argument('--cohort', default='production-smoke')
+    parser.add_argument('--expected-commit', required=True, help='Exact 40-character main commit production must be serving before smoke begins')
+    parser.add_argument('--deployment-timeout-seconds', type=float, default=120, help='Bounded wait for production to reach --expected-commit (default: 120)')
+    parser.add_argument('--deployment-poll-seconds', type=float, default=5, help='Poll interval for release marker (default: 5)')
     args = parser.parse_args()
 
     base = args.base_url.rstrip('/')
@@ -44,6 +103,16 @@ def main():
     run_id = args.run_id.replace(' ', '-')[:80]
     cohort = args.cohort.strip().lower()[:80]
     origin = base
+
+    # Control-plane gate: CI green is not production evidence. Do not execute the
+    # route/ingest smoke until the public production marker proves that the exact
+    # main commit which triggered this workflow is live.
+    wait_for_expected_commit(
+        base,
+        args.expected_commit,
+        timeout_seconds=args.deployment_timeout_seconds,
+        poll_seconds=args.deployment_poll_seconds,
+    )
 
     pages = [
         '/en/',
