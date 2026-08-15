@@ -25,18 +25,24 @@ For public builds it injects Vercel Web Analytics using:
 <script defer src="/_vercel/insights/script.js"></script>
 ```
 
-GA4 is injected immediately after `<head>` only when a valid GA4 Measurement ID is configured.
+GA4 is injected immediately after `<head>` for public builds using the AhaFrame GA4 Web Data Stream:
 
-Accepted environment variables, in priority order:
+```text
+G-EWPR5QXGWJ
+```
+
+The Measurement ID is browser-visible configuration, not a secret.
+
+Optional environment overrides, in priority order:
 
 ```text
 NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
 AHAFRAME_GA_MEASUREMENT_ID=G-XXXXXXXXXX
 ```
 
-The second name is a migration compatibility alias. Prefer `NEXT_PUBLIC_GA_MEASUREMENT_ID` so the same public configuration works with the Next.js migration app.
+The second name is a migration compatibility alias. Prefer `NEXT_PUBLIC_GA_MEASUREMENT_ID` when an override is needed so the same public configuration works with the Next.js migration app.
 
-A non-empty malformed value fails the build instead of silently shipping broken analytics.
+Local static builds remain analytics-free by default. A non-empty malformed override fails the build instead of silently shipping broken analytics.
 
 ## Next.js migration app
 
@@ -46,23 +52,15 @@ A non-empty malformed value fails the build instead of silently shipping broken 
 @vercel/analytics
 ```
 
-`web/components/third-party-analytics.tsx` renders `Analytics` from `@vercel/analytics/next` and conditionally loads GA4 from `NEXT_PUBLIC_GA_MEASUREMENT_ID`.
+`web/components/third-party-analytics.tsx` renders `Analytics` from `@vercel/analytics/next` and uses `G-EWPR5QXGWJ` as the production GA4 default. `NEXT_PUBLIC_GA_MEASUREMENT_ID` can override that value when needed. Development mode does not load the default GA4 ID unless an explicit override is configured.
 
 ## Vercel setup
 
 Vercel Web Analytics must be enabled for the `ahaframe` project. After deployment, verify that the page loads the Vercel analytics script and sends a page-view request to the project analytics endpoint.
 
-## GA4 setup
+## GA4 verification
 
-Create or select the AhaFrame GA4 Web Data Stream and copy its Measurement ID (`G-...`). Configure that value in the production Vercel environment as:
-
-```text
-NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
-```
-
-Then redeploy production and verify with GA4 Realtime or Google Tag Assistant.
-
-The Measurement ID is browser-visible configuration, not a secret.
+After production deployment, verify `G-EWPR5QXGWJ` with GA4 Realtime or Google Tag Assistant. Confirm that page views for `ahaframe.com` appear without sending email addresses, feedback text, or other user-owned private data.
 
 ## Privacy boundary
 
