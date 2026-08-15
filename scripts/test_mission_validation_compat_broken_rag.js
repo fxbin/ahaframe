@@ -1,0 +1,13 @@
+'use strict';
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const path=require('node:path');
+const text=fs.readFileSync(path.join(__dirname,'..','src','assets','broken-rag-pipeline.js'),'utf8');
+assert.ok(text.includes("'rag_parameter_changed'"),'RAG Mission must preserve the stable route interaction event');
+assert.ok(text.includes("missionId:'broken-rag-pipeline'"),'RAG Mission interaction must carry additive missionId');
+assert.ok(!text.includes("'mission_policy_changed'"),'RAG Mission must not double-count with a second generic policy-change event');
+assert.ok(text.includes("'mission_started'"));
+assert.ok(text.includes("'simulation_run'"));
+assert.ok(text.includes("'release_decision_submitted'"));
+assert.ok(text.includes("'mission_completed'"));
+console.log('PASS Broken RAG validation compatibility: stable route interaction event + additive Mission semantics, no double emission.');
