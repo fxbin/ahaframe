@@ -1,12 +1,12 @@
 # AhaFrame Development Roadmap
 
-Date: 2026-08-13  
-Version: v0.6 — Conceptual Closure Complete / Validation First  
+Date: 2026-08-15  
+Version: v0.7 — Validation Alpha Ready  
 Status: active execution roadmap
 
 ## Product direction
 
-AhaFrame is an English-first **Interactive AI Engineering Lab** for experienced software developers becoming AI engineers.
+AhaFrame is an **Interactive AI Engineering Lab** for experienced software developers becoming AI engineers.
 
 ```text
 Prompt shapes behavior.
@@ -23,24 +23,29 @@ Learning loop:
 SEE → PLAY → BREAK → AHA → BUILD
 ```
 
-Architecture principle:
+Architecture principles:
 
 > **Simulate the concept. Spend compute only to validate reality.**
 
-Current execution principle:
-
 > **Do not let platform completeness outrun product evidence.**
 
-The v1 mental model is now conceptually closed. Content expansion stops by default. The immediate job is to measure whether the existing system actually changes how qualified developers think about production AI.
+> **Anonymous First, Account Enhanced.**
 
-Execution sources of truth:
+The v1 mental model is conceptually closed. Content expansion stops by default. The current job is to determine whether the existing product creates durable product value for qualified developers.
 
-- `docs/CURRICULUM.md` — curriculum map and backlog;
-- `docs/PRODUCT_SPEC.md` — product and pricing hypotheses;
-- `docs/VALIDATION.md` — Validation Alpha event, feedback, storage, and Product Gate contract;
-- `docs/adr/0001-saas-platform-runtime.md` — accepted future SaaS runtime architecture;
-- GitHub issue `#22` — master execution state;
-- this roadmap — current phase order and stop lines.
+## Execution sources of truth
+
+- `docs/ROADMAP.md` — phase order and stop lines;
+- GitHub issue #22 — master execution state;
+- GitHub issue #19 — current Validation Alpha run;
+- GitHub issue #60 — cohort/evidence-system Epic;
+- GitHub issue #64 — Product Gate M4B final decision;
+- `docs/VALIDATION.md` — validation/evidence contract;
+- `docs/VALIDATION_METRICS.md` — M2 metric definitions;
+- `docs/VALIDATION_CONSOLE.md` — M3 operator workflow;
+- `docs/PRODUCT_GATE_MEMO.md` — M4 decision process;
+- `docs/VALIDATION_ALPHA_RUNBOOK.md` — current cohort protocol;
+- `docs/PRODUCTION_RELEASE_GATE.md` — exact-production release evidence.
 
 ---
 
@@ -56,7 +61,7 @@ Context Window Lab             done
 Agent Loop Simulator           done
 ```
 
-Production/failure experiences:
+Failure / production experiences:
 
 ```text
 Instruction Conflict Lab       done
@@ -73,16 +78,7 @@ Integrated Build:
 Reliable Support Agent Build   done
 ```
 
-Foundation infrastructure:
-
-- AhaFrame brand + `ahaframe.com`;
-- warm-white / graphite / teal visual system;
-- deterministic Lab / Simulation Engine;
-- History / Checkpoint / Compare / Replay / Reset;
-- static build + validation + CI;
-- no-login crawlable educational pages;
-- pricing hypothesis: `$49 one-time Foundations` + future `$12/month Production Labs`;
-- paused Next.js migration bootstrap under `web/` kept green in CI.
+Foundation infrastructure includes AhaFrame brand/domain, deterministic Lab Engine, static production build, bilingual `en`/`zh-CN` surface, SEO/GEO, Vercel Web Analytics, GA4, Early Access signup, and a paused Next.js migration bootstrap kept green in CI.
 
 ---
 
@@ -106,254 +102,179 @@ Goal:
 Integration:
 
 ```text
-Prompt
-+ Context
-+ Harness
-+ Loop
-+ Graph
-+ Evaluation
-        ↓
-Reliable Support Agent Build
-        ↓
-SHIP / BLOCK / INCONCLUSIVE
+Prompt + Context + Harness + Loop + Graph + Evaluation
+                         ↓
+             Reliable Support Agent Build
+                         ↓
+              SHIP / BLOCK / INCONCLUSIVE
 ```
-
-The integrated Build uses existing layer scenarios rather than inventing a second set of formulas. Automated tests verify that:
-
-- the starting architecture is blocked by cross-layer failures;
-- repairing Prompt alone does not hide Graph/runtime problems;
-- repairing Graph alone does not hide Prompt problems;
-- one coherent six-layer reference architecture can clear the modeled release gate.
 
 ## Content stop line
 
-**Effective immediately:**
-
 > **STOP CONTENT EXPANSION BY DEFAULT.**
 
-Do not build another Lab merely because a new AI Engineering term appears.
-
-Backlog topics such as MCP, idempotency, tool contracts, guardrails, routing, observability, multi-agent patterns, and framework tutorials resume only when one of these is true:
-
-1. Validation shows a real comprehension gap;
-2. users repeatedly request the topic;
-3. it is required for a paid outcome;
-4. the six-layer mental model is proven incomplete.
+New topics resume only when validation shows a real comprehension gap, repeated user demand, a paid-outcome dependency, or an incomplete six-layer mental model.
 
 ---
 
-# Phase 2 — Validation Instrumentation
+# Phase 2 — Validation Foundation
 
-**Status: CURRENT — issue #16**
+**Status: COMPLETE — #16 / #42 / #58**
 
-Goal:
+AhaFrame now has:
 
-> Measure behavior, mental-model change, cross-layer continuation, future-use intent, and return behavior before building account/billing/platform completeness.
+- anonymous user/session context;
+- locale-neutral semantic events;
+- Strong Aha feedback;
+- waitlist / paid-intent capture;
+- durable Supabase persistence;
+- `en` + `zh-CN` production parity;
+- stable cohort attribution;
+- production validation ingest.
 
-## Anonymous validation context
-
-Every semantic event receives:
-
-```text
-anonymousUserId
-sessionId
-firstSeenAt
-visitCount
-returnVisit
-pageType
-layer
-labId
-labVersion
-utmSource / medium / campaign
-firstUtmSource
-referrer
-deviceClass
-```
-
-No account is required.
-
-## Funnel
+Production Supabase truth:
 
 ```text
-landing_viewed
-      ↓
-lab_viewed
-      ↓
-lab_started
-      ↓
-meaningful_interaction
-      ↓
-failure_tradeoff_observed
-      ↓
-aha_feedback_submitted
-      ↓
-second_lab_started
-      ↓
-capstone_started / capstone_completed
-      ↓
-pricing_viewed / paid_intent_clicked
-      ↓
-waitlist_submitted
-      ↓
-return_visit
+project: ahaframe-validation
+ref:     swzddvprnyjrrgpzcsgp
 ```
 
-### Meaningful Interaction
-
-A page view does not count.
-
-For the first Alpha, a Lab reaches meaningful interaction after either:
-
-- at least two semantic state-changing actions; or
-- a meaningful preset / explicit failure-injection action.
-
-This is an operational product metric, not a formal learning assessment.
-
-## Strong Aha
-
-After selected meaningful states, ask:
-
-> **Did this change how you think about this system?**
-
-Responses:
+Canonical migrations:
 
 ```text
-No
-A little
-Yes
-Oh, I finally get it.
+20260814023253_validation_alpha.sql
+20260815000100_validation_locale.sql
+20260815071500_validation_cohort.sql
+20260815092200_validation_read_models.sql
 ```
 
-```text
-Strong Aha = Yes + Oh, I finally get it.
-```
-
-Optional qualitative prompt:
-
-> **What do you understand differently now?**
-
-The optional note is stored separately from ordinary analytics properties.
-
-## Validation backend
-
-Provider-neutral browser contract:
-
-```text
-AhaFrame semantic events / feedback / waitlist
-        ↓
-HTTP ingest endpoint
-        ↓
-Supabase Edge Function
-        ↓
-Postgres
-```
-
-Repository implementation:
-
-```text
-supabase/migrations/202608130001_validation_alpha.sql
-supabase/functions/validation-ingest/index.ts
-```
-
-Tables:
-
-```text
-validation_events
-aha_feedback
-validation_waitlist
-```
-
-Security boundary:
-
-- Row Level Security enabled;
-- no direct browser access to validation tables;
-- service credential only in the server-side Edge Function;
-- allowed-origin check;
-- POST-only ingest;
-- bounded payload/string sizes;
-- event/feedback IDs provide idempotency;
-- public callers receive no database rows.
-
-See `docs/VALIDATION.md`.
-
-## Phase 2 exit criteria
-
-Before deployment:
-
-- [x] stable anonymous identity/session model;
-- [x] return-visit model;
-- [x] first/session attribution;
-- [x] semantic event enrichment;
-- [x] Meaningful Interaction derivation;
-- [x] Aha feedback UI/payload;
-- [x] explicit local Demo mode;
-- [x] waitlist enriched with anonymous validation context;
-- [x] migration + Edge Function contract in repo;
-- [x] runtime/build/backend contract tests in CI;
-- [ ] dedicated AhaFrame Supabase project provisioned;
-- [ ] migration applied;
-- [ ] anonymous ingest function deployed and verified end-to-end.
-
-Issue #16 remains open until the final three remote-storage items pass.
+Do not use stale project refs or old migration filenames from historical notes.
 
 ---
 
-# Phase 3 — Validation Deployment
+# Phase 3 — Validation Operations
 
-**Status: NEXT — issue #17**
+**Status: COMPLETE — #17 / #65 / #59 / #71 / #72 / #78**
 
-Goal:
+Minimum trustworthy Alpha operations now include:
 
-> Put the conceptually closed, no-login product in front of real users with durable evidence capture and basic operational visibility.
+- `ahaframe.com` HTTPS + Vercel production;
+- event / feedback / waitlist production persistence;
+- Vercel deployment/runtime visibility;
+- Supabase Edge Function logs;
+- rollback procedure;
+- P0/P1 Alpha stop rules;
+- stable desktop/mobile language switching;
+- production-ready Early Access conversion flow;
+- bounded GitHub Actions trigger model;
+- exact production commit identity before Production Smoke can pass.
 
-Required:
+## Exact production release invariant
 
-- production `ahaframe.com` deployment;
-- validation endpoint configured for analytics, feedback, and waitlist;
-- real event/feedback/waitlist writes verified;
-- anonymous session continuity verified;
-- canonical/robots/sitemap/OG checked;
-- mobile + desktop smoke test;
-- basic error/uptime visibility;
-- rollback procedure.
+Every production build publishes `/assets/build-meta.json`. Production Smoke must match its `gitCommitSha` against the exact triggering `main` SHA before route and POST smoke executes.
 
-Still **not required** before Validation Alpha:
-
-```text
-Supabase Auth
-cross-device progress
-Entitlement
-Waffo checkout
-Subscription
-CreditLedger
-full Next.js SaaS migration
-Live Mode
-```
+`Vercel READY` alone is not sufficient production evidence.
 
 ---
 
-# Phase 4 — Validation Alpha
+# Phase 4 — Validation Evidence System
 
-**Status: AFTER #16 + #17 — issue #19**
+**Status: M1–M4A COMPLETE — #60**
+
+## M1 — #61 Cohort attribution — COMPLETE
+
+Stable anonymous `cohortId`, persisted and propagated through event / feedback / waitlist without conflating locale or UTM attribution.
+
+## M2 — #62 Product-decision read models — COMPLETE
+
+Stable Postgres evidence layer:
+
+```text
+validation_product_events_v1
+validation_feedback_latest_v1
+validation_user_lab_facts_v1
+validation_participant_facts_v1
+validation_data_quality_issues_v1
+validation_product_metrics_v1(...)
+```
+
+Every Product Gate metric has a defined numerator, denominator and grain with fixture-backed PostgreSQL regression.
+
+`production-smoke` is excluded from Product Gate evidence.
+
+Important semantics:
+
+- D7 and continuation are cohort-scoped;
+- `meaningful_interaction` and `failure_tradeoff_observed` are currently structurally coupled and cannot be double-weighted;
+- `Want more Labs` is currently **not directly measurable**.
+
+## M3 — #63 Internal Validation Console — COMPLETE
+
+Operator-only local Markdown/HTML reporting:
+
+- funnel and target hypotheses;
+- strongest/weakest Labs/layers;
+- locale/source/device mix;
+- qualitative feedback review;
+- data-health warnings;
+- smoke-exclusion and evidence freshness.
+
+No public `/admin` surface and no participant anonymous IDs in qualitative output.
+
+## M4A — #64 Product Gate memo system — COMPLETE
+
+A versioned memo generator now pre-fills M2/M3 evidence while leaving the final business decision to operator review.
+
+It never auto-selects a decision from thresholds.
+
+M4B remains pending until the real #19 cohort closes.
+
+---
+
+# Phase 5 — Validation Alpha
+
+**Status: CURRENT / READY TO RECRUIT — #19**
 
 Cohort:
 
-> approximately **20–30 qualified software developers moving toward AI engineering**.
+> approximately **20–30 deliberately recruited software developers moving toward AI engineering**.
 
-Observe:
+Stable cohort ID:
 
-- where developers enter the stack;
-- which Labs produce meaningful interaction;
-- whether failure/trade-off states are reached;
-- Strong Aha by layer / Lab;
-- qualitative mental-model changes;
-- first-Lab → second-Lab / cross-layer continuation;
-- capstone use;
-- more-Labs / pricing / waitlist intent;
-- return behavior;
-- confusion around synthetic educational metrics.
+```text
+alpha-2026-08
+```
 
-Initial internal decision signals:
+Tracked entry URLs:
+
+```text
+https://ahaframe.com/en/?cohort=alpha-2026-08
+https://ahaframe.com/zh-cn/?cohort=alpha-2026-08
+```
+
+The cohort is intentionally not a broad Product Hunt / Hacker News / Reddit launch. The goal is interpretable product evidence, not traffic volume.
+
+## Run rule
+
+Ask participants to use AhaFrame naturally. Do not force a fixed Lab order. Do not change product mechanics, event semantics, metric formulas, or add new Labs during the cohort unless a documented P0/P1 evidence-integrity problem requires intervention.
+
+See `docs/VALIDATION_ALPHA_RUNBOOK.md`.
+
+## Primary evidence
+
+- Landing → Lab Start;
+- Meaningful Interaction;
+- failure/trade-off exposure;
+- Strong Aha with response counts;
+- second Lab / second engineering layer;
+- ≥2 meaningful Labs;
+- integrated Build start/completion;
+- return / D7;
+- pricing / paid intent / waitlist conversion;
+- qualitative save/sync/account/cross-device demand;
+- strongest and weakest Labs/layers.
+
+Initial hypotheses:
 
 | Signal | Initial target |
 |---|---:|
@@ -361,20 +282,34 @@ Initial internal decision signals:
 | Meaningful Interaction | ≥ 60% of Lab starters |
 | Failure / Trade-off Trigger | ≥ 40% |
 | First Lab → Second Layer | ≥ 30% |
-| Users completing ≥2 Labs | ≥ 25% |
-| **Strong Aha Rate** | **≥ 60%** |
-| Want more Labs | ≥ 40% |
+| Users engaging with ≥2 Labs | ≥ 25% |
+| Strong Aha Rate | ≥ 60% |
+| Want more Labs | ≥ 40% *(not directly measurable yet)* |
 | Pricing visit | ≥ 10% |
 | Paid / founding intent | ≥ 3% |
 | D7 Return | ≥ 15%; ≥20% strong |
 
-These are internal decision heuristics, not industry benchmarks.
+These are internal hypotheses, not industry benchmarks and not automatic pass/fail rules.
 
 ---
 
-# Phase 5 — Product Gate
+# Phase 6 — Product Gate / M4B
 
-After the first qualified cohort, choose exactly one primary decision:
+**Status: PENDING #19 COHORT CLOSE — #64**
+
+After the cohort window is deliberately closed and D7-eligible users have had enough time to mature:
+
+```text
+final M3 operator report
+        ↓
+M4B versioned Product Gate memo
+        ↓
+quantitative + qualitative + contradictory evidence review
+        ↓
+choose exactly one decision
+```
+
+Decision set:
 
 ```text
 GO PLATFORM
@@ -384,13 +319,7 @@ CONTENT / BRAND ASSET
 STOP
 ```
 
-A `GO PLATFORM` decision should normally require:
-
-- clear mental-model value / Strong Aha;
-- meaningful cross-layer continuation;
-- future-use or return intent;
-- credible payment intent;
-- no unresolved trust problem around deterministic educational metrics.
+A `GO PLATFORM` decision should normally require meaningful Aha, cross-layer continuation, return/future-use intent, credible demand, clean evidence integrity, and observed reasons that account/save/sync/platform capabilities solve actual user demand.
 
 Do not reinterpret “software is deployable” as `GO PLATFORM`.
 
@@ -398,24 +327,23 @@ Do not reinterpret “software is deployable” as `GO PLATFORM`.
 
 # Conditional Platform Path — PAUSED
 
-Accepted architecture is preserved:
+Accepted future architecture remains:
 
 ```text
 Next.js App Router + TypeScript
-→ Raphael StarterKit reusable SaaS foundation
-→ Supabase identity + application data
-→ Waffo payment adapter
-→ AhaFrame Lab Engine remains framework-independent
+→ reusable Product Foundation
+→ Anonymous-First Supabase identity/application layer
+→ durable progress + Entitlement
+→ Waffo billing adapter
+→ optional credits / Live Mode later
 ```
 
-Existing work is not discarded. The Next.js M1 bootstrap under `web/` remains covered by CI.
-
-Paused until `GO PLATFORM`:
+Paused until reviewed `GO PLATFORM`:
 
 ```text
 #11 / #27–#30 full runtime migration
-#12 optional Supabase identity
-#13 progress / checkpoint / entitlement
+#12 identity foundation
+#13 progress / checkpoint / Entitlement
 #14 Waffo billing
 #15 compute-credit ledger
 #18 platform E2E / security / billing gate
@@ -423,36 +351,26 @@ Paused until `GO PLATFORM`:
 #21 Public Beta decision
 ```
 
-Identity remains optional even after platform work resumes:
-
-```text
-Visit / learn / use Labs anonymously
-        ↓
-Save / Purchase / Build / Live Mode
-        ↓
-Sign in
-```
-
-Credits remain reserved for **real compute**, never ordinary learning or deterministic simulation.
+No payment is collected during the current Validation Alpha.
 
 ---
 
 # Current next action
 
 ```text
-#16 code / storage contract      almost complete
+#66 canonical docs sync
         ↓
-provision AhaFrame Supabase project
+record #19 cohort start timestamp
         ↓
-apply migration + deploy ingest function
+recruit 20–30 qualified developers
         ↓
-verify durable event / feedback / waitlist writes
+monitor data health with M3 without changing experiment mechanics
         ↓
-close #16
+allow D7 eligibility to mature
         ↓
-#17 validation deployment
+close cohort window deliberately
         ↓
-#19 qualified developer Alpha
+M4B / #64 final Product Gate memo
         ↓
-Product Gate
+choose one decision before platform work resumes
 ```
