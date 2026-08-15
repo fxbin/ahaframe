@@ -16,6 +16,7 @@ from ahaframe.i18n import (  # noqa: E402
     language_switch_items,
     load_locale_source,
     localized_path,
+    route_available,
     ui,
     validate_locale_sources,
 )
@@ -33,6 +34,8 @@ def main() -> None:
     assert en["routePrefix"] == "en"
     assert zh["routePrefix"] == "zh-cn"
     assert en["home"]["headline"] == "Understand AI by seeing it work."
+    assert set(en["availableRoutes"]) == set(PUBLIC_ROUTE_RELATIVES)
+    assert zh["availableRoutes"] == []
 
     for locale in SUPPORTED_LOCALES:
         for key in REQUIRED_UI_KEYS:
@@ -45,10 +48,13 @@ def main() -> None:
     assert localized_path("/en/labs/rag-failure/", "zh-CN") == "/zh-cn/labs/rag-failure/"
     assert localized_path("/zh-cn/build/reliable-support-agent/", "en") == "/en/build/reliable-support-agent/"
 
+    assert route_available("/en/labs/rag-failure/", "en") is True
+    assert route_available("/en/labs/rag-failure/", "zh-CN") is False
+
     switcher = language_switch_items("/en/labs/rag-failure/")
     assert switcher == (
-        {"locale": "en", "label": "English", "href": "/en/labs/rag-failure/", "hreflang": "en"},
-        {"locale": "zh-CN", "label": "简体中文", "href": "/zh-cn/labs/rag-failure/", "hreflang": "zh-CN"},
+        {"locale": "en", "label": "English", "href": "/en/labs/rag-failure/", "hreflang": "en", "available": True},
+        {"locale": "zh-CN", "label": "简体中文", "href": "/zh-cn/labs/rag-failure/", "hreflang": "zh-CN", "available": False},
     )
 
     all_routes = set()
@@ -69,7 +75,8 @@ def main() -> None:
 
     print(
         f"PASS: i18n foundation validates {len(SUPPORTED_LOCALES)} locales, "
-        f"{len(PUBLIC_ROUTE_RELATIVES)} public route pairs, shared UI keys, and no locale-specific scenario forks."
+        f"{len(PUBLIC_ROUTE_RELATIVES)} public route pairs, progressive route availability, "
+        "shared UI keys, and no locale-specific scenario forks."
     )
 
 
