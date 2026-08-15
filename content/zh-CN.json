@@ -1,7 +1,14 @@
 {
   "locale": "zh-CN",
   "routePrefix": "zh-cn",
-  "availableRoutes": ["", "pricing/", "early-access/"],
+  "availableRoutes": [
+    "",
+    "pricing/",
+    "early-access/",
+    "lessons/token-playground/",
+    "lessons/context-window/",
+    "lessons/agent-loop/"
+  ],
   "brand": "AhaFrame",
   "ui": {
     "nav": {
@@ -24,7 +31,7 @@
     }
   },
   "meta": {
-    "status": "marketing-ready",
-    "note": "Landing, pricing, and early-access are localized; learning routes are delivered by #46."
+    "status": "foundation-ready",
+    "note": "Landing, marketing, and Foundation lessons are localized; Production Labs and Integrated Build continue in #46."
   }
 }
