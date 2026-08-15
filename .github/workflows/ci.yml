@@ -29,6 +29,8 @@ jobs:
           fi
       - name: Test Lab Engine
         run: node scripts/test_lab_engine.js
+      - name: Test Integrated Build
+        run: node scripts/test_integrated_build.js
       - name: Test Validation Runtime
         run: node scripts/test_validation_runtime.js
       - name: Test i18n Foundation
@@ -47,6 +49,8 @@ jobs:
         run: python3 scripts/test_harness_localization.py
       - name: Validate Graph and Evaluation localization
         run: python3 scripts/test_graph_evaluation_localization.py
+      - name: Validate Integrated Build localization
+        run: python3 scripts/test_integrated_build_localization.py
       - name: Validate
         run: python3 scripts/validate.py
       - name: Validate instrumentation build
