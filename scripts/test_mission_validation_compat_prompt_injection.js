@@ -1,0 +1,13 @@
+'use strict';
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const path=require('node:path');
+const text=fs.readFileSync(path.join(__dirname,'..','src','assets','prompt-injection-attack.js'),'utf8');
+assert.ok(text.includes("'instruction_conflict_parameter_changed'"),'Prompt Injection Mission must preserve the stable instruction interaction event');
+assert.ok(text.includes("missionId:'prompt-injection-attack'"),'Prompt Injection interaction must carry additive missionId');
+assert.ok(!text.includes("'mission_policy_changed'"),'Prompt Injection Mission must not double-count with a second generic policy-change event');
+assert.ok(text.includes("'mission_started'"));
+assert.ok(text.includes("'simulation_run'"));
+assert.ok(text.includes("'release_decision_submitted'"));
+assert.ok(text.includes("'mission_completed'"));
+console.log('PASS Prompt Injection validation compatibility: stable route interaction event + additive Mission semantics, no double emission.');
