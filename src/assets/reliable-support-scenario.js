@@ -69,23 +69,25 @@
       const architectureScore=clamp(taskReadiness*0.35+reliability*0.35+safety*0.30,0,100);
       const evalPolicy=EVALUATION[state.evaluationPolicy].state;
       const productionCoverage=state.evaluationPolicy!=='demo';
-      const blockers=[]; const warnings=[];
+      const blockers=[]; const warnings=[]; const blockerDetails=[]; const warningDetails=[];
+      const block=(code,text,params={})=>{blockers.push(text);blockerDetails.push({code,params});};
+      const warn=(code,text,params={})=>{warnings.push(text);warningDetails.push({code,params});};
 
-      if(prompt.conflictCount>0)blockers.push(`Prompt contract still has ${prompt.conflictCount} unresolved conflict(s).`);
-      if(context.overflowTokens>0)blockers.push(`Context exceeds the fixed working budget by ${context.overflowTokens.toLocaleString()} tokens.`);
-      if(graph.failurePropagationRisk>0.25)blockers.push(`Graph failure propagation is ${(graph.failurePropagationRisk*100).toFixed(0)}%, above the modeled architecture limit.`);
-      if(agent.runawayRisk>0.15)blockers.push(`Loop runaway risk is ${(agent.runawayRisk*100).toFixed(1)}%, above the modeled execution limit.`);
-      if(architectureScore<evalPolicy.passThreshold)blockers.push(`Architecture score ${architectureScore.toFixed(1)} is below the ${evalPolicy.passThreshold} release threshold.`);
-      if(evalPolicy.safetyVeto&&safety<95)blockers.push(`Safety readiness ${safety.toFixed(1)} is below the 95-point consequential-action floor.`);
-      if(productionCoverage&&rag.recall*100<80)blockers.push(`Retrieval recall ${(rag.recall*100).toFixed(1)}% is below the production evidence floor.`);
-      if(productionCoverage&&context.criticalRetentionPercent<80)blockers.push(`Critical context retention ${context.criticalRetentionPercent.toFixed(1)}% is below the production floor.`);
-      if(evalPolicy.costGate&&costIndex>75)blockers.push(`Cost index ${costIndex.toFixed(1)} exceeds the configured budget of 75.`);
+      if(prompt.conflictCount>0)block('prompt-conflicts',`Prompt contract still has ${prompt.conflictCount} unresolved conflict(s).`,{count:prompt.conflictCount});
+      if(context.overflowTokens>0)block('context-overflow',`Context exceeds the fixed working budget by ${context.overflowTokens.toLocaleString()} tokens.`,{tokens:context.overflowTokens});
+      if(graph.failurePropagationRisk>0.25)block('graph-propagation',`Graph failure propagation is ${(graph.failurePropagationRisk*100).toFixed(0)}%, above the modeled architecture limit.`,{percent:Number((graph.failurePropagationRisk*100).toFixed(0))});
+      if(agent.runawayRisk>0.15)block('loop-runaway',`Loop runaway risk is ${(agent.runawayRisk*100).toFixed(1)}%, above the modeled execution limit.`,{percent:Number((agent.runawayRisk*100).toFixed(1))});
+      if(architectureScore<evalPolicy.passThreshold)block('architecture-threshold',`Architecture score ${architectureScore.toFixed(1)} is below the ${evalPolicy.passThreshold} release threshold.`,{score:Number(architectureScore.toFixed(1)),threshold:evalPolicy.passThreshold});
+      if(evalPolicy.safetyVeto&&safety<95)block('safety-floor',`Safety readiness ${safety.toFixed(1)} is below the 95-point consequential-action floor.`,{score:Number(safety.toFixed(1)),floor:95});
+      if(productionCoverage&&rag.recall*100<80)block('retrieval-recall-floor',`Retrieval recall ${(rag.recall*100).toFixed(1)}% is below the production evidence floor.`,{recall:Number((rag.recall*100).toFixed(1)),floor:80});
+      if(productionCoverage&&context.criticalRetentionPercent<80)block('critical-retention-floor',`Critical context retention ${context.criticalRetentionPercent.toFixed(1)}% is below the production floor.`,{retention:Number(context.criticalRetentionPercent.toFixed(1)),floor:80});
+      if(evalPolicy.costGate&&costIndex>75)block('cost-budget',`Cost index ${costIndex.toFixed(1)} exceeds the configured budget of 75.`,{cost:Number(costIndex.toFixed(1)),limit:75});
 
-      if(!prompt.promptClosed)warnings.push('Prompt authority is not fully closed; better runtime controls cannot repair an ambiguous instruction contract.');
-      if(graph.coordinationOverhead>55)warnings.push(`Graph coordination overhead is ${graph.coordinationOverhead.toFixed(0)}; simplify unless the decomposition creates measured value.`);
-      if(agent.humanReviewsPer100>35)warnings.push(`Approval improves control but creates about ${agent.humanReviewsPer100} reviews per 100 modeled runs.`);
-      if(state.evaluationPolicy==='demo')warnings.push('Demo evaluation underweights production-tail failures; a positive dashboard is weak release evidence.');
-      if(context.savingsPercent<25)warnings.push('Context quality is strong but context economics are weak.');
+      if(!prompt.promptClosed)warn('prompt-open','Prompt authority is not fully closed; better runtime controls cannot repair an ambiguous instruction contract.');
+      if(graph.coordinationOverhead>55)warn('graph-coordination',`Graph coordination overhead is ${graph.coordinationOverhead.toFixed(0)}; simplify unless the decomposition creates measured value.`,{value:Number(graph.coordinationOverhead.toFixed(0))});
+      if(agent.humanReviewsPer100>35)warn('approval-load',`Approval improves control but creates about ${agent.humanReviewsPer100} reviews per 100 modeled runs.`,{reviews:agent.humanReviewsPer100});
+      if(state.evaluationPolicy==='demo')warn('demo-evaluation','Demo evaluation underweights production-tail failures; a positive dashboard is weak release evidence.');
+      if(context.savingsPercent<25)warn('weak-context-economics','Context quality is strong but context economics are weak.');
 
       const evidenceMargin=architectureScore-evalPolicy.passThreshold;
       let decision='SHIP';
@@ -94,6 +96,7 @@
       let diagnosis='The architecture clears the modeled gate. Its remaining trade-offs are visible rather than hidden.';
       if(decision==='BLOCK')diagnosis=`Release blocked: ${blockers[0]}`;
       else if(decision==='INCONCLUSIVE')diagnosis='The architecture is plausible, but the modeled evidence margin is narrower than the evaluation evidence width.';
+      const diagnosisCode=decision==='BLOCK'?'blocked':decision==='INCONCLUSIVE'?'inconclusive':'healthy';
 
       const labels={prompt:PROMPT[state.promptPolicy].label,retrieval:RETRIEVAL[state.retrievalPolicy].label,context:CONTEXT[state.contextPolicy].label,execution:EXECUTION[state.executionPolicy].label,graph:GRAPH[state.graphPolicy].label,evaluation:EVALUATION[state.evaluationPolicy].label};
       const tradeoffs=[
@@ -103,7 +106,7 @@
         `Graph — ${labels.graph}: ${(graph.failurePropagationRisk*100).toFixed(0)}% failure propagation / ${graph.coordinationOverhead.toFixed(0)} coordination.`,
         `Evaluation — ${labels.evaluation}: ${evaluation.confidenceWidth.toFixed(1)}-point evidence width / ${evalPolicy.safetyVeto?'safety veto':'no safety veto'}.`,
       ];
-      return {labels,prompt,rag,context,agent,graph,evaluation,taskReadiness,reliability,safety,latencyIndex,costIndex,architectureScore,blockers,warnings,tradeoffs,decision,diagnosis,metrics:{taskReadiness,reliability,safety,latencyIndex,costIndex,architectureScore,blockerCount:blockers.length,warningCount:warnings.length}};
+      return {labels,prompt,rag,context,agent,graph,evaluation,taskReadiness,reliability,safety,latencyIndex,costIndex,architectureScore,blockers,warnings,blockerDetails,warningDetails,tradeoffs,decision,diagnosis,diagnosisCode,metrics:{taskReadiness,reliability,safety,latencyIndex,costIndex,architectureScore,blockerCount:blockers.length,warningCount:warnings.length}};
     },
   });
 })(typeof window!=='undefined'?window:globalThis);
