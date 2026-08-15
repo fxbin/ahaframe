@@ -1,33 +1,50 @@
-from .i18n import json_attr
-from .production import concept_guide, lab_header, lab_source, next_band, quick_answer, takeaways, write_lab
+from __future__ import annotations
 
-DOMAIN='production-harness'
+from .i18n import json_attr, load_content_source
+from .production import lab_header, next_band, quick_answer, takeaways, write_lab
+
+CONTENT_DOMAIN='mission-47000-retry'
+UI_DOMAIN='production-harness'
 
 
-def _options(values):
-    return ''.join(f'<option value="{key}">{label}</option>' for key,label in values.items())
+def _options(values: dict[str,str], selected: str) -> str:
+    return ''.join(
+        f'<option value="{key}"{" selected" if key == selected else ""}>{label}</option>'
+        for key,label in values.items()
+    )
 
 
-def _build(locale):
-    slug='agent-reliability';d=lab_source(locale,slug,DOMAIN);c=d['interactive'];metrics=c['metrics'];p=d['presentation']
-    body=f'''<div class="container">{lab_header(slug,'⌘',locale,d,DOMAIN)}{quick_answer(d['quick'],locale,DOMAIN)}
-    <div data-agent-reliability-lab data-agent-reliability-copy="{json_attr(p)}">
-      <section class="card interactive"><div class="panel-title"><span>{c['panelTitle']}</span><span class="badge">{c['simulation']}</span></div><p class="subtle">{c['intro']}</p>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:18px"><div>
-        <label class="label" for="agent-max-steps">{c['maxSteps']}</label><div class="control-row"><input id="agent-max-steps" class="slider" type="range" min="4" max="20" step="1" value="14"><output class="badge" data-agent-max-steps-value>14</output></div>
-        <label class="label" for="agent-retry-limit" style="display:block;margin-top:18px">{c['retryLimit']}</label><div class="control-row"><input id="agent-retry-limit" class="slider" type="range" min="0" max="5" step="1" value="4"><output class="badge" data-agent-retry-value>4</output></div>
-        <label class="label" for="agent-timeout" style="display:block;margin-top:18px">{c['timeout']}</label><div class="control-row"><input id="agent-timeout" class="slider" type="range" min="2" max="20" step="1" value="12"><output class="badge" data-agent-timeout-value>12 {p['seconds']}</output></div>
-      </div><div>
-        <label class="label" for="agent-termination">{c['termination']}</label><select id="agent-termination" class="select" style="margin-top:8px">{_options(c['terminationOptions'])}</select>
-        <button type="button" class="btn wide" data-agent-validation style="margin-top:16px">{p['validation']['off']}</button><button type="button" class="btn wide" data-agent-human style="margin-top:10px">{p['human']['off']}</button>
-        <div class="note" style="margin-top:16px">{c['irreversible']}</div><div class="actions" style="margin-top:16px"><button type="button" class="btn primary" data-agent-balanced>{c['preset']}</button><button type="button" class="btn" data-agent-reset>{c['reset']}</button></div>
-      </div></div></section>
-      <section class="card lesson-section" style="padding:20px;margin-top:18px"><div class="panel-title">{c['systemSees']}</div><div class="metrics" style="margin-top:14px">
-        <div class="metric">{metrics[0]}<br><strong data-agent-success>—</strong></div><div class="metric">{metrics[1]}<br><strong data-agent-reliability>—</strong></div><div class="metric">{metrics[2]}<br><strong data-agent-runaway>—</strong></div><div class="metric">{metrics[3]}<br><strong data-agent-unsafe>—</strong></div><div class="metric">{metrics[4]}<br><strong data-agent-latency>—</strong></div><div class="metric">{metrics[5]}<br><strong data-agent-cost>—</strong></div><div class="metric">{metrics[6]}<br><strong data-agent-reviews>—</strong></div>
-      </div><div class="note" style="margin-top:14px"><strong>{c['diagnosis']}:</strong> <span data-agent-diagnosis>—</span></div>
-      <div class="compare-grid" style="margin-top:16px"><div class="compare-card warn"><span class="label">{c['baseline']}</span><strong>{c['baselineStrong']}</strong><p class="subtle">{c['baselineText']}</p></div><span class="flow-arrow">→</span><div class="compare-card good"><span class="label">{c['current']}</span><div data-agent-compare style="display:grid;gap:6px;margin-top:6px"><span>{c['waiting']}</span></div></div></div></section>
-    </div>{takeaways(d['takeaways'],locale,DOMAIN)}{concept_guide(d,locale,DOMAIN)}{next_band(d['next'],locale)}</div>'''
-    write_lab(slug,locale,body,d,'<script src="/assets/agent-reliability.js" defer></script>',DOMAIN)
+def _build(locale: str):
+    slug='agent-reliability'
+    d=load_content_source(locale,CONTENT_DOMAIN)['mission']
+    ui=d['ui'];controls=d['controls'];evidence=d['evidenceLabels']
+    copy={'ui':ui,'evidenceLabels':evidence,'metrics':d['metrics'],'outcomes':d['outcomes'],'debrief':d['debrief']}
+    evidence_buttons=''.join(f'<button type="button" class="btn small" data-mission-evidence="{key}">{label}</button>' for key,label in evidence.items())
+    metric_cards=''.join(f'<div class="metric">{item["label"]}<br><strong data-mission-metric="{item["key"]}">—</strong></div>' for item in d['metrics'])
+
+    body=f'''<div class="container">{lab_header(slug,'↻',locale,d,UI_DOMAIN)}{quick_answer(d['quick'],locale,UI_DOMAIN)}
+    <div data-retry-mission data-mission-copy="{json_attr(copy)}">
+      <section class="card lesson-section" style="padding:22px"><span class="eyebrow">{d['brief']['eyebrow']}</span><h2>{d['brief']['title']}</h2><p><strong>{d['brief']['role']}</strong> {d['brief']['body']}</p><div class="note"><strong>{d['brief']['objective']}</strong><br>{d['brief']['stakes']}</div><div class="actions"><button type="button" class="btn primary" data-mission-start>{ui['start']}</button></div></section>
+      <div data-mission-workspace hidden>
+        <section class="card interactive" style="margin-top:18px"><div class="panel-title"><span>{ui['workspace']}</span><span class="badge"><span data-mission-budget>6</span> · {ui['budget']}</span></div>
+          <div class="lab-control-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:18px"><div><div class="label">{ui['evidence']}</div><div class="actions" style="margin-top:10px">{evidence_buttons}</div><div class="note" data-mission-evidence-view style="margin-top:14px;min-height:150px">{ui['waiting']}</div></div><div><div class="label">{ui['policy']}</div>
+            <label class="label" style="display:block;margin-top:10px">{controls['retry-limit']['label']}</label><select class="select" data-mission-control="retry-limit" data-value-type="number">{_options(controls['retry-limit']['options'],'2')}</select>
+            <label class="label" style="display:block;margin-top:12px">{controls['timeout']['label']}</label><select class="select" data-mission-control="timeout" data-value-type="number">{_options(controls['timeout']['options'],'4')}</select>
+            <label class="label" style="display:block;margin-top:12px">{controls['idempotency']['label']}</label><select class="select" data-mission-control="idempotency" data-value-type="string">{_options(controls['idempotency']['options'],'none')}</select>
+            <label class="label" style="display:block;margin-top:12px">{controls['approval']['label']}</label><select class="select" data-mission-control="approval" data-value-type="string">{_options(controls['approval']['options'],'none')}</select>
+            <label class="label" style="display:block;margin-top:12px">{controls['compensation']['label']}</label><select class="select" data-mission-control="compensation" data-value-type="string">{_options(controls['compensation']['options'],'none')}</select>
+            <label class="label" style="display:block;margin-top:12px">{controls['terminal-verifier']['label']}</label><select class="select" data-mission-control="terminal-verifier" data-value-type="boolean">{_options(controls['terminal-verifier']['options'],'false')}</select>
+            <div class="actions"><button type="button" class="btn primary" data-mission-run>{ui['run']}</button><button type="button" class="btn" data-mission-reset>{ui['reset']}</button></div><div class="status" data-mission-status></div>
+          </div></div>
+        </section>
+        <section class="card lesson-section" style="padding:20px;margin-top:18px"><div class="panel-title"><span>{ui['outcome']}</span><span class="badge" data-mission-outcome>—</span></div><div class="metrics" style="margin-top:14px">{metric_cards}</div></section>
+        <section class="card lesson-section" style="padding:20px;margin-top:18px"><div class="panel-title">{ui['attempts']}</div><div data-mission-attempts class="takeaways" style="margin-top:12px"><div class="takeaway"><span>{ui['noAttempts']}</span></div></div><div data-mission-compare class="note" style="margin-top:14px" hidden></div></section>
+        <section class="card lesson-section" style="padding:20px;margin-top:18px"><div class="panel-title">{ui['release']}</div><p class="subtle">{ui['releaseHint']}</p><div class="actions"><button type="button" class="btn" data-mission-decision="SHIP">{ui['ship']}</button><button type="button" class="btn" data-mission-decision="BLOCK">{ui['block']}</button><button type="button" class="btn" data-mission-decision="INCONCLUSIVE">{ui['inconclusive']}</button></div><div class="status" data-mission-decision-status></div></section>
+        <section class="card lesson-section" data-mission-debrief hidden style="padding:22px;margin-top:18px"><span class="eyebrow">{d['debrief']['eyebrow']}</span><h2>{d['debrief']['title']}</h2><div class="note"><strong>{d['debrief']['rule']}</strong></div><p>{d['debrief']['body']}</p><ul>{''.join(f'<li>{point}</li>' for point in d['debrief']['points'])}</ul><div class="actions"><button type="button" class="btn primary" data-mission-complete>{ui['complete']}</button></div></section>
+      </div>
+    </div>{takeaways(d['takeaways'],locale,UI_DOMAIN)}{next_band(d['next'],locale)}</div>'''
+    scripts=''.join(['<script src="/assets/mission-engine.js" defer></script>','<script src="/assets/47000-retry-scenario.js" defer></script>','<script src="/assets/47000-retry-mission.js" defer></script>','<script src="/assets/47000-retry.js" defer></script>'])
+    write_lab(slug,locale,body,d,scripts,UI_DOMAIN)
 
 
 def build():
