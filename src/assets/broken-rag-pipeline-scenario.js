@@ -50,14 +50,7 @@
     id:'broken-rag-pipeline-scenario',
     version:'0.8.0',
     title:'The Broken RAG Pipeline',
-    initialState:{
-      retrieval:'vector',
-      topK:5,
-      rerankDepth:0,
-      freshness:'off',
-      authority:'score-only',
-      compression:'none',
-    },
+    initialState:{retrieval:'vector',topK:5,rerankDepth:0,freshness:'off',authority:'score-only',compression:'none'},
     reduce(state,action){
       switch(action.type){
         case 'SET_RETRIEVAL': {
@@ -120,24 +113,11 @@
       const authoritativeCoveragePercent=authoritative?100:0;
 
       const retrievalTrace=ranking.map((doc)=>({
-        id:doc.id,
-        title:doc.title,
-        rank:doc.rank,
-        selected:doc.selected,
-        current:doc.current,
-        ageDays:doc.ageDays,
-        authority:doc.authority,
+        id:doc.id,title:doc.title,rank:doc.rank,selected:doc.selected,current:doc.current,ageDays:doc.ageDays,authority:doc.authority,
         initialScore:Number(doc.initialScore.toFixed(3)),
         rerankScore:doc.rerankScore===undefined?null:Number(doc.rerankScore.toFixed(3)),
       }));
-
-      const contextComposition=selected.map((doc)=>({
-        id:doc.id,
-        title:doc.title,
-        current:doc.current,
-        compressedTokens:Math.round(doc.tokens*compression.tokenFactor),
-        answerBearing:Boolean(doc.answer),
-      }));
+      const contextComposition=selected.map((doc)=>({id:doc.id,title:doc.title,current:doc.current,compressedTokens:Math.round(doc.tokens*compression.tokenFactor),answerBearing:Boolean(doc.answer)}));
 
       let diagnosisCode='HEALTHY';
       if(staleEvidenceRiskPercent>20)diagnosisCode='STALE_AUTHORITY';
@@ -148,12 +128,18 @@
 
       return {
         evidence:{
-          incident:{question:'Can I return a purchase after 40 days?',authoritativePolicy:'Refund Policy v3',authoritativeAnswer:'45 days'},
+          incident:{
+            question:'Can I return a purchase after 40 days?',
+            observedAnswer:answerSource?`${answerSource.answer}`:'No supported answer',
+            citedSourceId:answerSource?.id||null,
+            operationsNote:'A newer refund-policy document was published two days ago and is already indexed.',
+          },
           retrievalTrace,
           documents:selected.map((doc)=>({id:doc.id,title:doc.title,current:doc.current,ageDays:doc.ageDays,authority:doc.authority,answer:doc.answer})),
           contextComposition,
-          answer:{claim:answerSource?`${answerSource.answer}`:'No supported answer',sourceId:answerSource?.id||null,correct:answerCorrect,authoritativeAnswer:'45 days'},
+          answer:{claim:answerSource?`${answerSource.answer}`:'No supported answer',sourceId:answerSource?.id||null,citationTitle:answerSource?.title||null},
         },
+        answerCorrect,
         authoritativeCoveragePercent,
         staleEvidenceRiskPercent,
         groundingScore,
@@ -162,15 +148,7 @@
         latencyMs,
         costIndex,
         diagnosisCode,
-        metrics:{
-          authoritativeCoveragePercent,
-          staleEvidenceRiskPercent,
-          groundingScore,
-          contextTokens,
-          contextOverflowTokens,
-          latencyMs,
-          costIndex,
-        },
+        metrics:{authoritativeCoveragePercent,staleEvidenceRiskPercent,groundingScore,contextTokens,contextOverflowTokens,latencyMs,costIndex},
       };
     },
   });
