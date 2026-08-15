@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import { ThirdPartyAnalytics } from "../components/third-party-analytics";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -25,6 +26,7 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
           </div>
         </header>
         {children}
+        <ThirdPartyAnalytics />
       </body>
     </html>
   );
