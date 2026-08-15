@@ -1,30 +1,30 @@
 {
   "locale": "zh-CN",
   "routePrefix": "zh-cn",
-  "availableRoutes": [],
+  "availableRoutes": ["", "pricing/", "early-access/"],
   "brand": "AhaFrame",
   "ui": {
     "nav": {
-      "lessons": "\u8bfe\u7a0b",
-      "roadmap": "\u5b66\u4e60\u8def\u5f84",
-      "pricing": "\u5b9a\u4ef7",
-      "about": "\u5173\u4e8e",
-      "early_access": "\u52a0\u5165\u5185\u6d4b",
-      "menu": "\u83dc\u5355"
+      "lessons": "课程",
+      "roadmap": "学习路径",
+      "pricing": "定价",
+      "about": "关于",
+      "early_access": "加入内测",
+      "menu": "菜单"
     },
     "footer": {
-      "tagline": "\u9762\u5411 AI \u5de5\u7a0b\u7684\u4ea4\u4e92\u5f0f\u53ef\u89c6\u5316\u5b66\u4e60\u3002",
-      "sitemap": "\u7ad9\u70b9\u5730\u56fe",
-      "about": "\u5173\u4e8e",
-      "early_access": "\u5185\u6d4b"
+      "tagline": "面向 AI 工程的交互式可视化学习。",
+      "sitemap": "站点地图",
+      "about": "关于",
+      "early_access": "内测"
     },
     "language": {
       "en": "English",
-      "zh-CN": "\u7b80\u4f53\u4e2d\u6587"
+      "zh-CN": "简体中文"
     }
   },
   "meta": {
-    "status": "shell-only",
-    "note": "Full zh-CN page copy is intentionally delivered by localization milestones #45 and #46."
+    "status": "marketing-ready",
+    "note": "Landing, pricing, and early-access are localized; learning routes are delivered by #46."
   }
 }
