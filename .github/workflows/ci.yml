@@ -39,6 +39,8 @@ jobs:
         env:
           AHAFRAME_BASE_URL: https://ahaframe.com
         run: python3 scripts/build_site.py
+      - name: Validate Foundation localization
+        run: python3 scripts/test_foundation_localization.py
       - name: Validate
         run: python3 scripts/validate.py
       - name: Validate instrumentation build
