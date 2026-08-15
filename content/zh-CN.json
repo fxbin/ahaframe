@@ -1,0 +1,28 @@
+{
+  "locale": "zh-CN",
+  "routePrefix": "zh-cn",
+  "brand": "AhaFrame",
+  "ui": {
+    "nav": {
+      "lessons": "\u8bfe\u7a0b",
+      "roadmap": "\u5b66\u4e60\u8def\u5f84",
+      "pricing": "\u5b9a\u4ef7",
+      "about": "\u5173\u4e8e",
+      "early_access": "\u52a0\u5165\u5185\u6d4b",
+      "menu": "\u83dc\u5355"
+    },
+    "footer": {
+      "sitemap": "\u7ad9\u70b9\u5730\u56fe",
+      "about": "\u5173\u4e8e",
+      "early_access": "\u5185\u6d4b"
+    },
+    "language": {
+      "en": "English",
+      "zh-CN": "\u7b80\u4f53\u4e2d\u6587"
+    }
+  },
+  "meta": {
+    "status": "shell-only",
+    "note": "Full zh-CN page copy is intentionally delivered by localization milestones #45 and #46."
+  }
+}
