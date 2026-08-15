@@ -173,12 +173,26 @@ def test_mobile_contract():
                 assert soup.select_one('input[type="range"], select') is not None, (locale,relative,'interactive control')
 
 
+def annotation(value: object) -> str:
+    text=str(value).replace('%','%25').replace('\r','%0D').replace('\n','%0A')
+    return text[:7000]
+
+
 def main():
-    test_content_sources()
-    test_pages_and_alternates()
-    test_sitemap_and_geo()
-    test_shared_runtime_and_backend_contract()
-    test_mobile_contract()
+    checks=(
+        ('content-source-leakage',test_content_sources),
+        ('page-seo-and-alternates',test_pages_and_alternates),
+        ('sitemap-and-geo',test_sitemap_and_geo),
+        ('runtime-and-backend',test_shared_runtime_and_backend_contract),
+        ('mobile-contract',test_mobile_contract),
+    )
+    for name,check in checks:
+        try:
+            check()
+            print(f'PASS {name}')
+        except Exception as exc:
+            print(f'::error title=Localization QA {name}::{annotation(exc)}')
+            raise
     print(f'PASS release localization QA: {len(PUBLIC_ROUTE_RELATIVES)} route pairs, reciprocal SEO, bilingual sitemap/GEO, leakage guard, locale analytics contract, and mobile structure.')
 
 
