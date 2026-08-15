@@ -83,7 +83,8 @@ These dimensions remain independent:
 
 ```text
 cohortId     = experiment / validation group
-locale       = presentation language\ UTM fields   = acquisition attribution
+locale       = presentation language
+UTM fields   = acquisition attribution
 anonymous ID = pseudonymous browser identity
 ```
 
