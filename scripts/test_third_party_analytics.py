@@ -9,6 +9,7 @@ ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'scripts'))
 
 from ahaframe.third_party_analytics import (  # noqa: E402
+    DEFAULT_GA_MEASUREMENT_ID,
     GA_MARKER,
     VERCEL_MARKER,
     ga4_head_snippet,
@@ -33,6 +34,7 @@ def restore_env(name:str,prior:str|None):
 def test_ga_id_contract():
     prior_next=with_env('NEXT_PUBLIC_GA_MEASUREMENT_ID','g-test123')
     prior_legacy=with_env('AHAFRAME_GA_MEASUREMENT_ID',None)
+    prior_base=with_env('AHAFRAME_BASE_URL','http://localhost:8080')
     try:
         assert google_analytics_id()=='G-TEST123'
         os.environ['NEXT_PUBLIC_GA_MEASUREMENT_ID']='not-valid'
@@ -42,9 +44,15 @@ def test_ga_id_contract():
             assert 'G-XXXXXXXXXX' in str(exc)
         else:
             raise AssertionError('invalid GA4 ID must fail')
+
+        os.environ.pop('NEXT_PUBLIC_GA_MEASUREMENT_ID',None)
+        assert google_analytics_id()==''
+        os.environ['AHAFRAME_BASE_URL']='https://ahaframe.com'
+        assert google_analytics_id()==DEFAULT_GA_MEASUREMENT_ID=='G-EWPR5QXGWJ'
     finally:
         restore_env('NEXT_PUBLIC_GA_MEASUREMENT_ID',prior_next)
         restore_env('AHAFRAME_GA_MEASUREMENT_ID',prior_legacy)
+        restore_env('AHAFRAME_BASE_URL',prior_base)
 
 
 def test_static_injection():
@@ -69,6 +77,9 @@ def test_generated_public_site():
     source=homepage.read_text(encoding='utf-8')
     assert VERCEL_MARKER in source,'public CI build must contain Vercel Web Analytics'
     assert '/_vercel/insights/script.js' in source
+    assert GA_MARKER in source,'public CI build must contain GA4'
+    assert 'googletagmanager.com/gtag/js?id=G-EWPR5QXGWJ' in source
+    assert "gtag('config',\"G-EWPR5QXGWJ\")" in source
 
 
 def test_next_migration_contract():
@@ -78,6 +89,7 @@ def test_next_migration_contract():
     assert '@vercel/analytics/next' in component
     assert '<Analytics />' in component
     assert 'NEXT_PUBLIC_GA_MEASUREMENT_ID' in component
+    assert 'G-EWPR5QXGWJ' in component
     assert 'googletagmanager.com/gtag/js' in component
     layout=(ROOT/'web/app/layout.tsx').read_text(encoding='utf-8')
     assert '<ThirdPartyAnalytics />' in layout
@@ -88,7 +100,7 @@ def main():
     test_static_injection()
     test_generated_public_site()
     test_next_migration_contract()
-    print('PASS Traffic Analytics: static Vercel Analytics, GA4 configuration contract, idempotent injection, and Next.js migration integration.')
+    print('PASS Traffic Analytics: Vercel Analytics and GA4 G-EWPR5QXGWJ are present in public builds, with local opt-out, override validation, and Next.js migration parity.')
 
 
 if __name__=='__main__': main()

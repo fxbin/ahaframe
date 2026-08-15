@@ -18,28 +18,30 @@ ROOT = Path(__file__).resolve().parents[2]
 SITE = ROOT / "site"
 
 GA_PATTERN = re.compile(r"^G-[A-Z0-9]+$")
+DEFAULT_GA_MEASUREMENT_ID = "G-EWPR5QXGWJ"
 VERCEL_MARKER = 'data-ahaframe-analytics="vercel"'
 GA_MARKER = 'data-ahaframe-analytics="ga4"'
-
-
-def google_analytics_id() -> str:
-    raw = (
-        os.environ.get("NEXT_PUBLIC_GA_MEASUREMENT_ID")
-        or os.environ.get("AHAFRAME_GA_MEASUREMENT_ID")
-        or ""
-    ).strip().upper()
-    if raw and not GA_PATTERN.fullmatch(raw):
-        raise SystemExit(
-            "Google Analytics Measurement ID must use GA4 format G-XXXXXXXXXX "
-            "(NEXT_PUBLIC_GA_MEASUREMENT_ID or AHAFRAME_GA_MEASUREMENT_ID)."
-        )
-    return raw
 
 
 def is_public_build() -> bool:
     raw = os.environ.get("AHAFRAME_BASE_URL", "http://localhost:8080").strip()
     parsed = urlparse(raw)
     return parsed.hostname not in {"localhost", "127.0.0.1", None}
+
+
+def google_analytics_id() -> str:
+    configured = (
+        os.environ.get("NEXT_PUBLIC_GA_MEASUREMENT_ID")
+        or os.environ.get("AHAFRAME_GA_MEASUREMENT_ID")
+        or ""
+    ).strip().upper()
+    raw = configured or (DEFAULT_GA_MEASUREMENT_ID if is_public_build() else "")
+    if raw and not GA_PATTERN.fullmatch(raw):
+        raise SystemExit(
+            "Google Analytics Measurement ID must use GA4 format G-XXXXXXXXXX "
+            "(NEXT_PUBLIC_GA_MEASUREMENT_ID or AHAFRAME_GA_MEASUREMENT_ID)."
+        )
+    return raw
 
 
 def ga4_head_snippet(measurement_id: str) -> str:

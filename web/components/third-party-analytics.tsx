@@ -2,9 +2,15 @@ import { Analytics } from "@vercel/analytics/next";
 import Script from "next/script";
 
 const GA_PATTERN = /^G-[A-Z0-9]+$/;
+const DEFAULT_GA_MEASUREMENT_ID = "G-EWPR5QXGWJ";
 
 function googleAnalyticsId(): string {
-  const value = (process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ?? "").trim().toUpperCase();
+  const configured = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
+  const value = (
+    configured ?? (process.env.NODE_ENV === "production" ? DEFAULT_GA_MEASUREMENT_ID : "")
+  )
+    .trim()
+    .toUpperCase();
   if (value && !GA_PATTERN.test(value)) {
     throw new Error("NEXT_PUBLIC_GA_MEASUREMENT_ID must use GA4 format G-XXXXXXXXXX.");
   }
