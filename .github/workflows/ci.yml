@@ -39,6 +39,20 @@ jobs:
         run: node scripts/test_lab_engine.js
       - name: Test Mission Engine
         run: node scripts/test_mission_engine.js
+      - name: Test flagship Mission scenarios
+        run: |
+          set -euo pipefail
+          found=0
+          for test_file in scripts/test_mission_*.js; do
+            [ -e "$test_file" ] || continue
+            [ "$test_file" = "scripts/test_mission_engine.js" ] && continue
+            found=1
+            echo "Running $test_file"
+            node "$test_file"
+          done
+          if [ "$found" -eq 0 ]; then
+            echo 'No flagship Mission scenario tests found yet.'
+          fi
       - name: Test Integrated Build
         run: node scripts/test_integrated_build.js
       - name: Test Validation Runtime
