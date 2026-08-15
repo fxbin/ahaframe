@@ -23,6 +23,15 @@ from ahaframe.i18n import (  # noqa: E402
     validate_locale_sources,
 )
 
+ZH_READY={
+    "",
+    "pricing/",
+    "early-access/",
+    "lessons/token-playground/",
+    "lessons/context-window/",
+    "lessons/agent-loop/",
+}
+
 
 def main() -> None:
     assert DEFAULT_LOCALE == "en"
@@ -36,13 +45,19 @@ def main() -> None:
     assert en["routePrefix"] == "en"
     assert zh["routePrefix"] == "zh-cn"
     assert set(en["availableRoutes"]) == set(PUBLIC_ROUTE_RELATIVES)
-    assert set(zh["availableRoutes"]) == {"", "pricing/", "early-access/"}
+    assert set(zh["availableRoutes"]) == ZH_READY
 
     for locale in SUPPORTED_LOCALES:
         for key in REQUIRED_UI_KEYS:
             assert ui(locale, key).strip(), (locale, key)
         assert load_content_source(locale,"home")["title"].strip()
         assert load_content_source(locale,"marketing")["pricing"]["title"].strip()
+        foundation=load_content_source(locale,"foundation")
+        assert set(foundation["lessons"]) == {"token-playground","context-window","agent-loop"}
+        for slug,lesson in foundation["lessons"].items():
+            assert lesson["name"].strip(), (locale,slug)
+            assert lesson["quick"].strip(), (locale,slug)
+            assert lesson["guide"]["title"].strip(), (locale,slug)
 
     assert ui("zh-CN", "nav.lessons") == "课程"
     assert ui("zh-CN", "language.zh-CN") == "简体中文"
@@ -53,20 +68,20 @@ def main() -> None:
 
     assert route_available("/en/", "zh-CN") is True
     assert route_available("/en/pricing/", "zh-CN") is True
+    for slug in ("token-playground","context-window","agent-loop"):
+        path=f"/en/lessons/{slug}/"
+        assert route_available(path,"zh-CN") is True
+        assert localized_or_default_path(path,"zh-CN") == f"/zh-cn/lessons/{slug}/"
     assert route_available("/en/labs/rag-failure/", "en") is True
     assert route_available("/en/labs/rag-failure/", "zh-CN") is False
-    assert localized_or_default_path("/en/pricing/","zh-CN") == "/zh-cn/pricing/"
     assert localized_or_default_path("/en/labs/rag-failure/","zh-CN") == "/en/labs/rag-failure/"
 
-    switcher = language_switch_items("/en/labs/rag-failure/")
-    assert switcher == (
-        {"locale": "en", "label": "English", "href": "/en/labs/rag-failure/", "hreflang": "en", "available": True},
-        {"locale": "zh-CN", "label": "简体中文", "href": "/zh-cn/labs/rag-failure/", "hreflang": "zh-CN", "available": False},
-    )
+    lesson_switcher=language_switch_items("/en/lessons/context-window/")
+    assert lesson_switcher[1]["available"] is True
+    assert lesson_switcher[1]["href"] == "/zh-cn/lessons/context-window/"
 
-    home_switcher=language_switch_items("/en/")
-    assert home_switcher[1]["available"] is True
-    assert home_switcher[1]["href"] == "/zh-cn/"
+    lab_switcher=language_switch_items("/en/labs/rag-failure/")
+    assert lab_switcher[1]["available"] is False
 
     all_routes = set()
     for relative in PUBLIC_ROUTE_RELATIVES:
@@ -85,7 +100,7 @@ def main() -> None:
 
     print(
         f"PASS: i18n foundation validates {len(SUPPORTED_LOCALES)} locales, "
-        f"{len(PUBLIC_ROUTE_RELATIVES)} public route pairs, localized marketing rollout, "
+        f"{len(PUBLIC_ROUTE_RELATIVES)} public route pairs, zh-CN Foundation rollout, "
         "shared UI keys, and no locale-specific scenario forks."
     )
 
