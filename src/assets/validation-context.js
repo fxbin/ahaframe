@@ -6,6 +6,7 @@
   const ATTR_KEY='ahaframe_validation_attribution_v1';
   const COHORT_KEY='ahaframe_validation_cohort_v1';
   const FEEDBACK_KEY='ahaframe_aha_feedback_v1';
+  const WAITLIST_KEY='ahaframe_waitlist';
   const STRONG_AHA=new Set(['yes','aha']);
   const PREFIX_LOCALES={'en':'en','zh-cn':'zh-CN'};
   const ROUTES={
@@ -74,9 +75,29 @@
     if(!response.ok)throw new Error('feedback submission failed');
     return {ok:true,remote:true,mode:'remote',payload};
   }
+  function buildWaitlistPayload(email,intent='waitlist'){
+    const normalized=String(email||'').trim().toLowerCase();
+    if(!/^\S+@\S+\.\S+$/.test(normalized))throw new RangeError('Enter a valid email address.');
+    const c=getContext();
+    const normalizedIntent=String(intent||'waitlist').trim().slice(0,120)||'waitlist';
+    return {email:normalized,intent:normalizedIntent,source:pathname(),createdAt:now(),anonymousUserId:c.anonymousUserId,sessionId:c.sessionId,cohortId:c.cohortId,locale:c.locale,layer:c.layer,labId:c.labId,labVersion:c.labVersion,utmSource:c.utmSource,utmMedium:c.utmMedium,utmCampaign:c.utmCampaign,firstUtmSource:c.firstUtmSource,referrer:c.referrer,deviceClass:c.deviceClass};
+  }
+  async function submitWaitlist(email,intent='waitlist'){
+    const payload=buildWaitlistPayload(email,intent); const endpoint=root.AHAFRAME_CONFIG?.waitlistEndpoint;
+    if(!endpoint){
+      const prior=read(root.localStorage,WAITLIST_KEY,[]).filter((item)=>item?.email!==payload.email);
+      prior.push(payload); write(root.localStorage,WAITLIST_KEY,prior);
+      return {ok:true,remote:false,mode:'demo',payload};
+    }
+    const response=await root.fetch(endpoint,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(payload)});
+    if(!response.ok)throw new Error('waitlist submission failed');
+    return {ok:true,remote:true,mode:'remote',payload};
+  }
   AhaFrame.getValidationContext=getContext;
   AhaFrame.buildFeedbackPayload=buildFeedbackPayload;
   AhaFrame.submitFeedback=submitFeedback;
+  AhaFrame.buildWaitlistPayload=buildWaitlistPayload;
+  AhaFrame.submitWaitlist=submitWaitlist;
   AhaFrame.isStrongAha=(rating)=>STRONG_AHA.has(rating);
-  AhaFrame.validationContext={getContext,buildFeedbackPayload,submitFeedback};
+  AhaFrame.validationContext={getContext,buildFeedbackPayload,submitFeedback,buildWaitlistPayload,submitWaitlist};
 })(typeof window!=='undefined'?window:globalThis);

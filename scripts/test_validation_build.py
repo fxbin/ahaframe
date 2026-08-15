@@ -38,7 +38,7 @@ for page in pages:
         raise SystemExit(f'{page.relative_to(SITE)} has invalid validation/runtime script order: {scripts}')
 
 context_source=(SITE/'assets/validation-context.js').read_text(encoding='utf-8')
-for token in ['anonymousUserId','sessionId','returnVisit','firstUtmSource','feedbackEndpoint','strongAha']:
+for token in ['anonymousUserId','sessionId','returnVisit','firstUtmSource','feedbackEndpoint','strongAha','buildWaitlistPayload','submitWaitlist']:
     if token not in context_source:
         raise SystemExit(f'validation-context.js missing {token}')
 
@@ -48,12 +48,27 @@ for event in ['meaningful_interaction','failure_tradeoff_observed','aha_feedback
         raise SystemExit(f'validation-ui.js missing canonical event {event}')
 
 app_source=(SITE/'assets/app.js').read_text(encoding='utf-8')
-for token in ['schemaVersion','eventId','getValidationContext','waitlist_submitted','waitlist_demo_saved']:
+for token in ['schemaVersion','eventId','getValidationContext','waitlist_submitted','waitlist_demo_saved','early_access_viewed','early_access_form_started','early_access_submit_attempt','early_access_submit_success','early_access_submit_error','inFlight','aria-busy']:
     if token not in app_source:
-        raise SystemExit(f'app.js missing validation integration token {token}')
+        raise SystemExit(f'app.js missing validation/conversion integration token {token}')
+
+for early_page in [SITE/'en/early-access/index.html',SITE/'zh-cn/early-access/index.html']:
+    soup=BeautifulSoup(early_page.read_text(encoding='utf-8'),'html.parser')
+    form=soup.select_one('[data-waitlist-form]')
+    if not form:
+        raise SystemExit(f'{early_page.relative_to(SITE)} missing waitlist form')
+    email=form.select_one('input[name="email"][type="email"][required]')
+    submit=form.select_one('button[type="submit"]')
+    status=soup.select_one('[data-status][role="status"][aria-live="polite"]')
+    success=soup.select_one('[data-waitlist-success][hidden]')
+    trust=soup.select_one('[data-waitlist-trust]')
+    if not all([email,submit,status,success,trust]):
+        raise SystemExit(f'{early_page.relative_to(SITE)} missing production Early Access UX contract')
+    if 'Demo mode' in trust.get_text(' ',strip=True) or '演示模式' in trust.get_text(' ',strip=True):
+        raise SystemExit(f'{early_page.relative_to(SITE)} exposes demo-mode copy in production trust text')
 
 backend=subprocess.run([sys.executable,str(ROOT/'scripts/test_validation_backend.py')],capture_output=True,text=True)
 if backend.returncode:
     raise SystemExit(f'validation backend contract failed\n{backend.stdout}\n{backend.stderr}')
 
-print(f'PASS Validation Build: {len(pages)} generated pages load anonymous context, semantic analytics, Aha feedback, Lab Engine, and the storage backend contract.')
+print(f'PASS Validation Build: {len(pages)} generated pages load anonymous context, semantic analytics, production-ready Early Access conversion, Aha feedback, Lab Engine, and the storage backend contract.')

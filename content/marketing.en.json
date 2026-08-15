@@ -31,7 +31,10 @@
     "emailLabel": "Email address",
     "placeholder": "you@example.com",
     "button": "Join Early Access →",
-    "demoNote": "MVP: submissions are stored locally unless the remote waitlist endpoint is configured at build time.",
+    "trustNote": "No payment. Your email is used only for AhaFrame early-access invitations and product updates.",
+    "successTitle": "You're on the list.",
+    "successCopy": "We'll email you when new labs or Alpha invitations are ready. You can keep exploring the free labs now.",
+    "successLink": "Explore free labs →",
     "cards": [["01","Interactive mental models","Understand hidden AI-system behavior before memorizing framework APIs."],["02","Failure simulations","Break RAG, agents, context, and evaluation systems in repeatable scenarios."],["03","Production labs","Move from conceptual intuition to architecture, debugging, and implementation trade-offs."]]
   }
 }
