@@ -42,7 +42,7 @@ def _build(locale: str):
         <section class="card lesson-section" style="padding:20px;margin-top:18px"><div class="panel-title">{ui['release']}</div><p class="subtle">{ui['releaseHint']}</p><div class="actions"><button type="button" class="btn" data-mission-decision="SHIP">{ui['ship']}</button><button type="button" class="btn" data-mission-decision="BLOCK">{ui['block']}</button><button type="button" class="btn" data-mission-decision="INCONCLUSIVE">{ui['inconclusive']}</button></div><div class="status" data-mission-decision-status></div></section>
         <section class="card lesson-section" data-mission-debrief hidden style="padding:22px;margin-top:18px"><span class="eyebrow">{d['debrief']['eyebrow']}</span><h2>{d['debrief']['title']}</h2><div class="note"><strong>{d['debrief']['rule']}</strong></div><p>{d['debrief']['body']}</p><ul>{''.join(f'<li>{point}</li>' for point in d['debrief']['points'])}</ul><div class="actions"><button type="button" class="btn primary" data-mission-complete>{ui['complete']}</button></div></section>
       </div>
-    </div>{takeaways(d['takeaways'],locale,UI_DOMAIN)}{next_band(d['next'],locale)}</div>'''
+    </div>{takeaways(d['takeaways'],locale,UI_DOMAIN)}{next_band(d['next'],locale)}{next_band(d['earlyAccess'],locale)}</div>'''
     scripts=''.join(['<script src="/assets/mission-engine.js" defer></script>','<script src="/assets/47000-retry-scenario.js" defer></script>','<script src="/assets/47000-retry-mission.js" defer></script>','<script src="/assets/47000-retry.js" defer></script>'])
     write_lab(slug,locale,body,d,scripts,UI_DOMAIN)
 
