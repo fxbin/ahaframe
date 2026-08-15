@@ -123,7 +123,7 @@ def test_shared_runtime_and_backend_contract():
     check=ui.split('function checkCapstone',1)[1].split('function bindFallbackControls',1)[0]
     assert "dataset.decision==='SHIP'" in check and "textContent||''" not in check,'capstone completion must use stable decision enum'
     combined='\n'.join(p.read_text(encoding='utf-8') for p in (SITE/'assets').glob('*.js')); assert not re.search(r"track\(['\"][^'\"]*(?:_zh|zh_|_cn|cn_)[^'\"]*['\"]",combined,re.I),'locale-specific analytics event name found'
-    migration=(ROOT/'supabase/migrations/202608150001_validation_locale.sql').read_text(encoding='utf-8'); ingest=(ROOT/'supabase/functions/validation-ingest/index.ts').read_text(encoding='utf-8')
+    migration=(ROOT/'supabase/migrations/20260815000100_validation_locale.sql').read_text(encoding='utf-8'); ingest=(ROOT/'supabase/functions/validation-ingest/index.ts').read_text(encoding='utf-8')
     assert migration.count('add column if not exists locale')==3 and ingest.count('locale: locale(body.locale)')==3
 
 
