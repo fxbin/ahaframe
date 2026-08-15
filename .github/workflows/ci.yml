@@ -49,6 +49,8 @@ jobs:
         env:
           AHAFRAME_BASE_URL: https://ahaframe.com
         run: python3 scripts/build_site.py
+      - name: Validate language switcher
+        run: python3 scripts/test_language_switcher.py
       - name: Validate third-party analytics
         run: python3 scripts/test_third_party_analytics.py
       - name: Validate Foundation localization
