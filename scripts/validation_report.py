@@ -25,7 +25,8 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
-RESERVED_COHORTS = {"production-smoke"}
+RESERVED_COHORTS = {"production-smoke", "production_smoke_test"}
+SMOKE_PROBE_COHORT = "production-smoke"
 LOW_SAMPLE_N = 5
 
 METRIC_ORDER = [
@@ -207,6 +208,8 @@ class EvidenceBundle:
     participants: list[dict[str, Any]]
     feedback: list[dict[str, Any]]
     quality: list[dict[str, Any]]
+    smoke_metrics: list[dict[str, Any]] | None = None
+    smoke_raw_present: bool | None = None
 
 
 def fetch_evidence(client: SupabaseRestClient, cohort: str, start: datetime, end: datetime) -> EvidenceBundle:
@@ -223,17 +226,43 @@ def fetch_evidence(client: SupabaseRestClient, cohort: str, start: datetime, end
         [cohort_filter, ("submitted_at", f"gte.{iso(start)}"), ("submitted_at", f"lt.{iso(end)}")],
         order="submitted_at.desc",
     )
-    quality = client.select(
+
+    # Include target-cohort issues plus unattributed/global issues. Missing cohort is
+    # itself a data-health condition, so filtering only by the target cohort would
+    # hide exactly the evidence the operator needs to see.
+    quality_candidates = client.select(
         "validation_data_quality_issues_v1",
         "severity,issue_code,cohort_id,lab_id,observed_at,detail",
-        [cohort_filter],
+        [("observed_at", f"gte.{iso(start)}"), ("observed_at", f"lt.{iso(end)}")],
         order="observed_at.desc",
     )
+    quality = [
+        row
+        for row in quality_candidates
+        if safe_text(row.get("cohort_id")).strip() in {"", cohort}
+    ]
+
+    # A report must not claim smoke exclusion passed just because the SQL contract
+    # says so. Exercise the canonical production-smoke cohort in the same window:
+    # raw smoke evidence must exist and every Product Gate metric must stay zero.
+    smoke_raw_rows = client.select(
+        "validation_events",
+        "cohort_id",
+        [
+            ("cohort_id", f"eq.{SMOKE_PROBE_COHORT}"),
+            ("event_ts", f"gte.{iso(start)}"),
+            ("event_ts", f"lt.{iso(end)}"),
+        ],
+        limit=1,
+    )
+
     return EvidenceBundle(
         metrics=client.metrics(cohort, start, end),
         participants=participants,
         feedback=feedback,
         quality=quality,
+        smoke_metrics=client.metrics(SMOKE_PROBE_COHORT, start, end),
+        smoke_raw_present=bool(smoke_raw_rows),
     )
 
 
@@ -244,6 +273,8 @@ def load_fixture(path: Path) -> EvidenceBundle:
         participants=list(data.get("participants", [])),
         feedback=list(data.get("feedback", [])),
         quality=list(data.get("quality", [])),
+        smoke_metrics=list(data.get("smoke_metrics", [])) if "smoke_metrics" in data else None,
+        smoke_raw_present=bool(data.get("smoke_raw_present")) if "smoke_raw_present" in data else None,
     )
 
 
@@ -290,6 +321,24 @@ def latest_timestamp(participants: list[dict[str, Any]], feedback: list[dict[str
     return max(values) if values else None
 
 
+def smoke_exclusion_status(bundle: EvidenceBundle) -> str:
+    if bundle.smoke_raw_present is None or bundle.smoke_metrics is None:
+        return "NOT CHECKED"
+    if not bundle.smoke_raw_present:
+        return "NOT EXERCISED"
+    if not bundle.smoke_metrics:
+        return "UNKNOWN"
+    has_unique_visitor_metric = any(
+        safe_text(row.get("metric_key")) == "unique_cohort_visitors"
+        for row in bundle.smoke_metrics
+    )
+    any_nonzero = any(
+        int(row.get("numerator") or 0) != 0 or int(row.get("denominator") or 0) != 0
+        for row in bundle.smoke_metrics
+    )
+    return "PASS" if has_unique_visitor_metric and not any_nonzero else "FAIL"
+
+
 def build_model(
     bundle: EvidenceBundle,
     cohort: str,
@@ -323,12 +372,21 @@ def build_model(
     ]
     error_count = sum(row["count"] for row in quality_summary if row["severity"] == "ERROR")
     warning_count = sum(row["count"] for row in quality_summary if row["severity"] == "WARNING")
+    unattributed_quality_count = sum(
+        1 for row in bundle.quality if not safe_text(row.get("cohort_id")).strip()
+    )
 
-    latest = latest_timestamp(bundle.participants, bundle.feedback, bundle.quality)
+    # Global/unattributed quality warnings should be visible, but must not make an
+    # empty cohort look fresh. Freshness tracks evidence attributable to the cohort.
+    cohort_quality = [
+        row for row in bundle.quality if safe_text(row.get("cohort_id")).strip() == cohort
+    ]
+    latest = latest_timestamp(bundle.participants, bundle.feedback, cohort_quality)
     freshness_hours = None
     if latest:
         freshness_hours = max(0.0, (generated_at - latest).total_seconds() / 3600)
 
+    smoke_status = smoke_exclusion_status(bundle)
     report_warnings = []
     visitor_metric = metrics_by_key.get("unique_cohort_visitors", {})
     visitor_count = int(visitor_metric.get("numerator") or 0)
@@ -342,6 +400,18 @@ def build_model(
         report_warnings.append(f"Data health contains {error_count} ERROR occurrence(s); investigate before using this report for Product Gate decisions.")
     if warning_count:
         report_warnings.append(f"Data health contains {warning_count} WARNING occurrence(s); review caveats before interpreting evidence.")
+    if unattributed_quality_count:
+        report_warnings.append(
+            f"Data health includes {unattributed_quality_count} unattributed/global issue occurrence(s); these are shown because missing cohort attribution can itself invalidate evidence."
+        )
+    if smoke_status == "FAIL":
+        report_warnings.append("Smoke exclusion probe FAILED: reserved production-smoke evidence reached Product Gate metrics.")
+    elif smoke_status == "UNKNOWN":
+        report_warnings.append("Smoke exclusion probe is UNKNOWN because the Product Gate metric function returned no probe rows.")
+    elif smoke_status == "NOT EXERCISED":
+        report_warnings.append("Smoke exclusion probe was not exercised because no raw production-smoke event exists in this analysis window.")
+    elif smoke_status == "NOT CHECKED":
+        report_warnings.append("Smoke exclusion probe was not checked by this evidence source.")
     if cohort in RESERVED_COHORTS:
         report_warnings.append("This is a reserved smoke/test cohort. Product metrics are expected to be zero by design.")
 
@@ -380,11 +450,12 @@ def build_model(
         "quality_rows": bundle.quality,
         "quality_errors": error_count,
         "quality_warnings": warning_count,
+        "unattributed_quality_count": unattributed_quality_count,
         "latest_evidence_at": iso(latest) if latest else None,
         "freshness_hours": freshness_hours,
         "report_warnings": report_warnings,
         "caveats": list(CORE_CAVEATS),
-        "smoke_exclusion": "PASS",
+        "smoke_exclusion": smoke_status,
         "want_more_labs": "NOT DIRECTLY MEASURABLE",
     }
 
@@ -428,8 +499,8 @@ def render_markdown(model: dict[str, Any], redact_notes: bool = False) -> str:
         f"- **Cohort:** `{model['cohort']}`",
         f"- **Window:** `{model['window_start']}` → `{model['window_end']}`",
         f"- **Generated:** `{model['generated_at']}`",
-        f"- **Latest evidence:** `{model['latest_evidence_at'] or 'none'}`",
-        f"- **Smoke exclusion:** **{model['smoke_exclusion']}**",
+        f"- **Latest cohort evidence:** `{model['latest_evidence_at'] or 'none'}`",
+        f"- **Smoke exclusion probe:** **{model['smoke_exclusion']}**",
         "",
         "## Operator warnings",
         "",
@@ -459,9 +530,16 @@ def render_markdown(model: dict[str, Any], redact_notes: bool = False) -> str:
                 note,
                 "",
             ])
-    lines.extend(["## Data health", "", f"- ERROR occurrences: **{model['quality_errors']}**", f"- WARNING occurrences: **{model['quality_warnings']}**", ""])
+    lines.extend([
+        "## Data health",
+        "",
+        f"- ERROR occurrences: **{model['quality_errors']}**",
+        f"- WARNING occurrences: **{model['quality_warnings']}**",
+        f"- Unattributed/global occurrences included: **{model['unattributed_quality_count']}**",
+        "",
+    ])
     if not model["quality_summary"]:
-        lines.append("No data-quality issues for this cohort.")
+        lines.append("No cohort-specific or unattributed data-quality issues in this window.")
     else:
         lines.extend(["| Severity | Issue | Count |", "|---|---|---:|"])
         for row in model["quality_summary"]:
@@ -513,6 +591,7 @@ def render_html(model: dict[str, Any], redact_notes: bool = False) -> str:
         )
     notes_html = "".join(note_cards) or '<p class="muted">No qualitative notes in this cohort/window.</p>'
     quality_rows = [[row["severity"], row["issue_code"], row["count"]] for row in model["quality_summary"]]
+    smoke_class = "health-ok" if model["smoke_exclusion"] == "PASS" else ("health-error" if model["smoke_exclusion"] == "FAIL" else "muted")
 
     return f"""<!doctype html>
 <html lang="en">
@@ -537,9 +616,9 @@ code{{background:#eceee9;border-radius:5px;padding:2px 5px}} footer{{margin-top:
 <div class="meta">Cohort <code>{html.escape(model['cohort'])}</code> · {html.escape(model['window_start'])} → {html.escape(model['window_end'])}</div>
 <div class="grid">
   <div class="card stat"><span class="muted">Cohort visitors</span><strong>{next((m['numerator'] for m in model['metrics'] if m['key']=='unique_cohort_visitors'), 0)}</strong></div>
-  <div class="card stat"><span class="muted">Latest evidence</span><strong style="font-size:16px">{html.escape(model['latest_evidence_at'] or 'none')}</strong></div>
+  <div class="card stat"><span class="muted">Latest cohort evidence</span><strong style="font-size:16px">{html.escape(model['latest_evidence_at'] or 'none')}</strong></div>
   <div class="card stat"><span class="muted">Data health</span><strong class="{'health-error' if model['quality_errors'] else 'health-ok'}">{model['quality_errors']} error / {model['quality_warnings']} warning</strong></div>
-  <div class="card stat"><span class="muted">Smoke exclusion</span><strong class="health-ok">{html.escape(model['smoke_exclusion'])}</strong></div>
+  <div class="card stat"><span class="muted">Smoke exclusion probe</span><strong class="{smoke_class}">{html.escape(model['smoke_exclusion'])}</strong></div>
 </div>
 <section class="card warning"><h2 style="margin-top:0">Operator warnings</h2><ul>{warning_html}</ul></section>
 <h2>Product funnel / decision metrics</h2>
@@ -555,8 +634,8 @@ code{{background:#eceee9;border-radius:5px;padding:2px 5px}} footer{{margin-top:
 <h3>Strong Aha by locale</h3>{html_table(['Segment','Responses','Strong Aha','Rate','Sample'], aha(model['aha_by_locale']))}
 <h2>Qualitative queue</h2>{notes_html}
 <h2>Data health</h2>
-<p><strong>{model['quality_errors']}</strong> ERROR occurrence(s) · <strong>{model['quality_warnings']}</strong> WARNING occurrence(s)</p>
-{html_table(['Severity','Issue','Count'], quality_rows, 'No data-quality issues for this cohort.')}
+<p><strong>{model['quality_errors']}</strong> ERROR occurrence(s) · <strong>{model['quality_warnings']}</strong> WARNING occurrence(s) · <strong>{model['unattributed_quality_count']}</strong> unattributed/global occurrence(s)</p>
+{html_table(['Severity','Issue','Count'], quality_rows, 'No cohort-specific or unattributed data-quality issues in this window.')}
 <h2>Evidence caveats</h2><ul>{caveat_html}</ul>
 <h2>Known unmeasured signal</h2><p><code>Want more Labs</code>: <strong>{html.escape(model['want_more_labs'])}</strong></p>
 <footer>Generated {html.escape(model['generated_at'])}. Operator-only evidence artifact; do not publish qualitative notes.</footer>
@@ -624,7 +703,12 @@ def main(argv: list[str] | None = None) -> int:
             "ok": True,
             "cohort": cohort,
             "window": {"start": iso(start), "end": iso(end)},
-            "quality": {"errors": model["quality_errors"], "warnings": model["quality_warnings"]},
+            "quality": {
+                "errors": model["quality_errors"],
+                "warnings": model["quality_warnings"],
+                "unattributed": model["unattributed_quality_count"],
+            },
+            "smoke_exclusion": model["smoke_exclusion"],
             "outputs": [str(path) for path in written],
         }, ensure_ascii=False, indent=2))
         return 0
