@@ -2,6 +2,7 @@
   const root=document.querySelector('[data-agent-workflow-graph-lab]');
   if(!root)return;
 
+  const copy=JSON.parse(root.dataset.graphCopy||'{}');
   const lab=window.AhaFrame.createLab('agent-workflow-graph');
   lab.checkpoint('over-engineered-baseline');
 
@@ -18,8 +19,17 @@
   const signed=(value,digits=0)=>{const n=Number(value)||0;return `${n>=0?'+':''}${n.toFixed(digits)}`;};
   const delta=(diff,key)=>{const item=diff.metrics?.[key];return item?Number(item.after)-Number(item.before):0;};
 
+  function localizedStages(state,derived){
+    const template=copy.topologyStages?.[state.topology];
+    if(!Array.isArray(template))return derived.topologyStages;
+    return template.map((stage)=>stage.replace('{count}',String(state.agentCount)));
+  }
+
   function render(frame){
     const {state,derived}=frame;
+    const seconds=copy.seconds||'s';
+    const per100=copy.per100||'/100';
+    const compare=copy.compare||{};
     controls.topology.value=state.topology;
     controls.agents.value=String(state.agentCount);
     controls.parallelism.max=String(Math.min(4,state.agentCount));
@@ -33,19 +43,21 @@
     out('architecture-score').textContent=String(derived.architectureScore);
     out('reliability').textContent=`${(derived.reliability*100).toFixed(1)}%`;
     out('success').textContent=`${(derived.successRate*100).toFixed(1)}%`;
-    out('latency').textContent=`${derived.latencySeconds.toFixed(1)}s`;
+    out('latency').textContent=`${derived.latencySeconds.toFixed(1)} ${seconds}`;
     out('cost').textContent=derived.costIndex.toFixed(1);
     out('coordination').textContent=derived.coordinationOverhead.toFixed(0);
     out('state-complexity').textContent=derived.stateComplexity.toFixed(0);
     out('propagation').textContent=`${(derived.failurePropagationRisk*100).toFixed(0)}%`;
     out('duplicate-work').textContent=`${(derived.duplicateWorkRisk*100).toFixed(0)}%`;
     out('unsafe-action').textContent=`${(derived.unsafeActionRisk*100).toFixed(0)}%`;
-    out('human-reviews').textContent=`${derived.humanReviewsPer100}/100`;
-    out('diagnosis').textContent=derived.diagnosis;
-    out('loop-vs-graph').textContent=derived.loopVsGraph;
-    out('topology-stages').innerHTML=derived.topologyStages.map((stage,index)=>`<span class="flow-node">${stage}</span>${index<derived.topologyStages.length-1?'<span class="flow-arrow">→</span>':''}`).join('');
+    out('human-reviews').textContent=`${derived.humanReviewsPer100}${per100}`;
+    out('diagnosis').textContent=copy.diagnosis?.[derived.failureType]||derived.diagnosis;
+    out('diagnosis').dataset.failureType=derived.failureType;
+    out('loop-vs-graph').textContent=copy.loopVsGraph||derived.loopVsGraph;
+    const stages=localizedStages(state,derived);
+    out('topology-stages').innerHTML=stages.map((stage,index)=>`<span class="flow-node">${stage}</span>${index<stages.length-1?'<span class="flow-arrow">→</span>':''}`).join('');
     const diff=lab.compare('over-engineered-baseline');
-    out('compare').innerHTML=`<strong>Vs. over-engineered baseline</strong><span>Architecture score ${signed(delta(diff,'architectureScore'))}</span><span>Reliability ${signed(delta(diff,'reliabilityPercent'),1)} pts</span><span>Failure propagation ${signed(delta(diff,'failurePropagationPercent'),1)} pts</span><span>Cost ${signed(delta(diff,'costIndex'),1)}</span><span>Latency ${signed(delta(diff,'latencySeconds'),1)}s</span>`;
+    out('compare').innerHTML=`<strong>${compare.title||'Vs. over-engineered baseline'}</strong><span>${compare.architecture||'Architecture score'} ${signed(delta(diff,'architectureScore'))}</span><span>${compare.reliability||'Reliability'} ${signed(delta(diff,'reliabilityPercent'),1)} ${compare.points||'pts'}</span><span>${compare.propagation||'Failure propagation'} ${signed(delta(diff,'failurePropagationPercent'),1)} ${compare.points||'pts'}</span><span>${compare.cost||'Cost'} ${signed(delta(diff,'costIndex'),1)}</span><span>${compare.latency||'Latency'} ${signed(delta(diff,'latencySeconds'),1)} ${seconds}</span>`;
   }
   lab.subscribe(render);
 
