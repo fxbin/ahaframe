@@ -34,6 +34,8 @@ ZH_READY={
     "labs/rag-failure/",
     "labs/context-compression/",
     "labs/agent-reliability/",
+    "labs/agent-workflow-graph/",
+    "labs/evaluation-failure/",
 }
 
 
@@ -57,21 +59,23 @@ def main() -> None:
         assert load_content_source(locale,"home")["title"].strip()
         assert load_content_source(locale,"marketing")["pricing"]["title"].strip()
         foundation=load_content_source(locale,"foundation")
-        assert set(foundation["lessons"]) == {"token-playground","context-window","agent-loop"}
-        production=load_content_source(locale,"production-prompt-context")
+        prompt_context=load_content_source(locale,"production-prompt-context")
         harness=load_content_source(locale,"production-harness")
-        assert set(production["labs"]) == {"instruction-conflict","rag-failure","context-compression"}
+        graph_evaluation=load_content_source(locale,"production-graph-evaluation")
+        assert set(foundation["lessons"]) == {"token-playground","context-window","agent-loop"}
+        assert set(prompt_context["labs"]) == {"instruction-conflict","rag-failure","context-compression"}
         assert set(harness["labs"]) == {"agent-reliability"}
+        assert set(graph_evaluation["labs"]) == {"agent-workflow-graph","evaluation-failure"}
         for slug,lesson in foundation["lessons"].items():
             assert lesson["name"].strip(), (locale,slug)
             assert lesson["quick"].strip(), (locale,slug)
             assert lesson["guide"]["title"].strip(), (locale,slug)
-        for source in (production,harness):
+        for source in (prompt_context,harness,graph_evaluation):
             for slug,lab in source["labs"].items():
                 assert lab["name"].strip(), (locale,slug)
                 assert lab["quick"].strip(), (locale,slug)
-                assert lab["guide"]["title"].strip(), (locale,slug)
                 assert lab["presentation"], (locale,slug)
+                assert (lab.get("guide") or lab.get("explainer")), (locale,slug)
 
     assert ui("zh-CN", "nav.lessons") == "课程"
     assert ui("zh-CN", "language.zh-CN") == "简体中文"
@@ -84,16 +88,16 @@ def main() -> None:
         path=f"/en/lessons/{slug}/"
         assert route_available(path,"zh-CN") is True
         assert localized_or_default_path(path,"zh-CN") == f"/zh-cn/lessons/{slug}/"
-    for slug in ("instruction-conflict","rag-failure","context-compression","agent-reliability"):
+    for slug in ("instruction-conflict","rag-failure","context-compression","agent-reliability","agent-workflow-graph","evaluation-failure"):
         path=f"/en/labs/{slug}/"
         assert route_available(path,"zh-CN") is True
         assert localized_or_default_path(path,"zh-CN") == f"/zh-cn/labs/{slug}/"
-    assert route_available("/en/labs/agent-workflow-graph/", "zh-CN") is False
-    assert localized_or_default_path("/en/labs/agent-workflow-graph/","zh-CN") == "/en/labs/agent-workflow-graph/"
+    assert route_available("/en/build/reliable-support-agent/", "zh-CN") is False
+    assert localized_or_default_path("/en/build/reliable-support-agent/","zh-CN") == "/en/build/reliable-support-agent/"
 
-    lab_switcher=language_switch_items("/en/labs/agent-reliability/")
+    lab_switcher=language_switch_items("/en/labs/evaluation-failure/")
     assert lab_switcher[1]["available"] is True
-    assert lab_switcher[1]["href"] == "/zh-cn/labs/agent-reliability/"
+    assert lab_switcher[1]["href"] == "/zh-cn/labs/evaluation-failure/"
 
     all_routes = set()
     for relative in PUBLIC_ROUTE_RELATIVES:
@@ -112,7 +116,7 @@ def main() -> None:
 
     print(
         f"PASS: i18n foundation validates {len(SUPPORTED_LOCALES)} locales, "
-        f"{len(PUBLIC_ROUTE_RELATIVES)} public route pairs, Prompt/Context/Harness zh-CN rollout, "
+        f"{len(PUBLIC_ROUTE_RELATIVES)} public route pairs, all standalone zh-CN Labs, "
         "shared UI keys, and no locale-specific scenario forks."
     )
 

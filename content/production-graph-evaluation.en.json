@@ -1,0 +1,216 @@
+{
+  "locale": "en",
+  "ui": {
+    "home": "Home",
+    "productionLabs": "Production Labs",
+    "preview": "Production Lab Preview",
+    "minutes": "min",
+    "share": "Share",
+    "inOneSentence": "In one sentence",
+    "keyTakeaways": "Key takeaways",
+    "commonQuestions": "Common questions",
+    "simulationNote": "AhaFrame simulation note",
+    "reviewed": "Reviewed",
+    "buildChallenge": "Build challenge"
+  },
+  "labs": {
+    "agent-workflow-graph": {
+      "name": "Agent Workflow Graph Lab",
+      "layer": "Graph Engineering",
+      "level": "Intermediate",
+      "minutes": 25,
+      "seoTitle": "Agent Workflow Graph Lab — Orchestrate AI systems | AhaFrame",
+      "description": "Compare AI workflow topologies, state boundaries, retry scope, joins, parallelism, and review gates.",
+      "hero": "Start from an over-engineered coordinator graph and find the smallest topology that earns its complexity.",
+      "quick": "Graph Engineering shapes orchestration: how deterministic steps, tools, local loops, agents, branches, joins, and review gates connect.",
+      "interactive": {
+        "panelTitle": "Workflow controls",
+        "topology": "Topology",
+        "topologyOptions": {
+          "single-agent": "Single Agent",
+          "sequential": "Sequential Pipeline",
+          "branched": "Branched Workflow",
+          "parallel": "Parallel Specialists",
+          "coordinator": "Coordinator + Workers"
+        },
+        "stateMode": "State boundary",
+        "stateModeOptions": {"shared": "Shared state", "isolated": "Isolated state"},
+        "retryScope": "Retry scope",
+        "retryScopeOptions": {"graph": "Whole graph", "node": "Failed node only"},
+        "joinStrategy": "Join strategy",
+        "joinStrategyOptions": {"first": "First result", "all": "All results", "verified": "Verified merge"},
+        "humanGate": "Review gate",
+        "humanGateOptions": {"none": "None", "before-refund": "Before consequential action"},
+        "agentCount": "Agent count",
+        "parallelism": "Parallelism",
+        "preset": "Apply bounded graph",
+        "reset": "Reset baseline",
+        "metrics": ["Architecture score", "Reliability", "Success", "Latency", "Cost", "Coordination", "State complexity", "Failure propagation", "Duplicate work", "Action risk", "Human reviews"],
+        "diagnosis": "Diagnosis",
+        "loopVsGraph": "Loop vs Graph"
+      },
+      "presentation": {
+        "seconds": "s",
+        "per100": "/100",
+        "diagnosis": {
+          "healthy": "Healthy graph policy: responsibilities are explicit, state is bounded, retries stay local, joins verify competing branches, and consequential action has a deliberate gate.",
+          "shared-state-contamination": "Shared-state contamination: several workers can mutate or overwrite the same working state, so one bad observation propagates across otherwise independent branches.",
+          "retry-blast-radius": "Retry blast radius: a local failure restarts too much of the workflow, duplicating successful work and increasing the chance of repeated side effects.",
+          "premature-join": "Premature join: the graph accepts the first branch to finish instead of reconciling evidence, so latency improves by trading away reliability.",
+          "unnecessary-multi-agent": "Unnecessary multi-agent complexity: extra workers increase coordination and state cost without adding enough independent capability to justify them.",
+          "coordination-overhead": "Coordination overhead dominates: the topology spends too much effort routing, merging, and synchronizing compared with the underlying task.",
+          "human-bottleneck": "Human gate is correctly protecting the irreversible action, but the current topology makes that review path a latency bottleneck."
+        },
+        "loopVsGraph": "Loop controls iteration inside a node or agent. Graph controls how nodes, loops, tools, branches, joins, and gates are connected.",
+        "topologyStages": {
+          "single-agent": ["Agent loop", "Refund tool"],
+          "sequential": ["Classify", "Retrieve", "Decide", "Refund", "Verify"],
+          "branched": ["Classify", "Policy branch + Account branch", "Verified join", "Refund gate", "Verify"],
+          "parallel": ["Parallel specialists", "Join", "Refund", "Verify"],
+          "coordinator": ["Coordinator", "Workers × {count}", "Join", "Refund", "Verifier"]
+        },
+        "compare": {
+          "title": "Vs. over-engineered baseline",
+          "architecture": "Architecture score",
+          "reliability": "Reliability",
+          "propagation": "Failure propagation",
+          "cost": "Cost",
+          "latency": "Latency",
+          "points": "pts"
+        }
+      },
+      "explainer": {
+        "title": "Graph Engineering is not “add more agents”",
+        "paragraphs": [
+          "Graph Engineering designs control flow around an AI system. A workflow may contain deterministic application steps, retrieval, local agent loops, validation, review, and final actions. The graph decides how those responsibilities connect, not how impressive the diagram looks.",
+          "Loop Engineering and Graph Engineering operate at different levels. A loop defines how one local unit iterates through action, observation, verification, retry, recovery, escalation, and stopping. A graph decides where that local loop sits relative to other nodes and branches.",
+          "Retry scope changes the failure blast radius. Restarting an entire workflow because one node failed duplicates work that already succeeded. A node-level retry keeps recovery local and makes side effects easier to reason about.",
+          "Shared mutable state reduces plumbing but increases coupling. One stale observation can contaminate branches that never depended on the failing node. Isolated branch state requires an explicit merge, creating a useful validation boundary.",
+          "Parallel branches can shorten a critical path when work is genuinely independent. They also add scheduling, duplicated setup, synchronization, and join decisions. First-result joins are fast; verified joins trade extra work for stronger evidence.",
+          "More agents are not a goal. Extra workers are useful only when they represent independent capabilities or contexts. Deterministic code is often the better node when a responsibility has a stable contract.",
+          "Review placement is also topology. A review step everywhere creates a bottleneck. A gate at the consequential boundary protects the important action while leaving low-risk work automated. All values in this Lab are deterministic educational metrics rather than production benchmarks."
+        ]
+      },
+      "next": {
+        "title": "Local iteration and global orchestration are different responsibilities.",
+        "description": "The capstone combines Prompt, Context, Harness, Loop, Graph, and Evaluation.",
+        "href": "/en/early-access/",
+        "query": "?intent=reliable-support-agent-build",
+        "button": "Continue"
+      }
+    },
+    "evaluation-failure": {
+      "name": "Evaluation Failure Lab",
+      "layer": "Evaluation Engineering",
+      "level": "Intermediate",
+      "minutes": 25,
+      "seoTitle": "Evaluation Failure Lab — Debug AI release decisions | AhaFrame",
+      "description": "Debug a simulated AI evaluation process by changing dataset composition, thresholds, safety vetoes, sample size, judge strategy, and cost gates while deciding whether a candidate should ship.",
+      "hero": "Agent v2 looks better on the dashboard. Your job is not to tune the agent—it is to debug the evaluation process and decide whether the evidence is strong enough to ship.",
+      "quick": "Evaluation is a release-decision system, not a single score: representative slices, evidence strength, veto conditions, judge coverage, and production economics determine whether an apparent improvement is trustworthy.",
+      "interactive": {
+        "panelTitle": "Naive release evaluation",
+        "simulation": "Deterministic simulation",
+        "intro": "The team improved retrieval and tool behavior in a customer-support agent. A demo-heavy evaluation says v2 wins. The hidden problem: long-horizon and safety-critical refund cases regressed.",
+        "dataset": "Evaluation dataset",
+        "datasetOptions": {"demo-biased": "Demo-biased", "production-like": "Production-like", "safety-heavy": "Safety-heavy"},
+        "threshold": "Global pass threshold",
+        "sampleSize": "Evaluation sample size",
+        "sampleOptions": {"50": "50 cases", "100": "100 cases", "200": "200 cases", "500": "500 cases"},
+        "judge": "Judge strategy",
+        "judgeOptions": {"deterministic": "Deterministic checks", "rubric": "Semantic / rubric judge", "mixed": "Mixed evaluation"},
+        "criticalPolicy": "Critical policy: the refund safety slice has a release floor of 80. The synthetic cost-per-success budget is 0.100 cost units.",
+        "preset": "Apply production evaluation",
+        "reset": "Reset naive evaluation",
+        "releaseDecision": "Release decision",
+        "metrics": ["v1 aggregate", "v2 aggregate", "Aggregate delta", "Critical safety v2", "Regressions", "Evidence width", "Judge noise index", "Eval cost index"],
+        "diagnosis": "Current diagnosis",
+        "sliceTitle": "Slice comparison",
+        "sliceBadge": "v1 → v2",
+        "sliceIntro": "The aggregate is a weighted mixture. Change the dataset preset to see which failures the evaluation gives enough importance to influence the release decision.",
+        "sliceColumns": ["Slice", "Weight", "v1", "v2", "Δ"],
+        "economics": "Economics and evidence",
+        "costPerSuccess": "Cost per successful task",
+        "costNote": "Synthetic cost units. The cost gate is intentionally independent from quality.",
+        "yourPolicy": "Your evaluation policy",
+        "waiting": "Waiting for changes…"
+      },
+      "presentation": {
+        "safety": {"on": "Safety veto: ON", "off": "Safety veto: OFF"},
+        "costGate": {"on": "Cost gate: ON", "off": "Cost gate: OFF"},
+        "state": {"on": "ON", "off": "OFF", "unchanged": "unchanged"},
+        "decision": {"SHIP": "SHIP", "BLOCK": "BLOCK", "INCONCLUSIVE": "INCONCLUSIVE"},
+        "diagnosis": {
+          "healthy": "Healthy evaluation policy: representative slices, evidence strength, release gates, and economics support the decision.",
+          "aggregate-score-trap": "Aggregate score trap: v2 looks better overall, but a critical slice materially regresses or falls below the release floor.",
+          "economic-regression": "Economic regression: the candidate clears quality checks but exceeds the configured cost-per-success budget.",
+          "underpowered-eval": "Underpowered evaluation: the apparent improvement is smaller than the modeled evidence width. Collect stronger evidence before shipping.",
+          "demo-biased-dataset": "Demo-biased dataset: easy and common cases dominate the aggregate while consequential production failures receive too little weight.",
+          "missing-veto": "Missing veto: a safety-critical regression is being averaged into the overall score instead of acting as a release gate.",
+          "judge-mismatch": "Judge mismatch: deterministic checks are cheap and stable, but their modeled coverage is too narrow for semantic and process-level regressions."
+        },
+        "sliceLabels": {
+          "common-faq": "Common FAQ",
+          "retrieval-heavy": "Retrieval-heavy",
+          "tool-calling": "Tool calling",
+          "long-horizon": "Long-horizon",
+          "safety-critical-refund": "Safety-critical refund"
+        },
+        "critical": "Critical",
+        "points": "pts",
+        "regressionTotal": "total",
+        "regressionCritical": "critical",
+        "compare": {
+          "title": "Vs. naive evaluation",
+          "candidate": "Candidate score",
+          "evidence": "Evidence width",
+          "evalCost": "Eval cost",
+          "safety": "Safety veto",
+          "costGate": "Cost gate"
+        }
+      },
+      "takeaways": [
+        ["Averages can hide tail risk", "A higher overall score can coexist with a release-blocking regression in a small but consequential slice."],
+        ["Dataset composition is a product decision", "Your evaluation distribution determines which failures count enough to influence the aggregate."],
+        ["A veto is different from a weight", "Some safety conditions should block a release rather than be averaged against easy wins elsewhere."],
+        ["Evidence strength matters", "A positive delta is not automatically trustworthy when the evaluation is underpowered or the judge has limited coverage."],
+        ["Quality and economics are separate gates", "A candidate can improve task quality while worsening cost per successful outcome."]
+      ],
+      "guide": {
+        "eyebrow": "Production mental model",
+        "title": "Why can a better benchmark score produce a worse release decision?",
+        "intro": "AI systems rarely fail uniformly. A candidate can improve common questions while regressing on long-horizon tasks, rare tool sequences, or safety-critical actions. When the evaluation compresses all of those cases into one average, the most important failure can disappear inside a strong headline number.",
+        "sections": [
+          {"title": "Representative data beats convenient demos", "body": "A demo-biased set overweights the cases the team already knows how to solve. A production-like set increases the influence of difficult and consequential cases. This lab uses fixed synthetic slice scores so the learner can isolate the evaluation design itself from model randomness."},
+          {"title": "Thresholds and vetoes answer different questions", "body": "A global threshold asks whether average performance is high enough. A veto asks whether a specific failure is unacceptable regardless of the average. If an AI system can perform an irreversible refund, a safety regression may deserve a hard release gate even when the rest of the system improves."},
+          {"title": "More samples reduce uncertainty; they do not fix bad coverage", "body": "The modeled evidence width shrinks as the sample size grows. That demonstrates why small evaluations provide weaker evidence. But collecting more examples from a biased distribution does not make the evaluation representative. Sample size and dataset design are independent engineering decisions."},
+          {"title": "Judge strategy changes coverage, noise, and cost", "body": "Deterministic checks are stable and cheap, but can miss semantic or process-level defects. Rubric judges can cover more nuanced quality but introduce judge noise and cost. Mixed evaluation combines complementary checks. None of these choices is universally correct; the evaluation method must match the failure modes that matter."},
+          {"title": "What is simulated here?", "body": "All slice scores, confidence behavior, judge noise, and cost values are synthetic educational quantities. No live LLM judge, benchmark, customer-support traffic, or repeated stochastic trial is being executed. Real release policies require representative data, validated graders and verifiers, and organization-specific risk criteria."}
+        ],
+        "faq": [
+          {"q": "Should the highest aggregate score always ship?", "a": "No. Aggregate metrics are useful summaries, but they should not override critical regressions or evidence-quality requirements."},
+          {"q": "Is a larger evaluation set always better?", "a": "It improves evidence strength only if the cases are representative and the scoring method measures the behavior you care about."},
+          {"q": "Should every metric become a hard veto?", "a": "No. Vetoes are appropriate for selected non-negotiable conditions. Too many hard gates can make iteration impossible."},
+          {"q": "Why can the decision be INCONCLUSIVE?", "a": "Because engineering evidence can be insufficient. A release process should be allowed to say ‘we do not know yet’ instead of forcing every noisy comparison into ship or block."}
+        ],
+        "note": "This Lab independently re-models evaluation concepts from public engineering references; values are synthetic and should not be used as universal production thresholds."
+      },
+      "challenge": {
+        "title": "Define the minimum release gate for a refund-capable support agent.",
+        "body": "Choose the dataset mix, evidence strength, judge strategy, safety boundary, and economic constraint you would require before deployment. The goal is a defensible policy—not the highest possible dashboard score.",
+        "href": "/en/early-access/",
+        "query": "?intent=evaluation-build-challenge",
+        "button": "Take the challenge",
+        "event": "evaluation_build_challenge_started"
+      },
+      "next": {
+        "title": "You debugged the evaluation process.",
+        "description": "Next, Context Compression Lab will make the trade-off between token savings and lost evidence visible before the Content MVP capstone connects retrieval, agents, evaluation, and production constraints.",
+        "href": "/en/early-access/",
+        "query": "?intent=evaluation-production-labs",
+        "button": "Get Production Labs",
+        "event": "evaluation_paid_intent_click"
+      }
+    }
+  }
+}

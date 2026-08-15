@@ -2,6 +2,7 @@
   const root=document.querySelector('[data-evaluation-lab]');
   if(!root)return;
 
+  const copy=JSON.parse(root.dataset.evaluationCopy||'{}');
   const lab=window.AhaFrame.createLab('evaluation-failure');
   lab.checkpoint('naive-eval');
 
@@ -44,16 +45,17 @@
 
   function stateChanged(diff,key){
     const item=diff.state?.[key];
-    if(!item)return 'unchanged';
-    const after=typeof item.after==='boolean'?(item.after?'ON':'OFF'):String(item.after);
-    return after;
+    if(!item)return copy.state?.unchanged||'unchanged';
+    if(typeof item.after==='boolean')return item.after?(copy.state?.on||'ON'):(copy.state?.off||'OFF');
+    return String(item.after);
   }
 
   function renderSlices(derived){
     outputs.slices.innerHTML=derived.sliceScores.map((slice)=>{
       const deltaStyle=slice.delta<0?'color:var(--danger);font-weight:800':'color:var(--success);font-weight:800';
-      const critical=slice.critical?' <span class="badge" style="color:var(--danger);border-color:#efd0cc;background:#fffafa">Critical</span>':'';
-      return `<tr><td><strong>${slice.label}</strong>${critical}</td><td>${(slice.weight*100).toFixed(0)}%</td><td>${slice.v1.toFixed(0)}</td><td>${slice.v2.toFixed(0)}</td><td style="${deltaStyle}">${signed(slice.delta,0)}</td></tr>`;
+      const critical=slice.critical?` <span class="badge" style="color:var(--danger);border-color:#efd0cc;background:#fffafa">${copy.critical||'Critical'}</span>`:'';
+      const label=copy.sliceLabels?.[slice.id]||slice.label;
+      return `<tr><td><strong>${label}</strong>${critical}</td><td>${(slice.weight*100).toFixed(0)}%</td><td>${slice.v1.toFixed(0)}</td><td>${slice.v2.toFixed(0)}</td><td style="${deltaStyle}">${signed(slice.delta,0)}</td></tr>`;
     }).join('');
   }
 
@@ -63,7 +65,7 @@
       BLOCK:{color:'var(--danger)',background:'#fff4f2',border:'#efd0cc'},
       INCONCLUSIVE:{color:'var(--warning)',background:'#fffaf0',border:'#ecd9af'},
     }[decision];
-    outputs.decision.textContent=decision;
+    outputs.decision.textContent=copy.decision?.[decision]||decision;
     outputs.decision.dataset.decision=decision;
     outputs.decision.style.color=styles.color;
     outputs.decision.style.background=styles.background;
@@ -72,34 +74,36 @@
 
   function render(frame){
     const {state,derived}=frame;
+    const points=copy.points||'pts';
+    const compare=copy.compare||{};
     dataset.value=state.datasetPreset;
     threshold.value=state.passThreshold;
     sampleSize.value=String(state.sampleSize);
     judgeMode.value=state.judgeMode;
     outputs.threshold.textContent=String(state.passThreshold);
 
-    safety.textContent=state.safetyVeto?'Safety veto: ON':'Safety veto: OFF';
+    safety.textContent=state.safetyVeto?(copy.safety?.on||'Safety veto: ON'):(copy.safety?.off||'Safety veto: OFF');
     safety.classList.toggle('primary',state.safetyVeto);
-    costGate.textContent=state.costGate?'Cost gate: ON':'Cost gate: OFF';
+    costGate.textContent=state.costGate?(copy.costGate?.on||'Cost gate: ON'):(copy.costGate?.off||'Cost gate: OFF');
     costGate.classList.toggle('primary',state.costGate);
 
     outputs.aggregateV1.textContent=derived.aggregateV1.toFixed(1);
     outputs.aggregateV2.textContent=derived.aggregateV2.toFixed(1);
-    outputs.delta.textContent=`${signed(derived.aggregateDelta,1)} pts`;
+    outputs.delta.textContent=`${signed(derived.aggregateDelta,1)} ${points}`;
     outputs.safetyScore.textContent=derived.metrics.criticalSafetyScore.toFixed(0);
-    outputs.regressions.textContent=`${derived.regressions.length} total · ${derived.criticalRegressions.length} critical`;
-    outputs.confidence.textContent=`±${derived.confidenceWidth.toFixed(1)} pts`;
+    outputs.regressions.textContent=`${derived.regressions.length} ${copy.regressionTotal||'total'} · ${derived.criticalRegressions.length} ${copy.regressionCritical||'critical'}`;
+    outputs.confidence.textContent=`±${derived.confidenceWidth.toFixed(1)} ${points}`;
     outputs.judgeNoise.textContent=`${(derived.judgeNoise*100).toFixed(0)}%`;
     outputs.evalCost.textContent=derived.estimatedEvalCost.toFixed(1);
     outputs.costV1.textContent=derived.costPerSuccessV1.toFixed(3);
     outputs.costV2.textContent=derived.costPerSuccessV2.toFixed(3);
     renderDecision(derived.decision);
-    outputs.diagnosis.textContent=derived.diagnosis;
+    outputs.diagnosis.textContent=copy.diagnosis?.[derived.failureType]||derived.diagnosis;
     outputs.diagnosis.dataset.failureType=derived.failureType;
     renderSlices(derived);
 
     const diff=lab.compare('naive-eval');
-    outputs.compare.innerHTML=`<strong>Vs. naive evaluation</strong><span>Candidate score ${signed(metricDelta(diff,'aggregateV2'),1)} pts</span><span>Evidence width ${signed(metricDelta(diff,'confidenceWidth'),1)} pts</span><span>Eval cost ${signed(metricDelta(diff,'estimatedEvalCost'),1)}</span><span>Safety veto ${stateChanged(diff,'safetyVeto')}</span><span>Cost gate ${stateChanged(diff,'costGate')}</span>`;
+    outputs.compare.innerHTML=`<strong>${compare.title||'Vs. naive evaluation'}</strong><span>${compare.candidate||'Candidate score'} ${signed(metricDelta(diff,'aggregateV2'),1)} ${points}</span><span>${compare.evidence||'Evidence width'} ${signed(metricDelta(diff,'confidenceWidth'),1)} ${points}</span><span>${compare.evalCost||'Eval cost'} ${signed(metricDelta(diff,'estimatedEvalCost'),1)}</span><span>${compare.safety||'Safety veto'} ${stateChanged(diff,'safetyVeto')}</span><span>${compare.costGate||'Cost gate'} ${stateChanged(diff,'costGate')}</span>`;
   }
 
   lab.subscribe(render);

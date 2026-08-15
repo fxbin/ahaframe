@@ -1,0 +1,216 @@
+{
+  "locale": "zh-CN",
+  "ui": {
+    "home": "首页",
+    "productionLabs": "生产实验",
+    "preview": "Production Lab 预览",
+    "minutes": "分钟",
+    "share": "分享",
+    "inOneSentence": "一句话理解",
+    "keyTakeaways": "关键结论",
+    "commonQuestions": "常见问题",
+    "simulationNote": "AhaFrame 教学模拟说明",
+    "reviewed": "内容复核",
+    "buildChallenge": "动手想一想"
+  },
+  "labs": {
+    "agent-workflow-graph": {
+      "name": "Agent 工作流图实验",
+      "layer": "Graph 工程",
+      "level": "进阶",
+      "minutes": 25,
+      "seoTitle": "Agent 工作流图实验 — 理解多步骤与多 Agent 编排 | AhaFrame",
+      "description": "比较 AI 工作流的拓扑、状态边界、重试范围、Join 策略、并行度和人工审核位置，理解 Graph Engineering 的真实职责。",
+      "hero": "从一个过度设计的 Coordinator + Workers 图开始，逐步删掉不必要的复杂度，找到真正值得存在的最小工作流拓扑。",
+      "quick": "Graph 工程负责全局编排：决定确定性步骤、工具、本地 Loop、Agent、分支、Join 与人工 Gate 如何连接，而不是单纯增加更多 Agent。",
+      "interactive": {
+        "panelTitle": "工作流控制项",
+        "topology": "拓扑",
+        "topologyOptions": {
+          "single-agent": "单 Agent",
+          "sequential": "顺序流水线",
+          "branched": "分支工作流",
+          "parallel": "并行专家",
+          "coordinator": "Coordinator + Workers"
+        },
+        "stateMode": "状态边界",
+        "stateModeOptions": {"shared": "共享状态", "isolated": "隔离状态"},
+        "retryScope": "重试范围",
+        "retryScopeOptions": {"graph": "整个 Graph", "node": "只重试失败节点"},
+        "joinStrategy": "Join 策略",
+        "joinStrategyOptions": {"first": "第一个结果", "all": "等待全部结果", "verified": "校验后合并"},
+        "humanGate": "人工审核 Gate",
+        "humanGateOptions": {"none": "无", "before-refund": "在高后果操作前"},
+        "agentCount": "Agent 数量",
+        "parallelism": "并行度",
+        "preset": "应用有界 Graph 预设",
+        "reset": "恢复过度设计基线",
+        "metrics": ["架构分数", "可靠性", "成功率", "延迟", "成本", "协调开销", "状态复杂度", "失败传播", "重复工作", "危险操作风险", "人工审核"],
+        "diagnosis": "当前诊断",
+        "loopVsGraph": "Loop 与 Graph 的边界"
+      },
+      "presentation": {
+        "seconds": "秒",
+        "per100": "/100",
+        "diagnosis": {
+          "healthy": "Graph 策略较为健康：职责清晰、状态有边界、失败局部重试、并行分支在 Join 处校验，高后果动作也有明确 Gate。",
+          "shared-state-contamination": "共享状态污染：多个 Worker 可以修改同一份工作状态，一个错误观察会传播到原本相互独立的分支。",
+          "retry-blast-radius": "重试爆炸半径过大：局部节点失败却触发整条工作流重跑，既重复已经成功的工作，也提高重复副作用的概率。",
+          "premature-join": "过早 Join：Graph 直接接受最先返回的分支，而不是校验和合并证据。延迟变低了，但可靠性被拿去交换速度。",
+          "unnecessary-multi-agent": "不必要的多 Agent 复杂度：额外 Worker 增加协调和状态成本，却没有提供足够独立的能力来证明这些复杂度值得存在。",
+          "coordination-overhead": "协调开销已经主导系统：大量成本花在路由、同步和合并，而不是完成真正的任务。",
+          "human-bottleneck": "人工 Gate 放在不可逆操作前是正确的，但当前拓扑让审核路径成为明显的延迟瓶颈。"
+        },
+        "loopVsGraph": "Loop 控制一个节点或 Agent 内部如何迭代；Graph 控制节点、Loop、工具、分支、Join 与 Gate 在整个系统里如何连接。",
+        "topologyStages": {
+          "single-agent": ["Agent Loop", "退款工具"],
+          "sequential": ["分类", "检索", "决策", "退款", "校验"],
+          "branched": ["分类", "政策分支 + 账户分支", "校验后 Join", "退款 Gate", "校验"],
+          "parallel": ["并行专家", "Join", "退款", "校验"],
+          "coordinator": ["Coordinator", "Workers × {count}", "Join", "退款", "Verifier"]
+        },
+        "compare": {
+          "title": "相对过度设计基线",
+          "architecture": "架构分数",
+          "reliability": "可靠性",
+          "propagation": "失败传播",
+          "cost": "成本",
+          "latency": "延迟",
+          "points": "个百分点"
+        }
+      },
+      "explainer": {
+        "title": "Graph Engineering 不是“再加几个 Agent”",
+        "paragraphs": [
+          "Graph Engineering 设计的是 AI 系统外围的控制流。一条工作流可以包含确定性应用步骤、检索、本地 Agent Loop、校验、人工审核和最终动作。Graph 决定这些责任怎样连接，而不是让流程图看起来更复杂。",
+          "Loop Engineering 与 Graph Engineering 工作在不同层级。Loop 定义一个局部单元如何在动作、观察、校验、重试、恢复、升级和停止之间迭代；Graph 决定这个局部 Loop 位于哪些节点和分支之间。",
+          "重试范围决定失败的爆炸半径。一个节点失败就让整条工作流重新开始，会重复已经成功的工作；节点级重试把恢复限制在局部，也更容易推理副作用。",
+          "共享可变状态减少了数据传递代码，却增加了耦合。一个过期观察可能污染根本不依赖该节点的其他分支。隔离分支状态需要显式 Join，反而形成一个有价值的校验边界。",
+          "当工作真正独立时，并行分支可以缩短关键路径；但它也会增加调度、重复初始化、同步与 Join 决策。First-result Join 更快，Verified Join 则用更多工作换更可靠的证据。",
+          "更多 Agent 从来不是目标。只有当额外 Worker 代表独立能力、独立上下文或真正可以并行的责任时，多 Agent 才值得存在。对于契约稳定的责任，确定性代码往往是更好的节点。",
+          "人工审核放在哪里，本身也是拓扑设计。每个节点都审核会制造瓶颈；把 Gate 放在真正高后果的边界，可以保护关键动作，同时让低风险步骤继续自动化。本实验中的所有数值都是确定性的教学模拟指标，不是生产基准。"
+        ]
+      },
+      "next": {
+        "title": "局部迭代与全局编排，是两种不同的工程责任。",
+        "description": "Integrated Build 会把 Prompt、Context、Harness、Loop、Graph 与 Evaluation 六层责任放进同一个系统。",
+        "href": "/en/early-access/",
+        "query": "?intent=reliable-support-agent-build",
+        "button": "继续"
+      }
+    },
+    "evaluation-failure": {
+      "name": "Evaluation 失败实验",
+      "layer": "Evaluation 工程",
+      "level": "进阶",
+      "minutes": 25,
+      "seoTitle": "Evaluation 失败实验 — 调试 AI 系统的发布决策 | AhaFrame",
+      "description": "通过数据集构成、通过阈值、安全 veto、样本量、Judge 策略和成本 Gate，调试一个 AI 系统的发布评测流程。",
+      "hero": "Agent v2 在总分面板上看起来更好了。你的任务不是继续调 Agent，而是调试 Evaluation：现有证据到底够不够支撑发布？",
+      "quick": "Evaluation 是一套发布决策系统，不是一个总分；代表性切片、证据强度、硬性 veto、Judge 覆盖范围和生产经济性共同决定“变好”是否可信。",
+      "interactive": {
+        "panelTitle": "天真的发布评测",
+        "simulation": "确定性教学模拟",
+        "intro": "团队改善了客服 Agent 的检索与工具调用，一个偏向 Demo 场景的评测显示 v2 明显胜出。被总分掩盖的问题是：长链路任务和高风险退款场景实际上退化了。",
+        "dataset": "评测数据集",
+        "datasetOptions": {"demo-biased": "偏 Demo", "production-like": "接近生产分布", "safety-heavy": "偏安全场景"},
+        "threshold": "全局通过阈值",
+        "sampleSize": "评测样本量",
+        "sampleOptions": {"50": "50 个样本", "100": "100 个样本", "200": "200 个样本", "500": "500 个样本"},
+        "judge": "Judge 策略",
+        "judgeOptions": {"deterministic": "确定性检查", "rubric": "语义 / Rubric Judge", "mixed": "混合评测"},
+        "criticalPolicy": "关键发布规则：退款安全切片的最低发布分数是 80；教学模拟中的单次成功成本预算上限为 0.100。",
+        "preset": "应用生产评测预设",
+        "reset": "恢复天真评测基线",
+        "releaseDecision": "发布决策",
+        "metrics": ["v1 总分", "v2 总分", "总分变化", "v2 关键安全分", "退化切片", "证据区间宽度", "Judge 噪声指数", "评测成本指数"],
+        "diagnosis": "当前诊断",
+        "sliceTitle": "切片对比",
+        "sliceBadge": "v1 → v2",
+        "sliceIntro": "总分只是不同切片按权重混合后的结果。切换数据集预设，观察哪些失败被赋予足够权重，能够真正影响发布决策。",
+        "sliceColumns": ["切片", "权重", "v1", "v2", "Δ"],
+        "economics": "经济性与证据",
+        "costPerSuccess": "每个成功任务的成本",
+        "costNote": "这里使用合成成本单位；成本 Gate 与质量 Gate 刻意保持独立。",
+        "yourPolicy": "你当前的评测策略",
+        "waiting": "等待参数变化……"
+      },
+      "presentation": {
+        "safety": {"on": "安全 veto：开启", "off": "安全 veto：关闭"},
+        "costGate": {"on": "成本 Gate：开启", "off": "成本 Gate：关闭"},
+        "state": {"on": "开启", "off": "关闭", "unchanged": "未变化"},
+        "decision": {"SHIP": "可以发布", "BLOCK": "阻止发布", "INCONCLUSIVE": "证据不足"},
+        "diagnosis": {
+          "healthy": "评测策略较为健康：数据切片、证据强度、发布 Gate 与经济性能够共同支撑当前决策。",
+          "aggregate-score-trap": "总分陷阱：v2 整体看起来更好，但关键切片发生明显退化，或已经跌破发布底线，不能被平均分掩盖。",
+          "economic-regression": "经济性退化：候选版本通过了质量检查，但每个成功任务的成本超过了当前预算。",
+          "underpowered-eval": "评测证据不足：表面提升小于当前模型化证据区间的宽度。在发布前需要更强的证据。",
+          "demo-biased-dataset": "数据集偏向 Demo：简单、常见场景占据了大部分权重，而真正高后果的生产失败几乎影响不了总分。",
+          "missing-veto": "缺少硬性 veto：安全关键切片发生退化，却仍然被平均进总分，而不是直接成为发布 Gate。",
+          "judge-mismatch": "Judge 与失败模式不匹配：确定性检查便宜且稳定，但对语义和流程级退化的覆盖不足。"
+        },
+        "sliceLabels": {
+          "common-faq": "常见 FAQ",
+          "retrieval-heavy": "高检索依赖",
+          "tool-calling": "工具调用",
+          "long-horizon": "长链路任务",
+          "safety-critical-refund": "安全关键退款"
+        },
+        "critical": "关键切片",
+        "points": "分",
+        "regressionTotal": "个退化",
+        "regressionCritical": "个关键退化",
+        "compare": {
+          "title": "相对天真评测基线",
+          "candidate": "候选版本总分",
+          "evidence": "证据区间宽度",
+          "evalCost": "评测成本",
+          "safety": "安全 veto",
+          "costGate": "成本 Gate"
+        }
+      },
+      "takeaways": [
+        ["平均分可以掩盖尾部风险", "整体分数升高，可以同时存在一个足以阻止发布的小规模高后果切片退化。"],
+        ["数据集构成是一项产品决策", "Evaluation 的样本分布决定哪些失败有足够权重进入总分，并真正影响发布。"],
+        ["Veto 与权重不是一回事", "有些安全条件不应该继续和其他简单场景求平均，而应该直接阻止发布。"],
+        ["证据强度很重要", "当样本不足或 Judge 覆盖有限时，一个正向变化并不自动等于可信提升。"],
+        ["质量与经济性应该分别设 Gate", "候选系统可能提高任务质量，同时让每个成功结果的成本变得更差。"]
+      ],
+      "guide": {
+        "eyebrow": "生产系统心智模型",
+        "title": "为什么更高的 Benchmark 分数，反而可能导向更差的发布决策？",
+        "intro": "AI 系统很少在所有场景里均匀失败。一个候选版本可能改善常见问题，却在长链路任务、少见工具序列或安全关键动作上退化。如果 Evaluation 把所有场景压成一个平均分，真正重要的失败就会消失在漂亮的 headline number 里。",
+        "sections": [
+          {"title": "有代表性的数据，比方便演示的数据更重要", "body": "偏 Demo 的数据集会过度强调团队已经知道怎么解决的场景。接近生产分布的数据集，会让困难和高后果场景拥有更合理的影响力。本实验使用固定的合成切片分数，让你把注意力集中在评测设计，而不是模型随机性。"},
+          {"title": "阈值和 veto 回答的是两个问题", "body": "全局阈值问的是“平均表现是否足够高”；veto 问的是“某种失败是否无论平均分多高都不可接受”。如果系统可以执行不可逆退款，一次安全退化就可能值得成为硬发布 Gate。"},
+          {"title": "更多样本降低不确定性，但修复不了错误覆盖", "body": "随着样本量增加，模拟中的证据区间会变窄，这展示了小样本为什么证据更弱。但从有偏分布中继续收集更多样本，并不会让它变得有代表性。样本量和数据集设计是两项独立决策。"},
+          {"title": "Judge 策略会同时改变覆盖、噪声与成本", "body": "确定性检查稳定、便宜，但可能漏掉语义或流程层面的缺陷；Rubric Judge 能覆盖更细的质量判断，却引入 Judge 噪声和成本；混合评测把互补方法组合起来。没有一种方法永远正确，关键是它是否覆盖你真正关心的失败模式。"},
+          {"title": "这里模拟的是什么？", "body": "所有切片分数、证据区间、Judge 噪声和成本都是用于教学的合成值。这里没有运行真实 LLM Judge、真实 Benchmark、客服流量或重复随机实验。真正的发布策略需要有代表性的数据、经过验证的 grader / verifier，以及组织自身的风险标准。"}
+        ],
+        "faq": [
+          {"q": "总分最高的版本是不是就应该发布？", "a": "不是。总分是有价值的摘要，但不能覆盖关键切片退化或证据质量不足。"},
+          {"q": "评测集是不是越大越好？", "a": "只有在样本有代表性、评分方法确实测量了目标行为时，更大的样本量才会提供更强证据。"},
+          {"q": "是不是每个指标都应该变成硬 veto？", "a": "不是。Veto 适合少量不可妥协的条件；硬 Gate 太多会让系统无法正常迭代。"},
+          {"q": "为什么发布决策可以是“证据不足”？", "a": "因为工程证据本来就可能不充分。成熟的发布流程应该允许回答“现在还不知道”，而不是强迫每次噪声对比都二选一。"}
+        ],
+        "note": "本实验独立重建公开 AI Evaluation 工程概念；所有数值都是合成教学值，不应被当作通用生产阈值。"
+      },
+      "challenge": {
+        "title": "为一个可执行退款的客服 Agent 定义最小发布 Gate。",
+        "body": "选择你会要求的数据分布、证据强度、Judge 策略、安全边界和经济约束。目标不是做出最高分，而是写出一套能够被辩护的发布政策。",
+        "href": "/en/early-access/",
+        "query": "?intent=evaluation-build-challenge",
+        "button": "开始挑战",
+        "event": "evaluation_build_challenge_started"
+      },
+      "next": {
+        "title": "你已经调试了 Evaluation，而不是只看总分。",
+        "description": "继续进入后续学习，把 Context、Harness、Graph 与 Evaluation 的权衡连接到完整生产系统。",
+        "href": "/en/early-access/",
+        "query": "?intent=evaluation-production-labs",
+        "button": "获取 Production Labs",
+        "event": "evaluation_paid_intent_click"
+      }
+    }
+  }
+}
