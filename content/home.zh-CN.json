@@ -57,7 +57,7 @@
     ]
   },
   "stack": {
-    "kicker": "AhaFrame AI Engineering Stack",
+    "kicker": "AhaFrame AI 工程栈",
     "title": "生产 AI 系统背后的六类工程责任",
     "copy": "它们不是框架名，而是六个不同的责任边界。先判断问题属于哪一层，再决定该在哪里修。",
     "layers": [
