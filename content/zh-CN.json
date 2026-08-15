@@ -13,7 +13,8 @@
     "labs/context-compression/",
     "labs/agent-reliability/",
     "labs/agent-workflow-graph/",
-    "labs/evaluation-failure/"
+    "labs/evaluation-failure/",
+    "build/reliable-support-agent/"
   ],
   "brand": "AhaFrame",
   "ui": {
@@ -37,7 +38,7 @@
     }
   },
   "meta": {
-    "status": "production-labs-ready",
-    "note": "Landing, marketing, Foundation, and all standalone Production Labs are localized; Integrated Build remains in #46."
+    "status": "m4-learning-surface-ready",
+    "note": "Every current English Validation Alpha learning route now has a zh-CN equivalent backed by the shared Engine/scenario implementation."
   }
 }
