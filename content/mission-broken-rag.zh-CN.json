@@ -1,0 +1,98 @@
+{
+  "locale": "zh-CN",
+  "mission": {
+    "name": "失效的 RAG Pipeline",
+    "seoTitle": "失效的 RAG Pipeline — 生产级 RAG 事故模拟 | AhaFrame",
+    "description": "排查一次生产 RAG 事故：新退款政策已经进入知识库，客服 Agent 却仍然引用旧政策。",
+    "level": "生产事故",
+    "layer": "Context × Evaluation",
+    "minutes": 15,
+    "hero": "新退款政策已经在知识库里，客服 Agent 却仍然按旧政策回答。你需要在错误继续影响客户之前，定位证据链路出了什么问题。",
+    "quick": "RAG 的可靠性是整条证据管线的属性：检索分数、时效性、来源权威性、重排与上下文策略必须共同决定什么证据能进入模型。",
+    "brief": {
+      "eyebrow": "INCIDENT 001 · SEV-2",
+      "title": "系统把昨天的事实，当成了今天的答案。",
+      "role": "你是当前值班的 AI Engineer。",
+      "body": "客户询问 40 天前购买的商品还能否退货。客服 Agent 拒绝了退款，并引用了一份旧政策。运营确认，两天前已经发布新版退款政策，而且新文档早已完成索引。",
+      "objective": "恢复证据的新鲜度与 Grounding，同时不能突破 6k Context、延迟与成本预算。",
+      "stakes": "一次错误回答，可能规模化拒绝本来有效的退款请求。"
+    },
+    "ui": {
+      "start": "开始事故排查",
+      "workspace": "事故控制台",
+      "evidence": "证据",
+      "inspect": "查看",
+      "policy": "检索策略",
+      "budget": "变更预算",
+      "run": "运行 Pipeline",
+      "reset": "重置事故",
+      "attempts": "尝试记录",
+      "noAttempts": "还没有运行任何一次模拟。",
+      "release": "发布决策",
+      "releaseHint": "至少运行一次策略后再做发布判断。",
+      "ship": "SHIP",
+      "block": "BLOCK",
+      "inconclusive": "INCONCLUSIVE",
+      "complete": "完成 Mission",
+      "outcome": "当前结果",
+      "waiting": "先检查证据，调整策略，再运行 Pipeline。",
+      "error": "当前 Mission 状态下无法执行这个操作。",
+      "compared": "基线 → 最新尝试"
+    },
+    "evidenceLabels": {
+      "incident": "事故报告",
+      "retrieval-trace": "Retrieval Trace",
+      "documents": "检索到的文档",
+      "context-composition": "Context 组成",
+      "answer": "回答与引用来源"
+    },
+    "controls": {
+      "retrieval-strategy": {"label": "检索方式", "options": {"vector": "仅 Vector", "hybrid": "Hybrid"}},
+      "top-k": {"label": "Top-K", "options": {"2": "2", "3": "3", "5": "5", "8": "8"}},
+      "rerank-depth": {"label": "Rerank 深度", "options": {"0": "关闭", "4": "Top 4", "6": "Top 6"}},
+      "freshness-policy": {"label": "时效策略", "options": {"off": "关闭", "soft": "按时间衰减", "strict": "严格过滤过期证据"}},
+      "authority-policy": {"label": "权威来源策略", "options": {"score-only": "只看相似度分数", "source-priority": "优先权威来源"}},
+      "compression-policy": {"label": "Context 压缩", "options": {"none": "不压缩", "balanced": "平衡压缩", "aggressive": "激进压缩"}}
+    },
+    "metrics": [
+      {"key": "staleEvidenceRiskPercent", "label": "旧证据风险", "format": "percent"},
+      {"key": "groundingScore", "label": "Grounding", "format": "score"},
+      {"key": "authoritativeCoveragePercent", "label": "权威证据覆盖", "format": "percent"},
+      {"key": "contextTokens", "label": "Context Tokens", "format": "integer"},
+      {"key": "latencyMs", "label": "延迟", "format": "ms"},
+      {"key": "costIndex", "label": "成本指数", "format": "decimal"}
+    ],
+    "outcomes": {
+      "STALE_AUTHORITY_FAILURE": "旧证据仍然占据主导",
+      "CONTEXT_OVERFLOW": "Context 超出预算",
+      "INSUFFICIENT_EVIDENCE": "证据质量不足",
+      "ACCURATE_BUT_TOO_SLOW": "准确，但延迟过高",
+      "ACCURATE_BUT_TOO_EXPENSIVE": "准确，但成本过高",
+      "PRODUCTION_VIABLE": "具备生产可行性"
+    },
+    "debrief": {
+      "eyebrow": "ENGINEERING DEBRIEF",
+      "title": "真正的问题，从来不是 Context 不够多。",
+      "rule": "Retrieval Quality 是整条 Pipeline 的属性。更多 Context 不等于更好的证据。",
+      "body": "这次事故的根因，是过期来源在排序中压过了当前权威来源。单纯提高 Top-K 可能看起来提升了 Recall，却会继续保留错误证据，同时吞掉更多 Context。可靠的策略需要同时处理检索信号、时效性、来源权威、Rerank，以及不会损失关键细节的 Context 策略。",
+      "points": [
+        "Similarity 不等于 Authority。",
+        "Freshness 应该属于 Retrieval Policy，而不是检索完成后再靠 Prompt 补救。",
+        "激进压缩可能把正确的证据集合重新压成一个 Grounding 不足的答案。",
+        "先追踪证据链，再决定要不要调模型。"
+      ]
+    },
+    "takeaways": [
+      ["Retrieval 是一条 Pipeline", "Chunking、候选召回、Rerank、Freshness 与 Context 策略会相互影响。"],
+      ["权威来源优先于热门结果", "相似度最高的文档，不应该天然拥有覆盖当前事实的权力。"],
+      ["先观察，再调参", "Retrieval Trace 能区分“证据没找到”“找到的是旧证据”和“Context 丢失”三类问题。"]
+    ],
+    "next": {
+      "title": "下一个事故：The $47,000 Retry",
+      "description": "这一次证据是对的，但 Agent 的工具运行时在 Timeout 后重复执行了不可逆操作。",
+      "button": "进入可靠性事故",
+      "href": "/en/labs/agent-reliability/",
+      "event": "mission_next_clicked"
+    }
+  }
+}
