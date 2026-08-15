@@ -2,7 +2,7 @@ from pathlib import Path
 import json, os, html, re, shutil
 from urllib.parse import urlparse
 
-from .i18n import HREFLANG, SUPPORTED_LOCALES, equivalent_paths, language_switch_items, load_locale_source, localized_path, ui
+from .i18n import HREFLANG, SUPPORTED_LOCALES, equivalent_paths, language_switch_items, load_locale_source, localized_path, route_available, route_prefix, ui
 
 ROOT=Path(__file__).resolve().parents[2]
 SRC=ROOT/'src'
@@ -49,10 +49,16 @@ def header(active='', locale='en', current_path=None):
     def cls(n): return 'active' if n==active else ''
     links=f'''<a class="{cls('Lessons')}" href="{root}#lessons">{ui(locale,'nav.lessons')}</a><a class="{cls('Roadmap')}" href="{root}#roadmap">{ui(locale,'nav.roadmap')}</a><a class="{cls('Pricing')}" href="{pricing}">{ui(locale,'nav.pricing')}</a><a class="{cls('About')}" href="{root}#about">{ui(locale,'nav.about')}</a>'''
     switch_items=language_switch_items(current_path)
-    switcher='<span class="language-switcher" aria-label="Language">'+''.join(
-        f'<span class="subtle" aria-current="page">{html.escape(item["label"])}</span>' if item['locale']==locale else f'<a href="{item["href"]}" hreflang="{item["hreflang"]}">{html.escape(item["label"])}</a>'
-        for item in switch_items
-    )+'</span>'
+    switcher_parts=[]
+    for item in switch_items:
+        label=html.escape(item['label'])
+        if item['locale']==locale:
+            switcher_parts.append(f'<span class="subtle" aria-current="page">{label}</span>')
+        elif item['available']:
+            switcher_parts.append(f'<a href="{item["href"]}" hreflang="{item["hreflang"]}">{label}</a>')
+        else:
+            switcher_parts.append(f'<span class="subtle" aria-disabled="true" title="Translation in progress">{label}</span>')
+    switcher='<span class="language-switcher" aria-label="Language">'+''.join(switcher_parts)+'</span>'
     return f'''<header class="site-header"><div class="container nav"><a class="brand" href="{root}" aria-label="AhaFrame home">{logo()}<span>AhaFrame</span></a><nav class="nav-links" aria-label="Primary">{links}</nav><div class="nav-actions">{switcher}<a class="btn primary" data-event="header_early_access" href="{early}">{ui(locale,'nav.early_access')}</a></div><details class="mobile-nav"><summary class="btn small" aria-label="Open navigation">{ui(locale,'nav.menu')}</summary><div class="mobile-panel">{links}{switcher}<a href="{early}">{ui(locale,'nav.early_access')}</a></div></details></div></header>'''
 
 def footer(locale='en'):
@@ -66,14 +72,20 @@ def jsonld(obj):
 def page(title,desc,path,body,active='',schemas=None,scripts='',robots=None,locale='en'):
     if locale not in SUPPORTED_LOCALES:
         raise ValueError(f'Unsupported page locale: {locale}')
-    expected_prefix=f'/{"en" if locale=="en" else "zh-cn"}/'
+    expected_prefix=f'/{route_prefix(locale)}/'
     if not path.startswith(expected_prefix):
         raise ValueError(f'Page path {path!r} does not match locale {locale!r}')
+    if not route_available(path,locale):
+        raise ValueError(f'Page route {path!r} is not declared available for locale {locale!r}')
     url=BASE+path
     if robots is None:
         robots='noindex,nofollow' if IS_LOCAL else 'index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1'
     alternates=equivalent_paths(path)
-    alternate_links=''.join(f'<link rel="alternate" hreflang="{HREFLANG[loc]}" href="{BASE+alt}">' for loc,alt in alternates.items())
+    alternate_links=''.join(
+        f'<link rel="alternate" hreflang="{HREFLANG[loc]}" href="{BASE+alt}">'
+        for loc,alt in alternates.items()
+        if route_available(path,loc)
+    )
     alternate_links+=f'<link rel="alternate" hreflang="x-default" href="{BASE+alternates["en"]}">'
     head=f'''<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{html.escape(title)}</title><meta name="description" content="{html.escape(desc,quote=True)}"><link rel="canonical" href="{url}">{alternate_links}<meta name="robots" content="{robots}"><meta property="og:type" content="website"><meta property="og:site_name" content="AhaFrame"><meta property="og:title" content="{html.escape(title,quote=True)}"><meta property="og:description" content="{html.escape(desc,quote=True)}"><meta property="og:url" content="{url}"><meta property="og:image" content="{BASE}/assets/og-ahaframe.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="AhaFrame — interactive visual learning for AI engineering"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="{html.escape(title,quote=True)}"><meta name="twitter:description" content="{html.escape(desc,quote=True)}"><meta name="twitter:image" content="{BASE}/assets/og-ahaframe.png"><meta name="theme-color" content="#fbfbf8"><link rel="icon" href="/assets/favicon.svg"><link rel="manifest" href="/manifest.webmanifest"><link rel="stylesheet" href="/assets/styles.css">'''
     base_schema={'@context':'https://schema.org','@type':'Organization','@id':BASE+'/#organization','name':'AhaFrame','url':BASE,'description':'Interactive visual lessons for understanding and building AI systems.'}
