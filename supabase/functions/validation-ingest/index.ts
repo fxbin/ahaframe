@@ -29,6 +29,11 @@ function text(value: unknown, max = 256) {
   return typeof value === 'string' ? value.trim().slice(0, max) : ''
 }
 
+function locale(value: unknown) {
+  const parsed = text(value, 16)
+  return parsed === 'zh-CN' ? 'zh-CN' : 'en'
+}
+
 function validDate(value: unknown) {
   const parsed = typeof value === 'string' ? Date.parse(value) : NaN
   return Number.isFinite(parsed) ? new Date(parsed).toISOString() : null
@@ -50,6 +55,7 @@ async function ingestEvent(body: Record<string, unknown>) {
     event_id: eventId,
     anonymous_user_id: anonymousUserId,
     session_id: sessionId,
+    locale: locale(body.locale),
     name,
     props: object(body.props),
     path: text(body.path, 500),
@@ -85,6 +91,7 @@ async function ingestFeedback(body: Record<string, unknown>) {
     feedback_id: feedbackId,
     anonymous_user_id: anonymousUserId,
     session_id: sessionId,
+    locale: locale(body.locale),
     layer: text(body.layer, 80),
     lab_id: labId,
     lab_version: text(body.labVersion, 40),
@@ -110,6 +117,7 @@ async function ingestWaitlist(body: Record<string, unknown>) {
     source: text(body.source, 500),
     anonymous_user_id: text(body.anonymousUserId, 120),
     session_id: text(body.sessionId, 120),
+    locale: locale(body.locale),
     layer: text(body.layer, 80),
     lab_id: text(body.labId, 120),
     lab_version: text(body.labVersion, 40),
