@@ -48,14 +48,20 @@ def main():
     assert '/en/labs/agent-reliability/' in en.find('link',rel='canonical')['href']
     assert '/zh-cn/labs/agent-reliability/' in zh.find('link',rel='canonical')['href']
 
+    en_cta=en.select_one('[data-event="agent_reliability_paid_intent_click"]')
+    zh_cta=zh.select_one('[data-event="agent_reliability_paid_intent_click"]')
+    assert en_cta is not None and zh_cta is not None, 'paid-intent event must remain stable across locales'
+    assert en_cta.get('href')=='/en/early-access/?intent=agent-reliability-production-labs'
+    assert zh_cta.get('href')=='/zh-cn/early-access/?intent=agent-reliability-production-labs'
+
     scenario=(SITE/'assets'/'lab-scenarios.js').read_text(encoding='utf-8')
     adapter=(SITE/'assets'/'agent-reliability.js').read_text(encoding='utf-8')
     assert "id:'agent-reliability'" in scenario
     assert 'zh-CN' not in scenario and '/zh-cn/' not in scenario, 'locale logic leaked into shared scenario'
     assert "derived.failureType" in adapter and "copy.diagnosis" in adapter, 'adapter must localize stable semantic failure keys'
-    assert "agent_reliability_parameter_changed" in adapter, 'analytics event semantics must remain stable'
+    assert "agent_reliability_parameter_changed" in adapter, 'parameter analytics event semantics must remain stable'
 
-    print('PASS: Harness en + zh-CN routes share one scenario/adapter and localize only presentation semantics.')
+    print('PASS: Harness en + zh-CN routes share one scenario/adapter, preserve paid-intent semantics, and localize only presentation semantics.')
 
 
 if __name__=='__main__':
