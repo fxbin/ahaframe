@@ -1,7 +1,7 @@
 from pathlib import Path
 
 ROOT=Path(__file__).resolve().parents[1]
-migration=(ROOT/'supabase/migrations/202608130001_validation_alpha.sql').read_text(encoding='utf-8').lower()
+migration=(ROOT/'supabase/migrations/20260814023253_validation_alpha.sql').read_text(encoding='utf-8').lower()
 function=(ROOT/'supabase/functions/validation-ingest/index.ts').read_text(encoding='utf-8')
 
 for table in ['validation_events','aha_feedback','validation_waitlist']:

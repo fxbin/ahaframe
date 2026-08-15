@@ -1,0 +1,160 @@
+{
+  "locale": "en",
+  "ui": {
+    "lessons": "Lessons",
+    "minutes": "min",
+    "share": "Share",
+    "markComplete": "Mark lesson complete",
+    "inOneSentence": "In one sentence",
+    "keyTakeaways": "Key takeaways",
+    "buildChallenge": "Build challenge",
+    "advancedLabs": "Advanced labs",
+    "whatYouLearn": "What you’ll learn",
+    "lessonPath": "Lesson path",
+    "conceptGuide": "Concept guide",
+    "commonQuestions": "Common questions",
+    "learningNote": "AhaFrame learning note",
+    "reviewed": "Reviewed"
+  },
+  "lessons": {
+    "token-playground": {
+      "name": "Token Playground",
+      "category": "Foundations",
+      "level": "Beginner",
+      "minutes": 6,
+      "description": "See how large language models tokenize text, assign next-token probabilities, and change sampling behavior with temperature.",
+      "seoTitle": "Token Playground — How LLM next-token prediction works | AhaFrame",
+      "quick": "LLMs generate text by repeatedly estimating probabilities for the next token, selecting one, appending it to the context, and repeating the process.",
+      "learn": ["How text becomes tokens", "How next-token probabilities work", "How temperature changes sampling"],
+      "path": [
+        {"name":"Prompt","description":"Read the input","state":"done"},
+        {"name":"Tokenize","description":"Split text units","state":"done"},
+        {"name":"Predict","description":"Inspect probabilities","state":"active"},
+        {"name":"Sample","description":"Change temperature"},
+        {"name":"Repeat","description":"Append next token"}
+      ],
+      "labels": {"prompt":"1 · Prompt","tokenization":"2 · Tokenization","probabilities":"3 · Next-token probabilities","temperature":"4 · Temperature","sampled":"5 · Example sampled token","probability":"Probability"},
+      "takeaways": [
+        ["Tokens are building blocks","Models read and write token units."],
+        ["Probabilities guide choices","Candidate tokens receive different scores."],
+        ["Temperature changes randomness","Higher values flatten the distribution."],
+        ["Generation is iterative","The chosen token becomes new context."]
+      ],
+      "challenge": {"title":"Choose decoding settings for structured output","body":"Would you use the same temperature for creative copy and strict JSON? Explain the trade-off before opening the next lab."},
+      "guide": {
+        "title":"How does next-token prediction work?",
+        "intro":"A large language model generates text by estimating a probability distribution over possible next tokens, selecting a token using a decoding strategy, adding the selected token to the current context, and repeating the process.",
+        "sections":[
+          {"title":"What is a token?","body":"A token is a text unit used by the model. It can be a whole word, part of a word, punctuation, whitespace, or another fragment depending on the tokenizer."},
+          {"title":"What does temperature change?","body":"Temperature changes the shape of the sampling distribution. Lower values concentrate probability around top candidates; higher values give lower-ranked candidates more chance to appear."},
+          {"title":"Why does this matter in engineering?","body":"Decoding choices affect variability, deterministic behavior, structured-output reliability, and how an application balances creativity with control."}
+        ],
+        "faq":[
+          {"q":"Does an LLM choose a whole sentence at once?","a":"No. Autoregressive language models generate incrementally, token by token."},
+          {"q":"Is a token always a word?","a":"No. Token boundaries depend on the tokenizer and can split words or include punctuation."},
+          {"q":"Does temperature change model knowledge?","a":"No. It changes sampling behavior, not the model weights or underlying knowledge."},
+          {"q":"Are the probabilities in this lab from a live model?","a":"No. This MVP uses deterministic educational values so the learning experience stays stable."}
+        ],
+        "note":"Interactive values are illustrative; conceptual explanations are the durable learning content."
+      },
+      "next": {"title":"Token prediction makes sense now.","description":"Next: understand the finite working context around those tokens.","href":"/en/lessons/context-window/","button":"Continue →"}
+    },
+    "context-window": {
+      "name": "Context Window Lab",
+      "category": "Context Engineering",
+      "level": "Beginner",
+      "minutes": 8,
+      "description": "Visualize how an LLM context window fills up and compare summarization, RAG, memory, and truncation strategies.",
+      "seoTitle": "Context Window Lab — Context engineering visual lab | AhaFrame",
+      "quick": "A context window is the model’s finite working input budget; system instructions, conversation history, documents, and tool results all compete for that space.",
+      "learn": ["What consumes context", "Why overflow happens", "Trade-offs of four strategies"],
+      "path": [
+        {"name":"Fill","description":"Add system + history","state":"done"},
+        {"name":"Observe","description":"Watch token usage","state":"done"},
+        {"name":"Manage","description":"Choose a strategy","state":"active"},
+        {"name":"Compare","description":"Inspect trade-offs"}
+      ],
+      "labels": {"usage":"Context usage","composition":"System 12% · Conversation 42% · Documents 28% · Tools 12% · Memory 6%","choose":"Choose a strategy","drop":"Drop old messages","summarize":"Summarize","rag":"RAG","memory":"Memory","before":"Before","after":"After strategy","beforeRisk":"Risk: little space remains for new turns.","principle":"Context engineering is trade-off management: keep the most useful information available while controlling cost, latency, and information loss."},
+      "strategyNotes": {
+        "drop":"47,350 tokens removed; 56,100 tokens of headroom remain. Fast, but older turns are lost.",
+        "summarize":"78,820 tokens condensed or removed; 87,570 tokens of headroom remain.",
+        "rag":"94,450 tokens removed from active context; 103,200 tokens of headroom remain as documents move to on-demand retrieval.",
+        "memory":"62,950 tokens removed from active context; 71,700 tokens of headroom remain as stable facts move to persistent memory."
+      },
+      "takeaways": [
+        ["Context is finite","Inputs compete for a limited working budget."],
+        ["Summaries compress history","They preserve less detail but free capacity."],
+        ["RAG retrieves on demand","External knowledge need not stay in context."],
+        ["Memory is a separate layer","Persistent facts are not the same as active context."]
+      ],
+      "challenge": {"title":"Design a context strategy for a support agent","body":"Decide what stays in the prompt, what becomes a summary, what goes to retrieval, and what belongs in persistent memory."},
+      "guide": {
+        "title":"What is an LLM context window?",
+        "intro":"A context window is the finite amount of input information a model can process for a generation step. System instructions, user and assistant messages, retrieved passages, tool outputs, and other supplied content all consume that working budget.",
+        "sections":[
+          {"title":"What happens when context becomes too large?","body":"An application must decide what to remove, compress, retrieve later, or persist elsewhere. The correct choice depends on which information is important for the next model decision."},
+          {"title":"How is RAG different from memory?","body":"RAG retrieves relevant external information when needed. Memory usually refers to information persisted across turns or sessions. Both can supply context, but neither is identical to the context window itself."},
+          {"title":"Why is context engineering important?","body":"Good context design improves relevance and reliability while helping control token cost and latency. More context is not automatically better context."}
+        ],
+        "faq":[
+          {"q":"Is context the same as memory?","a":"No. Context is the current working input; memory is a persistence strategy that may later supply context."},
+          {"q":"Does RAG increase the context window size?","a":"No. RAG selects information to place inside the available context."},
+          {"q":"Should I always summarize old messages?","a":"No. Summarization trades detail for compactness and can remove information that later becomes important."},
+          {"q":"Are the token limits shown here model-specific?","a":"The 200,000-token value is an educational example, not a claim about every model."}
+        ],
+        "note":"The lab uses a stable simulated token budget to make trade-offs observable."
+      },
+      "next": {"title":"You can now reason about context trade-offs.","description":"Next: see how agents use tools and observations in a loop.","href":"/en/lessons/agent-loop/","button":"Continue →"}
+    },
+    "agent-loop": {
+      "name": "Agent Loop Simulator",
+      "category": "Loop Engineering",
+      "level": "Intermediate",
+      "minutes": 9,
+      "description": "Step through an AI agent loop: understand the task, choose an action, call a tool, observe the result, recover from errors, and answer.",
+      "seoTitle": "Agent Loop Simulator — How AI agents use tools and observations | AhaFrame",
+      "quick": "An AI agent repeatedly decides what to do next, acts through tools, observes the result, and uses that observation to decide whether to continue, retry, or answer.",
+      "learn": ["How agent loops differ from chat", "Where tool calls fit", "Why observations and retries matter"],
+      "controlTitle":"Control the loop",
+      "controlCopy":"Use the simulator controls to advance one step at a time, reset state, or inject a failure.",
+      "labels": {"simulation":"Live simulation","manual":"Step through manually","task":"Task","taskText":"Find the weather in Tokyo and tell me if I need an umbrella.","currentState":"Current state","finalAnswer":"Final answer","timeline":"Execution timeline","toolResult":"Tool result","toolValue":"Tokyo · Light Rain · 18°C<br>Humidity 92% · Wind NE 12 km/h","latency":"Latency","cost":"Est. cost","next":"Next step →","reset":"Reset","error":"Simulate tool error"},
+      "nodes":["User","Agent","Tool","Observe","Refine","Answer"],
+      "timeline":["Understand task","Choose action","Call weather tool","Observe result","Retry or refine","Final answer"],
+      "status":[
+        "The agent reads the user task and identifies missing information.",
+        "The agent selects the weather tool.",
+        "The weather tool is called with city = Tokyo.",
+        "Observation received: light rain, 18°C, humidity 92%.",
+        "The agent checks whether the observation is sufficient.",
+        "Final answer ready: bring an umbrella."
+      ],
+      "errorStatus":"Tool error: Weather API timeout → observe failure → retry.",
+      "waiting":"Waiting for final answer…",
+      "result":"Bring an umbrella — light rain is expected in Tokyo.",
+      "takeaways": [
+        ["Agents operate in loops","A result becomes input to the next decision."],
+        ["Tools extend capability","Actions connect the model to external systems."],
+        ["Observations guide decisions","Tool output changes what the agent does next."],
+        ["Reliability needs recovery","Retries and termination rules belong in the design."]
+      ],
+      "challenge": {"title":"Add a termination rule and fallback","body":"Define when the agent should retry, when it should stop, and what it should tell the user when the weather tool stays unavailable."},
+      "guide": {
+        "title":"What is an AI agent loop?",
+        "intro":"An agent loop is an iterative control process in which a model or agent interprets the current state, chooses an action, receives an observation, and decides whether to continue or return a final answer.",
+        "sections":[
+          {"title":"Why do agents use tools?","body":"Tools allow an agent to access information or perform actions that are not contained in the model itself, such as querying a database, calling an API, running code, or updating another system."},
+          {"title":"What is an observation?","body":"An observation is the result returned from an action or tool. The agent uses that result as new evidence for the next decision."},
+          {"title":"What makes an agent reliable?","body":"Production agents need explicit tool contracts, validation, retries, timeouts, authorization boundaries, observability, and termination conditions. The loop alone is not the reliability layer."}
+        ],
+        "faq":[
+          {"q":"Is every chatbot an agent?","a":"No. A chatbot can answer directly without taking iterative actions through tools."},
+          {"q":"Does an agent need hidden chain-of-thought?","a":"No. Agent control can be implemented through explicit state, tool calls, structured decisions, and observable transitions."},
+          {"q":"Why simulate tool errors?","a":"Because failures are normal in production; recovery behavior is part of the system design."},
+          {"q":"Is ReAct the only agent pattern?","a":"No. Plan-and-execute, workflows, state machines, and other orchestration patterns are also common."}
+        ],
+        "note":"The weather values and timing are illustrative; the control-flow concepts are the learning target."
+      },
+      "next": {"title":"You completed the Foundation learning path.","description":"Next: continue into failure-first production Labs.","href":"/en/early-access/","query":"?intent=completed-path","button":"Join Early Access →","event":"lesson_path_completed"}
+    }
+  }
+}

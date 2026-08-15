@@ -1,0 +1,87 @@
+{
+  "locale": "en",
+  "title": "AhaFrame — Understand AI by seeing it work",
+  "description": "Interactive visual lessons for AI engineering: tokens, context windows, RAG, agents, evaluation, and production AI.",
+  "hero": {
+    "eyebrow": "Interactive AI Engineering",
+    "headlineBefore": "Understand AI by",
+    "headlineAccent": "seeing",
+    "headlineAfter": "it work.",
+    "subheadline": "Interactive lessons for AI engineering. Explore token generation, context windows, RAG, agents, and release evaluation through visual simulations.",
+    "primary": "Start Learning →",
+    "secondary": "Explore Production Labs",
+    "proofs": ["No signup required", "Interactive experiences", "Simulation-first"],
+    "demoTitle": "Token Playground",
+    "demoBadge": "Interactive demo",
+    "promptLabel": "Your prompt",
+    "predictionLabel": "Next token prediction",
+    "settings": "Settings",
+    "temperature": "Temperature",
+    "sampling": "Sampling",
+    "sampleToken": "Example sampled token"
+  },
+  "foundations": {
+    "kicker": "Build the mental model",
+    "title": "Start with three interactive foundations",
+    "copy": "Change a parameter, watch the system respond, and connect the result back to an engineering decision.",
+    "progressTitle": "Your local progress",
+    "progressCopy": "Stored in this browser. No account needed.",
+    "notStarted": "Not started",
+    "cards": [
+      {"slug":"token-playground","number":"01","category":"Foundations","name":"Token Playground","description":"See how LLMs predict the next token.","link":"Try it now →"},
+      {"slug":"context-window","number":"02","category":"Context Engineering","name":"Context Window Lab","description":"See how context fills, overflows, and gets managed.","link":"Try it now →"},
+      {"slug":"agent-loop","number":"03","category":"Loop Engineering","name":"Agent Loop Simulator","description":"Step through act → observe → refine.","link":"Try it now →"}
+    ]
+  },
+  "production": {
+    "kicker": "Break systems on purpose",
+    "title": "Production Lab previews",
+    "copy": "Start from a failure state. Tune the engineering policy, compare against the baseline, and learn what the system trades away when one metric improves.",
+    "cards": [
+      {"slug":"instruction-conflict","status":"New","layer":"Prompt","icon":"¶","name":"Instruction Conflict Lab","description":"Fix instruction authority, then see why Prompt still cannot enforce runtime safety.","firstLabel":"Control","first":"Authority · specificity · context role · schema · ambiguity","secondLabel":"Learn","second":"Prompt → Context → Harness → Evaluation boundaries","link":"Debug the instruction contract →"},
+      {"slug":"rag-failure","status":"Available","layer":"Context","icon":"⌕","name":"RAG Failure Lab","description":"Fix retrieval without assuming more context is always better.","firstLabel":"Control","first":"Chunk size · Top-K · hybrid · reranker","secondLabel":"Observe","second":"Recall · precision · context · quality · cost","link":"Break and tune RAG →"},
+      {"slug":"context-compression","status":"Available","layer":"Context","icon":"▱","name":"Context Compression Lab","description":"Save tokens without silently deleting the information that changes the answer.","firstLabel":"Control","first":"Compression · summary · retrieval · memory · protection","secondLabel":"Observe","second":"Retention · quality · hallucination · latency · cost","link":"Compress the working context →"},
+      {"slug":"agent-reliability","status":"Available","layer":"Harness","icon":"⌘","name":"Agent Reliability Lab","description":"Improve reliability without pretending retries, guardrails, and approvals are free.","firstLabel":"Control","first":"Steps · retries · timeout · validation · approval","secondLabel":"Observe","second":"Success · runaway · safety · latency · cost","link":"Tune the agent policy →"},
+      {"slug":"evaluation-failure","status":"Available","layer":"Evaluation","icon":"✓","name":"Evaluation Failure Lab","description":"Find the release regression hidden behind a better aggregate score.","firstLabel":"Control","first":"Dataset · threshold · veto · samples · judge · cost","secondLabel":"Decide","second":"SHIP · BLOCK · INCONCLUSIVE","link":"Debug the release decision →"}
+    ]
+  },
+  "method": {
+    "kicker": "Learning model",
+    "title": "See. Play. Break. Aha. Build.",
+    "items": [
+      {"name":"See","description":"Make invisible AI states visible through clear diagrams and simulations."},
+      {"name":"Play","description":"Change parameters and compare outcomes instead of memorizing vocabulary."},
+      {"name":"Break","description":"Trigger failure modes intentionally so weak assumptions become visible."},
+      {"name":"Aha","description":"Connect cause and effect until the system clicks as a durable mental model."},
+      {"name":"Build","description":"Apply the mental model to architecture, trade-offs, evaluation, and production decisions."}
+    ]
+  },
+  "stack": {
+    "kicker": "AhaFrame AI Engineering Stack",
+    "title": "Six responsibilities behind production AI systems",
+    "copy": "The layers are engineering responsibilities, not framework names. Learn where a failure belongs before deciding how to fix it.",
+    "layers": [
+      ["Prompt Engineering","Behavior · instruction authority"],
+      ["Context Engineering","Knowledge · retrieval · compression"],
+      ["Harness Engineering","Reliability · tools · permissions"],
+      ["Loop Engineering","Iteration · recovery · termination"],
+      ["Graph Engineering","Orchestration · branches · joins"],
+      ["Evaluation Engineering","Evidence · release decisions"]
+    ]
+  },
+  "audience": {
+    "title": "Built for builders and learners",
+    "items": [
+      ["Developers moving into AI","Translate software experience into AI-native engineering."],
+      ["Product builders using LLMs","Understand the systems beneath the APIs."],
+      ["Technical learners","Build intuition instead of memorizing vocabulary."]
+    ]
+  },
+  "cta": {
+    "title": "Go from AI curiosity to AI engineering.",
+    "copy": "Join early access for new failure simulations and production labs.",
+    "email": "Email",
+    "placeholder": "Enter your email",
+    "button": "Join Early Access →"
+  }
+}

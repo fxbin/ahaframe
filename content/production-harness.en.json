@@ -1,0 +1,109 @@
+{
+  "locale": "en",
+  "ui": {
+    "home": "Home",
+    "productionLabs": "Production Labs",
+    "preview": "Production Lab Preview",
+    "minutes": "min",
+    "share": "Share",
+    "inOneSentence": "In one sentence",
+    "keyTakeaways": "Key takeaways",
+    "commonQuestions": "Common questions",
+    "simulationNote": "AhaFrame simulation note",
+    "reviewed": "Reviewed",
+    "buildChallenge": "Build challenge"
+  },
+  "labs": {
+    "agent-reliability": {
+      "name": "Agent Reliability Lab",
+      "layer": "Harness Engineering",
+      "level": "Intermediate",
+      "minutes": 20,
+      "seoTitle": "Agent Reliability Lab — Tune retries, limits, and guardrails | AhaFrame",
+      "description": "Tune a simulated customer-support agent by changing max steps, retries, timeouts, validation, human approval, and termination rules while watching success, runaway risk, safety, latency, and cost.",
+      "hero": "Start with an autonomous support agent that usually finishes the task—but retries too aggressively, can loop for too long, and may issue a refund without enough validation. Tune the control policy until reliability improves without hiding the cost and latency trade-offs.",
+      "quick": "Reliable agents are not agents that retry forever; they combine bounded execution, explicit validation, safe termination, and human control where irreversible actions justify it.",
+      "interactive": {
+        "panelTitle": "Unreliable production scenario",
+        "simulation": "Deterministic simulation",
+        "intro": "Scenario: a customer-support agent looks up an account, checks refund policy, and may call an irreversible refund tool. The baseline has enough freedom to complete many tasks, but weak stopping rules and aggressive retries create reliability and safety debt.",
+        "maxSteps": "Max steps",
+        "retryLimit": "Retry limit",
+        "timeout": "Tool timeout",
+        "termination": "Termination rule",
+        "terminationOptions": {
+          "weak": "Weak: stop only at max steps",
+          "bounded": "Bounded: stop repeated failures",
+          "goal-aware": "Goal-aware: stop on success or repetition"
+        },
+        "irreversible": "Irreversible action: issuing a refund. Human approval therefore improves safety, but it also adds review load and latency.",
+        "preset": "Apply reliability preset",
+        "reset": "Reset unreliable baseline",
+        "systemSees": "What the system sees",
+        "metrics": ["Success rate", "Reliability score", "Runaway risk", "Unsafe-action risk", "Sim latency", "Cost index", "Human reviews / 100"],
+        "diagnosis": "Current diagnosis",
+        "baseline": "Unreliable baseline",
+        "baselineStrong": "14 steps · 4 retries · weak termination",
+        "baselineText": "No result validation and no approval before an irreversible refund action.",
+        "current": "Your current policy",
+        "waiting": "Waiting for changes…"
+      },
+      "presentation": {
+        "seconds": "s",
+        "validation": {"on": "Result validation: ON", "off": "Result validation: OFF"},
+        "human": {"on": "Human approval: ON", "off": "Human approval: OFF"},
+        "diagnosis": {
+          "healthy": "Healthy control policy: task completion, execution bounds, and safety checks are balanced.",
+          "runaway-loop": "Runaway risk is too high: retries and step budget give a confused agent too much room to repeat work.",
+          "unsafe-action": "Unsafe-action risk is too high: irreversible tool calls need stronger validation or an approval boundary.",
+          "task-failure": "Task success is too low: the policy is stopping or timing out before enough valid recovery can happen.",
+          "slow-policy": "The policy is reliable but slow: timeout and review overhead are dominating the execution path.",
+          "expensive-policy": "The policy works, but too many steps or retries make the expected run unnecessarily expensive."
+        },
+        "compare": {
+          "title": "Vs. unreliable baseline",
+          "reliability": "Reliability",
+          "success": "Success",
+          "runaway": "Runaway",
+          "unsafe": "Unsafe actions",
+          "latency": "Latency",
+          "cost": "Cost",
+          "points": "pts"
+        }
+      },
+      "takeaways": [
+        ["Retries are not free", "Retries can recover transient failures, but aggressive retry budgets also increase execution length, latency, cost, and repeated-action risk."],
+        ["Max steps are a safety boundary", "A larger step budget can rescue complex tasks, but it also gives a confused agent more room to loop."],
+        ["Validation changes correctness", "Checking a tool result or proposed final action can catch bad state before it propagates into another step."],
+        ["Human approval belongs at consequence boundaries", "Approval is most valuable around irreversible or high-impact actions, where extra latency can be an acceptable trade for lower safety risk."],
+        ["Termination is part of the agent design", "Stopping on success, repeated failures, or repeated state is more reliable than treating max-steps exhaustion as the only exit."]
+      ],
+      "guide": {
+        "eyebrow": "Production mental model",
+        "title": "Why do agents fail even when every tool works?",
+        "intro": "An agent can have a capable model and functioning tools and still be unreliable. Reliability depends on the policy that connects observations to the next action: how long the loop may run, what gets retried, what must be validated, which actions require approval, and what counts as a legitimate stopping condition.",
+        "sections": [
+          {"title": "More retries improve recovery—and expand the failure surface", "body": "Transient tool errors justify retries, but retrying without a bounded policy can repeat side effects, amplify bad assumptions, and consume extra model/tool calls. Production agents should distinguish retryable failures from validation failures and permanent errors."},
+          {"title": "Max steps are a guardrail, not a planning strategy", "body": "A maximum step count is useful as a final circuit breaker, but it should not be the only termination rule. A good runtime can also stop when the goal is satisfied, the same failed state repeats, required information is unavailable, or the action budget no longer justifies another attempt."},
+          {"title": "Validation and approval solve different problems", "body": "Validation checks whether an observation, structured result, or proposed action is internally acceptable. Human approval introduces an external decision maker before a consequential action. Validation can run on every step; approval should be targeted where the consequence warrants the interruption."},
+          {"title": "What is simulated here?", "body": "The rates, latency, cost index, and risk values in this lab are deterministic educational metrics. They are not benchmark measurements from a live support agent, model, tool API, or human-review queue. The purpose is to make engineering cause and effect repeatable before a later Live Mode compares a policy against real executions."}
+        ],
+        "faq": [
+          {"q": "Should I always lower max steps?", "a": "No. Too few steps can prevent valid multi-tool tasks from completing. The goal is a bounded budget that matches task complexity."},
+          {"q": "Should every tool call have a retry?", "a": "No. Retries should depend on the failure class and whether repeating the action is safe and idempotent."},
+          {"q": "Does human approval make an agent reliable?", "a": "It reduces risk around selected actions, but it does not fix bad planning, weak validation, or runaway loops elsewhere."},
+          {"q": "Why show success and runaway risk separately?", "a": "A system can complete many tasks successfully and still be operationally dangerous if a meaningful minority of runs loop, overspend, or take unsafe actions."}
+        ],
+        "note": "Metrics are synthetic and pedagogical; validate policies with representative traces and evaluation sets before production decisions."
+      },
+      "next": {
+        "title": "You improved one agent control policy.",
+        "description": "The next Production Lab will focus on evaluation: how to prove that a new RAG or agent configuration is actually better across a representative test set.",
+        "href": "/en/early-access/",
+        "query": "?intent=agent-reliability-production-labs",
+        "button": "Get Production Labs",
+        "event": "agent_reliability_paid_intent_click"
+      }
+    }
+  }
+}

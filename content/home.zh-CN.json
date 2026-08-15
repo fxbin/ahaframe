@@ -1,0 +1,87 @@
+{
+  "locale": "zh-CN",
+  "title": "AhaFrame — 看见 AI 如何运作，才能真正理解它",
+  "description": "用交互式可视化实验理解 AI 工程：Token、上下文窗口、RAG、Agent、评测与生产系统中的工程权衡。",
+  "hero": {
+    "eyebrow": "交互式 AI 工程学习",
+    "headlineBefore": "看见 AI 如何",
+    "headlineAccent": "运作",
+    "headlineAfter": "，才能真正理解它。",
+    "subheadline": "不要只记概念。亲手改变参数、触发失败，再看清 Token、上下文、RAG、Agent 与评测之间真正的因果关系。",
+    "primary": "开始学习 →",
+    "secondary": "查看生产实验",
+    "proofs": ["无需注册", "可交互实验", "模拟优先"],
+    "demoTitle": "Token Playground",
+    "demoBadge": "可交互演示",
+    "promptLabel": "输入 Prompt",
+    "predictionLabel": "下一个 Token 的概率",
+    "settings": "参数",
+    "temperature": "Temperature",
+    "sampling": "采样方式",
+    "sampleToken": "示例采样结果"
+  },
+  "foundations": {
+    "kicker": "先建立心智模型",
+    "title": "从三个基础实验开始",
+    "copy": "一次只改变一个变量，观察系统如何响应，再把结果还原成一个可以用于工程判断的因果关系。",
+    "progressTitle": "本机学习进度",
+    "progressCopy": "只保存在当前浏览器，不需要账号。",
+    "notStarted": "未开始",
+    "cards": [
+      {"slug":"token-playground","number":"01","category":"基础","name":"Token Playground","description":"看见 LLM 是怎样一步步预测下一个 Token 的。","link":"打开实验 →"},
+      {"slug":"context-window","number":"02","category":"上下文工程","name":"上下文窗口实验","description":"看见上下文如何被占满、溢出，以及不同管理策略会牺牲什么。","link":"打开实验 →"},
+      {"slug":"agent-loop","number":"03","category":"Loop 工程","name":"Agent Loop 模拟器","description":"逐步观察行动、反馈、恢复与终止是怎样形成一次 Agent 迭代的。","link":"打开实验 →"}
+    ]
+  },
+  "production": {
+    "kicker": "主动把系统弄坏",
+    "title": "生产级失败实验",
+    "copy": "从一个明确的失败状态开始。调整工程策略、与基线比较，然后看清：一个指标变好时，系统究竟付出了什么代价。",
+    "cards": [
+      {"slug":"instruction-conflict","status":"新","layer":"Prompt","icon":"¶","name":"指令冲突实验","description":"先修正指令权威关系，再看为什么 Prompt 仍然无法替代真实的运行时安全机制。","firstLabel":"调整","first":"权威 · 明确度 · 上下文角色 · Schema · 歧义","secondLabel":"理解","second":"Prompt → Context → Harness → Evaluation 的责任边界","link":"调试指令契约 →"},
+      {"slug":"rag-failure","status":"可用","layer":"Context","icon":"⌕","name":"RAG 失败实验","description":"修复检索问题，同时验证“给模型更多上下文”为什么并不总是更好。","firstLabel":"调整","first":"Chunk · Top-K · Hybrid · Reranker","secondLabel":"观察","second":"召回 · 精度 · 上下文压力 · 质量 · 成本","link":"破坏并调试 RAG →"},
+      {"slug":"context-compression","status":"可用","layer":"Context","icon":"▱","name":"上下文压缩实验","description":"减少 Token 的同时，别把真正会改变答案的信息一起压掉。","firstLabel":"调整","first":"压缩 · 摘要 · 检索 · 记忆 · 关键信息保护","secondLabel":"观察","second":"信息保留 · 任务质量 · 幻觉风险 · 延迟 · 成本","link":"压缩工作上下文 →"},
+      {"slug":"agent-reliability","status":"可用","layer":"Harness","icon":"⌘","name":"Agent 可靠性实验","description":"提高可靠性，同时正视重试、校验、审批和运行约束本身也有成本。","firstLabel":"调整","first":"步数 · 重试 · 超时 · 结果校验 · 人工审批","secondLabel":"观察","second":"成功率 · 失控风险 · 安全 · 延迟 · 成本","link":"调整 Agent 策略 →"},
+      {"slug":"evaluation-failure","status":"可用","layer":"Evaluation","icon":"✓","name":"评测失败实验","description":"在整体分数变好的情况下，找出那个足以阻止发布的隐藏回归。","firstLabel":"调整","first":"数据集 · 阈值 · 安全否决 · 样本 · Judge · 成本","secondLabel":"决定","second":"SHIP · BLOCK · INCONCLUSIVE","link":"调试发布决策 →"}
+    ]
+  },
+  "method": {
+    "kicker": "学习方式",
+    "title": "SEE → PLAY → BREAK → AHA → BUILD",
+    "items": [
+      {"name":"SEE","description":"先把原本看不见的系统状态呈现出来。"},
+      {"name":"PLAY","description":"改变一个参数，观察结果如何变化，而不是背术语。"},
+      {"name":"BREAK","description":"主动触发失败，让隐藏假设暴露出来。"},
+      {"name":"AHA","description":"把原因、结果和工程边界连起来，形成可复用的理解。"},
+      {"name":"BUILD","description":"把这个心智模型带回架构、调试、评测与发布决策。"}
+    ]
+  },
+  "stack": {
+    "kicker": "AhaFrame AI 工程栈",
+    "title": "生产 AI 系统背后的六类工程责任",
+    "copy": "它们不是框架名，而是六个不同的责任边界。先判断问题属于哪一层，再决定该在哪里修。",
+    "layers": [
+      ["Prompt 工程","行为 · 指令权威"],
+      ["上下文工程","知识 · 检索 · 压缩"],
+      ["Harness 工程","可靠性 · 工具 · 权限"],
+      ["Loop 工程","迭代 · 恢复 · 终止"],
+      ["Graph 工程","编排 · 分支 · 汇合"],
+      ["评测工程","证据 · 发布决策"]
+    ]
+  },
+  "audience": {
+    "title": "为真正要构建 AI 系统的人设计",
+    "items": [
+      ["正在转向 AI 的开发者","把已有的软件工程经验迁移到 AI 原生工程问题上。"],
+      ["正在用 LLM 做产品的人","不只会调 API，也理解 API 下面的系统行为。"],
+      ["希望建立技术直觉的学习者","不靠背术语，而是理解参数、失败与工程取舍。"]
+    ]
+  },
+  "cta": {
+    "title": "从“会用 AI”走向“会构建 AI 系统”。",
+    "copy": "加入内测，第一时间体验新的失败模拟与生产实验。",
+    "email": "邮箱",
+    "placeholder": "输入邮箱",
+    "button": "加入内测 →"
+  }
+}

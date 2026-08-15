@@ -1,0 +1,37 @@
+{
+  "locale": "zh-CN",
+  "pricing": {
+    "title": "AhaFrame 定价 — AI 工程交互实验",
+    "description": "查看 AhaFrame 当前的定价验证方案：免费心智模型、一次性 AI 工程基础版，以及未来可能推出的 Production Labs。",
+    "kicker": "定价验证",
+    "headlineBefore": "理解概念永久免费；真正收费的是",
+    "headlineAccent": "工程能力",
+    "intro": "AhaFrame 正在验证一个更克制的付费边界：失败模拟、生产实验、Build 项目与评测挑战。当前 MVP 不会向你收款。",
+    "plans": [
+      {"name":"免费版","badge":"","description":"先把心智模型建立起来，再决定是否值得付费。","price":"$0","suffix":"/ 永久","items":["核心交互式心智模型","基础模拟实验","公开概念指南","本机学习进度","轮换开放的生产实验预览"],"cta":"体验评测失败实验","href":"/en/labs/evaluation-failure/","event":""},
+      {"name":"AI 工程基础版","badge":"当前推荐假设","description":"从理解系统，到形成生产环境中的工程判断。","price":"$49","suffix":"/ 一次性价格假设","items":["12 个交互式工程实验","失败模拟","3 个 Build 项目","评测挑战","基础路线长期访问"],"cta":"我会考虑一次支付 $49","href":"/zh-cn/early-access/?intent=foundations-49","event":"pricing_foundations_click"},
+      {"name":"Production Labs","badge":"未来方案假设","description":"持续增加更复杂的生产场景与高级实验。","price":"$12","suffix":"/ 月价格假设","items":["包含基础版全部内容","持续更新的生产场景","高级对比 / Replay 工作流","账号上线后的实验保存","只有真实计算能力上线后才引入 Live credits"],"cta":"我会考虑 $12/月","href":"/zh-cn/early-access/?intent=production-labs-12","event":"pricing_pro_click"}
+    ],
+    "compareTitle": "你真正为什么付费？",
+    "matrixHeaders": ["能力","免费版","基础版","Production Labs"],
+    "matrixRows": [["心智模型 + 概念指南","✓","✓","✓"],["基础模拟实验","部分","全部","全部"],["失败模拟","预览","✓","✓"],["Build 项目 + 评测","—","✓","✓"],["持续增长的生产实验库","—","—","✓"]],
+    "sequenceTitle": "当前开发顺序",
+    "sequence": [["RAG 失败实验","破坏检索、调整参数、与基线比较。","可用"],["Agent 可靠性实验","重试、限制、校验、安全与成本。","可用"],["评测失败实验","覆盖率、切片回归、安全否决、证据与发布门槛。","新"],["上下文压缩实验","Token 节省、关键信息保留、检索与记忆权衡。","下一步"],["可选账号","只有 Save / Purchase / Live Mode 真正需要身份时再引入。","以后" ]],
+    "ctaTitle": "帮我们验证付费边界。",
+    "ctaCopy": "请选择你真正愿意考虑的方案。这里只记录意向，不会产生扣款。",
+    "ctaButton": "加入内测 →"
+  },
+  "earlyAccess": {
+    "title": "AhaFrame 内测 — 加入 AI 工程实验候补名单",
+    "description": "加入 AhaFrame 内测，体验新的 AI 工程心智模型、失败模拟与生产实验，并参与产品验证。",
+    "eyebrow": "AhaFrame 内测",
+    "headlineBefore": "把对 AI 的理解变成",
+    "headlineAccent": "可用于工程决策的直觉",
+    "intro": "你会收到新的交互实验、失败模拟预览、定价验证与发布更新，也可以直接告诉我们哪些地方真正让你产生了 Aha。",
+    "emailLabel": "邮箱",
+    "placeholder": "you@example.com",
+    "button": "加入内测 →",
+    "demoNote": "如果远端候补名单接口尚未配置，页面会明确显示 Demo mode，不会把本机保存伪装成远端提交成功。",
+    "cards": [["01","交互式心智模型","先看见隐藏的系统状态，再理解框架 API 背后的工程问题。"],["02","失败模拟","在可重复的场景里主动破坏 RAG、Agent、上下文与评测策略。"],["03","生产实验","把概念理解推进到架构、调试、评测与工程权衡。"]]
+  }
+}

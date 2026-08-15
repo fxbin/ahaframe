@@ -29,14 +29,28 @@ jobs:
           fi
       - name: Test Lab Engine
         run: node scripts/test_lab_engine.js
+      - name: Test Integrated Build
+        run: node scripts/test_integrated_build.js
       - name: Test Validation Runtime
         run: node scripts/test_validation_runtime.js
+      - name: Test i18n Foundation
+        run: python3 scripts/test_i18n_foundation.py
       - name: Validate production smoke harness
         run: python3 -m py_compile scripts/smoke_production.py
       - name: Build static site
         env:
           AHAFRAME_BASE_URL: https://ahaframe.com
         run: python3 scripts/build_site.py
+      - name: Validate Foundation localization
+        run: python3 scripts/test_foundation_localization.py
+      - name: Validate Prompt and Context localization
+        run: python3 scripts/test_prompt_context_localization.py
+      - name: Validate Harness localization
+        run: python3 scripts/test_harness_localization.py
+      - name: Validate Graph and Evaluation localization
+        run: python3 scripts/test_graph_evaluation_localization.py
+      - name: Validate Integrated Build localization
+        run: python3 scripts/test_integrated_build_localization.py
       - name: Validate
         run: python3 scripts/validate.py
       - name: Validate instrumentation build

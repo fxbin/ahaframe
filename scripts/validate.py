@@ -1,12 +1,78 @@
 from __future__ import annotations
 from pathlib import Path
 from urllib.parse import urlparse
-import json, subprocess, sys, xml.etree.ElementTree as ET
+import json, re, subprocess, sys, xml.etree.ElementTree as ET
 from bs4 import BeautifulSoup
 
-ROOT=Path(__file__).resolve().parents[1]; SITE=ROOT/"site"; CONTENT=json.loads((ROOT/"content/en.json").read_text(encoding="utf-8"))
-EXPECTED_HTML={"index.html","404.html","en/index.html","en/pricing/index.html","en/early-access/index.html","en/lessons/token-playground/index.html","en/lessons/context-window/index.html","en/lessons/agent-loop/index.html","en/labs/rag-failure/index.html","en/labs/agent-reliability/index.html","en/labs/evaluation-failure/index.html","en/labs/context-compression/index.html","en/labs/instruction-conflict/index.html","en/labs/agent-workflow-graph/index.html","en/build/reliable-support-agent/index.html"}
-INTERACTIVE_HTML={"en/index.html","en/lessons/token-playground/index.html","en/lessons/context-window/index.html","en/lessons/agent-loop/index.html","en/labs/rag-failure/index.html","en/labs/agent-reliability/index.html","en/labs/evaluation-failure/index.html","en/labs/context-compression/index.html","en/labs/instruction-conflict/index.html","en/labs/agent-workflow-graph/index.html","en/build/reliable-support-agent/index.html"}
+from ahaframe.i18n import PUBLIC_ROUTE_RELATIVES, ROUTE_PREFIX, SUPPORTED_LOCALES, equivalent_paths, load_locale_source
+
+ROOT=Path(__file__).resolve().parents[1]
+SITE=ROOT/"site"
+CONTENT=json.loads((ROOT/"content/en.json").read_text(encoding="utf-8"))
+
+
+def route_file(locale: str, relative: str) -> str:
+    prefix=ROUTE_PREFIX[locale]
+    return f"{prefix}/index.html" if not relative else f"{prefix}/{relative}index.html"
+
+
+def route_files(relative: str) -> set[str]:
+    return {
+        route_file(locale,relative)
+        for locale in SUPPORTED_LOCALES
+        if relative in load_locale_source(locale).get("availableRoutes",[])
+    }
+
+
+EXPECTED_HTML={"index.html","404.html"}
+for locale in SUPPORTED_LOCALES:
+    for relative in load_locale_source(locale).get("availableRoutes",[]):
+        EXPECTED_HTML.add(route_file(locale,relative))
+
+INTERACTIVE_RELATIVES={
+    "",
+    "lessons/token-playground/","lessons/context-window/","lessons/agent-loop/",
+    "labs/rag-failure/","labs/agent-reliability/","labs/evaluation-failure/",
+    "labs/context-compression/","labs/instruction-conflict/","labs/agent-workflow-graph/",
+    "build/reliable-support-agent/",
+}
+INTERACTIVE_HTML=set().union(*(route_files(relative) for relative in INTERACTIVE_RELATIVES))
+
+EXTRA_SCRIPTS={
+    "labs/evaluation-failure/":("/assets/evaluation-scenario.js","/assets/evaluation.js"),
+    "labs/context-compression/":("/assets/context-compression-scenario.js","/assets/context-compression.js"),
+    "labs/instruction-conflict/":("/assets/instruction-conflict-scenario.js","/assets/prompt-authority.js"),
+    "labs/agent-workflow-graph/":("/assets/agent-workflow-graph-scenario.js","/assets/agent-workflow-graph.js"),
+}
+MOUNTS={
+    "labs/rag-failure/":"[data-rag-lab]",
+    "labs/agent-reliability/":"[data-agent-reliability-lab]",
+    "labs/evaluation-failure/":"[data-evaluation-lab]",
+    "labs/context-compression/":"[data-context-compression-lab]",
+    "labs/instruction-conflict/":"[data-instruction-conflict-lab]",
+    "labs/agent-workflow-graph/":"[data-agent-workflow-graph-lab]",
+    "build/reliable-support-agent/":"[data-reliable-support-agent]",
+}
+
+
+def locale_relative_for_file(rel: str):
+    for locale in SUPPORTED_LOCALES:
+        prefix=ROUTE_PREFIX[locale]+"/"
+        if rel.startswith(prefix):
+            suffix=rel[len(prefix):]
+            if suffix=="index.html":
+                return locale,""
+            if suffix.endswith("index.html"):
+                return locale,suffix[:-len("index.html")]
+    return None,None
+
+
+def textual_weight(text: str) -> int:
+    latin_words=len(re.findall(r"[A-Za-z0-9][A-Za-z0-9'_-]*",text))
+    cjk=len(re.findall(r"[\u3400-\u9fff]",text))
+    return latin_words+cjk
+
+
 errors=[]
 if not SITE.exists(): raise SystemExit("site/ is missing. Run scripts/build_site.py first.")
 html_files=sorted(SITE.rglob("*.html")); actual_html={str(path.relative_to(SITE)) for path in html_files}
@@ -14,9 +80,11 @@ if actual_html!=EXPECTED_HTML: errors.append(f"HTML route set mismatch: missing=
 
 for file in html_files:
     soup=BeautifulSoup(file.read_text(encoding="utf-8"),"html.parser"); rel=str(file.relative_to(SITE))
+    locale,relative=locale_relative_for_file(rel)
     if not soup.title: errors.append(f"{rel}: missing title")
     if not soup.find("meta",attrs={"name":"description"}): errors.append(f"{rel}: missing meta description")
     if not soup.find("link",attrs={"rel":"canonical"}): errors.append(f"{rel}: missing canonical")
+    if locale and soup.html and soup.html.get("lang")!=locale: errors.append(f"{rel}: html lang must be {locale}")
     ids=[node.get("id") for node in soup.find_all(attrs={"id":True})]; dup=sorted({v for v in ids if ids.count(v)>1})
     if dup: errors.append(f"{rel}: duplicate ids {dup}")
     for image in soup.find_all("img"):
@@ -31,31 +99,30 @@ for file in html_files:
         scripts=[node.get("src") for node in soup.find_all("script",src=True)]; engine="/assets/lab-engine.js"; scenarios="/assets/lab-scenarios.js"
         if engine not in scripts or scenarios not in scripts: errors.append(f"{rel}: missing Lab Engine runtime")
         elif scripts.index(engine)>scripts.index(scenarios): errors.append(f"{rel}: lab-engine.js must load before lab-scenarios.js")
-        extras={"en/labs/evaluation-failure/index.html":("/assets/evaluation-scenario.js","/assets/evaluation.js"),"en/labs/context-compression/index.html":("/assets/context-compression-scenario.js","/assets/context-compression.js"),"en/labs/instruction-conflict/index.html":("/assets/instruction-conflict-scenario.js","/assets/prompt-authority.js"),"en/labs/agent-workflow-graph/index.html":("/assets/agent-workflow-graph-scenario.js","/assets/agent-workflow-graph.js")}
-        if rel in extras:
-            scenario,adapter=extras[rel]
+        if relative in EXTRA_SCRIPTS:
+            scenario,adapter=EXTRA_SCRIPTS[relative]
             if scenario not in scripts or adapter not in scripts: errors.append(f"{rel}: missing page scenario or adapter")
             elif not scripts.index(scenarios)<scripts.index(scenario)<scripts.index(adapter): errors.append(f"{rel}: invalid scenario/adapter load order")
-        if rel=="en/build/reliable-support-agent/index.html":
+        if relative=="build/reliable-support-agent/":
             required=["/assets/instruction-conflict-scenario.js","/assets/evaluation-scenario.js","/assets/context-compression-scenario.js","/assets/agent-workflow-graph-scenario.js","/assets/reliable-support-scenario.js","/assets/integrated-build.js"]
             if any(item not in scripts for item in required): errors.append(f"{rel}: missing integrated scenario modules")
             else:
                 positions=[scripts.index(item) for item in required]
                 if positions!=sorted(positions) or scripts.index(scenarios)>positions[0]: errors.append(f"{rel}: invalid integrated scenario load order")
 
-    if rel.startswith("en/lessons/"):
+    if relative and relative.startswith("lessons/"):
         if len(soup.find_all("h1"))!=1: errors.append(f"{rel}: expected one H1")
-        if len(soup.get_text(" ",strip=True).split())<250: errors.append(f"{rel}: lesson textual content too thin")
+        if textual_weight(soup.get_text(" ",strip=True))<250: errors.append(f"{rel}: lesson textual content too thin")
         if "LearningResource" not in " ".join(n.get_text() for n in soup.find_all("script",attrs={"type":"application/ld+json"})): errors.append(f"{rel}: missing LearningResource schema")
         if not soup.select_one(".quick-answer") or not soup.select_one("[data-share]") or not soup.select_one("[data-complete-lesson]"): errors.append(f"{rel}: incomplete lesson controls")
 
-    if rel.startswith("en/labs/") or rel.startswith("en/build/"):
+    if relative and (relative.startswith("labs/") or relative.startswith("build/")):
         if len(soup.find_all("h1"))!=1: errors.append(f"{rel}: expected one H1")
-        if len(soup.get_text(" ",strip=True).split())<300: errors.append(f"{rel}: interactive content too thin")
+        if textual_weight(soup.get_text(" ",strip=True))<300: errors.append(f"{rel}: interactive content too thin")
         if "LearningResource" not in " ".join(n.get_text() for n in soup.find_all("script",attrs={"type":"application/ld+json"})): errors.append(f"{rel}: missing LearningResource schema")
         if not soup.select_one(".quick-answer") or not soup.select_one("[data-share]"): errors.append(f"{rel}: missing answer-first/share controls")
-    mounts={"en/labs/rag-failure/index.html":"[data-rag-lab]","en/labs/agent-reliability/index.html":"[data-agent-reliability-lab]","en/labs/evaluation-failure/index.html":"[data-evaluation-lab]","en/labs/context-compression/index.html":"[data-context-compression-lab]","en/labs/instruction-conflict/index.html":"[data-instruction-conflict-lab]","en/labs/agent-workflow-graph/index.html":"[data-agent-workflow-graph-lab]","en/build/reliable-support-agent/index.html":"[data-reliable-support-agent]"}
-    if rel in mounts and not soup.select_one(mounts[rel]): errors.append(f"{rel}: missing interactive mount point")
+    if relative in MOUNTS and not soup.select_one(MOUNTS[relative]): errors.append(f"{rel}: missing interactive mount point")
+
     for anchor in soup.find_all("a",href=True):
         href=anchor["href"]
         if href.startswith("/") and not href.startswith("//"):
@@ -66,11 +133,18 @@ for file in html_files:
             if not target.exists(): errors.append(f"{rel}: broken link {href}")
 
 try:
-    root=ET.fromstring((SITE/"sitemap.xml").read_text(encoding="utf-8")); ns={"s":"http://www.sitemaps.org/schemas/sitemap/0.9"}; locs=[n.text for n in root.findall("s:url/s:loc",ns)]; lastmods=[n.text for n in root.findall("s:url/s:lastmod",ns)]
-    if len(locs)!=13: errors.append(f"sitemap: expected 13 URLs, got {len(locs)}")
-    for slug in ["rag-failure","agent-reliability","evaluation-failure","context-compression","instruction-conflict","agent-workflow-graph"]:
-        if not any((v or '').endswith(f"/en/labs/{slug}/") for v in locs): errors.append(f"sitemap: missing {slug}")
-    if not any((v or '').endswith('/en/build/reliable-support-agent/') for v in locs): errors.append('sitemap: missing integrated Build')
+    root=ET.fromstring((SITE/"sitemap.xml").read_text(encoding="utf-8"))
+    ns={"s":"http://www.sitemaps.org/schemas/sitemap/0.9","x":"http://www.w3.org/1999/xhtml"}
+    locs=[n.text for n in root.findall("s:url/s:loc",ns)]
+    lastmods=[n.text for n in root.findall("s:url/s:lastmod",ns)]
+    expected_paths={path for relative in PUBLIC_ROUTE_RELATIVES for path in equivalent_paths(f"/en/{relative}").values()}
+    actual_paths={urlparse(value or '').path for value in locs}
+    if actual_paths!=expected_paths: errors.append(f"sitemap: localized route mismatch missing={sorted(expected_paths-actual_paths)}, extra={sorted(actual_paths-expected_paths)}")
+    if len(locs)!=len(PUBLIC_ROUTE_RELATIVES)*len(SUPPORTED_LOCALES): errors.append(f"sitemap: expected {len(PUBLIC_ROUTE_RELATIVES)*len(SUPPORTED_LOCALES)} localized URLs, got {len(locs)}")
+    for node in root.findall("s:url",ns):
+        links=node.findall("x:link",ns)
+        hreflangs={link.attrib.get('hreflang') for link in links}
+        if hreflangs!={'en','zh-CN','x-default'}: errors.append(f"sitemap: incomplete alternates for {node.find('s:loc',ns).text}: {sorted(hreflangs)}")
     if len(lastmods)!=len(locs) or any(v!=CONTENT["meta"]["updated"] for v in lastmods): errors.append('sitemap: invalid lastmod')
 except Exception as exc: errors.append(f"sitemap invalid: {exc}")
 
@@ -87,4 +161,4 @@ try:
     if vercel.get("outputDirectory")!="site" or "scripts/build_site.py" not in vercel.get("buildCommand",""): errors.append('vercel.json invalid build config')
 except Exception as exc: errors.append(f"vercel.json invalid: {exc}")
 if errors: print("\n".join(errors)); sys.exit(1)
-print(f"PASS: {len(html_files)} pages; six-layer conceptual closure, integration, JS and deployment config validated.")
+print(f"PASS: {len(html_files)} pages across {len(SUPPORTED_LOCALES)} locales; bilingual discovery, six-layer conceptual closure, integration, JS and deployment config validated.")

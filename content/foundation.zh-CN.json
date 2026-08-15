@@ -1,0 +1,160 @@
+{
+  "locale": "zh-CN",
+  "ui": {
+    "lessons": "课程",
+    "minutes": "分钟",
+    "share": "分享",
+    "markComplete": "标记为已学完",
+    "inOneSentence": "一句话理解",
+    "keyTakeaways": "关键结论",
+    "buildChallenge": "动手想一想",
+    "advancedLabs": "查看进阶实验",
+    "whatYouLearn": "你会理解什么",
+    "lessonPath": "学习路径",
+    "conceptGuide": "概念说明",
+    "commonQuestions": "常见问题",
+    "learningNote": "AhaFrame 学习说明",
+    "reviewed": "内容复核"
+  },
+  "lessons": {
+    "token-playground": {
+      "name": "Token Playground",
+      "category": "基础",
+      "level": "入门",
+      "minutes": 6,
+      "description": "看见大语言模型如何把文本拆成 Token、计算下一个 Token 的概率，以及 Temperature 如何改变采样结果。",
+      "seoTitle": "Token Playground — 看懂 LLM 如何预测下一个 Token | AhaFrame",
+      "quick": "LLM 不是一次写完整句话，而是不断计算“下一个 Token 可能是什么”，选出一个结果，把它加入上下文，再继续下一轮。",
+      "learn": ["文本为什么会被拆成 Token", "下一个 Token 的概率从哪里来", "Temperature 为什么会改变采样随机性"],
+      "path": [
+        {"name":"Prompt","description":"读取当前输入","state":"done"},
+        {"name":"Tokenize","description":"拆成 Token","state":"done"},
+        {"name":"Predict","description":"查看候选概率","state":"active"},
+        {"name":"Sample","description":"改变 Temperature"},
+        {"name":"Repeat","description":"把结果加入上下文"}
+      ],
+      "labels": {"prompt":"1 · Prompt","tokenization":"2 · Tokenization","probabilities":"3 · 下一个 Token 的概率","temperature":"4 · Temperature","sampled":"5 · 示例采样结果","probability":"概率"},
+      "takeaways": [
+        ["Token 是模型处理文本的基本单位","模型真正读写的是 Token，而不是我们看到的自然语言单词。"],
+        ["概率决定候选之间的相对机会","不同候选 Token 会得到不同概率，解码策略再决定如何从中选择。"],
+        ["Temperature 改变的是采样分布","值越高，低概率候选越容易被选中；它不会给模型增加新知识。"],
+        ["生成过程是循环发生的","每选出一个 Token，它都会成为下一轮预测的新上下文。"]
+      ],
+      "challenge": {"title":"为结构化输出选择解码策略","body":"写创意文案和输出严格 JSON 时，你会使用同样的 Temperature 吗？先说明为什么，再继续下一个实验。"},
+      "guide": {
+        "title":"LLM 到底怎样预测下一个 Token？",
+        "intro":"大语言模型每一轮都会针对当前上下文，计算一组候选 Token 的概率分布，再根据解码策略选择一个 Token。这个 Token 被追加到上下文后，模型继续计算下一轮，因此我们看到的长文本其实是一连串局部选择累积出来的。",
+        "sections":[
+          {"title":"Token 是什么？","body":"Token 是模型内部处理文本的单位。它可能是一个完整单词、一个词的一部分、标点、空格，甚至其他字符片段，具体边界取决于 tokenizer。理解这一点很重要，因为模型的上下文长度和生成成本通常也是按 Token 计算，而不是按“字”或“词”计算。"},
+          {"title":"Temperature 改变了什么？","body":"Temperature 会重新塑造采样概率的分布。较低的值会让概率更集中在头部候选，结果更稳定；较高的值会让分布更平，低概率候选获得更多机会，因此输出通常更有变化。它改变的是选择方式，不是模型参数和知识本身。"},
+          {"title":"为什么这是工程问题？","body":"在真实应用里，采样策略会影响输出稳定性、结构化数据的可解析性、测试可重复性，以及产品在创造性和可控性之间的取舍。一个适合写广告文案的配置，不一定适合生成必须通过 Schema 校验的 JSON。"}
+        ],
+        "faq":[
+          {"q":"LLM 会一次决定整句话吗？","a":"不会。自回归语言模型通常是逐个 Token 生成，每一步的结果都会影响下一步。"},
+          {"q":"一个 Token 就是一个单词吗？","a":"不一定。Tokenizer 可以把一个单词拆成多个 Token，也可能把标点或空格编码成独立 Token。"},
+          {"q":"提高 Temperature 会让模型知道得更多吗？","a":"不会。Temperature 只改变采样行为，不会修改模型权重，也不会补充缺失的知识。"},
+          {"q":"这里的概率来自真实模型吗？","a":"不是。这个实验使用稳定的教学模拟值，让你可以重复观察同一种因果关系，而不是把它误认为某个真实模型的基准测试。"}
+        ],
+        "note":"页面中的概率是教学模拟值；真正需要带走的是 Token、概率分布和采样之间的因果关系。"
+      },
+      "next": {"title":"现在，你已经能看懂一次 Token 预测。","description":"下一步：看看这些 Token 周围有限的工作空间——上下文窗口。","href":"/en/lessons/context-window/","button":"继续 →"}
+    },
+    "context-window": {
+      "name": "上下文窗口实验",
+      "category": "上下文工程",
+      "level": "入门",
+      "minutes": 8,
+      "description": "看见 LLM 的上下文窗口如何被逐渐占满，并比较删除、摘要、RAG 与 Memory 四种策略分别解决什么问题、牺牲什么信息。",
+      "seoTitle": "上下文窗口实验 — 看懂 Context Engineering 的核心权衡 | AhaFrame",
+      "quick": "上下文窗口就是模型这一次生成时能看到的有限工作空间；System Prompt、对话历史、检索文档和工具结果都在争夺同一份预算。",
+      "learn": ["哪些内容会占用上下文", "为什么上下文会溢出", "删除、摘要、RAG 与 Memory 分别在权衡什么"],
+      "path": [
+        {"name":"填充","description":"加入指令与历史","state":"done"},
+        {"name":"观察","description":"查看 Token 占用","state":"done"},
+        {"name":"管理","description":"选择处理策略","state":"active"},
+        {"name":"比较","description":"观察信息与容量权衡"}
+      ],
+      "labels": {"usage":"上下文占用","composition":"System 12% · 对话 42% · 文档 28% · 工具结果 12% · Memory 6%","choose":"选择一种策略","drop":"删除旧消息","summarize":"摘要压缩","rag":"RAG","memory":"Memory","before":"处理前","after":"处理后","beforeRisk":"风险：几乎没有空间留给新的对话和工具结果。","principle":"上下文工程不是单纯把内容塞得更少，而是在有限预算里保留真正会影响下一次模型决策的信息，同时控制成本、延迟与信息损失。"},
+      "strategyNotes": {
+        "drop":"移除 47,350 个 Token，剩余 56,100 个 Token 空间。速度快，但旧对话会直接丢失。",
+        "summarize":"压缩或移除 78,820 个 Token，剩余 87,570 个 Token 空间。容量释放更多，但摘要会牺牲细节。",
+        "rag":"从活动上下文移出 94,450 个 Token，剩余 103,200 个 Token 空间；文档改为需要时再检索。",
+        "memory":"从活动上下文移出 62,950 个 Token，剩余 71,700 个 Token 空间；稳定事实进入持久化 Memory，需要时再提供给上下文。"
+      },
+      "takeaways": [
+        ["上下文是有限资源","指令、历史、文档和工具结果都会竞争同一个工作预算。"],
+        ["摘要用细节换容量","它能释放空间，但被压缩掉的细节之后可能变得重要。"],
+        ["RAG 把知识改成按需获取","外部文档不必始终占据活动上下文，只在当前任务需要时检索进来。"],
+        ["Memory 不等于 Context","Memory 负责持久化；真正进入模型当前输入的内容才属于活动上下文。"]
+      ],
+      "challenge": {"title":"为客服 Agent 设计上下文策略","body":"明确哪些信息应该始终留在 Prompt，哪些可以摘要，哪些交给 RAG，哪些适合放进长期 Memory。不要只追求 Token 数最少，要说明丢失信息的风险。"},
+      "guide": {
+        "title":"什么是 LLM 的上下文窗口？",
+        "intro":"上下文窗口是模型在一次生成过程中能够处理的有限输入空间。System 指令、用户与助手消息、检索片段、工具结果以及其他被拼进请求的内容，都会占用这份预算。它更像工作台，而不是无限容量的知识库。",
+        "sections":[
+          {"title":"上下文太大时会发生什么？","body":"应用必须决定哪些内容删除、哪些压缩、哪些以后再检索、哪些持久化到别处。关键不是“旧内容一律删掉”，而是判断哪些信息会影响模型接下来的决策。如果删掉的是任务约束或关键证据，即使 Token 使用量变漂亮，答案也可能变差。"},
+          {"title":"RAG 和 Memory 有什么不同？","body":"RAG 通常在当前任务需要时检索相关外部信息；Memory 更强调跨轮次或跨会话保存事实、偏好或历史状态。两者都可以在某个时刻向模型提供内容，但都不等于上下文窗口本身。Context 是当前工作输入，RAG 和 Memory 是供给 Context 的不同机制。"},
+          {"title":"为什么上下文工程重要？","body":"好的上下文设计同时影响相关性、可靠性、Token 成本与响应延迟。更多上下文并不自动意味着更好的上下文；真正的工程问题，是让有限预算优先承载当前决策最需要的信息。"}
+        ],
+        "faq":[
+          {"q":"Context 和 Memory 是一回事吗？","a":"不是。Context 是当前一次生成看到的工作输入；Memory 是一种持久化策略，它保存的信息以后可以再被取出并放进 Context。"},
+          {"q":"RAG 能把模型的 Context Window 变大吗？","a":"不能。RAG 只是帮助你从外部知识中选择更相关的内容，再把这些内容放进现有的上下文预算。"},
+          {"q":"旧消息是不是都应该做摘要？","a":"不是。摘要会用细节换空间。如果后来任务依赖某个被摘要掉的事实，过度压缩反而会降低可靠性。"},
+          {"q":"这里的 200,000 Token 是某个模型的规格吗？","a":"不是。这是为了教学而固定的模拟预算，用来稳定展示容量、信息保留和策略之间的权衡。"}
+        ],
+        "note":"实验使用固定的教学模拟 Token 预算，让容量与信息损失的权衡可以重复观察；它不是任何模型供应商的规格声明。"
+      },
+      "next": {"title":"现在，你已经能判断上下文该留什么、舍什么。","description":"下一步：看看 Agent 如何在一次任务里反复行动、观察并决定是否继续。","href":"/en/lessons/agent-loop/","button":"继续 →"}
+    },
+    "agent-loop": {
+      "name": "Agent Loop 模拟器",
+      "category": "Loop 工程",
+      "level": "进阶入门",
+      "minutes": 9,
+      "description": "逐步走过一次 Agent Loop：理解任务、选择行动、调用工具、读取 Observation、处理失败，并决定继续还是给出最终答案。",
+      "seoTitle": "Agent Loop 模拟器 — 看懂 Agent 如何调用工具和迭代 | AhaFrame",
+      "quick": "Agent Loop 是一个可观察的控制循环：根据当前状态决定下一步，通过工具行动，读取结果，再决定继续、重试、恢复还是结束。",
+      "learn": ["Agent Loop 与普通聊天的差别", "工具调用处在循环的什么位置", "为什么 Observation、重试和终止条件同样重要"],
+      "controlTitle":"控制 Loop",
+      "controlCopy":"你可以一次推进一个步骤，也可以重置状态或主动注入工具故障，观察 Loop 如何恢复。",
+      "labels": {"simulation":"实时模拟","manual":"手动逐步推进","task":"任务","taskText":"查询东京天气，并告诉我是否需要带伞。","currentState":"当前状态","finalAnswer":"最终答案","timeline":"执行时间线","toolResult":"工具结果","toolValue":"东京 · 小雨 · 18°C<br>湿度 92% · 东北风 12 km/h","latency":"延迟","cost":"估算成本","next":"下一步 →","reset":"重置","error":"模拟工具故障"},
+      "nodes":["用户","Agent","工具","观察","调整","回答"],
+      "timeline":["理解任务","选择行动","调用天气工具","读取结果","重试或调整","最终回答"],
+      "status":[
+        "Agent 读取用户任务，并识别出当前缺少实时天气信息。",
+        "Agent 决定使用天气工具补充缺失信息。",
+        "天气工具被调用，参数 city = Tokyo。",
+        "收到 Observation：小雨、18°C、湿度 92%。",
+        "Agent 判断当前 Observation 是否已经足够回答问题。",
+        "信息已经充分，Agent 准备给出最终回答。"
+      ],
+      "errorStatus":"工具调用失败：Weather API 超时 → 记录失败 Observation → 进入恢复或重试。",
+      "waiting":"还没有最终答案……",
+      "result":"建议带伞——东京预计有小雨。",
+      "takeaways": [
+        ["Agent 的核心是循环控制","一次行动的结果会成为下一次决策的新输入。"],
+        ["工具把模型连接到外部能力","查询 API、数据库或执行操作，都发生在模型本身之外。"],
+        ["Observation 改变下一步决策","工具结果不是流程终点，而是 Agent 判断是否继续的重要证据。"],
+        ["可靠性不能只靠 Loop 本身","重试、超时、权限、校验和终止条件属于 Harness 等运行约束，不能靠“多循环几次”代替。"]
+      ],
+      "challenge": {"title":"加入终止条件与失败兜底","body":"定义 Agent 在什么情况下可以重试、什么时候必须停止，以及天气工具持续不可用时应该如何向用户说明。重点不是多试几次，而是让停止条件可预测。"},
+      "guide": {
+        "title":"什么是 AI Agent Loop？",
+        "intro":"Agent Loop 是一个迭代控制过程：Agent 读取当前状态，选择一个行动，得到新的 Observation，再判断任务是否完成、是否应该继续或是否需要恢复。它把一次回答扩展成了一个可以反复感知和行动的过程。",
+        "sections":[
+          {"title":"Agent 为什么需要工具？","body":"模型本身无法天然访问实时数据库、天气 API、代码执行器或业务系统。工具把 Agent 与这些外部能力连接起来，使它不仅能生成文字，还能获取新信息或执行真实动作。但工具权限越大，运行时安全边界也越重要。"},
+          {"title":"Observation 是什么？","body":"Observation 是一次行动返回的结果，例如 API 数据、工具报错或数据库查询结果。Agent 把它作为新的证据加入当前状态，再判断下一步，而不是假设工具一定成功。把失败也当作 Observation，是设计恢复路径的基础。"},
+          {"title":"什么让 Agent 变得可靠？","body":"真正的生产 Agent 还需要明确的工具契约、输入输出校验、重试上限、超时、权限控制、人工审批、可观测性和终止条件。Loop 负责局部迭代；这些运行约束属于 Harness 等其他工程责任。不要把“能循环”误解成“已经可靠”。"}
+        ],
+        "faq":[
+          {"q":"所有聊天机器人都是 Agent 吗？","a":"不是。普通聊天可以直接根据输入生成回答，不一定需要通过工具执行多步行动，也不一定存在可观察的状态循环。"},
+          {"q":"Agent 一定需要隐藏的 Chain-of-Thought 吗？","a":"不需要。工程上可以用显式状态、结构化决策、工具调用和可观察的状态转换来实现 Agent 控制，而不依赖暴露或保存隐藏推理过程。"},
+          {"q":"为什么实验里要主动模拟工具错误？","a":"因为生产环境中的超时、限流和无效返回是正常情况。失败后的行为设计，是 Agent 可靠性的一部分。"},
+          {"q":"ReAct 是唯一的 Agent 模式吗？","a":"不是。Plan-and-Execute、显式 Workflow、状态机和 Graph 编排都可以组织 Agent 行为，选择取决于任务结构和可靠性要求。"}
+        ],
+        "note":"天气数据和耗时都是教学模拟值；真正的学习目标是行动、Observation、恢复和终止之间的控制关系。"
+      },
+      "next": {"title":"Foundation 学习路径完成。","description":"下一步进入 Failure-first Production Labs：不是继续学名词，而是主动把系统弄坏，再判断应该在哪一层修。","href":"/en/early-access/","query":"?intent=completed-path","button":"加入内测 →","event":"lesson_path_completed"}
+    }
+  }
+}
