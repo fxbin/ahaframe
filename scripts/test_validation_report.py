@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import sys
 import tempfile
 import unittest
 from datetime import datetime, timezone
@@ -14,6 +15,7 @@ FIXTURE_PATH = ROOT / "scripts" / "fixtures" / "validation_console_fixture.json"
 
 spec = importlib.util.spec_from_file_location("validation_report", MODULE_PATH)
 validation_report = importlib.util.module_from_spec(spec)
+sys.modules["validation_report"] = validation_report
 assert spec.loader is not None
 spec.loader.exec_module(validation_report)
 
