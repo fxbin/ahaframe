@@ -56,6 +56,89 @@ class ValidationReportTests(unittest.TestCase):
         self.assertEqual(self.model["want_more_labs"], "NOT DIRECTLY MEASURABLE")
         self.assertEqual(self.model["smoke_exclusion"], "PASS")
 
+    def test_fetch_evidence_keeps_global_quality_and_probes_smoke(self):
+        class FakeClient:
+            def __init__(self):
+                self.select_calls = []
+                self.metric_calls = []
+
+            def metrics(self, cohort, start, end):
+                self.metric_calls.append(cohort)
+                if cohort == "production-smoke":
+                    return [{
+                        "metric_key": "unique_cohort_visitors",
+                        "numerator": 0,
+                        "denominator": None,
+                        "rate": None,
+                    }]
+                return [{
+                    "metric_key": "unique_cohort_visitors",
+                    "numerator": 1,
+                    "denominator": None,
+                    "rate": None,
+                }]
+
+            def select(self, view, fields, filters, order=None, limit=1000):
+                self.select_calls.append({
+                    "view": view,
+                    "fields": fields,
+                    "filters": list(filters),
+                    "order": order,
+                    "limit": limit,
+                })
+                if view == "validation_participant_facts_v1":
+                    return []
+                if view == "validation_feedback_latest_v1":
+                    return []
+                if view == "validation_data_quality_issues_v1":
+                    return [
+                        {
+                            "severity": "WARNING",
+                            "issue_code": "target_warning",
+                            "cohort_id": "alpha-fixture",
+                            "lab_id": "rag-failure",
+                            "observed_at": "2026-08-04T10:00:00Z",
+                            "detail": "target cohort warning",
+                        },
+                        {
+                            "severity": "WARNING",
+                            "issue_code": "missing_cohort",
+                            "cohort_id": "",
+                            "lab_id": "instruction-conflict",
+                            "observed_at": "2026-08-05T10:00:00Z",
+                            "detail": "unattributed warning",
+                        },
+                        {
+                            "severity": "ERROR",
+                            "issue_code": "other_cohort_only",
+                            "cohort_id": "other-alpha",
+                            "lab_id": "agent-reliability",
+                            "observed_at": "2026-08-06T10:00:00Z",
+                            "detail": "must not leak into selected cohort report",
+                        },
+                    ]
+                if view == "validation_events":
+                    return [{"cohort_id": "production-smoke"}]
+                raise AssertionError(f"unexpected view: {view}")
+
+        client = FakeClient()
+        bundle = validation_report.fetch_evidence(
+            client,
+            "alpha-fixture",
+            self.start,
+            self.end,
+        )
+
+        self.assertEqual([row["cohort_id"] for row in bundle.quality], ["alpha-fixture", ""])
+        self.assertTrue(bundle.smoke_raw_present)
+        self.assertEqual(bundle.smoke_metrics[0]["metric_key"], "unique_cohort_visitors")
+        self.assertEqual(client.metric_calls, ["alpha-fixture", "production-smoke"])
+
+        smoke_call = next(call for call in client.select_calls if call["view"] == "validation_events")
+        self.assertEqual(smoke_call["fields"], "cohort_id")
+        self.assertEqual(smoke_call["limit"], 1)
+        self.assertIn(("cohort_id", "eq.production-smoke"), smoke_call["filters"])
+
     def test_low_sample_and_operator_warnings_are_visible(self):
         self.assertTrue(any("interpret percentages cautiously" in item for item in self.model["report_warnings"]))
         self.assertTrue(any("WARNING" in item for item in self.model["report_warnings"]))
