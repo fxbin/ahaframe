@@ -301,7 +301,7 @@
     }
 
     function restoreAttempt(number){
-      ensurePhase(['REVIEW','DECIDE'],'restoreAttempt');
+      ensurePhase(['INTERVENE','REVIEW','DECIDE'],'restoreAttempt');
       const attempt=attemptByNumber(number);
       const frame=lab.replay(attempt.actions,{resetFirst:true});
       appliedActions=clone(attempt.actions);
