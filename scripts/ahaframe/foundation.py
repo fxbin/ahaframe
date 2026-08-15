@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import html
+import json
+
 from .core import BASE, UPDATED, breadcrumb, page
 from .i18n import load_content_source, localized_or_default_path, localized_path
 
@@ -11,6 +14,10 @@ def lesson_source(locale: str, slug: str) -> dict:
 
 def foundation_ui(locale: str) -> dict:
     return load_content_source(locale,'foundation')['ui']
+
+
+def json_attr(value) -> str:
+    return html.escape(json.dumps(value,ensure_ascii=False,separators=(',',':')),quote=True)
 
 
 def learning_schema(slug: str, locale: str, lesson: dict):
