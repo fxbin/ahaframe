@@ -7,7 +7,10 @@
     "early-access/",
     "lessons/token-playground/",
     "lessons/context-window/",
-    "lessons/agent-loop/"
+    "lessons/agent-loop/",
+    "labs/instruction-conflict/",
+    "labs/rag-failure/",
+    "labs/context-compression/"
   ],
   "brand": "AhaFrame",
   "ui": {
@@ -31,7 +34,7 @@
     }
   },
   "meta": {
-    "status": "foundation-ready",
-    "note": "Landing, marketing, and Foundation lessons are localized; Production Labs and Integrated Build continue in #46."
+    "status": "prompt-context-labs-ready",
+    "note": "Landing, marketing, Foundation, Prompt, and Context surfaces are localized; Harness, Graph, Evaluation, and Integrated Build continue in #46."
   }
 }
