@@ -4,7 +4,7 @@ from urllib.parse import urlparse
 import json, re, subprocess, sys, xml.etree.ElementTree as ET
 from bs4 import BeautifulSoup
 
-from ahaframe.i18n import ROUTE_PREFIX, SUPPORTED_LOCALES, load_locale_source
+from ahaframe.i18n import PUBLIC_ROUTE_RELATIVES, ROUTE_PREFIX, SUPPORTED_LOCALES, equivalent_paths, load_locale_source
 
 ROOT=Path(__file__).resolve().parents[1]
 SITE=ROOT/"site"
@@ -68,8 +68,6 @@ def locale_relative_for_file(rel: str):
 
 
 def textual_weight(text: str) -> int:
-    # English whitespace words + CJK codepoints gives a stable cross-locale
-    # thin-content guard without pretending Chinese segmentation is whitespace based.
     latin_words=len(re.findall(r"[A-Za-z0-9][A-Za-z0-9'_-]*",text))
     cjk=len(re.findall(r"[\u3400-\u9fff]",text))
     return latin_words+cjk
@@ -135,13 +133,18 @@ for file in html_files:
             if not target.exists(): errors.append(f"{rel}: broken link {href}")
 
 try:
-    root=ET.fromstring((SITE/"sitemap.xml").read_text(encoding="utf-8")); ns={"s":"http://www.sitemaps.org/schemas/sitemap/0.9"}; locs=[n.text for n in root.findall("s:url/s:loc",ns)]; lastmods=[n.text for n in root.findall("s:url/s:lastmod",ns)]
-    # Sitemap localization is the explicit #47 release/SEO gate. Until then the
-    # canonical English discovery surface remains 13 URLs.
-    if len(locs)!=13: errors.append(f"sitemap: expected 13 English URLs before #47, got {len(locs)}")
-    for slug in ["rag-failure","agent-reliability","evaluation-failure","context-compression","instruction-conflict","agent-workflow-graph"]:
-        if not any((v or '').endswith(f"/en/labs/{slug}/") for v in locs): errors.append(f"sitemap: missing {slug}")
-    if not any((v or '').endswith('/en/build/reliable-support-agent/') for v in locs): errors.append('sitemap: missing integrated Build')
+    root=ET.fromstring((SITE/"sitemap.xml").read_text(encoding="utf-8"))
+    ns={"s":"http://www.sitemaps.org/schemas/sitemap/0.9","x":"http://www.w3.org/1999/xhtml"}
+    locs=[n.text for n in root.findall("s:url/s:loc",ns)]
+    lastmods=[n.text for n in root.findall("s:url/s:lastmod",ns)]
+    expected_paths={path for relative in PUBLIC_ROUTE_RELATIVES for path in equivalent_paths(f"/en/{relative}").values()}
+    actual_paths={urlparse(value or '').path for value in locs}
+    if actual_paths!=expected_paths: errors.append(f"sitemap: localized route mismatch missing={sorted(expected_paths-actual_paths)}, extra={sorted(actual_paths-expected_paths)}")
+    if len(locs)!=len(PUBLIC_ROUTE_RELATIVES)*len(SUPPORTED_LOCALES): errors.append(f"sitemap: expected {len(PUBLIC_ROUTE_RELATIVES)*len(SUPPORTED_LOCALES)} localized URLs, got {len(locs)}")
+    for node in root.findall("s:url",ns):
+        links=node.findall("x:link",ns)
+        hreflangs={link.attrib.get('hreflang') for link in links}
+        if hreflangs!={'en','zh-CN','x-default'}: errors.append(f"sitemap: incomplete alternates for {node.find('s:loc',ns).text}: {sorted(hreflangs)}")
     if len(lastmods)!=len(locs) or any(v!=CONTENT["meta"]["updated"] for v in lastmods): errors.append('sitemap: invalid lastmod')
 except Exception as exc: errors.append(f"sitemap invalid: {exc}")
 
@@ -158,4 +161,4 @@ try:
     if vercel.get("outputDirectory")!="site" or "scripts/build_site.py" not in vercel.get("buildCommand",""): errors.append('vercel.json invalid build config')
 except Exception as exc: errors.append(f"vercel.json invalid: {exc}")
 if errors: print("\n".join(errors)); sys.exit(1)
-print(f"PASS: {len(html_files)} pages across {len(SUPPORTED_LOCALES)} locales; six-layer conceptual closure, integration, JS and deployment config validated.")
+print(f"PASS: {len(html_files)} pages across {len(SUPPORTED_LOCALES)} locales; bilingual discovery, six-layer conceptual closure, integration, JS and deployment config validated.")
