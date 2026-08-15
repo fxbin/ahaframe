@@ -8,9 +8,34 @@ require(path.join(__dirname,'..','src','assets','mission-engine.js'));
 const registerFixture=require(path.join(__dirname,'fixtures','mission_engine_fixture.js'));
 
 const AhaFrame=globalThis.AhaFrame;
+
+// Mission metadata may load before its scenario asset. Registration must stay
+// order-independent; scenario presence becomes a runtime precondition only.
+AhaFrame.registerMission({
+  id:'delayed-scenario-mission',
+  version:'0.8.0',
+  scenarioId:'delayed-scenario',
+});
+assert.throws(
+  ()=>AhaFrame.createMission('delayed-scenario-mission'),
+  /Lab scenario is not registered: delayed-scenario/,
+  'creating a Mission must fail clearly until its scenario is available',
+);
+AhaFrame.registerLabScenario({
+  id:'delayed-scenario',
+  version:'0.8.0',
+  initialState:{ready:true},
+  reduce(state,action){
+    if(action.type!=='NOOP')throw new Error(`Unsupported delayed-scenario action: ${action.type}`);
+    return {...state};
+  },
+  derive(state){return {metrics:{ready:state.ready?1:0}};},
+});
+assert.equal(AhaFrame.createMission('delayed-scenario-mission').getLabFrame().state.ready,true);
+
 registerFixture(AhaFrame);
 
-assert.deepEqual(AhaFrame.listMissions().map((item)=>item.id),['mission-engine-demo']);
+assert.deepEqual(AhaFrame.listMissions().map((item)=>item.id),['delayed-scenario-mission','mission-engine-demo']);
 assert.deepEqual(AhaFrame.MISSION_PHASES,['BRIEF','INVESTIGATE','INTERVENE','SIMULATE','REVIEW','DECIDE','DEBRIEF','COMPLETE']);
 
 let tick=1000;
@@ -109,6 +134,6 @@ function runDeterministicPolicy(){
 assert.deepEqual(runDeterministicPolicy(),runDeterministicPolicy(),'same policy must produce the same Mission evidence and outcome');
 
 assert.throws(()=>AhaFrame.createMission('missing-mission'),/Unknown Mission/);
-assert.throws(()=>AhaFrame.registerMission({id:'bad',scenarioId:'missing'}),/unknown Lab scenario/);
+assert.throws(()=>AhaFrame.registerMission({id:'bad-mission'}),/scenarioId/);
 
-console.log('PASS Mission Engine: phase machine, evidence inspection, intervention budget, deterministic simulation attempts, constraints, outcome classification, compare/restore, release decision, debrief, reset.');
+console.log('PASS Mission Engine: independent Mission/scenario load order, phase machine, evidence inspection, intervention budget, deterministic simulation attempts, constraints, outcome classification, compare/restore, release decision, debrief, reset.');
