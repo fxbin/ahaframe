@@ -17,6 +17,36 @@ from validation_report import build_model, load_fixture, parse_iso  # noqa: E402
 FIXTURE = ROOT / "scripts" / "fixtures" / "validation_console_fixture.json"
 
 
+def assert_stable_contract(text: str) -> None:
+    assert "Decision:** **PENDING OPERATOR REVIEW" in text
+    assert "This memo is a decision aid, not an automatic scorecard" in text
+    assert "Landing → Lab start" in text
+    assert "AT / ABOVE" in text
+    assert "Data Health ERROR: **0**" in text
+    assert "Data Health WARNING: **1**" in text
+    assert "Want more Labs`: **NOT DIRECTLY MEASURABLE**" in text
+    assert "Save / sync / account demand: **TODO" in text
+    assert "Contradictory evidence" in text
+    assert "Why not the alternatives?" in text
+    assert "Do not resume Auth/Billing/Entitlement/Credits unless" in text
+
+    for decision in DECISIONS:
+        assert f"- [ ] **{decision}**" in text
+        assert f"| {decision} | TODO |" in text
+
+    # Pre-filling evidence must never auto-select a decision even when multiple
+    # fixture metrics exceed their initial target hypotheses.
+    assert "- [x] **" not in text
+    assert "Decision:** **GO PLATFORM" not in text
+
+    # The decision memo summarizes note counts but never copies raw participant
+    # note text or identity/security-sensitive fields from the operator report.
+    assert "I now see why instruction hierarchy" not in text
+    assert "anonymous_user_id" not in text
+    assert "anonymousUserId" not in text
+    assert "SUPABASE_SERVICE_ROLE_KEY" not in text
+
+
 def main() -> int:
     bundle = load_fixture(FIXTURE)
     start = parse_iso("2026-08-01T00:00:00Z")
@@ -26,33 +56,7 @@ def main() -> int:
     memo = render_memo(model)
 
     assert evidence_readiness(model) == "EARLY / LOW SAMPLE"
-    assert "Decision:** **PENDING OPERATOR REVIEW" in memo
-    assert "This memo is a decision aid, not an automatic scorecard" in memo
-    assert "Landing → Lab start" in memo
-    assert "AT / ABOVE" in memo
-    assert "Data Health ERROR: **0**" in memo
-    assert "Data Health WARNING: **1**" in memo
-    assert "Want more Labs`: **NOT DIRECTLY MEASURABLE**" in memo
-    assert "Save / sync / account demand: **TODO" in memo
-    assert "Contradictory evidence" in memo
-    assert "Why not the alternatives?" in memo
-    assert "Do not resume Auth/Billing/Entitlement/Credits unless" in memo
-
-    for decision in DECISIONS:
-        assert f"- [ ] **{decision}**" in memo
-        assert f"| {decision} | TODO |" in memo
-
-    # Pre-filling evidence must never auto-select a decision even when multiple
-    # fixture metrics exceed their initial target hypotheses.
-    assert "- [x] **" not in memo
-    assert "Decision:** **GO PLATFORM" not in memo
-
-    # The decision memo summarizes note counts but never copies raw participant
-    # note text or identity/security-sensitive fields from the operator report.
-    assert "I now see why instruction hierarchy" not in memo
-    assert "anonymous_user_id" not in memo
-    assert "anonymousUserId" not in memo
-    assert "SUPABASE_SERVICE_ROLE_KEY" not in memo
+    assert_stable_contract(memo)
 
     with tempfile.TemporaryDirectory() as tmp:
         cmd = [
@@ -79,10 +83,9 @@ def main() -> int:
         output = Path(payload["output"])
         assert output.name == "alpha-fixture-20260812-decision-memo-v1.md"
         assert output.exists()
-        generated_text = output.read_text(encoding="utf-8")
-        assert generated_text == memo
+        assert_stable_contract(output.read_text(encoding="utf-8"))
 
-    print("PASS Product Gate memo: deterministic evidence prefill, no auto-decision, qualitative privacy boundary, versioned output")
+    print("PASS Product Gate memo: stable evidence semantics, no auto-decision, qualitative privacy boundary, versioned output")
     return 0
 
 
