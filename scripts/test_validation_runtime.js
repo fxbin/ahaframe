@@ -18,7 +18,7 @@ global.document={referrer:'https://example.dev/thread',documentElement:{lang:'en
 Object.defineProperty(global,'navigator',{value:{sendBeacon(){return false;}},configurable:true});
 global.CustomEvent=class CustomEvent{constructor(name,options){this.type=name;this.detail=options?.detail;}};
 global.dispatchEvent=()=>true;
-global.AHAFRAME_CONFIG={analyticsEndpoint:'',feedbackEndpoint:''};
+global.AHAFRAME_CONFIG={analyticsEndpoint:'',feedbackEndpoint:'',waitlistEndpoint:''};
 
 require(path.join(__dirname,'..','src','assets','validation-context.js'));
 require(path.join(__dirname,'..','src','assets','app.js'));
@@ -130,6 +130,39 @@ assert.equal(zhFeedback.path,'/zh-cn/labs/instruction-conflict/');
   assert.equal(newCohortVisit.cohortId,'alpha-2026-09','an explicit valid cohort on a new session may replace the current cohort attribution');
   assert.equal(newCohortVisit.visitCount,3);
 
+  location.pathname='/en/early-access/';
+  location.search='?intent=foundations-49';
+  document.documentElement.lang='en';
+  global.AHAFRAME_CONFIG.waitlistEndpoint='';
+  const waitlistPayload=AhaFrame.buildWaitlistPayload(' Test@Example.com ','foundations-49');
+  assert.equal(waitlistPayload.email,'test@example.com');
+  assert.equal(waitlistPayload.intent,'foundations-49');
+  assert.equal(waitlistPayload.source,'/en/early-access/');
+  assert.equal(waitlistPayload.locale,'en');
+  assert.equal(waitlistPayload.layer,'Commercial');
+  assert.equal(waitlistPayload.cohortId,'alpha-2026-09');
+  const demoWaitlist=await AhaFrame.submitWaitlist(' Test@Example.com ','foundations-49');
+  assert.equal(demoWaitlist.remote,false);
+  assert.equal(demoWaitlist.mode,'demo');
+  await AhaFrame.submitWaitlist('test@example.com','production-labs-12');
+  const localWaitlist=JSON.parse(localStorage.getItem('ahaframe_waitlist'));
+  assert.equal(localWaitlist.length,1,'local fallback must deduplicate repeated email submissions');
+  assert.equal(localWaitlist[0].intent,'production-labs-12');
+
+  let waitlistRemoteBody=null;
+  global.AHAFRAME_CONFIG.waitlistEndpoint='https://waitlist.invalid/collect';
+  global.fetch=async(_url,options)=>{waitlistRemoteBody=JSON.parse(options.body);return {ok:true};};
+  const remoteWaitlist=await AhaFrame.submitWaitlist('remote@example.com','early-access');
+  assert.equal(remoteWaitlist.remote,true);
+  assert.equal(waitlistRemoteBody.email,'remote@example.com');
+  assert.equal(waitlistRemoteBody.intent,'early-access');
+  assert.equal(waitlistRemoteBody.locale,'en');
+  assert.equal(waitlistRemoteBody.cohortId,'alpha-2026-09');
+  assert.equal(waitlistRemoteBody.anonymousUserId,first.anonymousUserId);
+  global.fetch=async()=>({ok:false});
+  await assert.rejects(()=>AhaFrame.submitWaitlist('failure@example.com','early-access'),/waitlist submission failed/);
+  assert.throws(()=>AhaFrame.buildWaitlistPayload('not-an-email'),/valid email address/);
+
   assert.throws(()=>AhaFrame.buildFeedbackPayload('great'),/no, little, yes, or aha/);
-  console.log('PASS Validation Runtime: bilingual locale context, anonymous identity, cohort attribution, sessions, UTM attribution, enriched events, Strong Aha payloads, demo/remote feedback, and return visits.');
+  console.log('PASS Validation Runtime: bilingual locale context, anonymous identity, cohort attribution, sessions, UTM attribution, enriched events, Strong Aha payloads, demo/remote feedback, production-ready waitlist payloads, and return visits.');
 })().catch((error)=>{console.error(error);process.exit(1);});
