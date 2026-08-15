@@ -10,7 +10,8 @@
     "lessons/agent-loop/",
     "labs/instruction-conflict/",
     "labs/rag-failure/",
-    "labs/context-compression/"
+    "labs/context-compression/",
+    "labs/agent-reliability/"
   ],
   "brand": "AhaFrame",
   "ui": {
@@ -34,7 +35,7 @@
     }
   },
   "meta": {
-    "status": "prompt-context-labs-ready",
-    "note": "Landing, marketing, Foundation, Prompt, and Context surfaces are localized; Harness, Graph, Evaluation, and Integrated Build continue in #46."
+    "status": "harness-lab-ready",
+    "note": "Landing, marketing, Foundation, Prompt, Context, and Harness surfaces are localized; Graph, Evaluation, and Integrated Build continue in #46."
   }
 }
