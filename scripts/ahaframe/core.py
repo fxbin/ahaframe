@@ -25,7 +25,7 @@ for target in ['en/lessons/token-playground','en/lessons/context-window','en/les
     (SITE/target).mkdir(parents=True,exist_ok=True)
 shutil.copytree(SRC/'assets', SITE/'assets')
 styles = ROOT/'src'/'styles'
-css = ''.join((styles/name).read_text(encoding='utf-8') for name in ['base.css','marketing.css','lessons.css','responsive.css'])
+css = ''.join((styles/name).read_text(encoding='utf-8') for name in ['base.css','language-switcher.css','marketing.css','lessons.css','responsive.css'])
 (SITE/'assets'/'styles.css').write_text(css, encoding='utf-8')
 from generate_og import generate_og
 generate_og(SITE/'assets'/'og-ahaframe.png')
@@ -49,17 +49,24 @@ def header(active='', locale='en', current_path=None):
     def cls(n): return 'active' if n==active else ''
     links=f'''<a class="{cls('Lessons')}" href="{root}#lessons">{ui(locale,'nav.lessons')}</a><a class="{cls('Roadmap')}" href="{root}#roadmap">{ui(locale,'nav.roadmap')}</a><a class="{cls('Pricing')}" href="{pricing}">{ui(locale,'nav.pricing')}</a><a class="{cls('About')}" href="{root}#about">{ui(locale,'nav.about')}</a>'''
     switch_items=language_switch_items(current_path)
-    switcher_parts=[]
+    current_item=next(item for item in switch_items if item['locale']==locale)
+    current_label=html.escape(current_item['label'])
+    desktop_parts=[]
+    mobile_parts=[]
     for item in switch_items:
         label=html.escape(item['label'])
         if item['locale']==locale:
-            switcher_parts.append(f'<span class="subtle" aria-current="page">{label}</span>')
+            desktop_parts.append(f'<span class="is-current" aria-current="page">{label}<span class="language-current-mark" aria-hidden="true">✓</span></span>')
+            mobile_parts.append(f'<span class="is-current" aria-current="page">{label}<span aria-hidden="true">✓</span></span>')
         elif item['available']:
-            switcher_parts.append(f'<a href="{item["href"]}" hreflang="{item["hreflang"]}">{label}</a>')
+            desktop_parts.append(f'<a href="{item["href"]}" hreflang="{item["hreflang"]}">{label}</a>')
+            mobile_parts.append(f'<a href="{item["href"]}" hreflang="{item["hreflang"]}">{label}</a>')
         else:
-            switcher_parts.append(f'<span class="subtle" aria-disabled="true" title="Translation in progress">{label}</span>')
-    switcher='<span class="language-switcher" aria-label="Language">'+''.join(switcher_parts)+'</span>'
-    return f'''<header class="site-header"><div class="container nav"><a class="brand" href="{root}" aria-label="AhaFrame home">{logo()}<span>AhaFrame</span></a><nav class="nav-links" aria-label="Primary">{links}</nav><div class="nav-actions">{switcher}<a class="btn primary" data-event="header_early_access" href="{early}">{ui(locale,'nav.early_access')}</a></div><details class="mobile-nav"><summary class="btn small" aria-label="Open navigation">{ui(locale,'nav.menu')}</summary><div class="mobile-panel">{links}{switcher}<a href="{early}">{ui(locale,'nav.early_access')}</a></div></details></div></header>'''
+            desktop_parts.append(f'<span class="is-disabled" aria-disabled="true">{label}</span>')
+            mobile_parts.append(f'<span class="is-disabled" aria-disabled="true">{label}</span>')
+    desktop_switcher=f'''<details class="language-switcher" aria-label="Language"><summary><span class="language-switcher-icon" aria-hidden="true">文</span><span>{current_label}</span><span class="language-switcher-chevron" aria-hidden="true">⌄</span></summary><div class="language-switcher-menu">{''.join(desktop_parts)}</div></details>'''
+    mobile_switcher=f'''<div class="mobile-language-list" aria-label="Language">{''.join(mobile_parts)}</div>'''
+    return f'''<header class="site-header"><div class="container nav"><a class="brand" href="{root}" aria-label="AhaFrame home">{logo()}<span>AhaFrame</span></a><nav class="nav-links" aria-label="Primary">{links}</nav><div class="nav-actions">{desktop_switcher}<a class="btn primary" data-event="header_early_access" href="{early}">{ui(locale,'nav.early_access')}</a></div><details class="mobile-nav"><summary class="btn small" aria-label="Open navigation">{ui(locale,'nav.menu')}</summary><div class="mobile-panel">{links}{mobile_switcher}<a href="{early}">{ui(locale,'nav.early_access')}</a></div></details></div></header>'''
 
 def footer(locale='en'):
     root=localized_path('/en/',locale)
