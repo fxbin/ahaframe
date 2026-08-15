@@ -16,6 +16,11 @@
     {"metric_key": "any_return_rate", "numerator": 2, "denominator": 6, "rate": 0.3333333333},
     {"metric_key": "d7_return_rate", "numerator": 1, "denominator": 4, "rate": 0.25}
   ],
+  "smoke_metrics": [
+    {"metric_key": "unique_cohort_visitors", "numerator": 0, "denominator": null, "rate": null},
+    {"metric_key": "landing_to_lab_start", "numerator": 0, "denominator": 0, "rate": null}
+  ],
+  "smoke_raw_present": true,
   "participants": [
     {"cohort_id": "alpha-fixture", "first_seen_at": "2026-08-01T00:00:00Z", "last_seen_at": "2026-08-10T00:00:00Z", "first_locale": "en", "acquisition_utm_source": "github", "acquisition_utm_medium": "social", "acquisition_utm_campaign": "alpha", "first_device_class": "desktop"},
     {"cohort_id": "alpha-fixture", "first_seen_at": "2026-08-01T01:00:00Z", "last_seen_at": "2026-08-02T02:00:00Z", "first_locale": "zh-CN", "acquisition_utm_source": "x", "acquisition_utm_medium": "social", "acquisition_utm_campaign": "alpha", "first_device_class": "mobile"},
@@ -33,6 +38,6 @@
     {"cohort_id": "alpha-fixture", "locale": "zh-CN", "layer": "Evaluation", "lab_id": "evaluation-failure", "rating": "yes", "strong_aha": true, "note": "评估不是最后打分，而是决定能不能发布。", "submitted_at": "2026-08-08T10:00:00Z", "device_class": "desktop"}
   ],
   "quality": [
-    {"severity": "WARNING", "issue_code": "feedback_without_start", "cohort_id": "alpha-fixture", "lab_id": "legacy-lab", "observed_at": "2026-08-02T12:00:00Z", "detail": "historical fixture warning"}
+    {"severity": "WARNING", "issue_code": "feedback_without_start", "cohort_id": "", "lab_id": "legacy-lab", "observed_at": "2026-08-02T12:00:00Z", "detail": "historical unattributed fixture warning"}
   ]
 }
