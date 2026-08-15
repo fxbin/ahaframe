@@ -1,5 +1,26 @@
 {
+  "locale": "en",
+  "routePrefix": "en",
   "brand": "AhaFrame",
+  "ui": {
+    "nav": {
+      "lessons": "Lessons",
+      "roadmap": "Roadmap",
+      "pricing": "Pricing",
+      "about": "About",
+      "early_access": "Join Early Access",
+      "menu": "Menu"
+    },
+    "footer": {
+      "sitemap": "Sitemap",
+      "about": "About",
+      "early_access": "Early Access"
+    },
+    "language": {
+      "en": "English",
+      "zh-CN": "简体中文"
+    }
+  },
   "home": {
     "title": "AhaFrame — Understand AI by seeing it work",
     "description": "Interactive visual lessons for AI engineering: tokens, context windows, RAG, agents, evaluation, and production AI.",
