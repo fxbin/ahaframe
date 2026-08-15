@@ -43,7 +43,7 @@ PUBLIC_ROUTE_RELATIVES = (
     "build/reliable-support-agent/",
 )
 
-# M1 only locks shared shell/UI keys. Page prose is localized by #45/#46.
+# Shared shell/UI keys that every locale must provide before any page can build.
 REQUIRED_UI_KEYS = (
     "nav.lessons",
     "nav.roadmap",
@@ -51,6 +51,7 @@ REQUIRED_UI_KEYS = (
     "nav.about",
     "nav.early_access",
     "nav.menu",
+    "footer.tagline",
     "footer.sitemap",
     "footer.about",
     "footer.early_access",
@@ -84,30 +85,20 @@ def _strip_known_prefix(path: str) -> str:
     return normalized.lstrip("/")
 
 
-def localized_path(path: str, locale: str) -> str:
-    """Map an existing public route to the equivalent locale-prefixed route."""
+def route_relative(path: str) -> str:
     relative = _strip_known_prefix(path)
     if relative and not relative.endswith("/"):
-        # Current public content routes are directory routes. Asset/API paths are
-        # intentionally outside this helper.
         raise ValueError(f"Expected a directory-style public route, got {path!r}")
-    return f"/{route_prefix(locale)}/{relative}"
+    return relative
+
+
+def localized_path(path: str, locale: str) -> str:
+    """Map an existing public route to the equivalent locale-prefixed route."""
+    return f"/{route_prefix(locale)}/{route_relative(path)}"
 
 
 def equivalent_paths(path: str) -> dict[str, str]:
     return {locale: localized_path(path, locale) for locale in SUPPORTED_LOCALES}
-
-
-def language_switch_items(path: str) -> tuple[dict[str, str], ...]:
-    return tuple(
-        {
-            "locale": locale,
-            "label": ui(locale, f"language.{locale}"),
-            "href": localized_path(path, locale),
-            "hreflang": HREFLANG[locale],
-        }
-        for locale in SUPPORTED_LOCALES
-    )
 
 
 @lru_cache(maxsize=None)
@@ -120,6 +111,26 @@ def load_locale_source(locale: str) -> dict[str, Any]:
     if data.get("locale") != locale:
         raise ValueError(f"{path.name}: locale field must be {locale!r}")
     return data
+
+
+def route_available(path: str, locale: str) -> bool:
+    """Whether a localized page is intentionally available in the current release branch."""
+    relative = route_relative(path)
+    available = load_locale_source(locale).get("availableRoutes", [])
+    return relative in available
+
+
+def language_switch_items(path: str) -> tuple[dict[str, Any], ...]:
+    return tuple(
+        {
+            "locale": locale,
+            "label": ui(locale, f"language.{locale}"),
+            "href": localized_path(path, locale),
+            "hreflang": HREFLANG[locale],
+            "available": route_available(path, locale),
+        }
+        for locale in SUPPORTED_LOCALES
+    )
 
 
 def _lookup(mapping: dict[str, Any], dotted_key: str) -> Any:
@@ -139,8 +150,9 @@ def ui(locale: str, key: str) -> str:
 
 
 def validate_locale_sources() -> None:
-    """Fail fast when locale identity or required shared UI keys drift."""
+    """Fail fast when locale identity, route availability, or shared UI keys drift."""
     errors: list[str] = []
+    public = set(PUBLIC_ROUTE_RELATIVES)
     for locale in SUPPORTED_LOCALES:
         try:
             source = load_locale_source(locale)
@@ -151,6 +163,18 @@ def validate_locale_sources() -> None:
             errors.append(
                 f"{locale}: routePrefix must be {ROUTE_PREFIX[locale]!r}, got {source.get('routePrefix')!r}"
             )
+        available = source.get("availableRoutes")
+        if not isinstance(available, list):
+            errors.append(f"{locale}: availableRoutes must be a list")
+        else:
+            duplicates = sorted({route for route in available if available.count(route) > 1})
+            unknown = sorted(set(available) - public)
+            if duplicates:
+                errors.append(f"{locale}: duplicate availableRoutes {duplicates}")
+            if unknown:
+                errors.append(f"{locale}: unknown availableRoutes {unknown}")
+            if locale == DEFAULT_LOCALE and set(available) != public:
+                errors.append("en: default locale must expose the complete public route surface")
         for key in REQUIRED_UI_KEYS:
             try:
                 value = _lookup(source, f"ui.{key}")

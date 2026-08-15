@@ -1,6 +1,7 @@
 {
   "locale": "zh-CN",
   "routePrefix": "zh-cn",
+  "availableRoutes": [],
   "brand": "AhaFrame",
   "ui": {
     "nav": {
@@ -12,6 +13,7 @@
       "menu": "\u83dc\u5355"
     },
     "footer": {
+      "tagline": "\u9762\u5411 AI \u5de5\u7a0b\u7684\u4ea4\u4e92\u5f0f\u53ef\u89c6\u5316\u5b66\u4e60\u3002",
       "sitemap": "\u7ad9\u70b9\u5730\u56fe",
       "about": "\u5173\u4e8e",
       "early_access": "\u5185\u6d4b"
