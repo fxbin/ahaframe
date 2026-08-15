@@ -134,7 +134,7 @@
       status.textContent='';
       outcome.textContent=ui.waiting||'Run the pipeline.';
       renderBudget();
-      window.AhaFrame?.track?.('mission_policy_changed',{missionId:'broken-rag-pipeline',interventionId:id});
+      window.AhaFrame?.track?.('rag_parameter_changed',{missionId:'broken-rag-pipeline',interventionId:id});
     }catch(error){
       status.textContent=error.message||ui.error||'Unable to change policy.';
       syncControls(mission.getLabFrame());
