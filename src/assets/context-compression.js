@@ -4,6 +4,9 @@
 
   const lab=window.AhaFrame.createLab('context-compression');
   lab.checkpoint('over-compressed-baseline');
+  let copy={};
+  try{copy=JSON.parse(root.dataset.contextCompressionCopy||'{}');}catch(_error){copy={};}
+  const numberLocale=document.documentElement.lang==='zh-CN'?'zh-CN':'en-US';
 
   const compression=document.querySelector('#context-compression-ratio');
   const summaryDepth=document.querySelector('#context-summary-depth');
@@ -31,32 +34,30 @@
     compare:document.querySelector('[data-context-compression-compare]'),
   };
 
-  const formatTokens=(value)=>Number(value).toLocaleString('en-US');
-  const signed=(value,digits=1)=>{
-    const n=Number(value)||0;
-    return `${n>=0?'+':''}${n.toFixed(digits)}`;
-  };
-  const metricDelta=(diff,key)=>{
-    const item=diff.metrics?.[key];
-    return item?Number(item.after)-Number(item.before):0;
-  };
+  const formatTokens=(value)=>Number(value).toLocaleString(numberLocale);
+  const signed=(value,digits=1)=>{const n=Number(value)||0;return `${n>=0?'+':''}${n.toFixed(digits)}`;};
+  const metricDelta=(diff,key)=>{const item=diff.metrics?.[key];return item?Number(item.after)-Number(item.before):0;};
+  const escapeHtml=(value)=>String(value??'').replace(/[&<>"']/g,(char)=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
 
   function renderSegments(derived){
     outputs.segments.innerHTML=derived.segments.map((segment)=>{
       const retained=segment.semanticRetentionPercent;
       const retentionStyle=retained<60?'color:var(--danger);font-weight:800':retained>=80?'color:var(--success);font-weight:800':'color:var(--warning);font-weight:800';
-      const critical=segment.critical?' <span class="badge" style="color:var(--danger);border-color:#efd0cc;background:#fffafa">Critical</span>':'';
-      return `<tr><td><strong>${segment.label}</strong>${critical}<br><span class="subtle">${segment.role}</span></td><td>${formatTokens(segment.tokens)}</td><td>${formatTokens(segment.activeTokens)}</td><td style="${retentionStyle}">${retained.toFixed(0)}%</td></tr>`;
+      const localized=copy.segments?.[segment.id]||[];
+      const label=localized[0]||segment.label;
+      const role=localized[1]||segment.role;
+      const critical=segment.critical?` <span class="badge" style="color:var(--danger);border-color:#efd0cc;background:#fffafa">${escapeHtml(copy.critical||'Critical')}</span>`:'';
+      return `<tr><td><strong>${escapeHtml(label)}</strong>${critical}<br><span class="subtle">${escapeHtml(role)}</span></td><td>${formatTokens(segment.tokens)}</td><td>${formatTokens(segment.activeTokens)}</td><td style="${retentionStyle}">${retained.toFixed(0)}%</td></tr>`;
     }).join('');
   }
 
   function renderBudget(derived){
     if(derived.overflowTokens>0){
-      outputs.budget.textContent=`OVER by ${formatTokens(derived.overflowTokens)}`;
+      outputs.budget.textContent=`${copy.over||'OVER by'} ${formatTokens(derived.overflowTokens)} ${copy.tokens||'tokens'}`;
       outputs.budget.style.color='var(--danger)';
       return;
     }
-    outputs.budget.textContent=`${formatTokens(derived.contextBudget-derived.activeContextTokens)} headroom`;
+    outputs.budget.textContent=`${formatTokens(derived.contextBudget-derived.activeContextTokens)} ${copy.headroom||'headroom'}`;
     outputs.budget.style.color='var(--success)';
   }
 
@@ -68,9 +69,9 @@
     memoryBudget.value=String(state.memoryBudget);
 
     outputs.compression.textContent=`${state.compressionRatio}%`;
-    outputs.retrieval.textContent=`${formatTokens(state.retrievalBudget)} tokens`;
-    outputs.memory.textContent=`${formatTokens(state.memoryBudget)} tokens`;
-    protectCritical.textContent=state.protectCritical?'Critical facts: PROTECTED':'Critical facts: UNPROTECTED';
+    outputs.retrieval.textContent=`${formatTokens(state.retrievalBudget)} ${copy.tokens||'tokens'}`;
+    outputs.memory.textContent=`${formatTokens(state.memoryBudget)} ${copy.tokens||'tokens'}`;
+    protectCritical.textContent=state.protectCritical?(copy.protected||'Critical facts: PROTECTED'):(copy.unprotected||'Critical facts: UNPROTECTED');
     protectCritical.classList.toggle('primary',state.protectCritical);
 
     outputs.active.textContent=`${formatTokens(derived.activeContextTokens)} / ${formatTokens(derived.contextBudget)}`;
@@ -81,47 +82,23 @@
     outputs.hallucination.textContent=`${derived.hallucinationRisk.toFixed(1)}%`;
     outputs.latency.textContent=derived.latencyIndex.toFixed(1);
     outputs.cost.textContent=derived.costIndex.toFixed(1);
-    outputs.diagnosis.textContent=derived.diagnosis;
+    outputs.diagnosis.textContent=copy.diagnosis?.[derived.failureType]||derived.diagnosis;
     outputs.diagnosis.dataset.failureType=derived.failureType;
     renderBudget(derived);
     renderSegments(derived);
 
     const diff=lab.compare('over-compressed-baseline');
-    outputs.compare.innerHTML=`<strong>Vs. over-compressed baseline</strong><span>Active context ${signed(metricDelta(diff,'activeContextTokens'),0)} tokens</span><span>Critical retention ${signed(metricDelta(diff,'criticalRetentionPercent'),1)} pts</span><span>Task quality ${signed(metricDelta(diff,'taskQuality'),1)} pts</span><span>Hallucination risk ${signed(metricDelta(diff,'hallucinationRisk'),1)} pts</span><span>Cost index ${signed(metricDelta(diff,'costIndex'),1)}</span>`;
+    const labels=copy.compare||{};
+    outputs.compare.innerHTML=`<strong>${escapeHtml(labels.title||'Vs. over-compressed baseline')}</strong><span>${escapeHtml(labels.active||'Active context')} ${signed(metricDelta(diff,'activeContextTokens'),0)} ${escapeHtml(copy.tokens||'tokens')}</span><span>${escapeHtml(labels.critical||'Critical retention')} ${signed(metricDelta(diff,'criticalRetentionPercent'),1)} pts</span><span>${escapeHtml(labels.quality||'Task quality')} ${signed(metricDelta(diff,'taskQuality'),1)} pts</span><span>${escapeHtml(labels.hallucination||'Hallucination risk')} ${signed(metricDelta(diff,'hallucinationRisk'),1)} pts</span><span>${escapeHtml(labels.cost||'Cost index')} ${signed(metricDelta(diff,'costIndex'),1)}</span>`;
   }
 
   lab.subscribe(render);
 
-  compression.addEventListener('input',()=>{
-    const value=Number(compression.value);
-    lab.dispatch('SET_COMPRESSION_RATIO',{value});
-    window.AhaFrame?.track('context_compression_parameter_changed',{parameter:'compression_ratio',value});
-  });
-  summaryDepth.addEventListener('change',()=>{
-    lab.dispatch('SET_SUMMARY_DEPTH',{value:summaryDepth.value});
-    window.AhaFrame?.track('context_compression_summary_depth_changed',{value:summaryDepth.value});
-  });
-  retrievalBudget.addEventListener('input',()=>{
-    const value=Number(retrievalBudget.value);
-    lab.dispatch('SET_RETRIEVAL_BUDGET',{value});
-    window.AhaFrame?.track('context_compression_parameter_changed',{parameter:'retrieval_budget',value});
-  });
-  memoryBudget.addEventListener('input',()=>{
-    const value=Number(memoryBudget.value);
-    lab.dispatch('SET_MEMORY_BUDGET',{value});
-    window.AhaFrame?.track('context_compression_parameter_changed',{parameter:'memory_budget',value});
-  });
-  protectCritical.addEventListener('click',()=>{
-    const current=lab.getFrame().state.protectCritical;
-    lab.dispatch('SET_PROTECT_CRITICAL',{value:!current});
-    window.AhaFrame?.track('context_compression_protection_changed',{value:!current});
-  });
-  balanced.addEventListener('click',()=>{
-    lab.dispatch('APPLY_BALANCED_PRESET');
-    window.AhaFrame?.track('context_compression_balanced_preset_applied');
-  });
-  reset.addEventListener('click',()=>{
-    lab.reset();
-    window.AhaFrame?.track('context_compression_baseline_reset');
-  });
+  compression.addEventListener('input',()=>{const value=Number(compression.value);lab.dispatch('SET_COMPRESSION_RATIO',{value});window.AhaFrame?.track('context_compression_parameter_changed',{parameter:'compression_ratio',value});});
+  summaryDepth.addEventListener('change',()=>{lab.dispatch('SET_SUMMARY_DEPTH',{value:summaryDepth.value});window.AhaFrame?.track('context_compression_summary_depth_changed',{value:summaryDepth.value});});
+  retrievalBudget.addEventListener('input',()=>{const value=Number(retrievalBudget.value);lab.dispatch('SET_RETRIEVAL_BUDGET',{value});window.AhaFrame?.track('context_compression_parameter_changed',{parameter:'retrieval_budget',value});});
+  memoryBudget.addEventListener('input',()=>{const value=Number(memoryBudget.value);lab.dispatch('SET_MEMORY_BUDGET',{value});window.AhaFrame?.track('context_compression_parameter_changed',{parameter:'memory_budget',value});});
+  protectCritical.addEventListener('click',()=>{const current=lab.getFrame().state.protectCritical;lab.dispatch('SET_PROTECT_CRITICAL',{value:!current});window.AhaFrame?.track('context_compression_protection_changed',{value:!current});});
+  balanced.addEventListener('click',()=>{lab.dispatch('APPLY_BALANCED_PRESET');window.AhaFrame?.track('context_compression_balanced_preset_applied');});
+  reset.addEventListener('click',()=>{lab.reset();window.AhaFrame?.track('context_compression_baseline_reset');});
 })();
