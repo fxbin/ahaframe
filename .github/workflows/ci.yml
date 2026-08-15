@@ -47,6 +47,8 @@ jobs:
         run: python3 -m py_compile scripts/smoke_production.py
       - name: Test Validation operator report
         run: python3 scripts/test_validation_report.py
+      - name: Test Product Gate memo
+        run: python3 scripts/test_product_gate_memo.py
       - name: Build static site
         env:
           AHAFRAME_BASE_URL: https://ahaframe.com
