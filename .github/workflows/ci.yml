@@ -31,6 +31,8 @@ jobs:
         run: node scripts/test_lab_engine.js
       - name: Test Validation Runtime
         run: node scripts/test_validation_runtime.js
+      - name: Test i18n Foundation
+        run: python3 scripts/test_i18n_foundation.py
       - name: Validate production smoke harness
         run: python3 -m py_compile scripts/smoke_production.py
       - name: Build static site
