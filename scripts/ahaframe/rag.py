@@ -8,8 +8,9 @@ def _options(values):
 
 def _build(locale):
     slug='rag-failure';d=lab_source(locale,slug);c=d['interactive'];metrics=c['metrics']
+    adapter_copy={"presentation":d['presentation'],"rerankerOn":c['rerankerOn'],"rerankerOff":c['rerankerOff']}
     body=f'''<div class="container">{lab_header(slug,'⌕',locale,d)}{quick_answer(d['quick'],locale)}
-    <div data-rag-lab data-rag-copy="{json_attr(d['presentation'])}"><section class="card interactive"><div class="panel-title"><span>{c['panelTitle']}</span><span class="badge">{c['simulation']}</span></div><p class="subtle">{c['intro']}</p><div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:18px"><div>
+    <div data-rag-lab data-rag-copy="{json_attr(adapter_copy)}"><section class="card interactive"><div class="panel-title"><span>{c['panelTitle']}</span><span class="badge">{c['simulation']}</span></div><p class="subtle">{c['intro']}</p><div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:18px"><div>
       <label class="label" for="rag-chunk-size">{c['chunk']}</label><div class="control-row"><input id="rag-chunk-size" class="slider" type="range" min="200" max="1400" step="100" value="1200"><output class="badge" data-rag-chunk-value>1200</output></div>
       <label class="label" for="rag-overlap" style="display:block;margin-top:18px">{c['overlap']}</label><div class="control-row"><input id="rag-overlap" class="slider" type="range" min="0" max="1150" step="50" value="100"><output class="badge" data-rag-overlap-value>100</output></div>
       <label class="label" for="rag-top-k" style="display:block;margin-top:18px">{c['topK']}</label><div class="control-row"><input id="rag-top-k" class="slider" type="range" min="2" max="15" step="1" value="12"><output class="badge" data-rag-top-k-value>12</output></div>
