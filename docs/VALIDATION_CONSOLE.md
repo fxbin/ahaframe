@@ -174,6 +174,26 @@ The report always reminds the operator that:
 5. `Want more Labs` is currently **not directly measurable** and must not be inferred from unrelated CTA clicks.
 6. `production-smoke` and `production_smoke_test` are excluded from the Product Gate evidence layer.
 
+## Production verification record — 2026-08-15
+
+Production project: `ahaframe-validation` (`swzddvprnyjrrgpzcsgp`).
+
+An authenticated operator-side database check over the preceding 14 days verified the assumptions used by the production report path without exposing service credentials or participant identifiers:
+
+```text
+raw production-smoke events = 3
+Product Gate metric rows     = 15
+smoke numerator sum          = 0
+smoke denominator sum        = 0
+Data Health ERROR            = 0
+Data Health WARNING          = 1
+unattributed/global issues   = 1
+```
+
+The intended first recruitment cohort `alpha-2026-08` currently has zero Product Gate visitors/evidence, which is valid before #19 recruitment begins. The historical warning is `feedback_without_start` with no cohort attribution; the Console must surface it as global evidence debt without treating it as fresh evidence for the empty Alpha cohort.
+
+This production check validates the database/read-model side of the operator flow. It intentionally does **not** record or expose `SUPABASE_SERVICE_ROLE_KEY`. The exact local CLI + local service-role environment invocation remains an operator-machine smoke gate; passing that gate must not require moving the secret into CI, browser code, ChatGPT, or repository files.
+
 ## Tests
 
 ```bash
@@ -187,6 +207,8 @@ The regression covers:
 - low-sample warnings;
 - cohort + unattributed data-health warnings;
 - global warnings not faking cohort freshness;
+- production fetch semantics for target/global quality rows;
+- raw smoke probe selection without participant IDs;
 - real smoke-probe PASS/FAIL semantics;
 - reserved smoke cohort handling;
 - HTML escaping of user-submitted notes;
