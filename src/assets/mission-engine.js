@@ -120,9 +120,6 @@
   AhaFrame.registerMission=function(definition){
     validateMission(definition);
     if(missions.has(definition.id))throw new Error(`Mission already registered: ${definition.id}`);
-    if(typeof AhaFrame.getLabScenario==='function'&&!AhaFrame.getLabScenario(definition.scenarioId)){
-      throw new Error(`Mission ${definition.id} references unknown Lab scenario: ${definition.scenarioId}`);
-    }
     const stored=Object.freeze({
       ...definition,
       version:definition.version||'0.8.0',
@@ -147,6 +144,9 @@
     const definition=typeof idOrDefinition==='string'?missions.get(idOrDefinition):idOrDefinition;
     if(!definition)throw new Error(`Unknown Mission: ${idOrDefinition}`);
     validateMission(definition);
+    if(typeof AhaFrame.getLabScenario==='function'&&!AhaFrame.getLabScenario(definition.scenarioId)){
+      throw new Error(`Mission ${definition.id} cannot start because Lab scenario is not registered: ${definition.scenarioId}`);
+    }
 
     const lab=AhaFrame.createLab(definition.scenarioId,{...(options.labOptions||{}),track:false});
     const now=typeof options.clock==='function'?options.clock:()=>Date.now();
