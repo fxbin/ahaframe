@@ -2,10 +2,12 @@ from pathlib import Path
 import json, os, html, re, shutil
 from urllib.parse import urlparse
 
+from .i18n import HREFLANG, SUPPORTED_LOCALES, equivalent_paths, language_switch_items, load_locale_source, localized_path, ui
+
 ROOT=Path(__file__).resolve().parents[2]
 SRC=ROOT/'src'
 SITE=ROOT/'site'
-CONTENT=json.loads((ROOT/'content/en.json').read_text(encoding='utf-8'))
+CONTENT=load_locale_source('en')
 BASE=os.environ.get('AHAFRAME_BASE_URL','http://localhost:8080').rstrip('/')
 UPDATED=os.environ.get('AHAFRAME_UPDATED',CONTENT.get('meta',{}).get('updated','2026-08-12'))
 
@@ -19,7 +21,7 @@ IS_LOCAL=parsed_base.hostname in {'localhost','127.0.0.1'}
 # site/ is build output only. Recreate it to prevent stale pages or assets from surviving a build.
 if SITE.exists():
     shutil.rmtree(SITE)
-for target in ['en/lessons/token-playground','en/lessons/context-window','en/lessons/agent-loop','en/pricing','en/early-access']:
+for target in ['en/lessons/token-playground','en/lessons/context-window','en/lessons/agent-loop','en/pricing','en/early-access','zh-cn/pricing','zh-cn/early-access']:
     (SITE/target).mkdir(parents=True,exist_ok=True)
 shutil.copytree(SRC/'assets', SITE/'assets')
 styles = ROOT/'src'/'styles'
@@ -39,26 +41,45 @@ runtime_config={
 def logo():
     return '''<span class="logo" aria-hidden="true"><svg viewBox="0 0 40 40" fill="none"><path d="M20 4.5 33 12v16L20 35.5 7 28V12L20 4.5Z" stroke="currentColor" stroke-width="4.2" stroke-linejoin="round"/></svg></span>'''
 
-def header(active=''):
+def header(active='', locale='en', current_path=None):
+    current_path=current_path or localized_path('/en/',locale)
+    root=localized_path('/en/',locale)
+    pricing=localized_path('/en/pricing/',locale)
+    early=localized_path('/en/early-access/',locale)
     def cls(n): return 'active' if n==active else ''
-    links=f'''<a class="{cls('Lessons')}" href="/en/#lessons">Lessons</a><a class="{cls('Roadmap')}" href="/en/#roadmap">Roadmap</a><a class="{cls('Pricing')}" href="/en/pricing/">Pricing</a><a class="{cls('About')}" href="/en/#about">About</a>'''
-    return f'''<header class="site-header"><div class="container nav"><a class="brand" href="/en/" aria-label="AhaFrame home">{logo()}<span>AhaFrame</span></a><nav class="nav-links" aria-label="Primary">{links}</nav><div class="nav-actions"><a class="btn primary" data-event="header_early_access" href="/en/early-access/">Join Early Access</a></div><details class="mobile-nav"><summary class="btn small" aria-label="Open navigation">Menu</summary><div class="mobile-panel">{links}<a href="/en/early-access/">Join Early Access</a></div></details></div></header>'''
+    links=f'''<a class="{cls('Lessons')}" href="{root}#lessons">{ui(locale,'nav.lessons')}</a><a class="{cls('Roadmap')}" href="{root}#roadmap">{ui(locale,'nav.roadmap')}</a><a class="{cls('Pricing')}" href="{pricing}">{ui(locale,'nav.pricing')}</a><a class="{cls('About')}" href="{root}#about">{ui(locale,'nav.about')}</a>'''
+    switch_items=language_switch_items(current_path)
+    switcher='<span class="language-switcher" aria-label="Language">'+''.join(
+        f'<span class="subtle" aria-current="page">{html.escape(item["label"])}</span>' if item['locale']==locale else f'<a href="{item["href"]}" hreflang="{item["hreflang"]}">{html.escape(item["label"])}</a>'
+        for item in switch_items
+    )+'</span>'
+    return f'''<header class="site-header"><div class="container nav"><a class="brand" href="{root}" aria-label="AhaFrame home">{logo()}<span>AhaFrame</span></a><nav class="nav-links" aria-label="Primary">{links}</nav><div class="nav-actions">{switcher}<a class="btn primary" data-event="header_early_access" href="{early}">{ui(locale,'nav.early_access')}</a></div><details class="mobile-nav"><summary class="btn small" aria-label="Open navigation">{ui(locale,'nav.menu')}</summary><div class="mobile-panel">{links}{switcher}<a href="{early}">{ui(locale,'nav.early_access')}</a></div></details></div></header>'''
 
-def footer():
-    return '''<footer class="footer"><div class="container footer-grid"><div>© 2026 AhaFrame · Interactive visual learning for AI engineering.</div><div class="footer-links"><a href="/sitemap.xml">Sitemap</a><a href="/en/#about">About</a><a href="/en/early-access/">Early Access</a></div></div></footer>'''
+def footer(locale='en'):
+    root=localized_path('/en/',locale)
+    early=localized_path('/en/early-access/',locale)
+    return f'''<footer class="footer"><div class="container footer-grid"><div>© 2026 AhaFrame · {ui(locale,'footer.tagline')}</div><div class="footer-links"><a href="/sitemap.xml">{ui(locale,'footer.sitemap')}</a><a href="{root}#about">{ui(locale,'footer.about')}</a><a href="{early}">{ui(locale,'footer.early_access')}</a></div></div></footer>'''
 
 def jsonld(obj):
     return '<script type="application/ld+json">'+json.dumps(obj,ensure_ascii=False,separators=(',',':'))+'</script>'
 
-def page(title,desc,path,body,active='',schemas=None,scripts='',robots=None):
+def page(title,desc,path,body,active='',schemas=None,scripts='',robots=None,locale='en'):
+    if locale not in SUPPORTED_LOCALES:
+        raise ValueError(f'Unsupported page locale: {locale}')
+    expected_prefix=f'/{"en" if locale=="en" else "zh-cn"}/'
+    if not path.startswith(expected_prefix):
+        raise ValueError(f'Page path {path!r} does not match locale {locale!r}')
     url=BASE+path
     if robots is None:
         robots='noindex,nofollow' if IS_LOCAL else 'index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1'
-    head=f'''<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{html.escape(title)}</title><meta name="description" content="{html.escape(desc,quote=True)}"><link rel="canonical" href="{url}"><link rel="alternate" hreflang="en" href="{url}"><link rel="alternate" hreflang="x-default" href="{url}"><meta name="robots" content="{robots}"><meta property="og:type" content="website"><meta property="og:site_name" content="AhaFrame"><meta property="og:title" content="{html.escape(title,quote=True)}"><meta property="og:description" content="{html.escape(desc,quote=True)}"><meta property="og:url" content="{url}"><meta property="og:image" content="{BASE}/assets/og-ahaframe.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="AhaFrame — interactive visual learning for AI engineering"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="{html.escape(title,quote=True)}"><meta name="twitter:description" content="{html.escape(desc,quote=True)}"><meta name="twitter:image" content="{BASE}/assets/og-ahaframe.png"><meta name="theme-color" content="#fbfbf8"><link rel="icon" href="/assets/favicon.svg"><link rel="manifest" href="/manifest.webmanifest"><link rel="stylesheet" href="/assets/styles.css">'''
+    alternates=equivalent_paths(path)
+    alternate_links=''.join(f'<link rel="alternate" hreflang="{HREFLANG[loc]}" href="{BASE+alt}">' for loc,alt in alternates.items())
+    alternate_links+=f'<link rel="alternate" hreflang="x-default" href="{BASE+alternates["en"]}">'
+    head=f'''<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{html.escape(title)}</title><meta name="description" content="{html.escape(desc,quote=True)}"><link rel="canonical" href="{url}">{alternate_links}<meta name="robots" content="{robots}"><meta property="og:type" content="website"><meta property="og:site_name" content="AhaFrame"><meta property="og:title" content="{html.escape(title,quote=True)}"><meta property="og:description" content="{html.escape(desc,quote=True)}"><meta property="og:url" content="{url}"><meta property="og:image" content="{BASE}/assets/og-ahaframe.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="AhaFrame — interactive visual learning for AI engineering"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="{html.escape(title,quote=True)}"><meta name="twitter:description" content="{html.escape(desc,quote=True)}"><meta name="twitter:image" content="{BASE}/assets/og-ahaframe.png"><meta name="theme-color" content="#fbfbf8"><link rel="icon" href="/assets/favicon.svg"><link rel="manifest" href="/manifest.webmanifest"><link rel="stylesheet" href="/assets/styles.css">'''
     base_schema={'@context':'https://schema.org','@type':'Organization','@id':BASE+'/#organization','name':'AhaFrame','url':BASE,'description':'Interactive visual lessons for understanding and building AI systems.'}
     head+=jsonld(base_schema)
     for s in schemas or []: head+=jsonld(s)
-    return f'''<!doctype html><html lang="en"><head>{head}</head><body>{header(active)}<main>{body}</main>{footer()}<script src="/assets/config.js" defer></script><script src="/assets/validation-context.js" defer></script><script src="/assets/app.js" defer></script><script src="/assets/validation-ui.js" defer></script><script src="/assets/lab-engine.js" defer></script><script src="/assets/lab-scenarios.js" defer></script>{scripts}</body></html>'''
+    return f'''<!doctype html><html lang="{locale}"><head>{head}</head><body>{header(active,locale,path)}<main>{body}</main>{footer(locale)}<script src="/assets/config.js" defer></script><script src="/assets/validation-context.js" defer></script><script src="/assets/app.js" defer></script><script src="/assets/validation-ui.js" defer></script><script src="/assets/lab-engine.js" defer></script><script src="/assets/lab-scenarios.js" defer></script>{scripts}</body></html>'''
 
 def breadcrumb(items):
     return {'@context':'https://schema.org','@type':'BreadcrumbList','itemListElement':[{'@type':'ListItem','position':i+1,'name':name,'item':BASE+url} for i,(name,url) in enumerate(items)]}
