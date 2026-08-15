@@ -1,0 +1,102 @@
+{
+  "locale": "zh-CN",
+  "ui": {
+    "home": "首页",
+    "build": "综合构建",
+    "share": "分享",
+    "inOneSentence": "一句话理解"
+  },
+  "build": {
+    "name": "可靠客服 Agent 综合构建",
+    "seoTitle": "可靠客服 Agent 综合构建 — 六层 AI 架构挑战 | AhaFrame",
+    "description": "把 Prompt、Context、Harness、Loop、Graph 与 Evaluation 六层决策组合进同一个确定性生产架构挑战。",
+    "hero": "停止孤立地调某一个组件。构建一个完整客服系统，让 Prompt、Context、Harness、Loop、Graph 与 Evaluation 的策略在同一组约束下保持一致。",
+    "level": "进阶",
+    "minutes": 35,
+    "badges": ["概念闭环 Capstone", "六层架构"],
+    "quick": "只有当行为契约、知识供给、运行时控制、局部迭代、全局编排和评测证据都服从同一组约束时，一个生产 AI 架构才真正接近可发布。",
+    "groups": {
+      "prompt": {"label": "Prompt", "options": {"loose": "宽松指令契约", "scoped": "作用域明确的权限", "typed": "强类型 Prompt 契约"}},
+      "retrieval": {"label": "Retrieval", "options": {"cheap": "低成本向量检索", "balanced": "平衡型 Hybrid + Rerank", "recall": "高召回 Hybrid"}},
+      "context": {"label": "Context", "options": {"lean": "精简上下文", "balanced": "平衡型关键上下文保护", "rich": "丰富上下文"}},
+      "execution": {"label": "Harness + Loop", "options": {"fast": "快速有界 Loop", "autonomous": "带校验的自主 Loop", "bounded": "有界执行 + 人工审批"}},
+      "graph": {"label": "Graph", "options": {"simple": "简单单 Loop Graph", "bounded": "有界分支 Graph", "complex": "Coordinator-heavy Graph"}},
+      "evaluation": {"label": "Evaluation", "options": {"demo": "偏 Demo 的评测", "production": "生产评测", "safety": "偏安全场景的评测"}}
+    },
+    "interactive": {
+      "title": "六层生产架构",
+      "badge": "确定性集成挑战",
+      "policySuffix": "策略",
+      "reference": "应用参考架构",
+      "reset": "恢复起始架构",
+      "referenceNote": "参考架构只是这个教学场景下一种可以被辩护的配置，不是所有系统都应照抄的标准答案。",
+      "stack": "集成技术栈",
+      "evidence": "Evaluation 证据",
+      "release": "发布决策",
+      "metrics": ["架构分数", "任务就绪度", "可靠性", "安全就绪度", "延迟指数", "成本指数"],
+      "diagnosis": "当前诊断",
+      "blockers": "发布阻断项",
+      "warnings": "权衡警告",
+      "explanation": "架构解释"
+    },
+    "presentation": {
+      "decision": {"SHIP": "可以发布", "BLOCK": "阻止发布", "INCONCLUSIVE": "证据不足"},
+      "points": "分",
+      "evidence": "{evaluation} · 证据区间宽度 {width} 分",
+      "emptyBlockers": "当前没有模拟出的发布阻断项。",
+      "emptyWarnings": "当前没有额外的模拟权衡警告。",
+      "diagnosis": {
+        "healthy": "当前架构已经通过模拟 Gate；剩余权衡是显式可见的，而不是被藏在一个总分里。",
+        "blocked": "发布被阻止：{blocker}",
+        "inconclusive": "架构本身看起来可行，但它超过发布阈值的证据余量仍小于 Evaluation 的证据区间宽度。"
+      },
+      "blockers": {
+        "prompt-conflicts": "Prompt 契约仍有 {count} 个未解决冲突。",
+        "context-overflow": "Context 超出固定工作预算 {tokens} tokens。",
+        "graph-propagation": "Graph 的失败传播风险为 {percent}%，超过当前模拟架构上限。",
+        "loop-runaway": "Loop 失控风险为 {percent}%，超过当前模拟执行上限。",
+        "architecture-threshold": "架构分数 {score} 低于发布阈值 {threshold}。",
+        "safety-floor": "安全就绪度 {score} 低于高后果操作要求的 {floor} 分底线。",
+        "retrieval-recall-floor": "Retrieval 召回率 {recall}% 低于生产证据底线 {floor}%。",
+        "critical-retention-floor": "关键 Context 保留率 {retention}% 低于生产底线 {floor}%。",
+        "cost-budget": "成本指数 {cost} 超过配置预算 {limit}。"
+      },
+      "warnings": {
+        "prompt-open": "Prompt 权限边界尚未闭合；再好的运行时控制也无法修复含糊的指令契约。",
+        "graph-coordination": "Graph 协调开销达到 {value}；除非这种拆分已经产生可测量价值，否则应该继续简化。",
+        "approval-load": "人工审批改善了控制，但每 100 次模拟运行大约会产生 {reviews} 次审核。",
+        "demo-evaluation": "偏 Demo 的 Evaluation 低估了生产尾部失败；漂亮的 Dashboard 仍然是很弱的发布证据。",
+        "weak-context-economics": "Context 质量不错，但上下文经济性较弱。"
+      },
+      "tradeoffs": {
+        "prompt": "Prompt — {label}：质量 {quality} / 策略违规风险 {risk}%。",
+        "context": "Context — {retrieval} + {context}：召回率 {recall}% / 关键内容保留率 {retention}%。",
+        "execution": "Harness + Loop — {label}：成功率 {success}% / 失控风险 {runaway}%。",
+        "graph": "Graph — {label}：失败传播 {propagation}% / 协调开销 {coordination}。",
+        "evaluation": "Evaluation — {label}：证据区间宽度 {width} 分 / {veto}。"
+      },
+      "veto": {"on": "启用安全 veto", "off": "未启用安全 veto"},
+      "compare": {"title": "相对起始基线", "architecture": "架构", "reliability": "可靠性", "safety": "安全", "cost": "成本"}
+    },
+    "explainer": {
+      "eyebrow": "BUILD · 概念闭环",
+      "title": "你要为整个系统辩护，而不是为某一个指标辩护",
+      "paragraphs": [
+        "这个 Capstone 把推理单位从单个子系统提升到整个 AI 系统。一个局部上看似优秀的选择，和其他层发生冲突后可能变成糟糕架构。强 Retrieval 修复不了含糊的指令权限；安全 Prompt 也无法强制建立运行时权限边界；可靠 Loop 仍然可能被放进一个不必要复杂的 Graph；一个不错的候选版本也可能因为 Evaluation 证据薄弱而被错误发布。",
+        "Prompt Engineering 定义行为契约：哪些指令拥有更高权限、高后果约束怎样表达、检索到的内容是数据还是指令，以及下游系统需要怎样的输出结构才能校验。在这个挑战里，未解决的 Prompt 冲突属于明确 blocker，而不是一个可以被平均掉的小质量扣分。",
+        "Context Engineering 同时包含 Retrieval 和工作上下文策略。Retrieval 决定哪些证据能够被找到；压缩和预算策略决定哪些证据最终能留在模型工作集里。架构既要保留足够的关键内容，也不能无限突破 Context Budget，更不能为不会改善任务的证据持续支付成本。",
+        "Harness 与 Loop Engineering 控制执行过程。校验、人工审批、重试、超时、终止和局部恢复会同时改变可靠性、运行成本与风险。增加重试可能提高完成率，也可能制造更多重复工作和长尾延迟，所以执行策略必须被当作一个生产控制系统，而不是只看单一成功率。",
+        "Graph Engineering 决定责任如何连接。Coordinator 带很多 Workers 看起来更高级，却可能增加状态耦合和失败传播。更小的分支工作流可以保留独立证据、只重试失败节点、在 Join 时校验，并把人工审核放到真正高后果的边界。只有当这些结构带来可测量优势时，Graph 的复杂度才值得存在。",
+        "Evaluation Engineering 把所有设计选择转换成发布决策。数据覆盖、证据区间、安全 veto 与成本 Gate 决定什么叫“准备好了”。同一个架构在偏 Demo 的 Evaluation 中可能看起来完全可以发布，换成生产 Gate 就会失败。因此 Evaluation 是系统架构的一部分，而不是上线前临时加上的 Dashboard。",
+        "这里所有数值都是由现有 AhaFrame Labs 组合出来的确定性教学抽象，不是真实模型 Benchmark，也不是通用生产阈值。目标是练习在显式约束下为一个完整架构给出可辩护理由，然后把这套推理带到拥有真实测量数据的生产系统。"
+      ]
+    },
+    "next": {
+      "title": "概念闭环意味着六层工程责任已经真正连接起来。",
+      "description": "完成这个 Build 后，AhaFrame 不再默认继续堆内容，而是转向验证 instrumentation 与小规模开发者 Alpha。",
+      "href": "/en/early-access/",
+      "query": "?intent=validation-alpha",
+      "button": "加入 Validation Alpha"
+    }
+  }
+}
