@@ -9,17 +9,17 @@ def _options(values):
 
 
 def _build(locale):
-    slug='agent-reliability';d=lab_source(locale,slug,DOMAIN);c=d['interactive'];metrics=c['metrics']
+    slug='agent-reliability';d=lab_source(locale,slug,DOMAIN);c=d['interactive'];metrics=c['metrics'];p=d['presentation']
     body=f'''<div class="container">{lab_header(slug,'⌘',locale,d,DOMAIN)}{quick_answer(d['quick'],locale,DOMAIN)}
-    <div data-agent-reliability-lab data-agent-reliability-copy="{json_attr(d['presentation'])}">
+    <div data-agent-reliability-lab data-agent-reliability-copy="{json_attr(p)}">
       <section class="card interactive"><div class="panel-title"><span>{c['panelTitle']}</span><span class="badge">{c['simulation']}</span></div><p class="subtle">{c['intro']}</p>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:18px"><div>
         <label class="label" for="agent-max-steps">{c['maxSteps']}</label><div class="control-row"><input id="agent-max-steps" class="slider" type="range" min="4" max="20" step="1" value="14"><output class="badge" data-agent-max-steps-value>14</output></div>
         <label class="label" for="agent-retry-limit" style="display:block;margin-top:18px">{c['retryLimit']}</label><div class="control-row"><input id="agent-retry-limit" class="slider" type="range" min="0" max="5" step="1" value="4"><output class="badge" data-agent-retry-value>4</output></div>
-        <label class="label" for="agent-timeout" style="display:block;margin-top:18px">{c['timeout']}</label><div class="control-row"><input id="agent-timeout" class="slider" type="range" min="2" max="20" step="1" value="12"><output class="badge" data-agent-timeout-value>12</output></div>
+        <label class="label" for="agent-timeout" style="display:block;margin-top:18px">{c['timeout']}</label><div class="control-row"><input id="agent-timeout" class="slider" type="range" min="2" max="20" step="1" value="12"><output class="badge" data-agent-timeout-value>12 {p['seconds']}</output></div>
       </div><div>
         <label class="label" for="agent-termination">{c['termination']}</label><select id="agent-termination" class="select" style="margin-top:8px">{_options(c['terminationOptions'])}</select>
-        <button type="button" class="btn wide" data-agent-validation style="margin-top:16px">—</button><button type="button" class="btn wide" data-agent-human style="margin-top:10px">—</button>
+        <button type="button" class="btn wide" data-agent-validation style="margin-top:16px">{p['validation']['off']}</button><button type="button" class="btn wide" data-agent-human style="margin-top:10px">{p['human']['off']}</button>
         <div class="note" style="margin-top:16px">{c['irreversible']}</div><div class="actions" style="margin-top:16px"><button type="button" class="btn primary" data-agent-balanced>{c['preset']}</button><button type="button" class="btn" data-agent-reset>{c['reset']}</button></div>
       </div></div></section>
       <section class="card lesson-section" style="padding:20px;margin-top:18px"><div class="panel-title">{c['systemSees']}</div><div class="metrics" style="margin-top:14px">
