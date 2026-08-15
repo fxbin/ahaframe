@@ -1,0 +1,37 @@
+{
+  "locale": "en",
+  "pricing": {
+    "title": "AhaFrame Pricing — Interactive AI engineering labs",
+    "description": "Explore AhaFrame pricing hypotheses for free AI engineering mental models, a one-time foundations track, and a future production-lab membership.",
+    "kicker": "Pricing validation",
+    "headlineBefore": "Learn the concepts free. Pay for",
+    "headlineAccent": "engineering capability",
+    "intro": "AhaFrame is testing a lower-friction paid layer around failure simulations, production labs, build projects, and evaluation. No payment is collected in this MVP.",
+    "plans": [
+      {"name":"Free","badge":"","description":"Build the mental models before paying for anything.","price":"$0","suffix":"/ forever","items":["Core interactive mental models","Foundational simulations","Public concept guides","Local progress tracking","Rotating production-lab previews"],"cta":"Try Evaluation Failure Lab","href":"/en/labs/evaluation-failure/","event":""},
+      {"name":"AI Engineer Foundations","badge":"Recommended hypothesis","description":"A focused path from understanding to production intuition.","price":"$49","suffix":"/ one-time concept","items":["12 interactive engineering labs","Failure simulations","3 build projects","Evaluation challenges","Lifetime access to the Foundations track"],"cta":"I’d consider $49 once","href":"/en/early-access/?intent=foundations-49","event":"pricing_foundations_click"},
+      {"name":"Production Labs","badge":"Future hypothesis","description":"For a larger, continuously growing advanced lab library.","price":"$12","suffix":"/ month concept","items":["Everything in Foundations","Ongoing production scenarios","Advanced compare / replay workflows","Saved experiments when accounts launch","Live-model credits only when enabled"],"cta":"I’d consider $12/month","href":"/en/early-access/?intent=production-labs-12","event":"pricing_pro_click"}
+    ],
+    "compareTitle": "What are you paying for?",
+    "matrixHeaders": ["Capability","Free","Foundations","Production Labs"],
+    "matrixRows": [["Mental models + concept guides","✓","✓","✓"],["Foundational simulations","Selected","All","All"],["Failure simulations","Preview","✓","✓"],["Build projects + evaluation","—","✓","✓"],["Growing production-lab library","—","—","✓"]],
+    "sequenceTitle": "Development sequence",
+    "sequence": [["RAG Failure Lab","Break retrieval, tune it, compare it.","Available"],["Agent Reliability Lab","Retries, limits, validation, safety, cost.","Available"],["Evaluation Failure Lab","Dataset coverage, regressions, vetoes, evidence, release gates.","New"],["Context Compression Lab","Token savings, retained evidence, retrieval, memory trade-offs.","Next"],["Optional accounts","Only when Save / Purchase / Live Mode needs identity.","Later"]],
+    "ctaTitle": "Help validate the paid layer.",
+    "ctaCopy": "Choose the offer you would realistically consider. This records intent only; no charge is made.",
+    "ctaButton": "Join Early Access →"
+  },
+  "earlyAccess": {
+    "title": "AhaFrame Early Access — Join the AI engineering lab waitlist",
+    "description": "Join AhaFrame early access for interactive AI engineering mental models, failure simulations, and production labs.",
+    "eyebrow": "AhaFrame Early Access",
+    "headlineBefore": "Build durable intuition for",
+    "headlineAccent": "AI engineering",
+    "intro": "Get new interactive labs, failure-simulation previews, pricing experiments, launch updates, and an opportunity to shape the roadmap.",
+    "emailLabel": "Email address",
+    "placeholder": "you@example.com",
+    "button": "Join Early Access →",
+    "demoNote": "MVP: submissions are stored locally unless the remote waitlist endpoint is configured at build time.",
+    "cards": [["01","Interactive mental models","Understand hidden AI-system behavior before memorizing framework APIs."],["02","Failure simulations","Break RAG, agents, context, and evaluation systems in repeatable scenarios."],["03","Production labs","Move from conceptual intuition to architecture, debugging, and implementation trade-offs."]]
+  }
+}
