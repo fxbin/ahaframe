@@ -36,11 +36,13 @@ def main():
     parser.add_argument('--base-url', default='https://ahaframe.com')
     parser.add_argument('--validation-endpoint', required=True)
     parser.add_argument('--run-id', required=True)
+    parser.add_argument('--cohort', default='production-smoke')
     args = parser.parse_args()
 
     base = args.base_url.rstrip('/')
     endpoint = args.validation_endpoint
     run_id = args.run_id.replace(' ', '-')[:80]
+    cohort = args.cohort.strip().lower()[:80]
     origin = base
 
     pages = [
@@ -76,6 +78,7 @@ def main():
     common = {
         'anonymousUserId': f'smoke-user-{run_id}',
         'sessionId': f'smoke-session-{run_id}',
+        'cohortId': cohort,
         'locale': 'zh-CN',
         'path': '/zh-cn/labs/instruction-conflict/',
         'layer': 'Prompt',
@@ -88,7 +91,7 @@ def main():
         **common,
         'eventId': f'smoke-event-{run_id}',
         'name': 'production_smoke_test',
-        'props': {'runId': run_id},
+        'props': {'runId': run_id, 'cohortId': cohort},
         'ts': now,
         'pageType': 'lab',
         'visitCount': 1,
@@ -104,8 +107,8 @@ def main():
         'feedbackId': f'smoke-feedback-{run_id}',
         'rating': 'yes',
         'strongAha': True,
-        'note': 'production smoke test zh-CN locale persistence',
-        'attribution': {'source': 'github-actions', 'runId': run_id},
+        'note': 'production smoke test zh-CN locale and cohort persistence',
+        'attribution': {'source': 'github-actions', 'runId': run_id, 'cohortId': cohort},
         'submittedAt': now,
     }
     waitlist = {
@@ -131,8 +134,8 @@ def main():
             raise SystemExit(f'validation {label}: endpoint did not return ok=true: {parsed}')
         print(f'PASS POST {label}: {parsed}')
 
-    print(f'PASS AhaFrame bilingual production smoke run_id={run_id}')
-    print(f'Expected DB IDs with locale=zh-CN: smoke-event-{run_id}, smoke-feedback-{run_id}, ahaframe-smoke+{run_id}@example.invalid')
+    print(f'PASS AhaFrame bilingual production smoke run_id={run_id} cohort={cohort}')
+    print(f'Expected DB IDs with locale=zh-CN and cohort_id={cohort}: smoke-event-{run_id}, smoke-feedback-{run_id}, ahaframe-smoke+{run_id}@example.invalid')
 
 
 if __name__ == '__main__':
