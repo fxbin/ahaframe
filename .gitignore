@@ -11,4 +11,5 @@ __pycache__/
 *.py[cod]
 .venv/
 .pytest_cache/
+.artifacts/validation/
 Thumbs.db
