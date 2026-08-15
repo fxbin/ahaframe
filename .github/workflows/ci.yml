@@ -37,6 +37,8 @@ jobs:
           fi
       - name: Test Lab Engine
         run: node scripts/test_lab_engine.js
+      - name: Test Mission Engine
+        run: node scripts/test_mission_engine.js
       - name: Test Integrated Build
         run: node scripts/test_integrated_build.js
       - name: Test Validation Runtime
