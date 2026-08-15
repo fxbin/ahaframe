@@ -43,6 +43,8 @@ jobs:
         run: python3 scripts/test_foundation_localization.py
       - name: Validate Prompt and Context localization
         run: python3 scripts/test_prompt_context_localization.py
+      - name: Validate Harness localization
+        run: python3 scripts/test_harness_localization.py
       - name: Validate
         run: python3 scripts/validate.py
       - name: Validate instrumentation build

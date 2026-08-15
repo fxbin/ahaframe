@@ -2,6 +2,7 @@
   const root=document.querySelector('[data-agent-reliability-lab]');
   if(!root)return;
 
+  const copy=JSON.parse(root.dataset.agentReliabilityCopy||'{}');
   const lab=window.AhaFrame.createLab('agent-reliability');
   lab.checkpoint('baseline');
 
@@ -41,6 +42,8 @@
 
   function render(frame){
     const {state,derived}=frame;
+    const seconds=copy.seconds||'s';
+    const compare=copy.compare||{};
     maxSteps.value=state.maxSteps;
     retryLimit.value=state.retryLimit;
     timeout.value=state.timeoutSec;
@@ -48,25 +51,25 @@
 
     outputs.maxSteps.textContent=String(state.maxSteps);
     outputs.retry.textContent=String(state.retryLimit);
-    outputs.timeout.textContent=`${state.timeoutSec} s`;
+    outputs.timeout.textContent=`${state.timeoutSec} ${seconds}`;
 
-    validation.textContent=state.validation?'Result validation: ON':'Result validation: OFF';
+    validation.textContent=state.validation?(copy.validation?.on||'Result validation: ON'):(copy.validation?.off||'Result validation: OFF');
     validation.classList.toggle('primary',state.validation);
-    human.textContent=state.humanApproval?'Human approval: ON':'Human approval: OFF';
+    human.textContent=state.humanApproval?(copy.human?.on||'Human approval: ON'):(copy.human?.off||'Human approval: OFF');
     human.classList.toggle('primary',state.humanApproval);
 
     outputs.success.textContent=`${(derived.successRate*100).toFixed(0)}%`;
     outputs.reliability.textContent=derived.reliabilityScore.toFixed(0);
     outputs.runaway.textContent=`${(derived.runawayRisk*100).toFixed(0)}%`;
     outputs.unsafe.textContent=`${(derived.unsafeActionRisk*100).toFixed(0)}%`;
-    outputs.latency.textContent=`${derived.latencySeconds.toFixed(1)} s`;
+    outputs.latency.textContent=`${derived.latencySeconds.toFixed(1)} ${seconds}`;
     outputs.cost.textContent=derived.costIndex.toFixed(1);
     outputs.reviews.textContent=String(derived.humanReviewsPer100);
-    outputs.diagnosis.textContent=derived.diagnosis;
+    outputs.diagnosis.textContent=copy.diagnosis?.[derived.failureType]||derived.diagnosis;
     outputs.diagnosis.dataset.failureType=derived.failureType;
 
     const diff=lab.compare('baseline');
-    outputs.compare.innerHTML=`<strong>Vs. unreliable baseline</strong><span>Reliability ${signed(metricDelta(diff,'reliabilityScore'))}</span><span>Success ${signed(metricDelta(diff,'successPercent'))} pts</span><span>Runaway ${signed(metricDelta(diff,'runawayPercent'))} pts</span><span>Unsafe actions ${signed(metricDelta(diff,'unsafeActionPercent'))} pts</span><span>Latency ${signed(metricDelta(diff,'latencySeconds'),1)} s</span><span>Cost ${signed(metricDelta(diff,'costIndex'),1)}</span>`;
+    outputs.compare.innerHTML=`<strong>${compare.title||'Vs. unreliable baseline'}</strong><span>${compare.reliability||'Reliability'} ${signed(metricDelta(diff,'reliabilityScore'))}</span><span>${compare.success||'Success'} ${signed(metricDelta(diff,'successPercent'))} ${compare.points||'pts'}</span><span>${compare.runaway||'Runaway'} ${signed(metricDelta(diff,'runawayPercent'))} ${compare.points||'pts'}</span><span>${compare.unsafe||'Unsafe actions'} ${signed(metricDelta(diff,'unsafeActionPercent'))} ${compare.points||'pts'}</span><span>${compare.latency||'Latency'} ${signed(metricDelta(diff,'latencySeconds'),1)} ${seconds}</span><span>${compare.cost||'Cost'} ${signed(metricDelta(diff,'costIndex'),1)}</span>`;
   }
 
   lab.subscribe(render);
