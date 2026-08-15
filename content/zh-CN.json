@@ -11,7 +11,9 @@
     "labs/instruction-conflict/",
     "labs/rag-failure/",
     "labs/context-compression/",
-    "labs/agent-reliability/"
+    "labs/agent-reliability/",
+    "labs/agent-workflow-graph/",
+    "labs/evaluation-failure/"
   ],
   "brand": "AhaFrame",
   "ui": {
@@ -35,7 +37,7 @@
     }
   },
   "meta": {
-    "status": "harness-lab-ready",
-    "note": "Landing, marketing, Foundation, Prompt, Context, and Harness surfaces are localized; Graph, Evaluation, and Integrated Build continue in #46."
+    "status": "production-labs-ready",
+    "note": "Landing, marketing, Foundation, and all standalone Production Labs are localized; Integrated Build remains in #46."
   }
 }
