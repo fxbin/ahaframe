@@ -1,0 +1,43 @@
+{
+  "metrics": [
+    {"metric_key": "unique_cohort_visitors", "numerator": 6, "denominator": null, "rate": null},
+    {"metric_key": "landing_to_lab_start", "numerator": 4, "denominator": 6, "rate": 0.6666666667},
+    {"metric_key": "meaningful_interaction_rate", "numerator": 5, "denominator": 7, "rate": 0.7142857143},
+    {"metric_key": "failure_tradeoff_exposure_rate", "numerator": 5, "denominator": 7, "rate": 0.7142857143},
+    {"metric_key": "strong_aha_rate", "numerator": 4, "denominator": 6, "rate": 0.6666666667},
+    {"metric_key": "second_lab_rate", "numerator": 3, "denominator": 5, "rate": 0.6},
+    {"metric_key": "second_layer_rate", "numerator": 2, "denominator": 5, "rate": 0.4},
+    {"metric_key": "two_meaningful_labs_rate", "numerator": 2, "denominator": 5, "rate": 0.4},
+    {"metric_key": "capstone_start_rate", "numerator": 2, "denominator": 5, "rate": 0.4},
+    {"metric_key": "capstone_completion_rate", "numerator": 1, "denominator": 2, "rate": 0.5},
+    {"metric_key": "pricing_visit_rate", "numerator": 2, "denominator": 6, "rate": 0.3333333333},
+    {"metric_key": "paid_intent_rate", "numerator": 1, "denominator": 6, "rate": 0.1666666667},
+    {"metric_key": "waitlist_conversion_rate", "numerator": 1, "denominator": 6, "rate": 0.1666666667},
+    {"metric_key": "any_return_rate", "numerator": 2, "denominator": 6, "rate": 0.3333333333},
+    {"metric_key": "d7_return_rate", "numerator": 1, "denominator": 4, "rate": 0.25}
+  ],
+  "smoke_metrics": [
+    {"metric_key": "unique_cohort_visitors", "numerator": 0, "denominator": null, "rate": null},
+    {"metric_key": "landing_to_lab_start", "numerator": 0, "denominator": 0, "rate": null}
+  ],
+  "smoke_raw_present": true,
+  "participants": [
+    {"cohort_id": "alpha-fixture", "first_seen_at": "2026-08-01T00:00:00Z", "last_seen_at": "2026-08-10T00:00:00Z", "first_locale": "en", "acquisition_utm_source": "github", "acquisition_utm_medium": "social", "acquisition_utm_campaign": "alpha", "first_device_class": "desktop"},
+    {"cohort_id": "alpha-fixture", "first_seen_at": "2026-08-01T01:00:00Z", "last_seen_at": "2026-08-02T02:00:00Z", "first_locale": "zh-CN", "acquisition_utm_source": "x", "acquisition_utm_medium": "social", "acquisition_utm_campaign": "alpha", "first_device_class": "mobile"},
+    {"cohort_id": "alpha-fixture", "first_seen_at": "2026-08-02T00:00:00Z", "last_seen_at": "2026-08-02T03:00:00Z", "first_locale": "en", "acquisition_utm_source": "github", "acquisition_utm_medium": "social", "acquisition_utm_campaign": "alpha", "first_device_class": "desktop"},
+    {"cohort_id": "alpha-fixture", "first_seen_at": "2026-08-03T00:00:00Z", "last_seen_at": "2026-08-11T00:00:00Z", "first_locale": "zh-CN", "acquisition_utm_source": "", "acquisition_utm_medium": "", "acquisition_utm_campaign": "", "first_device_class": "desktop"},
+    {"cohort_id": "alpha-fixture", "first_seen_at": "2026-08-04T00:00:00Z", "last_seen_at": "2026-08-04T01:00:00Z", "first_locale": "en", "acquisition_utm_source": "reddit", "acquisition_utm_medium": "social", "acquisition_utm_campaign": "alpha", "first_device_class": "tablet"},
+    {"cohort_id": "alpha-fixture", "first_seen_at": "2026-08-05T00:00:00Z", "last_seen_at": "2026-08-05T01:00:00Z", "first_locale": "zh-CN", "acquisition_utm_source": "github", "acquisition_utm_medium": "social", "acquisition_utm_campaign": "alpha", "first_device_class": "desktop"}
+  ],
+  "feedback": [
+    {"cohort_id": "alpha-fixture", "locale": "en", "layer": "Prompt", "lab_id": "instruction-conflict", "rating": "aha", "strong_aha": true, "note": "I now see why instruction hierarchy is an engineering boundary, not just prompt wording.", "submitted_at": "2026-08-03T10:00:00Z", "device_class": "desktop"},
+    {"cohort_id": "alpha-fixture", "locale": "zh-CN", "layer": "Context", "lab_id": "rag-failure", "rating": "yes", "strong_aha": true, "note": "之前只关注召回率，现在能看到上下文污染带来的连锁问题。", "submitted_at": "2026-08-04T10:00:00Z", "device_class": "mobile"},
+    {"cohort_id": "alpha-fixture", "locale": "en", "layer": "Context", "lab_id": "context-compression", "rating": "little", "strong_aha": false, "note": "Useful, but I still need a clearer production trade-off example.", "submitted_at": "2026-08-05T10:00:00Z", "device_class": "desktop"},
+    {"cohort_id": "alpha-fixture", "locale": "zh-CN", "layer": "Harness", "lab_id": "agent-reliability", "rating": "aha", "strong_aha": true, "note": "原来 harness 的核心不是包一层 API，而是控制失败传播。", "submitted_at": "2026-08-06T10:00:00Z", "device_class": "desktop"},
+    {"cohort_id": "alpha-fixture", "locale": "en", "layer": "Graph", "lab_id": "agent-workflow-graph", "rating": "no", "strong_aha": false, "note": "The graph model felt too abstract for me.", "submitted_at": "2026-08-07T10:00:00Z", "device_class": "tablet"},
+    {"cohort_id": "alpha-fixture", "locale": "zh-CN", "layer": "Evaluation", "lab_id": "evaluation-failure", "rating": "yes", "strong_aha": true, "note": "评估不是最后打分，而是决定能不能发布。", "submitted_at": "2026-08-08T10:00:00Z", "device_class": "desktop"}
+  ],
+  "quality": [
+    {"severity": "WARNING", "issue_code": "feedback_without_start", "cohort_id": "", "lab_id": "legacy-lab", "observed_at": "2026-08-02T12:00:00Z", "detail": "historical unattributed fixture warning"}
+  ]
+}
