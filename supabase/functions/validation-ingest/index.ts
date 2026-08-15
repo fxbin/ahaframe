@@ -34,6 +34,11 @@ function locale(value: unknown) {
   return parsed === 'zh-CN' ? 'zh-CN' : 'en'
 }
 
+function cohort(value: unknown) {
+  const parsed = text(value, 80).toLowerCase()
+  return /^[a-z0-9][a-z0-9._-]{0,79}$/.test(parsed) ? parsed : ''
+}
+
 function validDate(value: unknown) {
   const parsed = typeof value === 'string' ? Date.parse(value) : NaN
   return Number.isFinite(parsed) ? new Date(parsed).toISOString() : null
@@ -55,6 +60,7 @@ async function ingestEvent(body: Record<string, unknown>) {
     event_id: eventId,
     anonymous_user_id: anonymousUserId,
     session_id: sessionId,
+    cohort_id: cohort(body.cohortId),
     locale: locale(body.locale),
     name,
     props: object(body.props),
@@ -91,6 +97,7 @@ async function ingestFeedback(body: Record<string, unknown>) {
     feedback_id: feedbackId,
     anonymous_user_id: anonymousUserId,
     session_id: sessionId,
+    cohort_id: cohort(body.cohortId),
     locale: locale(body.locale),
     layer: text(body.layer, 80),
     lab_id: labId,
@@ -117,6 +124,7 @@ async function ingestWaitlist(body: Record<string, unknown>) {
     source: text(body.source, 500),
     anonymous_user_id: text(body.anonymousUserId, 120),
     session_id: text(body.sessionId, 120),
+    cohort_id: cohort(body.cohortId),
     locale: locale(body.locale),
     layer: text(body.layer, 80),
     lab_id: text(body.labId, 120),
