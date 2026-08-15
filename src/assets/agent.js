@@ -3,6 +3,9 @@
   if(!next)return;
   const reset=document.querySelector('[data-agent-reset]');
   const errorButton=document.querySelector('[data-agent-error]');
+  const mount=next.closest('[data-agent-copy]');
+  let copy={};
+  try{copy=JSON.parse(mount?.dataset.agentCopy||'{}');}catch(_error){copy={};}
   const nodes=[...document.querySelectorAll('[data-agent-node]')];
   const timeline=[...document.querySelectorAll('[data-time-step]')];
   const status=document.querySelector('[data-agent-status]');
@@ -26,8 +29,13 @@
       item.classList.toggle('done',i<state.step);
       item.classList.toggle('active',i===state.step);
     });
-    status.textContent=derived.status;
-    result.textContent=derived.result;
+    const localizedStatus=state.failure?copy.errorStatus:copy.status?.[Math.min(state.step,(copy.status?.length||1)-1)];
+    status.textContent=localizedStatus||derived.status;
+    if(derived.metrics?.completed){
+      result.textContent=copy.result||derived.result;
+    }else{
+      result.textContent=copy.waiting||derived.result;
+    }
   });
 
   next.addEventListener('click',()=>{
