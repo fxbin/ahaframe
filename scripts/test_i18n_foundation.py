@@ -36,6 +36,7 @@ ZH_READY={
     "labs/agent-reliability/",
     "labs/agent-workflow-graph/",
     "labs/evaluation-failure/",
+    "build/reliable-support-agent/",
 }
 
 
@@ -62,10 +63,15 @@ def main() -> None:
         prompt_context=load_content_source(locale,"production-prompt-context")
         harness=load_content_source(locale,"production-harness")
         graph_evaluation=load_content_source(locale,"production-graph-evaluation")
+        integrated=load_content_source(locale,"integrated-build")
         assert set(foundation["lessons"]) == {"token-playground","context-window","agent-loop"}
         assert set(prompt_context["labs"]) == {"instruction-conflict","rag-failure","context-compression"}
         assert set(harness["labs"]) == {"agent-reliability"}
         assert set(graph_evaluation["labs"]) == {"agent-workflow-graph","evaluation-failure"}
+        assert integrated["build"]["name"].strip()
+        assert integrated["build"]["quick"].strip()
+        assert set(integrated["build"]["groups"]) == {"prompt","retrieval","context","execution","graph","evaluation"}
+        assert integrated["build"]["presentation"]["blockers"]
         for slug,lesson in foundation["lessons"].items():
             assert lesson["name"].strip(), (locale,slug)
             assert lesson["quick"].strip(), (locale,slug)
@@ -92,12 +98,13 @@ def main() -> None:
         path=f"/en/labs/{slug}/"
         assert route_available(path,"zh-CN") is True
         assert localized_or_default_path(path,"zh-CN") == f"/zh-cn/labs/{slug}/"
-    assert route_available("/en/build/reliable-support-agent/", "zh-CN") is False
-    assert localized_or_default_path("/en/build/reliable-support-agent/","zh-CN") == "/en/build/reliable-support-agent/"
+    build_path="/en/build/reliable-support-agent/"
+    assert route_available(build_path,"zh-CN") is True
+    assert localized_or_default_path(build_path,"zh-CN") == "/zh-cn/build/reliable-support-agent/"
 
-    lab_switcher=language_switch_items("/en/labs/evaluation-failure/")
-    assert lab_switcher[1]["available"] is True
-    assert lab_switcher[1]["href"] == "/zh-cn/labs/evaluation-failure/"
+    build_switcher=language_switch_items(build_path)
+    assert build_switcher[1]["available"] is True
+    assert build_switcher[1]["href"] == "/zh-cn/build/reliable-support-agent/"
 
     all_routes = set()
     for relative in PUBLIC_ROUTE_RELATIVES:
@@ -116,7 +123,7 @@ def main() -> None:
 
     print(
         f"PASS: i18n foundation validates {len(SUPPORTED_LOCALES)} locales, "
-        f"{len(PUBLIC_ROUTE_RELATIVES)} public route pairs, all standalone zh-CN Labs, "
+        f"{len(PUBLIC_ROUTE_RELATIVES)} public route pairs, the complete zh-CN Validation Alpha learning surface, "
         "shared UI keys, and no locale-specific scenario forks."
     )
 
