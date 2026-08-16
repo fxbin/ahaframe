@@ -1,6 +1,6 @@
 """Build the AhaFrame static validation site."""
 
-from ahaframe import agent, agent_reliability, build_meta, context, context_compression, discovery, evaluation, graph, home, instruction_conflict, integrated_build, marketing, rag, third_party_analytics, token
+from ahaframe import agent, agent_reliability, build_meta, context, context_compression, discovery, evaluation, graph, home, instruction_conflict, integrated_build, marketing, performance, rag, third_party_analytics, token
 from ahaframe.core import SITE
 from ahaframe.i18n import assert_public_route_contract, validate_locale_sources
 
@@ -25,6 +25,7 @@ def main():
     marketing.build()
     discovery.build()
     third_party_analytics.apply()
+    performance.apply()
     # Public, non-secret release identity used by Production Smoke to prove that
     # ahaframe.com is serving the exact main commit under test.
     build_meta.apply(SITE)
