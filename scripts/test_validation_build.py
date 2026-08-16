@@ -71,8 +71,8 @@ for early_page in [SITE/'en/early-access/index.html',SITE/'zh-cn/early-access/in
         raise SystemExit(f'{early_page.relative_to(SITE)} exposes demo-mode copy in production trust text')
 
 pricing_contracts=[
-    (SITE/'en/pricing/index.html',['$39','foundations-39','Separate purchase','Advanced production incident simulations'],['$49','Everything in Foundations']),
-    (SITE/'zh-cn/pricing/index.html',['$39','foundations-39','需单独购买','高级生产事故模拟'],['$49','包含基础版全部内容']),
+    (SITE/'en/pricing/index.html',['$39','foundations-39','3 flagship production incidents','1 cross-layer Final Boss','Lifetime access as the Foundations track expands','Separate purchase','Advanced production incident simulations'],['$49','Everything in Foundations','12 interactive engineering labs','3 build projects']),
+    (SITE/'zh-cn/pricing/index.html',['$39','foundations-39','3 个旗舰生产事故 Mission','1 个跨层 Final Boss','Foundations 路线持续扩展，已购用户长期访问','需单独购买','高级生产事故模拟'],['$49','包含基础版全部内容','12 个交互式工程实验','3 个 Build 项目']),
 ]
 for pricing_page,required,forbidden in pricing_contracts:
     source=pricing_page.read_text(encoding='utf-8')
@@ -87,4 +87,4 @@ backend=subprocess.run([sys.executable,str(ROOT/'scripts/test_validation_backend
 if backend.returncode:
     raise SystemExit(f'validation backend contract failed\n{backend.stdout}\n{backend.stderr}')
 
-print(f'PASS Validation Build: {len(pages)} generated pages load anonymous context, semantic analytics, production-ready Early Access conversion, Aha feedback, global product feedback/contact UX, the $39 Foundations / separate Production Labs pricing contract, Lab Engine, and the storage backend contract.')
+print(f'PASS Validation Build: {len(pages)} generated pages load anonymous context, semantic analytics, production-ready Early Access conversion, Aha feedback, global product feedback/contact UX, the truthful $39 Foundations / separate Production Labs pricing contract, Lab Engine, and the storage backend contract.')
