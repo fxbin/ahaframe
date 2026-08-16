@@ -23,7 +23,23 @@ for key in ['analyticsEndpoint','waitlistEndpoint','feedbackEndpoint']:
     if key not in parsed:
         raise SystemExit(f'config.js missing {key}')
 
-pages=[SITE/'en/index.html',SITE/'en/pricing/index.html',SITE/'en/early-access/index.html']
+landing=SITE/'en/index.html'
+landing_source=landing.read_text(encoding='utf-8')
+landing_soup=BeautifulSoup(landing_source,'html.parser')
+landing_scripts=[node.get('src') for node in landing_soup.find_all('script',src=True)]
+landing_expected=['/assets/config.js','/assets/validation-context.js','/assets/app.js','/assets/home.js']
+for item in landing_expected:
+    if item not in landing_scripts:
+        raise SystemExit(f'{landing.relative_to(SITE)} missing {item}')
+for item in ['/assets/validation-ui.js','/assets/lab-engine.js','/assets/lab-scenarios.js']:
+    if item in landing_scripts:
+        raise SystemExit(f'{landing.relative_to(SITE)} eagerly loads {item}')
+if 'data-ahaframe-feedback-bootstrap' not in landing_source or "script.src='/assets/validation-ui.js'" not in landing_source:
+    raise SystemExit(f'{landing.relative_to(SITE)} missing lazy product feedback bootstrap')
+if 'mailto:support@ahaframe.com' not in landing_source:
+    raise SystemExit(f'{landing.relative_to(SITE)} missing support contact surface')
+
+pages=[SITE/'en/pricing/index.html',SITE/'en/early-access/index.html']
 pages+=sorted((SITE/'en/labs').glob('*/index.html'))
 pages+=sorted((SITE/'en/build').glob('*/index.html'))
 for page in pages:
@@ -87,4 +103,4 @@ backend=subprocess.run([sys.executable,str(ROOT/'scripts/test_validation_backend
 if backend.returncode:
     raise SystemExit(f'validation backend contract failed\n{backend.stdout}\n{backend.stderr}')
 
-print(f'PASS Validation Build: {len(pages)} generated pages load anonymous context, semantic analytics, production-ready Early Access conversion, Aha feedback, global product feedback/contact UX, the truthful $39 Foundations / separate Production Labs pricing contract, Lab Engine, and the storage backend contract.')
+print(f'PASS Validation Build: lean landing validation, {len(pages)} full-runtime generated pages, anonymous context, semantic analytics, production-ready Early Access conversion, Aha feedback, global product feedback/contact UX, the truthful $39 Foundations / separate Production Labs pricing contract, Lab Engine, and the storage backend contract.')
