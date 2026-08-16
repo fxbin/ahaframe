@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 ROOT=Path(__file__).resolve().parents[1]
 SITE=ROOT/'site'
 
-required_assets=['validation-context.js','validation-ui.js','app.js']
+required_assets=['validation-context.js','validation-ui.js','app.js','landing-analytics.js']
 for name in required_assets:
     path=SITE/'assets'/name
     if not path.exists():
@@ -23,7 +23,7 @@ for key in ['analyticsEndpoint','waitlistEndpoint','feedbackEndpoint']:
     if key not in parsed:
         raise SystemExit(f'config.js missing {key}')
 
-landing_expected=['/assets/config.js','/assets/validation-context.js','/assets/app.js','/assets/home.js']
+landing_expected=['/assets/config.js','/assets/validation-context.js','/assets/landing-analytics.js','/assets/home.js']
 for landing in [SITE/'index.html',SITE/'en/index.html']:
     landing_source=landing.read_text(encoding='utf-8')
     landing_soup=BeautifulSoup(landing_source,'html.parser')
@@ -31,7 +31,7 @@ for landing in [SITE/'index.html',SITE/'en/index.html']:
     for item in landing_expected:
         if item not in landing_scripts:
             raise SystemExit(f'{landing.relative_to(SITE)} missing {item}')
-    for item in ['/assets/validation-ui.js','/assets/lab-engine.js','/assets/lab-scenarios.js']:
+    for item in ['/assets/app.js','/assets/validation-ui.js','/assets/lab-engine.js','/assets/lab-scenarios.js']:
         if item in landing_scripts:
             raise SystemExit(f'{landing.relative_to(SITE)} eagerly loads {item}')
     if 'http-equiv="refresh"' in landing_source.lower():
@@ -40,6 +40,10 @@ for landing in [SITE/'index.html',SITE/'en/index.html']:
         raise SystemExit(f'{landing.relative_to(SITE)} missing lazy product feedback bootstrap')
     if 'mailto:support@ahaframe.com' not in landing_source:
         raise SystemExit(f'{landing.relative_to(SITE)} missing support contact surface')
+    if 'src="https://www.googletagmanager.com/gtag/js' in landing_source:
+        raise SystemExit(f'{landing.relative_to(SITE)} eagerly loads GA4')
+    if 'setTimeout(load,6000)' not in landing_source or 'googletagmanager.com/gtag/js?id=G-EWPR5QXGWJ' not in landing_source:
+        raise SystemExit(f'{landing.relative_to(SITE)} missing deferred GA4 bootstrap')
     stylesheets=[node.get('href') for node in landing_soup.find_all('link',attrs={'rel':'stylesheet'})]
     if '/assets/home.css' not in stylesheets:
         raise SystemExit(f'{landing.relative_to(SITE)} missing homepage-specific stylesheet')
@@ -65,6 +69,11 @@ context_source=(SITE/'assets/validation-context.js').read_text(encoding='utf-8')
 for token in ['anonymousUserId','sessionId','returnVisit','firstUtmSource','feedbackEndpoint','strongAha','buildProductFeedbackPayload','submitProductFeedback','ahaframe_product_feedback_v1','buildWaitlistPayload','submitWaitlist']:
     if token not in context_source:
         raise SystemExit(f'validation-context.js missing {token}')
+
+landing_runtime=(SITE/'assets/landing-analytics.js').read_text(encoding='utf-8')
+for token in ['schemaVersion','eventId','getValidationContext','analyticsEndpoint','sendBeacon','data-event']:
+    if token not in landing_runtime:
+        raise SystemExit(f'landing-analytics.js missing {token}')
 
 ui_source=(SITE/'assets/validation-ui.js').read_text(encoding='utf-8')
 for event in ['meaningful_interaction','failure_tradeoff_observed','aha_feedback_submitted','second_lab_started','capstone_completed','paid_intent_clicked','product_feedback_opened','product_feedback_submitted']:
@@ -111,4 +120,4 @@ backend=subprocess.run([sys.executable,str(ROOT/'scripts/test_validation_backend
 if backend.returncode:
     raise SystemExit(f'validation backend contract failed\n{backend.stdout}\n{backend.stderr}')
 
-print(f'PASS Validation Build: direct root + lean localized landing validation, {len(pages)} full-runtime generated pages, anonymous context, semantic analytics, production-ready Early Access conversion, Aha feedback, global product feedback/contact UX, the truthful $39 Foundations / separate Production Labs pricing contract, Lab Engine, and the storage backend contract.')
+print(f'PASS Validation Build: direct root + lean localized landing validation, deferred GA4, {len(pages)} full-runtime generated pages, anonymous context, semantic analytics, production-ready Early Access conversion, Aha feedback, global product feedback/contact UX, the truthful $39 Foundations / separate Production Labs pricing contract, Lab Engine, and the storage backend contract.')
