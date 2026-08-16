@@ -13,7 +13,7 @@ class MemoryStorage{
 global.window=global;
 global.localStorage=new MemoryStorage();
 global.sessionStorage=new MemoryStorage();
-global.location={pathname:'/en/labs/instruction-conflict/',search:'?utm_source=reddit&utm_medium=post&utm_campaign=alpha&cohort=alpha-2026-08'};
+global.location={origin:'https://ahaframe.com',pathname:'/en/labs/instruction-conflict/',search:'?utm_source=reddit&utm_medium=post&utm_campaign=alpha&cohort=alpha-2026-08'};
 global.document={referrer:'https://example.dev/thread',documentElement:{lang:'en'},addEventListener(){},querySelectorAll(){return []}};
 Object.defineProperty(global,'navigator',{value:{sendBeacon(){return false;}},configurable:true});
 global.CustomEvent=class CustomEvent{constructor(name,options){this.type=name;this.detail=options?.detail;}};
@@ -88,6 +88,20 @@ assert.equal(zhFeedback.locale,'zh-CN');
 assert.equal(zhFeedback.cohortId,'alpha-2026-08');
 assert.equal(zhFeedback.path,'/zh-cn/labs/instruction-conflict/');
 
+const productPayload=AhaFrame.buildProductFeedbackPayload('bug',' Button is stuck. ',' Tester@Example.com ');
+assert.ok(productPayload.productFeedbackId);
+assert.equal(productPayload.feedbackType,'bug');
+assert.equal(productPayload.message,'Button is stuck.');
+assert.equal(productPayload.email,'tester@example.com');
+assert.equal(productPayload.locale,'zh-CN');
+assert.equal(productPayload.pageType,'lab');
+assert.equal(productPayload.layer,'Prompt');
+assert.equal(productPayload.labId,'instruction-conflict');
+assert.equal(productPayload.cohortId,'alpha-2026-08');
+assert.equal(productPayload.path,'/zh-cn/labs/instruction-conflict/');
+assert.equal(productPayload.pageUrl,'https://ahaframe.com/zh-cn/labs/instruction-conflict/');
+assert.equal(productPayload.attribution.utmSource,'reddit');
+
 (async()=>{
   const demo=await AhaFrame.submitFeedback('yes','Prompt 不是权限系统。');
   assert.equal(demo.remote,false);
@@ -100,6 +114,16 @@ assert.equal(zhFeedback.path,'/zh-cn/labs/instruction-conflict/');
   assert.equal(localFeedback[0].locale,'zh-CN');
   assert.equal(localFeedback[0].cohortId,'alpha-2026-08');
 
+  const demoProduct=await AhaFrame.submitProductFeedback('feature','Add a comparison view.','');
+  assert.equal(demoProduct.remote,false);
+  assert.equal(demoProduct.mode,'demo');
+  assert.equal(demoProduct.payload.feedbackType,'feature');
+  assert.equal(demoProduct.payload.email,'');
+  const localProductFeedback=JSON.parse(localStorage.getItem('ahaframe_product_feedback_v1'));
+  assert.equal(localProductFeedback.length,1);
+  assert.equal(localProductFeedback[0].message,'Add a comparison view.');
+  assert.equal(localProductFeedback[0].cohortId,'alpha-2026-08');
+
   let remoteBody=null;
   global.AHAFRAME_CONFIG.feedbackEndpoint='https://feedback.invalid/collect';
   global.fetch=async(_url,options)=>{remoteBody=JSON.parse(options.body);return {ok:true};};
@@ -107,6 +131,17 @@ assert.equal(zhFeedback.path,'/zh-cn/labs/instruction-conflict/');
   assert.equal(remote.remote,true);
   assert.equal(remoteBody.rating,'little');
   assert.equal(remoteBody.strongAha,false);
+  assert.equal(remoteBody.locale,'zh-CN');
+  assert.equal(remoteBody.cohortId,'alpha-2026-08');
+  assert.equal(remoteBody.anonymousUserId,first.anonymousUserId);
+
+  remoteBody=null;
+  const remoteProduct=await AhaFrame.submitProductFeedback('confusing','The failure explanation needs an example.','reply@example.com');
+  assert.equal(remoteProduct.remote,true);
+  assert.ok(remoteBody.productFeedbackId);
+  assert.equal(remoteBody.feedbackType,'confusing');
+  assert.equal(remoteBody.message,'The failure explanation needs an example.');
+  assert.equal(remoteBody.email,'reply@example.com');
   assert.equal(remoteBody.locale,'zh-CN');
   assert.equal(remoteBody.cohortId,'alpha-2026-08');
   assert.equal(remoteBody.anonymousUserId,first.anonymousUserId);
@@ -164,5 +199,8 @@ assert.equal(zhFeedback.path,'/zh-cn/labs/instruction-conflict/');
   assert.throws(()=>AhaFrame.buildWaitlistPayload('not-an-email'),/valid email address/);
 
   assert.throws(()=>AhaFrame.buildFeedbackPayload('great'),/no, little, yes, or aha/);
-  console.log('PASS Validation Runtime: bilingual locale context, anonymous identity, cohort attribution, sessions, UTM attribution, enriched events, Strong Aha payloads, demo/remote feedback, production-ready waitlist payloads, and return visits.');
+  assert.throws(()=>AhaFrame.buildProductFeedbackPayload('complaint','message'),/bug, confusing, feature, or other/);
+  assert.throws(()=>AhaFrame.buildProductFeedbackPayload('bug','   '),/message is required/);
+  assert.throws(()=>AhaFrame.buildProductFeedbackPayload('bug','message','not-an-email'),/valid email address/);
+  console.log('PASS Validation Runtime: bilingual locale context, anonymous identity, cohort attribution, sessions, UTM attribution, enriched events, Strong Aha payloads, general product feedback, production-ready waitlist payloads, and return visits.');
 })().catch((error)=>{console.error(error);process.exit(1);});
