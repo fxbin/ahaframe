@@ -80,7 +80,7 @@ def _deferred_ga4(measurement_id: str) -> str:
         'window.gtag=window.gtag||gtag;gtag(\'js\',new Date());'
         f'gtag(\'config\',"{safe}");'
         'var s=document.createElement(\'script\');s.async=true;'
-        f's.src="https://www.googletagmanager.com/gtag/js?id={safe}";document.head.appendChild(s);}}'
+        f"s.src='https://www.googletagmanager.com/gtag/js?id={safe}';document.head.appendChild(s);}}"
         "['pointerdown','keydown','touchstart'].forEach(function(name){window.addEventListener(name,load,{once:true,passive:true});});"
         "window.addEventListener('load',function(){setTimeout(load,6000);},{once:true});"
         '})();</script>'
