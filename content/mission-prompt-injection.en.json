@@ -1,0 +1,95 @@
+{
+  "locale": "en",
+  "mission": {
+    "name": "The Prompt Injection Attack",
+    "seoTitle": "The Prompt Injection Attack — Agent Security Incident | AhaFrame",
+    "description": "Defend an AI agent from malicious instructions embedded in untrusted external content without destroying the useful workflow with deny-everything security.",
+    "level": "Production Incident",
+    "layer": "Prompt × Context × Harness",
+    "minutes": 15,
+    "hero": "An external knowledge page tells your Agent to access customer records. The requested tools are real and currently allowed. Keep the workflow useful without treating untrusted content as authority.",
+    "quick": "The model cannot be the sole security boundary: trust, capabilities and irreversible actions must be enforced by the runtime around it.",
+    "brief": {
+      "eyebrow": "INCIDENT 003 · SECURITY",
+      "title": "The dangerous instruction arrived as data.",
+      "role": "You own the Agent's trust and capability boundary.",
+      "body": "A support Agent reads external knowledge while answering refund questions. One retrieved page includes instructions asking it to enrich the answer with full CRM data and send account identifiers through an allowed tool path. A second attack is subtler. A benign security article also contains attack-like wording.",
+      "objective": "Block malicious instruction flow and sensitive tool reach while keeping useful external knowledge available and avoiding excessive false positives or human review.",
+      "stakes": "A prompt can be untrusted data even when it looks like an instruction."
+    },
+    "ui": {
+      "start": "Start incident",
+      "workspace": "Security control room",
+      "evidence": "Evidence",
+      "policy": "Trust + capability policy",
+      "budget": "Change budget",
+      "run": "Run attack suite",
+      "reset": "Reset incident",
+      "attempts": "Defense attempts",
+      "noAttempts": "No attack suite run yet.",
+      "release": "Release decision",
+      "releaseHint": "Run the attack suite before choosing SHIP, BLOCK or INCONCLUSIVE.",
+      "ship": "SHIP",
+      "block": "BLOCK",
+      "inconclusive": "INCONCLUSIVE",
+      "complete": "Complete mission",
+      "outcome": "Security outcome",
+      "waiting": "Inspect provenance and tool permissions before changing policy.",
+      "compared": "Exposed baseline → latest"
+    },
+    "evidenceLabels": {
+      "context-provenance": "Context provenance",
+      "attack-matrix": "Attack + benign test cases",
+      "permission-scopes": "Permission scopes",
+      "planned-tool-calls": "Planned tool calls",
+      "policy-trace": "Policy decision trace",
+      "policy": "Current security policy"
+    },
+    "controls": {
+      "trust-policy": {"label": "Context trust policy", "options": {"none": "No provenance policy", "label": "Trust labels", "provenance": "Provenance-aware"}},
+      "tool-scope": {"label": "Tool capability scope", "options": {"broad": "Broad support role", "scoped": "Least-privilege support role"}},
+      "approval": {"label": "Human approval", "options": {"none": "None", "sensitive": "Sensitive actions only", "all": "Every action"}},
+      "runtime-gate": {"label": "Runtime policy gate", "options": {"model-only": "Model decides", "risk-aware": "Risk-aware runtime gate", "deny-external": "Deny external-content actions"}},
+      "data-filter": {"label": "Sensitive-data filter", "options": {"false": "Off", "true": "On"}},
+      "result-validator": {"label": "Post-tool result validator", "options": {"false": "Off", "true": "On"}}
+    },
+    "metrics": [
+      {"key": "securityRiskPercent", "label": "Security risk", "format": "percent"},
+      {"key": "taskSuccessPercent", "label": "Task success", "format": "percent"},
+      {"key": "falsePositivePercent", "label": "False positives", "format": "percent"},
+      {"key": "humanReviewPercent", "label": "Human review", "format": "percent"},
+      {"key": "latencyMs", "label": "Latency", "format": "ms"}
+    ],
+    "outcomes": {
+      "SECURITY_VETO": "Security veto",
+      "SAFE_BUT_OVERBLOCKING": "Safe, but overblocking",
+      "SAFE_BUT_TOO_MANUAL": "Safe, but too manual",
+      "SAFE_BUT_TOO_SLOW": "Safe, but too slow",
+      "PRODUCTION_VIABLE": "Production viable"
+    },
+    "debrief": {
+      "eyebrow": "ENGINEERING DEBRIEF",
+      "title": "Prompt injection is a trust-boundary failure, not just a wording problem.",
+      "rule": "Models cannot be the sole security boundary. Trust, capabilities and sensitive actions must be enforced by the harness/runtime.",
+      "body": "The Agent saw system policy, developer workflow instructions and external content in one working context. Without provenance-aware trust and capability enforcement, untrusted data could reach real CRM tools. Denying all external content removes the attack but destroys useful work and creates false positives. Defense in depth keeps useful data readable while enforcing what it is allowed to cause.",
+      "points": [
+        "Data can contain instruction-shaped text without gaining instruction authority.",
+        "Least privilege limits blast radius even when model behavior is wrong.",
+        "Sensitive actions need runtime gates that do not depend on the model agreeing with the policy.",
+        "Security evaluation must include benign lookalikes, not only obvious attacks."
+      ]
+    },
+    "takeaways": [
+      ["Trust has provenance", "System policy, developer intent, user requests and retrieved data do not have equal authority."],
+      ["Capabilities are a runtime decision", "A model request is not permission to export customer data."],
+      ["Overblocking is also failure", "A policy that denies every external-content workflow is safe only by making the product useless."]
+    ],
+    "next": {
+      "title": "Final Boss preview: Ship the Production Support Agent",
+      "description": "Retrieval, tool reliability and security now collide in one release decision.",
+      "button": "Open the integrated build",
+      "href": "/en/build/reliable-support-agent/",
+      "event": "mission_next_clicked"
+    }
+  }
+}
