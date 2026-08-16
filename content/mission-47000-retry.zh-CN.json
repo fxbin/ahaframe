@@ -1,0 +1,105 @@
+{
+  "locale": "zh-CN",
+  "mission": {
+    "name": "47,000 美元 Retry 事故",
+    "seoTitle": "The $47,000 Retry — Agent 可靠性事故模拟 | AhaFrame",
+    "description": "处理一次 Agent Runtime 事故：客户端 Timeout 后自动 Retry，重复执行了不可逆退款操作，造成 47,000 美元重复暴露。",
+    "level": "生产事故",
+    "layer": "Harness × Loop · 运行护栏 × 循环",
+    "minutes": 15,
+    "hero": "退款工具在客户端看来已经 Timeout，但 Provider 最终完成了操作；Agent 随后自动 Retry，又执行了一次。重新开放流量之前，这个 Runtime 归你负责。",
+    "quick": "当工具存在不可逆副作用时，Retry Policy 与 Idempotency Policy 本质上是同一个可靠性设计问题。",
+    "brief": {
+      "eyebrow": "事故 002 · SEV-1",
+      "title": "一个看起来合理的 Retry Policy，制造了 47,000 美元风险暴露。",
+      "role": "你是当前值班的 AI / Backend Engineer。",
+      "body": "退款 Provider 在 5.2 秒后完成了请求，但 Client 在第 4 秒已经 Timeout，于是 Agent 开始第二次尝试。按照当前交易规模，重复操作对应 47,000 美元 Gross Exposure。",
+      "objective": "在维持瞬时故障恢复能力的同时，让重复 Intent 变得安全，并把延迟、成本和人工审核控制在预算内。",
+      "stakes": "当远端系统可以在 Client 放弃等待后继续完成操作时，Timeout 从来不等于失败。"
+    },
+    "ui": {
+      "start": "开始事故处理",
+      "workspace": "Runtime 控制室",
+      "evidence": "证据",
+      "policy": "可靠性策略",
+      "budget": "变更预算",
+      "run": "重放流量",
+      "reset": "重置事故",
+      "attempts": "策略尝试",
+      "noAttempts": "还没有进行流量重放。",
+      "release": "是否重新开放流量？",
+      "releaseHint": "至少运行一次策略后，再选择 SHIP、BLOCK 或 INCONCLUSIVE。",
+      "ship": "SHIP",
+      "block": "BLOCK",
+      "inconclusive": "INCONCLUSIVE",
+      "complete": "完成 Mission",
+      "outcome": "Runtime 结果",
+      "waiting": "先检查 Tool Timeline，再决定要改哪条策略。",
+      "compared": "故障基线 → 最新策略"
+    },
+    "evidenceLabels": {
+      "incident": "事故摘要",
+      "tool-timeline": "Tool Call Timeline",
+      "policy": "当前 Runtime Policy",
+      "side-effects": "副作用暴露",
+      "audit": "Audit Evidence"
+    },
+    "controls": {
+      "retry-limit": {"label": "Retry 次数", "options": {"0": "0", "1": "1", "2": "2", "3": "3", "4": "4"}},
+      "timeout": {"label": "Client Timeout", "options": {"3": "3 秒", "4": "4 秒", "6": "6 秒", "8": "8 秒", "10": "10 秒"}},
+      "idempotency": {"label": "Idempotency 范围", "options": {"none": "无", "request": "每次 Request", "operation": "每个业务 Operation"}},
+      "approval": {"label": "人工审核", "options": {"none": "无", "high-risk": "仅高风险操作", "all": "所有操作"}},
+      "compensation": {"label": "补偿机制", "options": {"none": "无", "reconcile": "事后对账", "reverse": "自动冲正重复暴露"}},
+      "terminal-verifier": {"label": "终态 Verifier", "options": {"false": "关闭", "true": "先核验 Provider 状态"}}
+    },
+    "metrics": [
+      {"key": "successPercent", "label": "任务成功率", "format": "percent"},
+      {"key": "duplicateActionPercent", "label": "重复操作", "format": "percent1"},
+      {"key": "grossExposureDollars", "label": "总风险暴露", "format": "usd"},
+      {"key": "netExposureDollars", "label": "净风险暴露", "format": "usd"},
+      {"key": "latencySeconds", "label": "延迟", "format": "seconds"},
+      {"key": "humanReviewPercent", "label": "人工审核", "format": "percent"},
+      {"key": "costIndex", "label": "成本指数", "format": "decimal"}
+    ],
+    "outcomes": {
+      "DUPLICATE_SIDE_EFFECT": "重复副作用触发 Veto",
+      "SAFE_BUT_TOO_MANUAL": "安全，但过度依赖人工",
+      "SAFE_BUT_LOW_RECOVERY": "安全，但恢复能力不足",
+      "SAFE_BUT_TOO_SLOW": "安全，但延迟过高",
+      "SAFE_BUT_TOO_EXPENSIVE": "安全，但成本过高",
+      "PRODUCTION_VIABLE": "具备生产可行性"
+    },
+    "debrief": {
+      "eyebrow": "工程复盘",
+      "title": "Timeout 是一次观察，不是 Transaction 的最终结果。",
+      "rule": "当工具会产生不可逆副作用时，Retry Policy 与 Idempotency Policy 必须一起设计。",
+      "body": "Client 看到了 Timeout，但 Provider 实际已经完成第一次退款。业务 Intent 没有 Operation-level Idempotency 边界时，Retry 会再次制造副作用。Compensation 可以事后减少损失，却不能把重复执行变成安全行为；完全关闭 Retry 则会牺牲本来可以恢复的任务。",
+      "points": [
+        "At-least-once 很常见；Exactly-once 的业务副作用必须依靠明确的业务边界。",
+        "Idempotency Key 应代表业务 Operation，而不只是某一次 HTTP Request。",
+        "Human Approval 是风险控制，同时也会增加延迟并降低自动化程度。",
+        "再次执行不可逆动作前，应该先确认 Provider 的真实终态。"
+      ]
+    },
+    "takeaways": [
+      ["Timeout ≠ Failure", "远端系统可能在调用方停止等待之后继续成功完成。"],
+      ["Retry 与 Idempotency 是一个设计", "只设计恢复策略、不设计重复 Intent 的安全边界，就会把恢复机制变成事故放大器。"],
+      ["Compensation 不是 Prevention", "冲正可以降低财务损失，但不能证明 Runtime 的重复执行契约已经正确。"]
+    ],
+    "next": {
+      "title": "下一个事故：The Prompt Injection Attack",
+      "description": "现在 Agent 已经足够可靠地执行工具；接下来，不可信内容开始试图操纵这些能力。",
+      "button": "进入安全事故",
+      "href": "/en/labs/instruction-conflict/",
+      "event": "mission_next_clicked"
+    },
+    "earlyAccess": {
+      "title": "想继续处理更多生产事故？",
+      "description": "加入 Early Access，获取新的 Production Labs 与事故 Mission。",
+      "button": "加入 Early Access",
+      "href": "/en/early-access/",
+      "query": "?intent=agent-reliability-production-labs",
+      "event": "agent_reliability_paid_intent_click"
+    }
+  }
+}
