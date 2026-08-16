@@ -10,7 +10,6 @@
   const outcomes=copy.outcomes||{};
   const metricSpecs=new Map((copy.metrics||[]).map((item)=>[item.key,item]));
   const metricLabels=copy.metricLabels||{};
-  const groups=copy.groups||{};
   const mission=window.AhaFrame.createMission('production-support-launch');
 
   const workspace=root.querySelector('[data-mission-workspace]');
@@ -27,6 +26,7 @@
   const debrief=root.querySelector('[data-mission-debrief]');
   const rationale=root.querySelector('[data-mission-rationale]');
   const controls=[...root.querySelectorAll('[data-mission-control]')];
+  const evidenceButtons=[...root.querySelectorAll('[data-mission-evidence]')];
   const decisionButtons=[...root.querySelectorAll('[data-mission-decision]')];
   const numberLocale=document.documentElement.lang==='zh-CN'?'zh-CN':'en-US';
   let pendingDecision='';
@@ -55,6 +55,10 @@
   function renderMetricsObject(value){
     if(!value||typeof value!=='object')return `<span>${esc(value)}</span>`;
     return `<div style="display:grid;gap:7px">${Object.entries(value).map(([key,item])=>`<div><strong>${esc(labelForMetric(key))}:</strong> ${esc(formatNumber(key,item))}</div>`).join('')}</div>`;
+  }
+  function renderIssueEvidence(details,templates,empty){
+    const items=localizedIssues(details,templates);
+    return items.length?`<ul>${items.map((item)=>`<li>${esc(item)}</li>`).join('')}</ul>`:`<span class="subtle">${esc(empty)}</span>`;
   }
 
   function syncControls(frame){
@@ -102,12 +106,14 @@
     debrief.hidden=true;
     pendingDecision='';
     rationale.value='';
+    rationale.disabled=false;
     decisionStatus.textContent='';
     status.textContent='';
     evidenceView.textContent=ui.waiting||'Inspect evidence before spending budget.';
     attemptsView.innerHTML=`<div class="takeaway"><span>${esc(ui.noAttempts||'No candidate replay yet.')}</span></div>`;
     compareView.hidden=true;
-    decisionButtons.forEach((button)=>button.classList.remove('primary'));
+    decisionButtons.forEach((button)=>{button.classList.remove('primary');button.disabled=false;});
+    evidenceButtons.forEach((button)=>{button.disabled=false;});
     controls.forEach((control)=>{control.disabled=false;});
     root.querySelector('[data-mission-run]').disabled=false;
     root.querySelector('[data-mission-submit-decision]').disabled=false;
@@ -120,12 +126,12 @@
     window.AhaFrame?.track?.('mission_started',{missionId:'production-support-launch'});
   });
 
-  root.querySelectorAll('[data-mission-evidence]').forEach((button)=>button.addEventListener('click',()=>{
+  evidenceButtons.forEach((button)=>button.addEventListener('click',()=>{
     try{
       const result=mission.inspectEvidence(button.dataset.missionEvidence);
       let html=renderMetricsObject(result.value);
-      if(result.id==='release-blockers')html=renderMetricsObject(Object.fromEntries((result.value||[]).map((item)=>[formatTemplate((copy.blockers||{})[item.code]||item.code,item.params||{}),''])));
-      if(result.id==='tradeoff-warnings')html=renderMetricsObject(Object.fromEntries((result.value||[]).map((item)=>[formatTemplate((copy.warnings||{})[item.code]||item.code,item.params||{}),''])));
+      if(result.id==='release-blockers')html=renderIssueEvidence(result.value,copy.blockers,ui.noBlockers||'No modeled release blockers.');
+      if(result.id==='tradeoff-warnings')html=renderIssueEvidence(result.value,copy.warnings,ui.noWarnings||'No additional modeled warnings.');
       evidenceView.innerHTML=`<strong>${esc((copy.evidenceLabels||{})[result.id]||result.id)}</strong><div style="margin-top:10px">${html}</div>`;
     }catch(error){status.textContent=error.message||'Unable to inspect evidence.';}
   }));
@@ -166,6 +172,9 @@
       decisionStatus.textContent=`${pendingDecision} · ${outcomes[decided.mission.outcomeCode]||decided.mission.outcomeCode}`;
       debrief.hidden=false;
       controls.forEach((control)=>{control.disabled=true;});
+      evidenceButtons.forEach((button)=>{button.disabled=true;});
+      decisionButtons.forEach((button)=>{button.disabled=true;});
+      rationale.disabled=true;
       root.querySelector('[data-mission-run]').disabled=true;
       root.querySelector('[data-mission-submit-decision]').disabled=true;
       window.AhaFrame?.track?.('release_decision_submitted',{missionId:'production-support-launch',decision:pendingDecision,outcomeCode:decided.mission.outcomeCode,rationalePresent:true,rationaleLengthBucket:bucket});
