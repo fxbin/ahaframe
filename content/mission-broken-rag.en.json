@@ -1,0 +1,98 @@
+{
+  "locale": "en",
+  "mission": {
+    "name": "The Broken RAG Pipeline",
+    "seoTitle": "The Broken RAG Pipeline — Production RAG Incident | AhaFrame",
+    "description": "Debug a production RAG incident where a support agent cites an outdated refund policy even though the current policy exists in the knowledge base.",
+    "level": "Production Incident",
+    "layer": "Context × Evaluation",
+    "minutes": 15,
+    "hero": "The new refund policy is in the knowledge base. Your support agent still answered with the old one. Diagnose the evidence pipeline before this reaches more customers.",
+    "quick": "RAG reliability is a pipeline property: retrieval score, freshness, authority, reranking and context policy must agree on what evidence deserves to reach the model.",
+    "brief": {
+      "eyebrow": "INCIDENT 001 · SEV-2",
+      "title": "Yesterday's truth shipped today.",
+      "role": "You are the on-call AI engineer.",
+      "body": "A customer asked whether a purchase from 40 days ago can still be returned. The support agent denied the return and cited an older policy. Operations confirms that a newer policy was published two days ago and is already indexed.",
+      "objective": "Restore evidence freshness and grounding without blowing the 6k context, latency, or cost budget.",
+      "stakes": "A wrong answer can deny valid refunds at scale."
+    },
+    "ui": {
+      "start": "Start incident",
+      "workspace": "Incident console",
+      "evidence": "Evidence",
+      "inspect": "Inspect",
+      "policy": "Retrieval policy",
+      "budget": "Change budget",
+      "run": "Run pipeline",
+      "reset": "Reset incident",
+      "attempts": "Attempt history",
+      "noAttempts": "No simulation run yet.",
+      "release": "Release decision",
+      "releaseHint": "Run at least one policy before deciding.",
+      "ship": "SHIP",
+      "block": "BLOCK",
+      "inconclusive": "INCONCLUSIVE",
+      "complete": "Complete mission",
+      "outcome": "Current outcome",
+      "waiting": "Inspect the evidence, change a policy, then run the pipeline.",
+      "error": "That action cannot be applied in the current Mission state.",
+      "compared": "Baseline → latest"
+    },
+    "evidenceLabels": {
+      "incident": "Incident report",
+      "retrieval-trace": "Retrieval trace",
+      "documents": "Retrieved documents",
+      "context-composition": "Context composition",
+      "answer": "Answer + citation"
+    },
+    "controls": {
+      "retrieval-strategy": {"label": "Retrieval", "options": {"vector": "Vector only", "hybrid": "Hybrid"}},
+      "top-k": {"label": "Top-K", "options": {"2": "2", "3": "3", "5": "5", "8": "8"}},
+      "rerank-depth": {"label": "Rerank depth", "options": {"0": "Off", "4": "Top 4", "6": "Top 6"}},
+      "freshness-policy": {"label": "Freshness policy", "options": {"off": "Off", "soft": "Soft decay", "strict": "Strict stale filter"}},
+      "authority-policy": {"label": "Authority policy", "options": {"score-only": "Similarity score only", "source-priority": "Prioritize authoritative sources"}},
+      "compression-policy": {"label": "Context compression", "options": {"none": "None", "balanced": "Balanced", "aggressive": "Aggressive"}}
+    },
+    "metrics": [
+      {"key": "staleEvidenceRiskPercent", "label": "Stale evidence risk", "format": "percent"},
+      {"key": "groundingScore", "label": "Grounding", "format": "score"},
+      {"key": "authoritativeCoveragePercent", "label": "Authority coverage", "format": "percent"},
+      {"key": "contextTokens", "label": "Context tokens", "format": "integer"},
+      {"key": "latencyMs", "label": "Latency", "format": "ms"},
+      {"key": "costIndex", "label": "Cost index", "format": "decimal"}
+    ],
+    "outcomes": {
+      "STALE_AUTHORITY_FAILURE": "Stale authority still wins",
+      "CONTEXT_OVERFLOW": "Context budget exceeded",
+      "INSUFFICIENT_EVIDENCE": "Evidence quality is insufficient",
+      "ACCURATE_BUT_TOO_SLOW": "Accurate, but too slow",
+      "ACCURATE_BUT_TOO_EXPENSIVE": "Accurate, but too expensive",
+      "PRODUCTION_VIABLE": "Production viable"
+    },
+    "debrief": {
+      "eyebrow": "ENGINEERING DEBRIEF",
+      "title": "More context was never the real fix.",
+      "rule": "Retrieval quality is a pipeline property. More context is not the same as better evidence.",
+      "body": "The incident was caused by a stale source outranking current authority. Increasing Top-K can improve apparent recall while preserving the wrong source and consuming more context. A robust policy combines retrieval signals with freshness, authority, reranking and a context-retention policy that preserves critical details.",
+      "points": [
+        "Similarity is not authority.",
+        "Freshness belongs in retrieval policy, not in a prompt apology after retrieval.",
+        "Aggressive compression can turn a correct evidence set into a poorly grounded answer.",
+        "Trace the evidence path before tuning the model."
+      ]
+    },
+    "takeaways": [
+      ["Retrieval is a pipeline", "Chunking, candidate retrieval, reranking, freshness and context policy interact."],
+      ["Authority beats popularity", "The highest similarity score should not automatically override the current source of truth."],
+      ["Observe before tuning", "A retrieval trace lets you distinguish missing evidence from stale evidence and context loss."]
+    ],
+    "next": {
+      "title": "Next incident: The $47,000 Retry",
+      "description": "The evidence is correct. Now the Agent's tool runtime repeats an irreversible action after a timeout.",
+      "button": "Open reliability incident",
+      "href": "/en/labs/agent-reliability/",
+      "event": "mission_next_clicked"
+    }
+  }
+}

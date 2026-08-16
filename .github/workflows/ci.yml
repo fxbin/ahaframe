@@ -39,6 +39,20 @@ jobs:
         run: node scripts/test_lab_engine.js
       - name: Test Mission Engine
         run: node scripts/test_mission_engine.js
+      - name: Test flagship Mission scenarios
+        run: |
+          set -euo pipefail
+          found=0
+          for test_file in scripts/test_mission_*.js; do
+            [ -e "$test_file" ] || continue
+            [ "$test_file" = "scripts/test_mission_engine.js" ] && continue
+            found=1
+            echo "Running $test_file"
+            node "$test_file"
+          done
+          if [ "$found" -eq 0 ]; then
+            echo 'No flagship Mission scenario tests found yet.'
+          fi
       - name: Test Integrated Build
         run: node scripts/test_integrated_build.js
       - name: Test Validation Runtime
@@ -57,6 +71,19 @@ jobs:
         env:
           AHAFRAME_BASE_URL: https://ahaframe.com
         run: python3 scripts/build_site.py
+      - name: Test generated Mission pages
+        run: |
+          set -euo pipefail
+          found=0
+          for test_file in scripts/test_mission_page_*.py; do
+            [ -e "$test_file" ] || continue
+            found=1
+            echo "Running $test_file"
+            python3 "$test_file"
+          done
+          if [ "$found" -eq 0 ]; then
+            echo 'No generated Mission page tests found yet.'
+          fi
       - name: Validate language switcher
         run: python3 scripts/test_language_switcher.py
       - name: Validate third-party analytics
