@@ -1,16 +1,16 @@
 {
   "locale": "zh-CN",
   "mission": {
-    "name": "The Prompt Injection Attack",
+    "name": "Prompt Injection 攻击",
     "seoTitle": "The Prompt Injection Attack — Agent 安全事故模拟 | AhaFrame",
     "description": "处理一次 Agent Prompt Injection 安全事故：恶意指令藏在不可信外部内容里，既要阻止越权，又不能用“全部拒绝”毁掉正常工作流。",
     "level": "生产事故",
-    "layer": "Prompt × Context × Harness",
+    "layer": "Prompt × Context × Harness · 提示 × 上下文 × 运行护栏",
     "minutes": 15,
     "hero": "一份外部知识页面要求 Agent 访问客户数据，而这些工具确实存在并且当前可用。你需要在保留正常知识检索能力的同时，阻止不可信内容获得指令权力。",
     "quick": "模型不能成为唯一的安全边界：Trust、Capability 与敏感操作必须由模型外部的 Runtime 强制执行。",
     "brief": {
-      "eyebrow": "INCIDENT 003 · SECURITY",
+      "eyebrow": "事故 003 · 安全事件",
       "title": "危险指令，是以“数据”的身份进入系统的。",
       "role": "你负责 Agent 的 Trust Boundary 与 Capability Boundary。",
       "body": "客服 Agent 会读取外部知识来回答退款问题。其中一篇检索文档要求它读取完整 CRM Profile，并通过现有 Tool Path 发送账户标识。第二个攻击更加隐蔽；同时，还有一篇正常安全文章本身就包含看起来很像攻击的关键词。",
@@ -46,7 +46,7 @@
       "policy": "当前安全策略"
     },
     "controls": {
-      "trust-policy": {"label": "Context Trust Policy", "options": {"none": "不区分来源", "label": "Trust Label", "provenance": "Provenance-aware"}},
+      "trust-policy": {"label": "Context Trust Policy", "options": {"none": "不区分来源", "label": "Trust Label", "provenance": "按来源判定信任"}},
       "tool-scope": {"label": "Tool Capability Scope", "options": {"broad": "宽泛客服权限", "scoped": "Least Privilege 客服权限"}},
       "approval": {"label": "人工审核", "options": {"none": "无", "sensitive": "仅敏感操作", "all": "所有操作"}},
       "runtime-gate": {"label": "Runtime Policy Gate", "options": {"model-only": "由模型自己判断", "risk-aware": "Risk-aware Runtime Gate", "deny-external": "拒绝外部内容触发操作"}},
@@ -68,7 +68,7 @@
       "PRODUCTION_VIABLE": "具备生产可行性"
     },
     "debrief": {
-      "eyebrow": "ENGINEERING DEBRIEF",
+      "eyebrow": "工程复盘",
       "title": "Prompt Injection 本质上是 Trust Boundary 失效，而不只是 Prompt 写得不好。",
       "rule": "模型不能成为唯一安全边界。Trust、Capability 与敏感操作必须由 Harness / Runtime 强制执行。",
       "body": "Agent 在同一个工作 Context 中同时看到 System Policy、Developer Workflow 与外部内容。如果没有 Provenance-aware Trust 和 Capability Enforcement，不可信数据就可能影响真实 CRM Tool。把所有外部内容都拒绝确实能消灭攻击，却也会摧毁正常任务并制造大量 False Positive。Defense in Depth 的目标，是允许数据被读取，同时限制它能够造成什么后果。",
