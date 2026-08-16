@@ -8,7 +8,7 @@
     "eyebrow": "AI ENGINEERING · 生产事故模拟器",
     "headline": "在生产事故里，真正学会 AI Engineering。",
     "subheadline": "先看 Evidence，再做有限工程变更，重放确定性系统，最后为 Release Decision 负责。不注册也可以直接开始。",
-    "primaryCta": "开始 The Broken RAG Pipeline",
+    "primaryCta": "开始失效的 RAG 管道",
     "secondaryCta": "查看 Campaign",
     "proof": [
       ["3", "个生产事故"],
@@ -21,7 +21,7 @@
       ["01", "证据完整性", "当前政策明明已经存在，Agent 却仍然引用旧版本。"],
       ["02", "不可逆操作", "一次 Timeout，两次退款，47,000 美元风险暴露。"],
       ["03", "Trust Boundary", "危险指令，是以 Data 的身份进入系统的。"],
-      ["FINAL", "生产发布", "六层 AI Engineering 约束，现在必须同时成立。"]
+      ["最终", "生产发布", "六层 AI Engineering 约束，现在必须同时成立。"]
     ]
   },
   "campaign": {
@@ -31,7 +31,7 @@
     "cards": {
       "rag-failure": {
         "step": "事故 01 · CONTEXT × EVALUATION",
-        "title": "The Broken RAG Pipeline",
+        "title": "失效的 RAG 管道",
         "incident": "新版退款政策早已完成索引，客服 Agent 却仍然引用旧政策，拒绝了一次本来有效的退款。",
         "decision": "同时处理 Freshness、Authority、Grounding、Context、Latency 与 Cost，而不是用“多检索一些”掩盖问题。",
         "dimensions": ["Retrieval Trace", "Freshness", "Authority", "Grounding"],
@@ -40,7 +40,7 @@
       },
       "agent-reliability": {
         "step": "事故 02 · HARNESS × LOOP",
-        "title": "The $47,000 Retry",
+        "title": "47,000 美元重试事故",
         "incident": "Client Timeout 了，Provider 却成功了；Agent 随后重试同一个不可逆退款操作，制造 47,000 美元风险暴露。",
         "decision": "保留瞬时故障恢复能力，同时让重复 Intent 在延迟、成本与人工审核预算下变得安全。",
         "dimensions": ["Retry", "Idempotency", "Approval", "Side Effects"],
@@ -49,7 +49,7 @@
       },
       "instruction-conflict": {
         "step": "事故 03 · PROMPT × CONTEXT × HARNESS",
-        "title": "The Prompt Injection Attack",
+        "title": "Prompt Injection 攻击",
         "incident": "不可信外部内容里出现了像 Instruction 一样的文字，并试图操纵真实 CRM Capability。",
         "decision": "建立 Defense in Depth，同时避免靠“拒绝所有外部内容”获得虚假的安全。",
         "dimensions": ["Provenance", "Least Privilege", "Runtime Gate", "False Positive"],
@@ -74,10 +74,10 @@
     "title": "先看 Evidence，最后才做 Decision。",
     "copy": "AhaFrame Mission 模拟的是工程工作，而不是知识问答。一个看起来合理的改动，仍可能因为新的 Binding Constraint 出现而失败。",
     "steps": [
-      ["01", "Inspect", "先看 Trace、Timeline、Permission Scope、Blocker 与 Scorecard，不急着改参数。"],
-      ["02", "Intervene", "使用有限工程预算，修改真正会改变系统行为的 Policy。"],
-      ["03", "Replay", "重放同一个确定性 Scenario，比较 Attempts，而不是凭直觉争论。"],
-      ["04", "Decide", "自己选择 SHIP、BLOCK 或 INCONCLUSIVE。Simulator 提供 Evidence，但它没有替你批准上线的权力。"]
+      ["01", "检查证据", "先看 Trace、Timeline、Permission Scope、Blocker 与 Scorecard，不急着改参数。"],
+      ["02", "有限干预", "使用有限工程预算，修改真正会改变系统行为的 Policy。"],
+      ["03", "重新运行", "重放同一个确定性 Scenario，比较 Attempts，而不是凭直觉争论。"],
+      ["04", "做出决策", "自己选择 SHIP、BLOCK 或 INCONCLUSIVE。Simulator 提供 Evidence，但它没有替你批准上线的权力。"]
     ]
   },
   "knowledge": {
@@ -85,21 +85,21 @@
     "title": "想理解事故背后的 Mental Model？从这里继续深入。",
     "copy": "Campaign 是主路径；Knowledge Map 则保留全部 Foundation、Specialist Lab、Prerequisite 与 Mission，作为完整参考面。",
     "groups": {
-      "foundation": {"title": "Foundations", "description": "小型机制 Playground；进入事故前可以选学。"},
-      "campaign": {"title": "Campaign Missions", "description": "v0.8 四个核心生产决策。"},
-      "specialist": {"title": "Specialist Sandbox", "description": "聚焦单一机制，同时被旗舰 Mission 吸收复用。"},
-      "prerequisite": {"title": "Final Boss References", "description": "发布挑战前后都值得补充的 Evaluation 与 Graph 模型。"}
+      "foundation": {"title": "基础机制", "description": "小型机制 Playground；进入事故前可以选学。"},
+      "campaign": {"title": "Campaign 任务", "description": "v0.8 四个核心生产决策。"},
+      "specialist": {"title": "专项沙盒", "description": "聚焦单一机制，同时被旗舰 Mission 吸收复用。"},
+      "prerequisite": {"title": "Final Boss 参考", "description": "发布挑战前后都值得补充的 Evaluation 与 Graph 模型。"}
     },
     "experiences": {
       "token-playground": {"name": "Token Playground", "note": "Tokenization 与 Sampling 机制。"},
-      "context-window": {"name": "Context Window Lab", "note": "有限 Working Context 的预算竞争。"},
-      "agent-loop": {"name": "Agent Loop Simulator", "note": "有界迭代、停止条件与恢复。"},
-      "rag-failure": {"name": "The Broken RAG Pipeline", "note": "Freshness、Authority、Retrieval 与 Grounding。"},
-      "context-compression": {"name": "Context Compression Lab", "note": "Context 压力下的关键证据保留。"},
-      "agent-reliability": {"name": "The $47,000 Retry", "note": "Retry、Idempotency 与不可逆副作用。"},
-      "instruction-conflict": {"name": "The Prompt Injection Attack", "note": "Trust、Capability 与 Runtime Enforcement。"},
-      "evaluation-failure": {"name": "Evaluation Failure Lab", "note": "Release Evidence、不确定性与 Veto。"},
-      "agent-workflow-graph": {"name": "Agent Workflow Graph Lab", "note": "Topology、Coordination 与 Failure Propagation。"},
+      "context-window": {"name": "上下文窗口实验", "note": "有限 Working Context 的预算竞争。"},
+      "agent-loop": {"name": "Agent 循环模拟器", "note": "有界迭代、停止条件与恢复。"},
+      "rag-failure": {"name": "失效的 RAG 管道", "note": "Freshness、Authority、Retrieval 与 Grounding。"},
+      "context-compression": {"name": "上下文压缩实验", "note": "Context 压力下的关键证据保留。"},
+      "agent-reliability": {"name": "47,000 美元重试事故", "note": "Retry、Idempotency 与不可逆副作用。"},
+      "instruction-conflict": {"name": "Prompt Injection 攻击", "note": "Trust、Capability 与 Runtime Enforcement。"},
+      "evaluation-failure": {"name": "评测失效实验", "note": "Release Evidence、不确定性与 Veto。"},
+      "agent-workflow-graph": {"name": "Agent 工作流图实验", "note": "Topology、Coordination 与 Failure Propagation。"},
       "reliable-support-agent": {"name": "发布生产客服 Agent", "note": "六层 Production Launch Final Boss。"}
     },
     "open": "打开"
@@ -116,7 +116,7 @@
   },
   "closing": {
     "title": "准备接手事故了吗？",
-    "copy": "现在直接从 Broken RAG 开始；完成 Final Boss 后，也可以加入 Validation Alpha。",
+    "copy": "现在直接从失效的 RAG 管道开始；完成 Final Boss 后，也可以加入 Validation Alpha。",
     "primary": "开始事故 01",
     "secondary": "加入 Validation Alpha"
   }
