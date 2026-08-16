@@ -38,20 +38,23 @@ INTERACTIVE_RELATIVES={
 }
 INTERACTIVE_HTML=set().union(*(route_files(relative) for relative in INTERACTIVE_RELATIVES))
 
-EXTRA_SCRIPTS={
-    "labs/evaluation-failure/":("/assets/evaluation-scenario.js","/assets/evaluation.js"),
-    "labs/context-compression/":("/assets/context-compression-scenario.js","/assets/context-compression.js"),
-    "labs/instruction-conflict/":("/assets/instruction-conflict-scenario.js","/assets/prompt-authority.js"),
-    "labs/agent-workflow-graph/":("/assets/agent-workflow-graph-scenario.js","/assets/agent-workflow-graph.js"),
+SCRIPT_VARIANTS={
+    "labs/evaluation-failure/":[("/assets/evaluation-scenario.js","/assets/evaluation.js")],
+    "labs/context-compression/":[("/assets/context-compression-scenario.js","/assets/context-compression.js")],
+    "labs/instruction-conflict/":[
+        ("/assets/instruction-conflict-scenario.js","/assets/prompt-authority.js"),
+        ("/assets/mission-engine.js","/assets/prompt-injection-attack-scenario.js","/assets/prompt-injection-attack-mission.js","/assets/prompt-injection-attack.js"),
+    ],
+    "labs/agent-workflow-graph/":[("/assets/agent-workflow-graph-scenario.js","/assets/agent-workflow-graph.js")],
 }
 MOUNTS={
-    "labs/rag-failure/":"[data-rag-lab]",
-    "labs/agent-reliability/":"[data-agent-reliability-lab]",
-    "labs/evaluation-failure/":"[data-evaluation-lab]",
-    "labs/context-compression/":"[data-context-compression-lab]",
-    "labs/instruction-conflict/":"[data-instruction-conflict-lab]",
-    "labs/agent-workflow-graph/":"[data-agent-workflow-graph-lab]",
-    "build/reliable-support-agent/":"[data-reliable-support-agent]",
+    "labs/rag-failure/":("[data-rag-lab]","[data-broken-rag-mission]"),
+    "labs/agent-reliability/":("[data-agent-reliability-lab]","[data-retry-mission]"),
+    "labs/evaluation-failure/":("[data-evaluation-lab]",),
+    "labs/context-compression/":("[data-context-compression-lab]",),
+    "labs/instruction-conflict/":("[data-instruction-conflict-lab]","[data-prompt-injection-mission]"),
+    "labs/agent-workflow-graph/":("[data-agent-workflow-graph-lab]",),
+    "build/reliable-support-agent/":("[data-reliable-support-agent]",),
 }
 
 
@@ -71,6 +74,16 @@ def textual_weight(text: str) -> int:
     latin_words=len(re.findall(r"[A-Za-z0-9][A-Za-z0-9'_-]*",text))
     cjk=len(re.findall(r"[\u3400-\u9fff]",text))
     return latin_words+cjk
+
+
+def valid_script_variant(scripts: list[str], scenarios: str, variants: list[tuple[str,...]]) -> bool:
+    for required in variants:
+        if any(item not in scripts for item in required):
+            continue
+        positions=[scripts.index(item) for item in required]
+        if positions==sorted(positions) and scripts.index(scenarios)<positions[0]:
+            return True
+    return False
 
 
 errors=[]
@@ -99,10 +112,8 @@ for file in html_files:
         scripts=[node.get("src") for node in soup.find_all("script",src=True)]; engine="/assets/lab-engine.js"; scenarios="/assets/lab-scenarios.js"
         if engine not in scripts or scenarios not in scripts: errors.append(f"{rel}: missing Lab Engine runtime")
         elif scripts.index(engine)>scripts.index(scenarios): errors.append(f"{rel}: lab-engine.js must load before lab-scenarios.js")
-        if relative in EXTRA_SCRIPTS:
-            scenario,adapter=EXTRA_SCRIPTS[relative]
-            if scenario not in scripts or adapter not in scripts: errors.append(f"{rel}: missing page scenario or adapter")
-            elif not scripts.index(scenarios)<scripts.index(scenario)<scripts.index(adapter): errors.append(f"{rel}: invalid scenario/adapter load order")
+        if relative in SCRIPT_VARIANTS and scenarios in scripts:
+            if not valid_script_variant(scripts,scenarios,SCRIPT_VARIANTS[relative]): errors.append(f"{rel}: missing or misordered page runtime variant")
         if relative=="build/reliable-support-agent/":
             required=["/assets/instruction-conflict-scenario.js","/assets/evaluation-scenario.js","/assets/context-compression-scenario.js","/assets/agent-workflow-graph-scenario.js","/assets/reliable-support-scenario.js","/assets/integrated-build.js"]
             if any(item not in scripts for item in required): errors.append(f"{rel}: missing integrated scenario modules")
@@ -121,7 +132,7 @@ for file in html_files:
         if textual_weight(soup.get_text(" ",strip=True))<300: errors.append(f"{rel}: interactive content too thin")
         if "LearningResource" not in " ".join(n.get_text() for n in soup.find_all("script",attrs={"type":"application/ld+json"})): errors.append(f"{rel}: missing LearningResource schema")
         if not soup.select_one(".quick-answer") or not soup.select_one("[data-share]"): errors.append(f"{rel}: missing answer-first/share controls")
-    if relative in MOUNTS and not soup.select_one(MOUNTS[relative]): errors.append(f"{rel}: missing interactive mount point")
+    if relative in MOUNTS and not any(soup.select_one(selector) for selector in MOUNTS[relative]): errors.append(f"{rel}: missing interactive mount point")
 
     for anchor in soup.find_all("a",href=True):
         href=anchor["href"]
