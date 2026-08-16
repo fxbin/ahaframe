@@ -1,0 +1,105 @@
+{
+  "locale": "en",
+  "mission": {
+    "name": "The $47,000 Retry",
+    "seoTitle": "The $47,000 Retry — Agent Reliability Incident | AhaFrame",
+    "description": "Stabilize an AI agent runtime after a client timeout and automatic retry repeat an irreversible refund action, creating $47,000 of duplicate exposure.",
+    "level": "Production Incident",
+    "layer": "Harness × Loop",
+    "minutes": 15,
+    "hero": "A refund tool timed out at the client, completed at the provider, then ran again because the Agent retried. You own the runtime before traffic reopens.",
+    "quick": "Retry policy and idempotency policy are one reliability problem whenever tools can create irreversible side effects.",
+    "brief": {
+      "eyebrow": "INCIDENT 002 · SEV-1",
+      "title": "$47,000 of exposure from one reasonable-looking retry policy.",
+      "role": "You are the on-call AI/backend engineer.",
+      "body": "The refund provider completed a request after 5.2 seconds. The client had already timed out at 4 seconds and the Agent started another attempt. Across the current transaction volume, duplicate actions now imply $47,000 of gross exposure.",
+      "objective": "Keep transient-failure recovery above the release target while making repeated intent safe and keeping latency, cost and human review inside budget.",
+      "stakes": "Timeout does not mean failure when the remote side can finish after the client gives up."
+    },
+    "ui": {
+      "start": "Start incident",
+      "workspace": "Runtime control room",
+      "evidence": "Evidence",
+      "policy": "Reliability policy",
+      "budget": "Change budget",
+      "run": "Replay traffic",
+      "reset": "Reset incident",
+      "attempts": "Policy attempts",
+      "noAttempts": "No replay run yet.",
+      "release": "Reopen traffic?",
+      "releaseHint": "Run at least one policy before choosing SHIP, BLOCK or INCONCLUSIVE.",
+      "ship": "SHIP",
+      "block": "BLOCK",
+      "inconclusive": "INCONCLUSIVE",
+      "complete": "Complete mission",
+      "outcome": "Runtime outcome",
+      "waiting": "Inspect the tool timeline before changing the policy.",
+      "compared": "Broken baseline → latest"
+    },
+    "evidenceLabels": {
+      "incident": "Incident summary",
+      "tool-timeline": "Tool-call timeline",
+      "policy": "Current runtime policy",
+      "side-effects": "Side-effect exposure",
+      "audit": "Audit evidence"
+    },
+    "controls": {
+      "retry-limit": {"label": "Retry limit", "options": {"0": "0", "1": "1", "2": "2", "3": "3", "4": "4"}},
+      "timeout": {"label": "Client timeout", "options": {"3": "3 s", "4": "4 s", "6": "6 s", "8": "8 s", "10": "10 s"}},
+      "idempotency": {"label": "Idempotency scope", "options": {"none": "None", "request": "Per request", "operation": "Per business operation"}},
+      "approval": {"label": "Human approval", "options": {"none": "None", "high-risk": "High-risk actions only", "all": "Every action"}},
+      "compensation": {"label": "Compensation", "options": {"none": "None", "reconcile": "Reconcile later", "reverse": "Auto-reverse duplicate exposure"}},
+      "terminal-verifier": {"label": "Terminal-state verifier", "options": {"false": "Off", "true": "Verify provider state"}}
+    },
+    "metrics": [
+      {"key": "successPercent", "label": "Task success", "format": "percent"},
+      {"key": "duplicateActionPercent", "label": "Duplicate actions", "format": "percent1"},
+      {"key": "grossExposureDollars", "label": "Gross exposure", "format": "usd"},
+      {"key": "netExposureDollars", "label": "Net exposure", "format": "usd"},
+      {"key": "latencySeconds", "label": "Latency", "format": "seconds"},
+      {"key": "humanReviewPercent", "label": "Human review", "format": "percent"},
+      {"key": "costIndex", "label": "Cost index", "format": "decimal"}
+    ],
+    "outcomes": {
+      "DUPLICATE_SIDE_EFFECT": "Duplicate side-effect veto",
+      "SAFE_BUT_TOO_MANUAL": "Safe, but too manual",
+      "SAFE_BUT_LOW_RECOVERY": "Safe, but recovery is too weak",
+      "SAFE_BUT_TOO_SLOW": "Safe, but too slow",
+      "SAFE_BUT_TOO_EXPENSIVE": "Safe, but too expensive",
+      "PRODUCTION_VIABLE": "Production viable"
+    },
+    "debrief": {
+      "eyebrow": "ENGINEERING DEBRIEF",
+      "title": "A timeout is an observation, not a transaction outcome.",
+      "rule": "Retry policy and idempotency policy must be designed together when a tool has irreversible side effects.",
+      "body": "The client saw a timeout, but the provider completed the first request. Retrying the same business intent without an operation-scoped idempotency boundary repeated the side effect. Compensation can reduce money lost after the fact, but it does not make duplicate execution safe. Disabling all retries solves the wrong problem by sacrificing recoverable work.",
+      "points": [
+        "At-least-once delivery is common; exactly-once side effects require a business boundary.",
+        "Idempotency keys should represent the operation, not merely one HTTP attempt.",
+        "Human approval is a risk control with latency and automation costs.",
+        "Audit the provider state before deciding whether another irreversible action is safe."
+      ]
+    },
+    "takeaways": [
+      ["Timeout ≠ failure", "The remote system can succeed after the caller has stopped waiting."],
+      ["Retry + idempotency is one design", "Recovery policy is unsafe when repeated intent can repeat side effects."],
+      ["Compensation is not prevention", "A reversal workflow can lower financial loss while the reliability contract remains broken."]
+    ],
+    "next": {
+      "title": "Next incident: The Prompt Injection Attack",
+      "description": "Your Agent is reliable enough to act. Now untrusted content tries to steer those capabilities.",
+      "button": "Open security incident",
+      "href": "/en/labs/instruction-conflict/",
+      "event": "mission_next_clicked"
+    },
+    "earlyAccess": {
+      "title": "Want more production incidents?",
+      "description": "Join Early Access for new Production Labs and incident Missions.",
+      "button": "Join Early Access",
+      "href": "/en/early-access/",
+      "query": "?intent=agent-reliability-production-labs",
+      "event": "agent_reliability_paid_intent_click"
+    }
+  }
+}

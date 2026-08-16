@@ -1,23 +1,74 @@
-from .i18n import json_attr
-from .production import concept_guide, lab_header, lab_source, next_band, quick_answer, takeaways, write_lab
+from __future__ import annotations
+
+from .i18n import json_attr, load_content_source
+from .production import lab_header, next_band, quick_answer, takeaways, write_lab
+
+CONTENT_DOMAIN='mission-broken-rag'
+UI_DOMAIN='production-prompt-context'
 
 
-def _options(values):
-    return ''.join(f'<option value="{key}">{label}</option>' for key,label in values.items())
+def _options(values: dict[str,str], selected: str) -> str:
+    return ''.join(
+        f'<option value="{key}"{" selected" if key == selected else ""}>{label}</option>'
+        for key,label in values.items()
+    )
 
 
-def _build(locale):
-    slug='rag-failure';d=lab_source(locale,slug);c=d['interactive'];metrics=c['metrics']
-    adapter_copy={"presentation":d['presentation'],"rerankerOn":c['rerankerOn'],"rerankerOff":c['rerankerOff']}
-    body=f'''<div class="container">{lab_header(slug,'⌕',locale,d)}{quick_answer(d['quick'],locale)}
-    <div data-rag-lab data-rag-copy="{json_attr(adapter_copy)}"><section class="card interactive"><div class="panel-title"><span>{c['panelTitle']}</span><span class="badge">{c['simulation']}</span></div><p class="subtle">{c['intro']}</p><div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:18px"><div>
-      <label class="label" for="rag-chunk-size">{c['chunk']}</label><div class="control-row"><input id="rag-chunk-size" class="slider" type="range" min="200" max="1400" step="100" value="1200"><output class="badge" data-rag-chunk-value>1200</output></div>
-      <label class="label" for="rag-overlap" style="display:block;margin-top:18px">{c['overlap']}</label><div class="control-row"><input id="rag-overlap" class="slider" type="range" min="0" max="1150" step="50" value="100"><output class="badge" data-rag-overlap-value>100</output></div>
-      <label class="label" for="rag-top-k" style="display:block;margin-top:18px">{c['topK']}</label><div class="control-row"><input id="rag-top-k" class="slider" type="range" min="2" max="15" step="1" value="12"><output class="badge" data-rag-top-k-value>12</output></div>
-    </div><div><label class="label" for="rag-retrieval">{c['retrieval']}</label><select id="rag-retrieval" class="select" style="margin-top:8px">{_options(c['retrievalOptions'])}</select><button type="button" class="btn wide" data-rag-reranker style="margin-top:16px">{c['rerankerOff']}</button><div class="note" style="margin-top:16px">{c['budget']}</div><div class="actions" style="margin-top:16px"><button type="button" class="btn primary" data-rag-balanced>{c['preset']}</button><button type="button" class="btn" data-rag-reset>{c['reset']}</button></div></div></div></section>
-    <section class="card lesson-section" style="padding:20px;margin-top:18px"><div class="panel-title">{c['outcome']}</div><div class="metrics" style="margin-top:14px"><div class="metric">{metrics[0]}<br><strong data-rag-recall>—</strong></div><div class="metric">{metrics[1]}<br><strong data-rag-precision>—</strong></div><div class="metric">{metrics[2]}<br><strong data-rag-context>—</strong></div><div class="metric">{metrics[3]}<br><strong data-rag-quality>—</strong></div><div class="metric">{metrics[4]}<br><strong data-rag-latency>—</strong></div><div class="metric">{metrics[5]}<br><strong data-rag-cost>—</strong></div></div><div class="bar" style="margin-top:16px"><span data-rag-context-bar style="width:100%"></span></div><div class="note" style="margin-top:14px"><strong>{c['diagnosis']}:</strong> <span data-rag-failure>—</span></div><div class="compare-grid" style="margin-top:16px"><div class="compare-card warn"><span class="label">{c['compareBaseline']}</span><strong>{c['compareBaselineStrong']}</strong><p class="subtle">{c['compareBaselineText']}</p></div><span class="flow-arrow">→</span><div class="compare-card good"><span class="label">{c['compareCurrent']}</span><div data-rag-compare style="display:grid;gap:6px;margin-top:6px"><span>{c['waiting']}</span></div></div></div></section></div>
-    {takeaways(d['takeaways'],locale)}{concept_guide(d,locale)}{next_band(d['next'],locale)}</div>'''
-    write_lab(slug,locale,body,d,'<script src="/assets/rag.js" defer></script>')
+def _build(locale: str):
+    slug='rag-failure'
+    d=load_content_source(locale,CONTENT_DOMAIN)['mission']
+    ui=d['ui']
+    controls=d['controls']
+    evidence=d['evidenceLabels']
+    copy={'ui':ui,'evidenceLabels':evidence,'metrics':d['metrics'],'outcomes':d['outcomes'],'debrief':d['debrief']}
+
+    evidence_buttons=''.join(
+        f'<button type="button" class="btn small" data-mission-evidence="{key}">{label}</button>'
+        for key,label in evidence.items()
+    )
+    metric_cards=''.join(
+        f'<div class="metric">{item["label"]}<br><strong data-mission-metric="{item["key"]}">—</strong></div>'
+        for item in d['metrics']
+    )
+
+    body=f'''<div class="container">{lab_header(slug,'⌁',locale,d,UI_DOMAIN)}{quick_answer(d['quick'],locale,UI_DOMAIN)}
+    <div data-broken-rag-mission data-mission-copy="{json_attr(copy)}">
+      <section class="card lesson-section" style="padding:22px">
+        <span class="eyebrow">{d['brief']['eyebrow']}</span><h2>{d['brief']['title']}</h2>
+        <p><strong>{d['brief']['role']}</strong> {d['brief']['body']}</p>
+        <div class="note"><strong>{d['brief']['objective']}</strong><br>{d['brief']['stakes']}</div>
+        <div class="actions"><button type="button" class="btn primary" data-mission-start>{ui['start']}</button></div>
+      </section>
+      <div data-mission-workspace hidden>
+        <section class="card interactive" style="margin-top:18px">
+          <div class="panel-title"><span>{ui['workspace']}</span><span class="badge"><span data-mission-budget>8</span> · {ui['budget']}</span></div>
+          <div class="lab-control-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:18px">
+            <div><div class="label">{ui['evidence']}</div><div class="actions" style="margin-top:10px">{evidence_buttons}</div><div class="note" data-mission-evidence-view style="margin-top:14px;min-height:150px">{ui['waiting']}</div></div>
+            <div><div class="label">{ui['policy']}</div>
+              <label class="label" for="mission-rag-retrieval" style="display:block;margin-top:10px">{controls['retrieval-strategy']['label']}</label><select id="mission-rag-retrieval" class="select" data-mission-control="retrieval-strategy" data-value-type="string">{_options(controls['retrieval-strategy']['options'],'vector')}</select>
+              <label class="label" for="mission-rag-top-k" style="display:block;margin-top:12px">{controls['top-k']['label']}</label><select id="mission-rag-top-k" class="select" data-mission-control="top-k" data-value-type="number">{_options(controls['top-k']['options'],'5')}</select>
+              <label class="label" for="mission-rag-rerank" style="display:block;margin-top:12px">{controls['rerank-depth']['label']}</label><select id="mission-rag-rerank" class="select" data-mission-control="rerank-depth" data-value-type="number">{_options(controls['rerank-depth']['options'],'0')}</select>
+              <label class="label" for="mission-rag-freshness" style="display:block;margin-top:12px">{controls['freshness-policy']['label']}</label><select id="mission-rag-freshness" class="select" data-mission-control="freshness-policy" data-value-type="string">{_options(controls['freshness-policy']['options'],'off')}</select>
+              <label class="label" for="mission-rag-authority" style="display:block;margin-top:12px">{controls['authority-policy']['label']}</label><select id="mission-rag-authority" class="select" data-mission-control="authority-policy" data-value-type="string">{_options(controls['authority-policy']['options'],'score-only')}</select>
+              <label class="label" for="mission-rag-compression" style="display:block;margin-top:12px">{controls['compression-policy']['label']}</label><select id="mission-rag-compression" class="select" data-mission-control="compression-policy" data-value-type="string">{_options(controls['compression-policy']['options'],'none')}</select>
+              <div class="actions"><button type="button" class="btn primary" data-mission-run>{ui['run']}</button><button type="button" class="btn" data-mission-reset>{ui['reset']}</button></div><div class="status" data-mission-status></div>
+            </div>
+          </div>
+        </section>
+        <section class="card lesson-section" style="padding:20px;margin-top:18px"><div class="panel-title"><span>{ui['outcome']}</span><span class="badge" data-mission-outcome>—</span></div><div class="metrics" style="margin-top:14px">{metric_cards}</div></section>
+        <section class="card lesson-section" style="padding:20px;margin-top:18px"><div class="panel-title">{ui['attempts']}</div><div data-mission-attempts class="takeaways" style="margin-top:12px"><div class="takeaway"><span>{ui['noAttempts']}</span></div></div><div data-mission-compare class="note" style="margin-top:14px" hidden></div></section>
+        <section class="card lesson-section" style="padding:20px;margin-top:18px"><div class="panel-title">{ui['release']}</div><p class="subtle">{ui['releaseHint']}</p><div class="actions"><button type="button" class="btn" data-mission-decision="SHIP">{ui['ship']}</button><button type="button" class="btn" data-mission-decision="BLOCK">{ui['block']}</button><button type="button" class="btn" data-mission-decision="INCONCLUSIVE">{ui['inconclusive']}</button></div><div class="status" data-mission-decision-status></div></section>
+        <section class="card lesson-section" data-mission-debrief hidden style="padding:22px;margin-top:18px"><span class="eyebrow">{d['debrief']['eyebrow']}</span><h2>{d['debrief']['title']}</h2><div class="note"><strong>{d['debrief']['rule']}</strong></div><p>{d['debrief']['body']}</p><ul>{''.join(f'<li>{point}</li>' for point in d['debrief']['points'])}</ul><div class="actions"><button type="button" class="btn primary" data-mission-complete>{ui['complete']}</button></div></section>
+      </div>
+    </div>{takeaways(d['takeaways'],locale,UI_DOMAIN)}{next_band(d['next'],locale)}</div>'''
+
+    scripts=''.join([
+        '<script src="/assets/mission-engine.js" defer></script>',
+        '<script src="/assets/broken-rag-pipeline-scenario.js" defer></script>',
+        '<script src="/assets/broken-rag-pipeline-mission.js" defer></script>',
+        '<script src="/assets/broken-rag-pipeline.js" defer></script>',
+    ])
+    write_lab(slug,locale,body,d,scripts,UI_DOMAIN)
 
 
 def build():
