@@ -89,6 +89,22 @@ def _optimize_home(path) -> None:
     path.write_text(source, encoding="utf-8")
 
 
+def _publish_root_home() -> None:
+    """Serve the optimized English landing directly at `/`.
+
+    The generator historically emitted a meta-refresh shell at site/index.html.
+    Static-file routing wins before Vercel rewrites, so that shell still created a
+    second navigation when PageSpeed tested the root domain. Reuse the canonical
+    English landing instead; its canonical/hreflang tags still point at /en/.
+    """
+    english_home = SITE / "en" / "index.html"
+    root_home = SITE / "index.html"
+    source = english_home.read_text(encoding="utf-8")
+    if 'http-equiv="refresh"' in source.lower():
+        raise ValueError("Optimized English homepage must not contain a meta refresh.")
+    root_home.write_text(source, encoding="utf-8")
+
+
 def apply() -> None:
     _build_home_css()
     for relative in (("en", "index.html"), ("zh-cn", "index.html")):
@@ -96,3 +112,4 @@ def apply() -> None:
         if not path.exists():
             raise ValueError(f"Expected generated homepage at {path}.")
         _optimize_home(path)
+    _publish_root_home()
