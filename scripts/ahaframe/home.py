@@ -117,7 +117,7 @@ def _build(locale: str):
 
     <section class="section surface-soft" id="about"><div class="container"><div class="section-head"><div><div class="section-kicker">{html.escape(d['about']['kicker'])}</div><h2 class="section-title">{html.escape(d['about']['title'])}</h2><p class="section-copy">{html.escape(d['about']['copy'])}</p></div></div><div class="takeaways">{about_points}</div></div></section>
 
-    <section><div class="container cta-band"><div><h2>{html.escape(d['closing']['title'])}</h2><p>{html.escape(d['closing']['copy'])}</p></div><div class="actions"><a class="btn primary" data-flagship-cta data-mission-id="{html.escape(first['missionId'])}" data-position="1" data-source="closing" href="{first_href}">{html.escape(d['closing']['primary'])} →</a><a class="btn" data-event="homepage_validation_alpha_click" href="{alpha_href}">{html.escape(d['closing']['secondary'])}</a></div></section>'''
+    <section><div class="container cta-band"><div><h2>{html.escape(d['closing']['title'])}</h2><p>{html.escape(d['closing']['copy'])}</p></div><div class="actions"><a class="btn primary" data-flagship-cta data-mission-id="{html.escape(first['missionId'])}" data-position="1" data-source="closing" href="{first_href}">{html.escape(d['closing']['primary'])} →</a><a class="btn" data-event="homepage_validation_alpha_click" href="{alpha_href}">{html.escape(d['closing']['secondary'])}</a></div></div></section>'''
 
     item_list={
         '@context':'https://schema.org',
