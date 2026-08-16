@@ -68,7 +68,9 @@ const safetyHeavy=fresh();
 result=applyLaunchPolicy(safetyHeavy,'safety');
 assert.equal(result.attempt.outcomeCode,'PRODUCTION_VIABLE_SAFETY_HEAVY');
 assert.equal(result.attempt.frame.derived.decision,'SHIP');
-assert.ok(result.attempt.frame.derived.evaluation.confidenceWidth<=balanced.listAttempts?.()?.[0]?.frame?.derived?.evaluation?.confidenceWidth || true);
+assert.equal(result.mission.interventionBudgetSpent,4);
+assert.ok(result.attempt.frame.derived.safety>=95);
+assert.ok(result.attempt.frame.derived.costIndex<=75);
 
 // One mistaken intervention is survivable, but the fifth change exhausts the budget.
 const budgeted=fresh();
