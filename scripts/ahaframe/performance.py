@@ -7,6 +7,7 @@ pay for it before a visitor starts a Mission.
 
 from __future__ import annotations
 
+import html
 import re
 
 from .core import ROOT, SITE
@@ -20,12 +21,20 @@ HOME_STYLE_SOURCES = (
 )
 GLOBAL_STYLE_TAG = '<link rel="stylesheet" href="/assets/styles.css">'
 HOME_STYLE_TAG = '<link rel="stylesheet" href="/assets/home.css">'
+APP_SCRIPT_TAG = '<script src="/assets/app.js" defer></script>'
+LANDING_ANALYTICS_TAG = '<script src="/assets/landing-analytics.js" defer></script>'
 DEFERRED_HOME_SCRIPTS = (
     '<script src="/assets/validation-ui.js" defer></script>',
     '<script src="/assets/lab-engine.js" defer></script>',
     '<script src="/assets/lab-scenarios.js" defer></script>',
 )
 BOOTSTRAP_MARKER = "data-ahaframe-feedback-bootstrap"
+GA4_EXTERNAL_RE = re.compile(
+    r'<script data-ahaframe-analytics="ga4" async '
+    r'src="https://www\.googletagmanager\.com/gtag/js\?id=(G-[A-Z0-9]+)"></script>'
+    r'<script data-ahaframe-analytics="ga4">.*?</script>',
+    flags=re.S,
+)
 
 
 FEEDBACK_BOOTSTRAP = r'''<style data-ahaframe-feedback-bootstrap>
@@ -62,16 +71,45 @@ def _build_home_css() -> None:
     (SITE / "assets" / "home.css").write_text(rendered, encoding="utf-8")
 
 
+def _deferred_ga4(measurement_id: str) -> str:
+    safe = html.escape(measurement_id, quote=True)
+    return (
+        '<script data-ahaframe-analytics="ga4">(function(){'
+        'var loaded=false;function load(){if(loaded)return;loaded=true;'
+        'window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}'
+        'window.gtag=window.gtag||gtag;gtag(\'js\',new Date());'
+        f'gtag(\'config\',"{safe}");'
+        'var s=document.createElement(\'script\');s.async=true;'
+        f's.src="https://www.googletagmanager.com/gtag/js?id={safe}";document.head.appendChild(s);}}'
+        "['pointerdown','keydown','touchstart'].forEach(function(name){window.addEventListener(name,load,{once:true,passive:true});});"
+        "window.addEventListener('load',function(){setTimeout(load,6000);},{once:true});"
+        '})();</script>'
+    )
+
+
+def _defer_ga4(source: str, path) -> str:
+    match = GA4_EXTERNAL_RE.search(source)
+    if not match:
+        raise ValueError(f"Expected eager GA4 snippet in {path}.")
+    return source[: match.start()] + _deferred_ga4(match.group(1)) + source[match.end() :]
+
+
 def _optimize_home(path) -> None:
     source = path.read_text(encoding="utf-8")
     if GLOBAL_STYLE_TAG not in source:
         raise ValueError(f"Expected global stylesheet tag in {path}.")
     source = source.replace(GLOBAL_STYLE_TAG, HOME_STYLE_TAG, 1)
 
+    if APP_SCRIPT_TAG not in source:
+        raise ValueError(f"Expected shared app runtime in {path}.")
+    source = source.replace(APP_SCRIPT_TAG, LANDING_ANALYTICS_TAG, 1)
+
     for tag in DEFERRED_HOME_SCRIPTS:
         if tag not in source:
             raise ValueError(f"Expected homepage runtime tag {tag!r} in {path}.")
         source = source.replace(tag, "", 1)
+
+    source = _defer_ga4(source, path)
 
     if BOOTSTRAP_MARKER in source:
         raise ValueError(f"Feedback bootstrap already exists in {path}.")
@@ -81,8 +119,14 @@ def _optimize_home(path) -> None:
 
     if HOME_STYLE_TAG not in source:
         raise ValueError(f"Homepage stylesheet was not applied to {path}.")
+    if APP_SCRIPT_TAG in source:
+        raise ValueError(f"Homepage still eagerly loads shared app runtime in {path}.")
+    if LANDING_ANALYTICS_TAG not in source:
+        raise ValueError(f"Homepage lean analytics runtime missing in {path}.")
     if any(tag in source for tag in DEFERRED_HOME_SCRIPTS):
         raise ValueError(f"Homepage still eagerly loads Lab-only runtime in {path}.")
+    if 'src="https://www.googletagmanager.com/gtag/js' in source:
+        raise ValueError(f"Homepage still eagerly loads GA4 in {path}.")
     if BOOTSTRAP_MARKER not in source:
         raise ValueError(f"Homepage feedback lazy loader missing in {path}.")
 
