@@ -6,8 +6,10 @@
   const ATTR_KEY='ahaframe_validation_attribution_v1';
   const COHORT_KEY='ahaframe_validation_cohort_v1';
   const FEEDBACK_KEY='ahaframe_aha_feedback_v1';
+  const PRODUCT_FEEDBACK_KEY='ahaframe_product_feedback_v1';
   const WAITLIST_KEY='ahaframe_waitlist';
   const STRONG_AHA=new Set(['yes','aha']);
+  const PRODUCT_FEEDBACK_TYPES=new Set(['bug','confusing','feature','other']);
   const PREFIX_LOCALES={'en':'en','zh-cn':'zh-CN'};
   const ROUTES={
     '':{pageType:'landing',layer:'Overview'},
@@ -75,6 +77,24 @@
     if(!response.ok)throw new Error('feedback submission failed');
     return {ok:true,remote:true,mode:'remote',payload};
   }
+  function buildProductFeedbackPayload(feedbackType,message,email=''){
+    const normalizedType=String(feedbackType||'').trim().toLowerCase();
+    if(!PRODUCT_FEEDBACK_TYPES.has(normalizedType))throw new RangeError('Product feedback type must be bug, confusing, feature, or other.');
+    const normalizedMessage=String(message||'').trim().slice(0,4000);
+    if(!normalizedMessage)throw new RangeError('Feedback message is required.');
+    const normalizedEmail=String(email||'').trim().toLowerCase().slice(0,320);
+    if(normalizedEmail&&!/^\S+@\S+\.\S+$/.test(normalizedEmail))throw new RangeError('Enter a valid email address.');
+    const c=getContext();
+    const origin=String(root.location?.origin||'').replace(/\/$/,'');
+    return {productFeedbackId:uuid(),anonymousUserId:c.anonymousUserId,sessionId:c.sessionId,cohortId:c.cohortId,locale:c.locale,pageType:c.pageType,layer:c.layer,labId:c.labId,labVersion:c.labVersion,feedbackType:normalizedType,message:normalizedMessage,email:normalizedEmail,path:pathname(),pageUrl:origin?origin+pathname():pathname(),submittedAt:now(),deviceClass:c.deviceClass,attribution:{cohortId:c.cohortId,utmSource:c.utmSource,utmMedium:c.utmMedium,utmCampaign:c.utmCampaign,firstUtmSource:c.firstUtmSource,referrer:c.referrer}};
+  }
+  async function submitProductFeedback(feedbackType,message,email=''){
+    const payload=buildProductFeedbackPayload(feedbackType,message,email); const endpoint=root.AHAFRAME_CONFIG?.feedbackEndpoint;
+    if(!endpoint){const prior=read(root.localStorage,PRODUCT_FEEDBACK_KEY,[]);prior.push(payload);write(root.localStorage,PRODUCT_FEEDBACK_KEY,prior);return {ok:true,remote:false,mode:'demo',payload};}
+    const response=await root.fetch(endpoint,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(payload)});
+    if(!response.ok)throw new Error('product feedback submission failed');
+    return {ok:true,remote:true,mode:'remote',payload};
+  }
   function buildWaitlistPayload(email,intent='waitlist'){
     const normalized=String(email||'').trim().toLowerCase();
     if(!/^\S+@\S+\.\S+$/.test(normalized))throw new RangeError('Enter a valid email address.');
@@ -96,8 +116,10 @@
   AhaFrame.getValidationContext=getContext;
   AhaFrame.buildFeedbackPayload=buildFeedbackPayload;
   AhaFrame.submitFeedback=submitFeedback;
+  AhaFrame.buildProductFeedbackPayload=buildProductFeedbackPayload;
+  AhaFrame.submitProductFeedback=submitProductFeedback;
   AhaFrame.buildWaitlistPayload=buildWaitlistPayload;
   AhaFrame.submitWaitlist=submitWaitlist;
   AhaFrame.isStrongAha=(rating)=>STRONG_AHA.has(rating);
-  AhaFrame.validationContext={getContext,buildFeedbackPayload,submitFeedback,buildWaitlistPayload,submitWaitlist};
+  AhaFrame.validationContext={getContext,buildFeedbackPayload,submitFeedback,buildProductFeedbackPayload,submitProductFeedback,buildWaitlistPayload,submitWaitlist};
 })(typeof window!=='undefined'?window:globalThis);
