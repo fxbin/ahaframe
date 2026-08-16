@@ -73,6 +73,8 @@ jobs:
         env:
           AHAFRAME_BASE_URL: https://ahaframe.com
         run: python3 scripts/build_site.py
+      - name: Test Campaign-first discovery
+        run: python3 scripts/test_campaign_discovery.py
       - name: Test generated Mission pages
         run: |
           set -euo pipefail
