@@ -1,16 +1,16 @@
 {
   "locale": "zh-CN",
   "mission": {
-    "name": "The $47,000 Retry",
+    "name": "47,000 美元 Retry 事故",
     "seoTitle": "The $47,000 Retry — Agent 可靠性事故模拟 | AhaFrame",
     "description": "处理一次 Agent Runtime 事故：客户端 Timeout 后自动 Retry，重复执行了不可逆退款操作，造成 47,000 美元重复暴露。",
     "level": "生产事故",
-    "layer": "Harness × Loop",
+    "layer": "Harness × Loop · 运行护栏 × 循环",
     "minutes": 15,
     "hero": "退款工具在客户端看来已经 Timeout，但 Provider 最终完成了操作；Agent 随后自动 Retry，又执行了一次。重新开放流量之前，这个 Runtime 归你负责。",
     "quick": "当工具存在不可逆副作用时，Retry Policy 与 Idempotency Policy 本质上是同一个可靠性设计问题。",
     "brief": {
-      "eyebrow": "INCIDENT 002 · SEV-1",
+      "eyebrow": "事故 002 · SEV-1",
       "title": "一个看起来合理的 Retry Policy，制造了 47,000 美元风险暴露。",
       "role": "你是当前值班的 AI / Backend Engineer。",
       "body": "退款 Provider 在 5.2 秒后完成了请求，但 Client 在第 4 秒已经 Timeout，于是 Agent 开始第二次尝试。按照当前交易规模，重复操作对应 47,000 美元 Gross Exposure。",
@@ -49,14 +49,14 @@
       "timeout": {"label": "Client Timeout", "options": {"3": "3 秒", "4": "4 秒", "6": "6 秒", "8": "8 秒", "10": "10 秒"}},
       "idempotency": {"label": "Idempotency 范围", "options": {"none": "无", "request": "每次 Request", "operation": "每个业务 Operation"}},
       "approval": {"label": "人工审核", "options": {"none": "无", "high-risk": "仅高风险操作", "all": "所有操作"}},
-      "compensation": {"label": "Compensation", "options": {"none": "无", "reconcile": "事后对账", "reverse": "自动冲正重复暴露"}},
+      "compensation": {"label": "补偿机制", "options": {"none": "无", "reconcile": "事后对账", "reverse": "自动冲正重复暴露"}},
       "terminal-verifier": {"label": "终态 Verifier", "options": {"false": "关闭", "true": "先核验 Provider 状态"}}
     },
     "metrics": [
       {"key": "successPercent", "label": "任务成功率", "format": "percent"},
       {"key": "duplicateActionPercent", "label": "重复操作", "format": "percent1"},
-      {"key": "grossExposureDollars", "label": "Gross Exposure", "format": "usd"},
-      {"key": "netExposureDollars", "label": "Net Exposure", "format": "usd"},
+      {"key": "grossExposureDollars", "label": "总风险暴露", "format": "usd"},
+      {"key": "netExposureDollars", "label": "净风险暴露", "format": "usd"},
       {"key": "latencySeconds", "label": "延迟", "format": "seconds"},
       {"key": "humanReviewPercent", "label": "人工审核", "format": "percent"},
       {"key": "costIndex", "label": "成本指数", "format": "decimal"}
@@ -70,7 +70,7 @@
       "PRODUCTION_VIABLE": "具备生产可行性"
     },
     "debrief": {
-      "eyebrow": "ENGINEERING DEBRIEF",
+      "eyebrow": "工程复盘",
       "title": "Timeout 是一次观察，不是 Transaction 的最终结果。",
       "rule": "当工具会产生不可逆副作用时，Retry Policy 与 Idempotency Policy 必须一起设计。",
       "body": "Client 看到了 Timeout，但 Provider 实际已经完成第一次退款。业务 Intent 没有 Operation-level Idempotency 边界时，Retry 会再次制造副作用。Compensation 可以事后减少损失，却不能把重复执行变成安全行为；完全关闭 Retry 则会牺牲本来可以恢复的任务。",
@@ -92,6 +92,13 @@
       "button": "进入安全事故",
       "href": "/en/labs/instruction-conflict/",
       "event": "mission_next_clicked"
+    },
+    "earlyAccess": {
+      "title": "想继续处理更多生产事故？",
+      "description": "加入 Early Access，获取新的 Production Labs 与事故 Mission。",
+      "button": "加入 Early Access",
+      "href": "/zh-cn/early-access/?intent=agent-reliability-production-labs",
+      "event": "agent_reliability_paid_intent_click"
     }
   }
 }
