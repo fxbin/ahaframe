@@ -38,14 +38,17 @@ for page in pages:
         raise SystemExit(f'{page.relative_to(SITE)} has invalid validation/runtime script order: {scripts}')
 
 context_source=(SITE/'assets/validation-context.js').read_text(encoding='utf-8')
-for token in ['anonymousUserId','sessionId','returnVisit','firstUtmSource','feedbackEndpoint','strongAha','buildWaitlistPayload','submitWaitlist']:
+for token in ['anonymousUserId','sessionId','returnVisit','firstUtmSource','feedbackEndpoint','strongAha','buildProductFeedbackPayload','submitProductFeedback','ahaframe_product_feedback_v1','buildWaitlistPayload','submitWaitlist']:
     if token not in context_source:
         raise SystemExit(f'validation-context.js missing {token}')
 
 ui_source=(SITE/'assets/validation-ui.js').read_text(encoding='utf-8')
-for event in ['meaningful_interaction','failure_tradeoff_observed','aha_feedback_submitted','second_lab_started','capstone_completed','paid_intent_clicked']:
+for event in ['meaningful_interaction','failure_tradeoff_observed','aha_feedback_submitted','second_lab_started','capstone_completed','paid_intent_clicked','product_feedback_opened','product_feedback_submitted']:
     if event not in ui_source:
         raise SystemExit(f'validation-ui.js missing canonical event {event}')
+for token in ['data-product-feedback-trigger','data-product-feedback-dialog','mailto:hello@ahaframe.com','Something is broken','Content is confusing','Feature request']:
+    if token not in ui_source:
+        raise SystemExit(f'validation-ui.js missing product feedback/contact surface token {token}')
 
 app_source=(SITE/'assets/app.js').read_text(encoding='utf-8')
 for token in ['schemaVersion','eventId','getValidationContext','waitlist_submitted','waitlist_demo_saved','early_access_viewed','early_access_form_started','early_access_submit_attempt','early_access_submit_success','early_access_submit_error','inFlight','aria-busy']:
@@ -71,4 +74,4 @@ backend=subprocess.run([sys.executable,str(ROOT/'scripts/test_validation_backend
 if backend.returncode:
     raise SystemExit(f'validation backend contract failed\n{backend.stdout}\n{backend.stderr}')
 
-print(f'PASS Validation Build: {len(pages)} generated pages load anonymous context, semantic analytics, production-ready Early Access conversion, Aha feedback, Lab Engine, and the storage backend contract.')
+print(f'PASS Validation Build: {len(pages)} generated pages load anonymous context, semantic analytics, production-ready Early Access conversion, Aha feedback, global product feedback/contact UX, Lab Engine, and the storage backend contract.')
