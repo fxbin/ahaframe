@@ -97,7 +97,8 @@
       "title": "Want more production incidents?",
       "description": "Join Early Access for new Production Labs and incident Missions.",
       "button": "Join Early Access",
-      "href": "/en/early-access/?intent=agent-reliability-production-labs",
+      "href": "/en/early-access/",
+      "query": "?intent=agent-reliability-production-labs",
       "event": "agent_reliability_paid_intent_click"
     }
   }
