@@ -294,9 +294,11 @@ Feature-branch pushes do not run duplicate remote CI. PRs into `main` run the PR
 
 ```text
 Free                       $0
-AI Engineer Foundations    $49 one-time hypothesis
+AI Engineer Foundations    $39 one-time hypothesis
 Production Labs            $12/month future hypothesis
 ```
+
+The two paid products are separate entitlements: Foundations is a one-time lifetime learning path; Production Labs is a continuing subscription for new advanced production incidents and workflows and does not include the Foundations purchase.
 
 No real payment is collected during Validation Alpha.
 
