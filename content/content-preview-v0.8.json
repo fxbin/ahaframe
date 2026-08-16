@@ -1,0 +1,63 @@
+{
+  "version": "0.8",
+  "issue": 92,
+  "status": "ready-to-run",
+  "purpose": "pre-alpha-content-experience-preview",
+  "cohortId": "content-preview-2026-08",
+  "formalAlphaCohortId": "alpha-2026-08",
+  "targetParticipants": {
+    "min": 3,
+    "max": 5
+  },
+  "entryUrls": {
+    "en": "https://ahaframe.com/en/?cohort=content-preview-2026-08",
+    "zh-CN": "https://ahaframe.com/zh-cn/?cohort=content-preview-2026-08"
+  },
+  "campaignMissionIds": [
+    "broken-rag-pipeline",
+    "47000-retry",
+    "prompt-injection-attack",
+    "production-support-launch"
+  ],
+  "observationSignals": [
+    "ten-second-product-understanding",
+    "first-mission-choice",
+    "first-mission-choice-reason",
+    "unprompted-mission-start",
+    "evidence-before-random-controls",
+    "run-retry-compare-behavior",
+    "post-mission-tradeoff-explanation",
+    "voluntary-second-experience"
+  ],
+  "requiredQuestions": [
+    "Which Mission was most attractive before you tried it?",
+    "Which was most useful after you tried it?",
+    "Where were you confused or bored?",
+    "Did any interaction feel like fake gamification?",
+    "What production incident would you want AhaFrame to simulate next?",
+    "Would you send one of these Missions to another engineer? Which one?"
+  ],
+  "analyticsContract": {
+    "discovery": [
+      "homepage_flagship_impression",
+      "homepage_flagship_click"
+    ],
+    "mission": [
+      "mission_started",
+      "simulation_run",
+      "release_decision_submitted",
+      "mission_completed"
+    ]
+  },
+  "decisionEnum": [
+    "START ALPHA",
+    "ITERATE CONTENT AGAIN"
+  ],
+  "rules": {
+    "doNotPrimeMissionChoice": true,
+    "doNotModifyFormalAlphaMetricDefinitions": true,
+    "doNotUseParticipantPiiInNotes": true,
+    "doNotCountPreviewAsFormalAlpha": true,
+    "formalAlphaStartsOnlyAfterStartAlphaDecision": true
+  }
+}

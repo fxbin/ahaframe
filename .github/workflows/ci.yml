@@ -75,6 +75,8 @@ jobs:
         run: python3 scripts/build_site.py
       - name: Test Campaign-first discovery
         run: python3 scripts/test_campaign_discovery.py
+      - name: Test Content & Experience preview contract
+        run: python3 scripts/test_content_preview_contract.py
       - name: Test generated Mission pages
         run: |
           set -euo pipefail
