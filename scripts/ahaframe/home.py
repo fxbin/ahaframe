@@ -1,76 +1,144 @@
-from textwrap import dedent
+from __future__ import annotations
 
-from .core import BASE, SITE, page
-from .i18n import load_content_source, localized_or_default_path, localized_path
+import html
+import json
 
+from .core import BASE, ROOT, SITE, page
+from .i18n import load_content_source, localized_path, route_prefix
 
-def _foundation_preview(slug):
-    if slug == 'token-playground':
-        return '''<div class="mini"><div class="prob-row"><span>Paris</span><div class="bar"><span style="width:91%"></span></div><b>91%</b></div><div class="prob-row"><span>Lyon</span><div class="bar light"><span style="width:16%"></span></div><b>3%</b></div><div class="prob-row"><span>located</span><div class="bar light"><span style="width:10%"></span></div><b>2%</b></div></div>'''
-    if slug == 'context-window':
-        return '''<div class="mini"><div class="context-bar"><span class="seg-system" style="width:12%"></span><span class="seg-convo" style="width:42%"></span><span class="seg-docs" style="width:28%"></span><span class="seg-tools" style="width:12%"></span><span class="seg-memory" style="width:6%"></span></div><small class="subtle">191,250 / 200,000 tokens</small></div>'''
-    return '''<div class="mini flow-mini"><span class="flow-node">User</span><span class="flow-arrow">→</span><span class="flow-node">Agent</span><span class="flow-arrow">→</span><span class="flow-node">Tool</span><span class="flow-arrow">→</span><span class="flow-node">Observe</span></div>'''
+DOMAIN='campaign-discovery'
+CONTRACT_PATH=ROOT/'content'/'lab-reconciliation-v0.8.json'
 
 
-def _build_home(locale):
-    copy = load_content_source(locale, 'home')
-    hero = copy['hero']
-    foundations = copy['foundations']
-    production = copy['production']
-    method = copy['method']
-    stack = copy['stack']
-    audience = copy['audience']
-    cta = copy['cta']
+def _contract():
+    data=json.loads(CONTRACT_PATH.read_text(encoding='utf-8'))
+    if data.get('status')!='active':
+        raise ValueError('Lab reconciliation contract must be active before building Campaign discovery.')
+    return data
 
-    home_path = localized_path('/en/', locale)
-    early_path = localized_or_default_path('/en/early-access/', locale)
-    first_lesson = localized_or_default_path('/en/lessons/token-playground/', locale)
 
-    item_list={'@context':'https://schema.org','@type':'ItemList','name':copy['title'],'itemListElement':[]}
-    position = 1
-    for card in foundations['cards']:
-        path = localized_or_default_path(f"/en/lessons/{card['slug']}/", locale)
-        item_list['itemListElement'].append({'@type':'ListItem','position':position,'url':BASE+path,'item':{'@type':'LearningResource','name':card['name'],'description':card['description'],'url':BASE+path,'publisher':{'@id':BASE+'/#organization'}}})
-        position += 1
-    for card in production['cards']:
-        path = localized_or_default_path(f"/en/labs/{card['slug']}/", locale)
-        item_list['itemListElement'].append({'@type':'ListItem','position':position,'url':BASE+path,'item':{'@type':'LearningResource','name':card['name'],'description':card['description'],'url':BASE+path,'publisher':{'@id':BASE+'/#organization'}}})
-        position += 1
+def _localized_experience_href(item: dict,locale: str) -> str:
+    return localized_path(item['route'],locale)
 
-    home_schema=[{'@context':'https://schema.org','@type':'WebSite','@id':BASE+home_path+'#website','name':'AhaFrame','url':BASE+home_path,'description':copy['description'],'inLanguage':locale,'publisher':{'@id':BASE+'/#organization'}},item_list]
 
-    foundation_cards=[]
-    icon_by_slug={'token-playground':'◇','context-window':'▱','agent-loop':'⌘'}
-    icon_class={'token-playground':'','context-window':' warm','agent-loop':' violet'}
-    for card in foundations['cards']:
-        path=localized_or_default_path(f"/en/lessons/{card['slug']}/",locale)
-        foundation_cards.append(f'''<a class="card lesson-card" href="{path}" data-event="lesson_card_click"><span class="lesson-status" data-lesson-status="{card['slug']}">{foundations['notStarted']}</span><div class="lesson-num">{card['number']} · {card['category']}</div><div class="lesson-head"><div class="icon-box{icon_class[card['slug']]}">{icon_by_slug[card['slug']]}</div><div><h3>{card['name']}</h3><p>{card['description']}</p></div></div>{_foundation_preview(card['slug'])}<span class="lesson-link">{card['link']}</span></a>''')
+def _tag_list(items: list[str]) -> str:
+    return ''.join(f'<span class="badge">{html.escape(item)}</span>' for item in items)
 
-    production_cards=[]
-    for card in production['cards']:
-        path=localized_or_default_path(f"/en/labs/{card['slug']}/",locale)
-        production_cards.append(f'''<a class="card lesson-card" href="{path}" data-event="production_lab_click"><span class="lesson-status">{card['status']}</span><div class="lesson-num">Production Lab · {card['layer']}</div><div class="lesson-head"><div class="icon-box">{card['icon']}</div><div><h3>{card['name']}</h3><p>{card['description']}</p></div></div><div class="mini"><div class="takeaway"><strong>{card['firstLabel']}</strong><span>{card['first']}</span></div><div class="takeaway"><strong>{card['secondLabel']}</strong><span>{card['second']}</span></div></div><span class="lesson-link">{card['link']}</span></a>''')
 
-    method_html=''.join(f'''<div class="method"><span class="method-no">{i:02}</span><h3>{item['name']}</h3><p>{item['description']}</p></div>''' for i,item in enumerate(method['items'],1))
-    stack_html=''.join(f'''<div class="roadmap-step"><span class="road-num">{i:02}</span><strong>{name}</strong><small>{sub}</small></div>''' for i,(name,sub) in enumerate(stack['layers'],1))
-    audience_icons=['&lt;/&gt;','▣','◉']
-    audience_html=''.join(f'''<div class="audience-row"><span class="audience-icon">{audience_icons[i]}</span><div><strong>{item[0]}</strong><br><span class="subtle">{item[1]}</span></div></div>''' for i,item in enumerate(audience['items']))
+def _campaign_card(item: dict,copy: dict,locale: str,position: int) -> str:
+    href=_localized_experience_href(item,locale)
+    mission_id=item['missionId']
+    return f'''<article class="card incident-card" data-flagship-impression data-mission-id="{html.escape(mission_id)}" data-position="{position}" data-campaign-role="{html.escape(item['campaignRole'])}">
+      <div class="incident-step">{html.escape(copy['step'])}</div>
+      <div class="incident-card-head"><h3>{html.escape(copy['title'])}</h3><span class="badge">{html.escape(copy['minutes'])}</span></div>
+      <p class="incident-stakes">{html.escape(copy['incident'])}</p>
+      <p class="subtle">{html.escape(copy['decision'])}</p>
+      <div class="badges incident-dimensions">{_tag_list(copy['dimensions'])}</div>
+      <a class="lesson-link" data-flagship-cta data-mission-id="{html.escape(mission_id)}" data-position="{position}" data-source="campaign-card" href="{href}">{html.escape(copy['cta'])} →</a>
+    </article>'''
 
-    home_body=f'''
-    <section class="hero"><div class="container hero-grid"><div><span class="eyebrow">{hero['eyebrow']}</span><h1>{hero['headlineBefore']}<br><span class="accent-text">{hero['headlineAccent']}</span>{hero['headlineAfter']}</h1><p class="lede">{hero['subheadline']}</p><div class="actions"><a class="btn primary" data-event="hero_start_learning_click" href="{first_lesson}">{hero['primary']}</a><a class="btn" data-event="hero_demo_click" href="#production-labs">{hero['secondary']}</a></div><div class="proof-row">{''.join(f'<span class="proof-chip">{item}</span>' for item in hero['proofs'])}</div></div>
-    <div class="card demo-card" aria-label="Token Playground"><div class="demo-header"><strong>{hero['demoTitle']}</strong><span class="live-badge">{hero['demoBadge']}</span></div><div class="hero-demo-grid"><div class="hero-demo-main"><span class="label">{hero['promptLabel']}</span><div class="prompt-box">The capital of France is</div><div class="demo-subtitle">{hero['predictionLabel']}</div><div class="prob-row" data-hero-prob><span data-label>Paris</span><div class="bar"><span style="width:91%"></span></div><b data-value>91%</b></div><div class="prob-row" data-hero-prob><span data-label>Lyon</span><div class="bar light"><span style="width:3%"></span></div><b data-value>3%</b></div><div class="prob-row" data-hero-prob><span data-label>located</span><div class="bar light"><span style="width:2%"></span></div><b data-value>2%</b></div></div><aside class="hero-demo-side"><span class="label">{hero['settings']}</span><div class="label" style="margin-top:14px">{hero['temperature']}</div><div class="control-row"><input id="hero-temperature" class="slider" type="range" min="0" max="2" step="0.1" value="0.7" aria-label="Temperature"><output id="hero-temperature-value">0.7</output></div><div class="label" style="margin-top:21px">{hero['sampling']}</div><select id="hero-sampling" class="select" aria-label="Sampling"><option value="sample">Sample</option><option value="greedy">Greedy</option></select><div class="selected-panel"><span class="subtle">{hero['sampleToken']}</span><div class="big" data-hero-selected>Paris</div></div></aside></div></div></div></section>
-    <section class="section" id="lessons"><div class="container"><div class="section-head"><div><div class="section-kicker">{foundations['kicker']}</div><h2 class="section-title">{foundations['title']}</h2><p class="section-copy">{foundations['copy']}</p></div><div class="card progress-card"><div class="progress-ring" data-progress-ring><strong data-progress-count>0/3</strong></div><div><h3>{foundations['progressTitle']}</h3><p>{foundations['progressCopy']}</p></div></div></div><div class="lesson-cards">{''.join(foundation_cards)}</div></div></section>
-    <section class="section" id="production-labs"><div class="container"><div class="section-head"><div><div class="section-kicker">{production['kicker']}</div><h2 class="section-title">{production['title']}</h2><p class="section-copy">{production['copy']}</p></div></div><div class="lesson-cards production-lab-grid" style="grid-template-columns:repeat(3,minmax(0,1fr))">{''.join(production_cards)}</div></div></section>
-    <section class="section"><div class="container"><div class="section-head"><div><div class="section-kicker">{method['kicker']}</div><h2 class="section-title">{method['title']}</h2></div></div><div class="method-grid" style="grid-template-columns:repeat(5,minmax(0,1fr))">{method_html}</div></div></section>
-    <section class="section" id="roadmap"><div class="container"><div class="section-head"><div><div class="section-kicker">{stack['kicker']}</div><h2 class="section-title">{stack['title']}</h2><p class="section-copy">{stack['copy']}</p></div></div><div class="roadmap-shell"><div class="card roadmap">{stack_html}</div><aside class="card audience-card" id="about"><h3>{audience['title']}</h3>{audience_html}</aside></div></div></section>
-    <section><div class="container cta-band"><div><h2>{cta['title']}</h2><p>{cta['copy']}</p></div><div><form class="signup" data-waitlist-form data-intent="homepage"><label class="sr-only" for="home-email-{locale}">{cta['email']}</label><input id="home-email-{locale}" class="input" name="email" type="email" autocomplete="email" placeholder="{cta['placeholder']}" required><button type="submit" class="btn primary">{cta['button']}</button></form><div data-status class="status"></div></div></div></section>
-    '''
-    home_body=dedent(home_body)
-    target=SITE/('en' if locale=='en' else 'zh-cn')/'index.html'
-    target.parent.mkdir(parents=True,exist_ok=True)
-    target.write_text(page(copy['title'],copy['description'],home_path,home_body,schemas=home_schema,scripts='<script src="/assets/home.js" defer></script>',locale=locale),encoding='utf-8')
+
+def _knowledge_item(item: dict,copy: dict,locale: str) -> str:
+    href=_localized_experience_href(item,locale)
+    return f'''<a class="knowledge-link" href="{href}"><span><strong>{html.escape(copy['name'])}</strong><small>{html.escape(copy['note'])}</small></span><span aria-hidden="true">→</span></a>'''
+
+
+def _build(locale: str):
+    d=load_content_source(locale,DOMAIN)
+    contract=_contract()
+    by_id={item['id']:item for item in contract['experiences']}
+    campaign_ids=contract['primaryCampaign']
+    if len(campaign_ids)!=4:
+        raise ValueError('v0.8 homepage expects the #90 Campaign contract to contain exactly four primary steps.')
+    if any(item_id not in by_id for item_id in campaign_ids):
+        raise ValueError('Campaign contract references an unknown experience.')
+
+    campaign_items=[by_id[item_id] for item_id in campaign_ids]
+    first=campaign_items[0]
+    first_href=_localized_experience_href(first,locale)
+    alpha_href=localized_path('/en/early-access/',locale)+'?intent=validation-alpha'
+    target=SITE/route_prefix(locale)
+    target.mkdir(parents=True,exist_ok=True)
+    root_path=localized_path('/en/',locale)
+
+    hero_queue=''.join(
+        f'''<div class="hero-incident-row"><span class="hero-incident-no">{html.escape(number)}</span><span><strong>{html.escape(title)}</strong><small>{html.escape(text)}</small></span></div>'''
+        for number,title,text in d['hero']['queue']
+    )
+    proof=''.join(
+        f'''<div class="hero-proof"><strong>{html.escape(value)}</strong><span>{html.escape(label)}</span></div>'''
+        for value,label in d['hero']['proof']
+    )
+
+    incident_cards=''.join(
+        _campaign_card(item,d['campaign']['cards'][item['id']],locale,index)
+        for index,item in enumerate(campaign_items[:3],start=1)
+    )
+    boss_item=campaign_items[3]
+    boss_copy=d['campaign']['cards'][boss_item['id']]
+    boss_href=_localized_experience_href(boss_item,locale)
+
+    method_steps=''.join(
+        f'''<div class="method"><div class="method-no">{html.escape(number)}</div><h3>{html.escape(title)}</h3><p>{html.escape(text)}</p></div>'''
+        for number,title,text in d['method']['steps']
+    )
+
+    foundations=[item for item in contract['experiences'] if item['primaryStatus']=='KEEP AS FOUNDATION']
+    specialist=[item for item in contract['experiences'] if item['primaryStatus']=='MERGE INTO FLAGSHIP']
+    prerequisites=[item for item in contract['experiences'] if item['primaryStatus']=='PREREQUISITE NODE']
+    grouped={
+        'foundation':foundations,
+        'campaign':campaign_items,
+        'specialist':specialist,
+        'prerequisite':prerequisites,
+    }
+    knowledge_ids=[item['id'] for items in grouped.values() for item in items]
+    contract_ids=[item['id'] for item in contract['experiences']]
+    if sorted(knowledge_ids)!=sorted(contract_ids):
+        raise ValueError('Knowledge Map grouping must cover every #90 experience exactly once.')
+
+    knowledge_groups=''.join(
+        f'''<div class="knowledge-group"><div class="knowledge-group-head"><span class="section-kicker">{html.escape(d['knowledge']['groups'][key]['title'])}</span><p>{html.escape(d['knowledge']['groups'][key]['description'])}</p></div><div>{''.join(_knowledge_item(item,d['knowledge']['experiences'][item['id']],locale) for item in items)}</div></div>'''
+        for key,items in grouped.items()
+    )
+    about_points=''.join(
+        f'''<div class="takeaway"><strong>{html.escape(title)}</strong><span>{html.escape(text)}</span></div>'''
+        for title,text in d['about']['points']
+    )
+
+    body=f'''<section class="hero"><div class="container hero-grid"><div><span class="eyebrow">{html.escape(d['hero']['eyebrow'])}</span><h1>{html.escape(d['hero']['headline'])}</h1><p class="lede">{html.escape(d['hero']['subheadline'])}</p><div class="actions"><a class="btn primary" data-flagship-cta data-mission-id="{html.escape(first['missionId'])}" data-position="1" data-source="hero" href="{first_href}">{html.escape(d['hero']['primaryCta'])} →</a><a class="btn" href="#lessons">{html.escape(d['hero']['secondaryCta'])}</a></div><div class="hero-proof-row">{proof}</div></div><div class="card hero-incident-console"><div class="panel-title"><span>{html.escape(d['hero']['queueTitle'])}</span><span class="badge">{html.escape(d['hero']['queueStatus'])}</span></div>{hero_queue}</div></div></section>
+
+    <section class="section" id="lessons"><div class="container"><div class="section-head"><div><div class="section-kicker">{html.escape(d['campaign']['kicker'])}</div><h2 class="section-title">{html.escape(d['campaign']['title'])}</h2><p class="section-copy">{html.escape(d['campaign']['copy'])}</p></div></div><div class="campaign-grid">{incident_cards}</div>
+    <article class="card campaign-boss" data-flagship-impression data-mission-id="{html.escape(boss_item['missionId'])}" data-position="4" data-campaign-role="{html.escape(boss_item['campaignRole'])}"><div><div class="section-kicker">{html.escape(d['campaign']['bossKicker'])}</div><h3>{html.escape(boss_copy['title'])}</h3><p class="incident-stakes">{html.escape(boss_copy['incident'])}</p><p class="subtle">{html.escape(d['campaign']['bossCopy'])}</p><div class="badges incident-dimensions">{_tag_list(boss_copy['dimensions'])}</div></div><div class="campaign-boss-action"><span class="badge">{html.escape(boss_copy['minutes'])}</span><a class="btn primary" data-flagship-cta data-mission-id="{html.escape(boss_item['missionId'])}" data-position="4" data-source="final-boss" href="{boss_href}">{html.escape(boss_copy['cta'])} →</a></div></article></div></section>
+
+    <section class="section surface-soft"><div class="container"><div class="section-head"><div><div class="section-kicker">{html.escape(d['method']['kicker'])}</div><h2 class="section-title">{html.escape(d['method']['title'])}</h2><p class="section-copy">{html.escape(d['method']['copy'])}</p></div></div><div class="method-grid">{method_steps}</div></div></section>
+
+    <section class="section" id="roadmap"><div class="container"><div class="section-head"><div><div class="section-kicker">{html.escape(d['knowledge']['kicker'])}</div><h2 class="section-title">{html.escape(d['knowledge']['title'])}</h2><p class="section-copy">{html.escape(d['knowledge']['copy'])}</p></div><span class="badge">{len(contract_ids)} experiences</span></div><div class="knowledge-grid">{knowledge_groups}</div></div></section>
+
+    <section class="section surface-soft" id="about"><div class="container"><div class="section-head"><div><div class="section-kicker">{html.escape(d['about']['kicker'])}</div><h2 class="section-title">{html.escape(d['about']['title'])}</h2><p class="section-copy">{html.escape(d['about']['copy'])}</p></div></div><div class="takeaways">{about_points}</div></div></section>
+
+    <section><div class="container cta-band"><div><h2>{html.escape(d['closing']['title'])}</h2><p>{html.escape(d['closing']['copy'])}</p></div><div class="actions"><a class="btn primary" data-flagship-cta data-mission-id="{html.escape(first['missionId'])}" data-position="1" data-source="closing" href="{first_href}">{html.escape(d['closing']['primary'])} →</a><a class="btn" data-event="homepage_validation_alpha_click" href="{alpha_href}">{html.escape(d['closing']['secondary'])}</a></div></div></section>'''
+
+    item_list={
+        '@context':'https://schema.org',
+        '@type':'ItemList',
+        'name':'AhaFrame v0.8 Campaign' if locale=='en' else 'AhaFrame v0.8 Campaign 挑战路径',
+        'numberOfItems':len(campaign_items),
+        'itemListElement':[
+            {
+                '@type':'ListItem',
+                'position':index,
+                'name':d['campaign']['cards'][item['id']]['title'],
+                'url':BASE+_localized_experience_href(item,locale),
+            }
+            for index,item in enumerate(campaign_items,start=1)
+        ],
+    }
+    website={'@context':'https://schema.org','@type':'WebSite','name':'AhaFrame','url':BASE+root_path,'inLanguage':locale,'description':d['meta']['description']}
+    scripts='<script src="/assets/home.js" defer></script>'
+    (target/'index.html').write_text(page(d['meta']['title'],d['meta']['description'],root_path,body,schemas=[website,item_list],scripts=scripts,locale=locale),encoding='utf-8')
 
 
 def build():
-    _build_home('en')
-    _build_home('zh-CN')
+    for locale in ('en','zh-CN'):
+        _build(locale)

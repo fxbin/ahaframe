@@ -83,7 +83,8 @@ def main() -> None:
                 assert lab["presentation"], (locale,slug)
                 assert (lab.get("guide") or lab.get("explainer")), (locale,slug)
 
-    assert ui("zh-CN", "nav.lessons") == "课程"
+    assert ui("zh-CN", "nav.lessons") == "Campaign"
+    assert ui("zh-CN", "nav.roadmap") == "知识地图"
     assert ui("zh-CN", "language.zh-CN") == "简体中文"
 
     assert localized_path("/en/", "zh-CN") == "/zh-cn/"
@@ -124,7 +125,7 @@ def main() -> None:
     print(
         f"PASS: i18n foundation validates {len(SUPPORTED_LOCALES)} locales, "
         f"{len(PUBLIC_ROUTE_RELATIVES)} public route pairs, the complete zh-CN Validation Alpha learning surface, "
-        "shared UI keys, and no locale-specific scenario forks."
+        "Campaign-first shared UI keys, and no locale-specific scenario forks."
     )
 
 

@@ -19,8 +19,8 @@
   "brand": "AhaFrame",
   "ui": {
     "nav": {
-      "lessons": "课程",
-      "roadmap": "学习路径",
+      "lessons": "Campaign",
+      "roadmap": "知识地图",
       "pricing": "定价",
       "about": "关于",
       "early_access": "加入内测",

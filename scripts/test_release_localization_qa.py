@@ -128,9 +128,23 @@ def test_shared_runtime_and_backend_contract():
     assert migration.count('add column if not exists locale')==3 and ingest.count('locale: locale(body.locale)')==3
 
 
+def mobile_one_column_selectors(css:str)->set[str]:
+    marker='@media(max-width:760px)'
+    assert marker in css
+    mobile=css.split(marker,1)[1].split('@media(',1)[0]
+    selectors=set()
+    for selector_list in re.findall(r'([^{}]+)\{grid-template-columns:1fr!important\}',mobile):
+        selectors.update(selector.strip() for selector in selector_list.split(','))
+    return selectors
+
+
 def test_mobile_contract():
-    css=(SITE/'assets'/'styles.css').read_text(encoding='utf-8'); assert '@media(max-width:760px)' in css
-    for selector in ('.mobile-nav{display:block}', '.lab-control-grid{grid-template-columns:1fr!important}', '.compare-grid{grid-template-columns:1fr}'): assert selector in css,selector
+    css=(SITE/'assets'/'styles.css').read_text(encoding='utf-8')
+    one_column=mobile_one_column_selectors(css)
+    assert '.mobile-nav{display:block}' in css
+    assert '.lab-control-grid' in one_column,'.lab-control-grid missing from mobile one-column rule'
+    assert '.campaign-grid' in one_column,'.campaign-grid missing from mobile one-column rule'
+    assert '.compare-grid{grid-template-columns:1fr}' in css
     for relative in ('','labs/instruction-conflict/','labs/agent-workflow-graph/','build/reliable-support-agent/','pricing/','early-access/'):
         for locale in SUPPORTED_LOCALES:
             soup=BeautifulSoup(page_file(locale,relative).read_text(encoding='utf-8'),'html.parser'); assert soup.select_one('details.mobile-nav') is not None,(locale,relative,'mobile menu')

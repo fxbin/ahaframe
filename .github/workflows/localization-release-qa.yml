@@ -25,7 +25,7 @@ jobs:
           python-version: '3.13'
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '24'
       - name: Install validation dependencies
         run: pip install -r requirements-dev.txt
       - name: Test bilingual validation runtime
