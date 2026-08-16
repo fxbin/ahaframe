@@ -46,6 +46,10 @@ SCRIPT_VARIANTS={
         ("/assets/mission-engine.js","/assets/prompt-injection-attack-scenario.js","/assets/prompt-injection-attack-mission.js","/assets/prompt-injection-attack.js"),
     ],
     "labs/agent-workflow-graph/":[("/assets/agent-workflow-graph-scenario.js","/assets/agent-workflow-graph.js")],
+    "build/reliable-support-agent/":[
+        ("/assets/instruction-conflict-scenario.js","/assets/evaluation-scenario.js","/assets/context-compression-scenario.js","/assets/agent-workflow-graph-scenario.js","/assets/reliable-support-scenario.js","/assets/integrated-build.js"),
+        ("/assets/mission-engine.js","/assets/instruction-conflict-scenario.js","/assets/evaluation-scenario.js","/assets/context-compression-scenario.js","/assets/agent-workflow-graph-scenario.js","/assets/reliable-support-scenario.js","/assets/production-support-launch-mission.js","/assets/production-support-launch.js"),
+    ],
 }
 MOUNTS={
     "labs/rag-failure/":("[data-rag-lab]","[data-broken-rag-mission]"),
@@ -54,7 +58,7 @@ MOUNTS={
     "labs/context-compression/":("[data-context-compression-lab]",),
     "labs/instruction-conflict/":("[data-instruction-conflict-lab]","[data-prompt-injection-mission]"),
     "labs/agent-workflow-graph/":("[data-agent-workflow-graph-lab]",),
-    "build/reliable-support-agent/":("[data-reliable-support-agent]",),
+    "build/reliable-support-agent/":("[data-reliable-support-agent]","[data-production-support-launch]"),
 }
 
 
@@ -114,12 +118,6 @@ for file in html_files:
         elif scripts.index(engine)>scripts.index(scenarios): errors.append(f"{rel}: lab-engine.js must load before lab-scenarios.js")
         if relative in SCRIPT_VARIANTS and scenarios in scripts:
             if not valid_script_variant(scripts,scenarios,SCRIPT_VARIANTS[relative]): errors.append(f"{rel}: missing or misordered page runtime variant")
-        if relative=="build/reliable-support-agent/":
-            required=["/assets/instruction-conflict-scenario.js","/assets/evaluation-scenario.js","/assets/context-compression-scenario.js","/assets/agent-workflow-graph-scenario.js","/assets/reliable-support-scenario.js","/assets/integrated-build.js"]
-            if any(item not in scripts for item in required): errors.append(f"{rel}: missing integrated scenario modules")
-            else:
-                positions=[scripts.index(item) for item in required]
-                if positions!=sorted(positions) or scripts.index(scenarios)>positions[0]: errors.append(f"{rel}: invalid integrated scenario load order")
 
     if relative and relative.startswith("lessons/"):
         if len(soup.find_all("h1"))!=1: errors.append(f"{rel}: expected one H1")
