@@ -1,0 +1,123 @@
+{
+  "locale": "en",
+  "meta": {
+    "title": "AhaFrame — Learn AI Engineering Through Production Incidents",
+    "description": "Learn AI engineering by debugging production incidents: stale RAG evidence, unsafe retries, prompt injection, and a final cross-layer launch decision."
+  },
+  "hero": {
+    "eyebrow": "AI ENGINEERING · INCIDENT SIMULATOR",
+    "headline": "Learn AI engineering by surviving production incidents.",
+    "subheadline": "Inspect evidence, make bounded engineering changes, replay deterministic systems, and defend a release decision. No signup required to start.",
+    "primaryCta": "Start The Broken RAG Pipeline",
+    "secondaryCta": "See the Campaign",
+    "proof": [
+      ["3", "production incidents"],
+      ["1", "cross-layer Final Boss"],
+      ["0", "signup steps to start"]
+    ],
+    "queueTitle": "INCIDENT QUEUE",
+    "queueStatus": "READY",
+    "queue": [
+      ["01", "Evidence integrity", "The current policy exists. Your Agent still cites the old one."],
+      ["02", "Irreversible actions", "One timeout. Two refunds. $47,000 exposed."],
+      ["03", "Trust boundary", "The dangerous instruction arrived as data."],
+      ["FINAL", "Production launch", "All six engineering layers now have to survive together."]
+    ]
+  },
+  "campaign": {
+    "kicker": "PRIMARY CAMPAIGN",
+    "title": "Three incidents. One production launch.",
+    "copy": "Start with the failure that looks most interesting. The Campaign is ordered, but not locked: each Mission teaches a production decision you will reuse in the Final Boss.",
+    "cards": {
+      "rag-failure": {
+        "step": "INCIDENT 01 · CONTEXT × EVALUATION",
+        "title": "The Broken RAG Pipeline",
+        "incident": "The new refund policy is already indexed. The support Agent still denies a valid return using the stale policy.",
+        "decision": "Fix freshness, authority, grounding, context, latency, and cost without hiding behind “retrieve more.”",
+        "dimensions": ["retrieval trace", "freshness", "authority", "grounding"],
+        "minutes": "15 min",
+        "cta": "Start incident"
+      },
+      "agent-reliability": {
+        "step": "INCIDENT 02 · HARNESS × LOOP",
+        "title": "The $47,000 Retry",
+        "incident": "The client timed out. The provider succeeded. The Agent retried the same irreversible refund and created $47,000 of exposure.",
+        "decision": "Keep recovery while making repeated intent safe under latency, cost, and human-review budgets.",
+        "dimensions": ["retry", "idempotency", "approval", "side effects"],
+        "minutes": "15 min",
+        "cta": "Take the incident"
+      },
+      "instruction-conflict": {
+        "step": "INCIDENT 03 · PROMPT × CONTEXT × HARNESS",
+        "title": "The Prompt Injection Attack",
+        "incident": "Untrusted external content contains instruction-shaped text and tries to steer real CRM capabilities.",
+        "decision": "Build defense in depth without winning by denying every useful external-content workflow.",
+        "dimensions": ["provenance", "least privilege", "runtime gate", "false positives"],
+        "minutes": "15 min",
+        "cta": "Defend the Agent"
+      },
+      "reliable-support-agent": {
+        "step": "FINAL BOSS · SIX-LAYER LAUNCH REVIEW",
+        "title": "Ship the Production Support Agent",
+        "incident": "The inherited candidate looks plausible, but Prompt authority, execution control, graph complexity, and release evidence are not production-ready.",
+        "decision": "Spend only five engineering change points, compare attempts, then defend SHIP, BLOCK, or INCONCLUSIVE with evidence.",
+        "dimensions": ["6 engineering layers", "5 change points", "hard vetoes", "release rationale"],
+        "minutes": "25 min",
+        "cta": "Enter the Final Boss"
+      }
+    },
+    "bossKicker": "AFTER THE THREE INCIDENTS",
+    "bossCopy": "The Final Boss does not give you a reference architecture button. It gives you evidence, a finite change budget, and responsibility for the release decision."
+  },
+  "method": {
+    "kicker": "HOW A MISSION WORKS",
+    "title": "Evidence first. Decision last.",
+    "copy": "AhaFrame Missions model engineering work, not trivia. You can make a plausible change and still fail because another constraint becomes binding.",
+    "steps": [
+      ["01", "Inspect", "Read traces, timelines, permission scopes, blockers, and scorecards before changing anything."],
+      ["02", "Intervene", "Spend bounded engineering budget on policies that change real system behavior."],
+      ["03", "Replay", "Run the same deterministic scenario and compare attempts instead of arguing from intuition."],
+      ["04", "Decide", "Own SHIP, BLOCK, or INCONCLUSIVE. The simulator supplies evidence; it does not grant permission to ship."]
+    ]
+  },
+  "knowledge": {
+    "kicker": "KNOWLEDGE MAP",
+    "title": "Need the model behind the incident? Go deeper here.",
+    "copy": "The Campaign is the primary path. The Knowledge Map keeps every retained Foundation, specialist Lab, prerequisite, and Mission available as a reference surface.",
+    "groups": {
+      "foundation": {"title": "Foundations", "description": "Small mechanics playgrounds. Optional before the incidents."},
+      "campaign": {"title": "Campaign Missions", "description": "The four primary production decisions in v0.8."},
+      "specialist": {"title": "Specialist Sandbox", "description": "A focused Lab whose mechanics are also consumed by flagship Missions."},
+      "prerequisite": {"title": "Final Boss References", "description": "Evaluation and graph models worth exploring before or after the launch challenge."}
+    },
+    "experiences": {
+      "token-playground": {"name": "Token Playground", "note": "Tokenization and sampling mechanics."},
+      "context-window": {"name": "Context Window Lab", "note": "Finite working-context budgeting."},
+      "agent-loop": {"name": "Agent Loop Simulator", "note": "Bounded iteration, stopping, and recovery."},
+      "rag-failure": {"name": "The Broken RAG Pipeline", "note": "Freshness, authority, retrieval, and grounding."},
+      "context-compression": {"name": "Context Compression Lab", "note": "Retention quality under context pressure."},
+      "agent-reliability": {"name": "The $47,000 Retry", "note": "Retries, idempotency, and irreversible side effects."},
+      "instruction-conflict": {"name": "The Prompt Injection Attack", "note": "Trust, capability, and runtime enforcement."},
+      "evaluation-failure": {"name": "Evaluation Failure Lab", "note": "Release evidence, uncertainty, and vetoes."},
+      "agent-workflow-graph": {"name": "Agent Workflow Graph Lab", "note": "Topology, coordination, and failure propagation."},
+      "reliable-support-agent": {"name": "Ship the Production Support Agent", "note": "The six-layer production launch Final Boss."}
+    },
+    "open": "Open"
+  },
+  "about": {
+    "kicker": "WHY AHAFRAME",
+    "title": "Mental models that have to survive contact with production.",
+    "copy": "AhaFrame is for software engineers moving into AI engineering. The goal is not to memorize framework APIs. It is to recognize failure modes, reason across layers, and make defensible system decisions.",
+    "points": [
+      ["Deterministic before expensive", "Core Missions are reproducible and replayable, so the engineering lesson is inspectable instead of hidden behind model randomness."],
+      ["Anonymous first", "Start a Mission immediately. Account features are not required to discover whether the product is useful."],
+      ["Failure is the curriculum", "Each flagship experience begins with a system that looks plausible but fails a consequential production constraint."]
+    ]
+  },
+  "closing": {
+    "title": "Ready to own the incident?",
+    "copy": "Start with Broken RAG now, or join Validation Alpha after you finish the Final Boss.",
+    "primary": "Start Incident 01",
+    "secondary": "Join Validation Alpha"
+  }
+}
