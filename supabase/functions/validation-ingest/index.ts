@@ -115,6 +115,41 @@ async function ingestFeedback(body: Record<string, unknown>) {
   return 'feedback'
 }
 
+async function ingestProductFeedback(body: Record<string, unknown>) {
+  const productFeedbackId = text(body.productFeedbackId, 120)
+  const anonymousUserId = text(body.anonymousUserId, 120)
+  const sessionId = text(body.sessionId, 120)
+  const feedbackType = text(body.feedbackType, 20)
+  const message = text(body.message, 4000)
+  const submittedAt = validDate(body.submittedAt)
+  const email = text(body.email, 320).toLowerCase()
+  if (!productFeedbackId || !anonymousUserId || !sessionId || !['bug', 'confusing', 'feature', 'other'].includes(feedbackType) || !message || !submittedAt) throw new Error('invalid product feedback payload')
+  if (email && !/^\S+@\S+\.\S+$/.test(email)) throw new Error('invalid product feedback email')
+
+  const row = {
+    product_feedback_id: productFeedbackId,
+    anonymous_user_id: anonymousUserId,
+    session_id: sessionId,
+    cohort_id: cohort(body.cohortId),
+    locale: locale(body.locale),
+    page_type: text(body.pageType, 80),
+    layer: text(body.layer, 80),
+    lab_id: text(body.labId, 120),
+    lab_version: text(body.labVersion, 40),
+    feedback_type: feedbackType,
+    message,
+    email,
+    path: text(body.path, 500),
+    page_url: text(body.pageUrl, 1000),
+    device_class: text(body.deviceClass, 40),
+    attribution: object(body.attribution),
+    submitted_at: submittedAt,
+  }
+  const { error } = await supabase.from('product_feedback').upsert(row, { onConflict: 'product_feedback_id', ignoreDuplicates: true })
+  if (error) throw error
+  return 'product-feedback'
+}
+
 async function ingestWaitlist(body: Record<string, unknown>) {
   const email = text(body.email, 320).toLowerCase()
   if (!/^\S+@\S+\.\S+$/.test(email)) throw new Error('invalid waitlist payload')
@@ -155,6 +190,7 @@ Deno.serve(async (req) => {
     const body = object(await req.json())
     let kind = ''
     if (body.eventId && body.name) kind = await ingestEvent(body)
+    else if (body.productFeedbackId && body.feedbackType) kind = await ingestProductFeedback(body)
     else if (body.feedbackId && body.rating) kind = await ingestFeedback(body)
     else if (body.email) kind = await ingestWaitlist(body)
     else return json(origin, { ok: false, error: 'unknown payload' }, 400)
