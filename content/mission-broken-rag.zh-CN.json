@@ -5,12 +5,12 @@
     "seoTitle": "失效的 RAG Pipeline — 生产级 RAG 事故模拟 | AhaFrame",
     "description": "排查一次生产 RAG 事故：新退款政策已经进入知识库，客服 Agent 却仍然引用旧政策。",
     "level": "生产事故",
-    "layer": "Context × Evaluation",
+    "layer": "Context × Evaluation · 上下文 × 评估",
     "minutes": 15,
     "hero": "新退款政策已经在知识库里，客服 Agent 却仍然按旧政策回答。你需要在错误继续影响客户之前，定位证据链路出了什么问题。",
     "quick": "RAG 的可靠性是整条证据管线的属性：检索分数、时效性、来源权威性、重排与上下文策略必须共同决定什么证据能进入模型。",
     "brief": {
-      "eyebrow": "INCIDENT 001 · SEV-2",
+      "eyebrow": "事故 001 · SEV-2",
       "title": "系统把昨天的事实，当成了今天的答案。",
       "role": "你是当前值班的 AI Engineer。",
       "body": "客户询问 40 天前购买的商品还能否退货。客服 Agent 拒绝了退款，并引用了一份旧政策。运营确认，两天前已经发布新版退款政策，而且新文档早已完成索引。",
@@ -49,14 +49,14 @@
     "controls": {
       "retrieval-strategy": {"label": "检索方式", "options": {"vector": "仅 Vector", "hybrid": "Hybrid"}},
       "top-k": {"label": "Top-K", "options": {"2": "2", "3": "3", "5": "5", "8": "8"}},
-      "rerank-depth": {"label": "Rerank 深度", "options": {"0": "关闭", "4": "Top 4", "6": "Top 6"}},
+      "rerank-depth": {"label": "Rerank 深度", "options": {"0": "关闭", "4": "前 4 个", "6": "前 6 个"}},
       "freshness-policy": {"label": "时效策略", "options": {"off": "关闭", "soft": "按时间衰减", "strict": "严格过滤过期证据"}},
       "authority-policy": {"label": "权威来源策略", "options": {"score-only": "只看相似度分数", "source-priority": "优先权威来源"}},
       "compression-policy": {"label": "Context 压缩", "options": {"none": "不压缩", "balanced": "平衡压缩", "aggressive": "激进压缩"}}
     },
     "metrics": [
       {"key": "staleEvidenceRiskPercent", "label": "旧证据风险", "format": "percent"},
-      {"key": "groundingScore", "label": "Grounding", "format": "score"},
+      {"key": "groundingScore", "label": "证据 Grounding", "format": "score"},
       {"key": "authoritativeCoveragePercent", "label": "权威证据覆盖", "format": "percent"},
       {"key": "contextTokens", "label": "Context Tokens", "format": "integer"},
       {"key": "latencyMs", "label": "延迟", "format": "ms"},
@@ -71,7 +71,7 @@
       "PRODUCTION_VIABLE": "具备生产可行性"
     },
     "debrief": {
-      "eyebrow": "ENGINEERING DEBRIEF",
+      "eyebrow": "工程复盘",
       "title": "真正的问题，从来不是 Context 不够多。",
       "rule": "Retrieval Quality 是整条 Pipeline 的属性。更多 Context 不等于更好的证据。",
       "body": "这次事故的根因，是过期来源在排序中压过了当前权威来源。单纯提高 Top-K 可能看起来提升了 Recall，却会继续保留错误证据，同时吞掉更多 Context。可靠的策略需要同时处理检索信号、时效性、来源权威、Rerank，以及不会损失关键细节的 Context 策略。",
