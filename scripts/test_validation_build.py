@@ -46,7 +46,7 @@ ui_source=(SITE/'assets/validation-ui.js').read_text(encoding='utf-8')
 for event in ['meaningful_interaction','failure_tradeoff_observed','aha_feedback_submitted','second_lab_started','capstone_completed','paid_intent_clicked','product_feedback_opened','product_feedback_submitted']:
     if event not in ui_source:
         raise SystemExit(f'validation-ui.js missing canonical event {event}')
-for token in ['data-product-feedback-trigger','productFeedbackDialog','mailto:hello@ahaframe.com','Something is broken','Content is confusing','Feature request']:
+for token in ['data-product-feedback-trigger','productFeedbackDialog','mailto:support@ahaframe.com','Something is broken','Content is confusing','Feature request']:
     if token not in ui_source:
         raise SystemExit(f'validation-ui.js missing product feedback/contact surface token {token}')
 
