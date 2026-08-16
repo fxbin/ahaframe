@@ -9,12 +9,12 @@
     "intro": "AhaFrame 正在验证一个更克制的付费边界：失败模拟、生产实验、Build 项目与评测挑战。当前 MVP 不会向你收款。",
     "plans": [
       {"name":"免费版","badge":"","description":"先把心智模型建立起来，再决定是否值得付费。","price":"$0","suffix":"/ 永久","items":["核心交互式心智模型","基础模拟实验","公开概念指南","本机学习进度","轮换开放的生产实验预览"],"cta":"体验评测失败实验","href":"/en/labs/evaluation-failure/","event":""},
-      {"name":"AI 工程基础版","badge":"当前推荐假设","description":"从理解系统，到形成生产环境中的工程判断。","price":"$49","suffix":"/ 一次性价格假设","items":["12 个交互式工程实验","失败模拟","3 个 Build 项目","评测挑战","基础路线长期访问"],"cta":"我会考虑一次支付 $49","href":"/zh-cn/early-access/?intent=foundations-49","event":"pricing_foundations_click"},
-      {"name":"Production Labs","badge":"未来方案假设","description":"持续增加更复杂的生产场景与高级实验。","price":"$12","suffix":"/ 月价格假设","items":["包含基础版全部内容","持续更新的生产场景","高级对比 / Replay 工作流","账号上线后的实验保存","只有真实计算能力上线后才引入 Live credits"],"cta":"我会考虑 $12/月","href":"/zh-cn/early-access/?intent=production-labs-12","event":"pricing_pro_click"}
+      {"name":"AI 工程基础版","badge":"当前推荐假设","description":"从理解系统，到形成生产环境中的工程判断。","price":"$39","suffix":"/ 一次性价格假设","items":["12 个交互式工程实验","失败模拟","3 个 Build 项目","评测挑战","基础路线长期访问"],"cta":"我会考虑一次支付 $39","href":"/zh-cn/early-access/?intent=foundations-39","event":"pricing_foundations_click"},
+      {"name":"Production Labs","badge":"未来方案假设","description":"独立订阅，持续获得更复杂的生产事故场景与高级工程工作流。","price":"$12","suffix":"/ 月价格假设","items":["高级生产事故模拟","持续增长的 Mission 库","高级对比 / Replay 工作流","账号上线后的实验保存","只有真实计算能力上线后才引入 Live credits"],"cta":"我会考虑 $12/月","href":"/zh-cn/early-access/?intent=production-labs-12","event":"pricing_pro_click"}
     ],
     "compareTitle": "你真正为什么付费？",
     "matrixHeaders": ["能力","免费版","基础版","Production Labs"],
-    "matrixRows": [["心智模型 + 概念指南","✓","✓","✓"],["基础模拟实验","部分","全部","全部"],["失败模拟","预览","✓","✓"],["Build 项目 + 评测","—","✓","✓"],["持续增长的生产实验库","—","—","✓"]],
+    "matrixRows": [["心智模型 + 概念指南","✓","✓","✓"],["完整 Foundations 路线","—","永久访问","需单独购买"],["基础失败模拟 + Build 项目","预览","✓","需单独购买"],["持续增长的生产事故实验库","预览","—","✓"],["高级对比 / Replay 工作流","—","—","✓"]],
     "sequenceTitle": "当前开发顺序",
     "sequence": [["RAG 失败实验","破坏检索、调整参数、与基线比较。","可用"],["Agent 可靠性实验","重试、限制、校验、安全与成本。","可用"],["评测失败实验","覆盖率、切片回归、安全否决、证据与发布门槛。","新"],["上下文压缩实验","Token 节省、关键信息保留、检索与记忆权衡。","下一步"],["可选账号","只有 Save / Purchase / Live Mode 真正需要身份时再引入。","以后" ]],
     "ctaTitle": "帮我们验证付费边界。",
