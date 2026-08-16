@@ -1,0 +1,153 @@
+{
+  "locale": "zh-CN",
+  "mission": {
+    "name": "发布生产客服 Agent",
+    "seoTitle": "发布生产客服 Agent — AI Engineering Final Boss | AhaFrame",
+    "description": "Final Boss：接手一个存在跨层缺陷的客服 Agent，在有限工程预算下检查证据、修改六层工程策略、重放候选版本，并为最终生产发布决策负责。",
+    "level": "Final Boss · 生产发布",
+    "layer": "Prompt × Context × Harness × Loop × Graph × Evaluation · 六层整合",
+    "minutes": 25,
+    "hero": "三次生产事故已经处理完了。现在，整个客服系统交到你手上。继承的候选版本存在真实的跨层缺陷，你只有 5 次工程变更机会，而 Launch Review 今天就要开始。",
+    "quick": "Production Readiness 是整个系统的属性：再高的平均分，也不能抵消关键 Safety Veto、薄弱证据或不安全的执行边界。",
+    "brief": {
+      "eyebrow": "FINAL BOSS · 发布评审",
+      "title": "这个候选版本看起来还不错，但它还不能发布。",
+      "role": "你是最终对生产发布决策负责的工程师。",
+      "body": "候选版本继承了你已经见过的几类问题：Instruction Authority 仍然宽松，执行策略过度自主，Graph 协调复杂度超过任务真正需要的程度，而且 Evaluation 仍偏向 Demo。与此同时，Retrieval 与 Context 并没有明显坏掉——这意味着对健康子系统乱动，同样会浪费宝贵的工程预算。",
+      "objective": "最多使用 5 次工程变更。先检查证据，修复真正具有约束力的跨层 blocker，重放候选版本并比较不同 Attempt，然后为 SHIP、BLOCK 或 INCONCLUSIVE 给出可辩护的工程理由。",
+      "stakes": "系统给出的 Release Score 只是证据之一。Safety Veto 与硬性生产约束不能被平均分冲掉。"
+    },
+    "incidentLedger": [
+      ["证据完整性", "Broken RAG 告诉你：更多 Context 并不等于更好的 Evidence。"],
+      ["不可逆操作", "$47,000 Retry 告诉你：Recovery 与 Idempotency 本质上是同一个设计问题。"],
+      ["Trust 与 Capability", "Prompt Injection 告诉你：Untrusted Data 不能因为像 Instruction 就获得运行时权力。"],
+      ["发布证据", "现在，这些边界必须在同一个 Production Decision 中同时成立。"]
+    ],
+    "ui": {
+      "start": "接手发布评审",
+      "workspace": "发布控制室",
+      "evidence": "证据控制台",
+      "policy": "工程干预",
+      "budget": "次变更机会剩余",
+      "run": "重放候选版本",
+      "reset": "重置发布评审",
+      "attempts": "候选版本尝试",
+      "noAttempts": "还没有重放任何候选版本。",
+      "release": "你的发布决策",
+      "releaseHint": "至少运行一次候选版本，然后选择 SHIP、BLOCK 或 INCONCLUSIVE，并写一段简短工程理由。",
+      "ship": "SHIP",
+      "block": "BLOCK",
+      "inconclusive": "INCONCLUSIVE",
+      "rationale": "工程理由",
+      "rationalePlaceholder": "哪些证据让这个决定可以被辩护？",
+      "rationaleRequired": "提交发布决策前，请先写一段简短理由。",
+      "submitDecision": "提交发布决策",
+      "complete": "完成 Final Boss",
+      "outcome": "模型化候选结果",
+      "waiting": "先检查继承下来的证据，再花费工程变更预算。",
+      "compared": "继承基线 → 最新尝试",
+      "blockers": "发布阻断项",
+      "warnings": "权衡警告",
+      "noBlockers": "当前没有模型化的发布阻断项。",
+      "noWarnings": "当前没有额外的模型化权衡警告。"
+    },
+    "evidenceLabels": {
+      "release-scorecard": "发布计分板",
+      "release-blockers": "硬性阻断项",
+      "tradeoff-warnings": "权衡警告",
+      "prompt-evidence": "Prompt 证据",
+      "context-evidence": "Context 证据",
+      "runtime-evidence": "Runtime 证据",
+      "graph-evidence": "Graph 证据",
+      "evaluation-evidence": "Evaluation 证据"
+    },
+    "groups": {
+      "prompt": {"label": "Prompt Authority", "intervention": "prompt-policy", "options": {"loose": "宽松指令契约", "scoped": "作用域明确的 Authority", "typed": "强类型 Prompt 契约"}},
+      "retrieval": {"label": "Retrieval", "intervention": "retrieval-policy", "options": {"cheap": "低成本 Vector Search", "balanced": "平衡型 Hybrid + Rerank", "recall": "高 Recall Hybrid"}},
+      "context": {"label": "Working Context", "intervention": "context-policy", "options": {"lean": "精简 Context", "balanced": "平衡型关键 Context 保护", "rich": "丰富 Context"}},
+      "execution": {"label": "Harness + Loop", "intervention": "execution-policy", "options": {"fast": "快速有界 Loop", "autonomous": "带校验的自主 Loop", "bounded": "有界执行 + 人工审批"}},
+      "graph": {"label": "Workflow Graph", "intervention": "graph-policy", "options": {"simple": "简单单 Loop Graph", "bounded": "有界分支 Graph", "complex": "Coordinator-heavy Graph"}},
+      "evaluation": {"label": "Release Evaluation", "intervention": "evaluation-policy", "options": {"demo": "偏 Demo 的 Evaluation", "production": "Production Evaluation", "safety": "Safety-heavy Evaluation"}}
+    },
+    "metrics": [
+      {"key": "architectureScore", "label": "架构", "format": "score"},
+      {"key": "taskReadiness", "label": "任务就绪度", "format": "score"},
+      {"key": "reliability", "label": "可靠性", "format": "score"},
+      {"key": "safety", "label": "安全", "format": "score"},
+      {"key": "latencyIndex", "label": "延迟指数", "format": "score"},
+      {"key": "costIndex", "label": "成本指数", "format": "score"}
+    ],
+    "metricLabels": {
+      "architectureScore": "架构分数",
+      "taskReadiness": "任务就绪度",
+      "reliability": "可靠性",
+      "safety": "安全就绪度",
+      "latencyIndex": "延迟指数",
+      "costIndex": "成本指数",
+      "blockerCount": "阻断项",
+      "warningCount": "警告项",
+      "instructionAdherence": "指令遵循",
+      "policyViolationRisk": "Policy 违规风险",
+      "promptQuality": "Prompt 质量",
+      "conflictCount": "Prompt 冲突",
+      "recallPercent": "Retrieval Recall",
+      "precisionPercent": "Retrieval Precision",
+      "contextTokens": "Context Tokens",
+      "overflowTokens": "Context Overflow",
+      "criticalRetentionPercent": "关键内容保留率",
+      "successPercent": "成功率",
+      "runawayPercent": "Loop 失控风险",
+      "unsafeActionPercent": "不安全操作风险",
+      "humanReviewsPer100": "每 100 次人工审核",
+      "failurePropagationPercent": "失败传播",
+      "coordinationOverhead": "协调开销",
+      "confidenceWidth": "证据区间宽度"
+    },
+    "blockers": {
+      "prompt-conflicts": "Prompt 契约仍有 {count} 个未解决冲突。",
+      "context-overflow": "Context 超出固定工作预算 {tokens} tokens。",
+      "graph-propagation": "Graph 失败传播风险为 {percent}%，超过当前模型化架构上限。",
+      "loop-runaway": "Loop 失控风险为 {percent}%，超过当前模型化执行上限。",
+      "architecture-threshold": "架构分数 {score} 低于发布阈值 {threshold}。",
+      "safety-floor": "安全就绪度 {score} 低于高后果操作要求的 {floor} 分底线。",
+      "retrieval-recall-floor": "Retrieval Recall {recall}% 低于生产证据底线。",
+      "critical-retention-floor": "关键 Context 保留率 {retention}% 低于生产底线。",
+      "cost-budget": "成本指数 {cost} 超过配置预算 {limit}。"
+    },
+    "warnings": {
+      "prompt-open": "Prompt Authority 尚未闭合；Runtime Control 无法修复含糊的 Instruction Contract。",
+      "graph-coordination": "Graph 协调开销达到 {value}；除非这种拆分已经产生可测量价值，否则应该简化。",
+      "approval-load": "Approval 改善了控制，但每 100 次模型化运行约会产生 {reviews} 次人工审核。",
+      "demo-evaluation": "偏 Demo 的 Evaluation 低估生产尾部失败；漂亮 Dashboard 仍然是很弱的发布证据。",
+      "weak-context-economics": "Context 质量不错，但 Context Economics 较弱。"
+    },
+    "outcomes": {
+      "CRITICAL_SAFETY_VETO": "触发关键 Safety Veto",
+      "RELEASE_BLOCKED": "发布被阻止",
+      "EVIDENCE_INCONCLUSIVE": "证据不足",
+      "VIABLE_BUT_OUTSIDE_OPERATING_BUDGET": "架构可行，但超出运行预算",
+      "CONSTRAINT_MISS": "生产约束未满足",
+      "PRODUCTION_VIABLE_BALANCED": "具备生产可行性 · 平衡证据策略",
+      "PRODUCTION_VIABLE_SAFETY_HEAVY": "具备生产可行性 · Safety-heavy 证据策略"
+    },
+    "debrief": {
+      "eyebrow": "最终工程复盘",
+      "title": "你优化的不是一个分数，而是在为整个系统负责。",
+      "rule": "Production Readiness 是系统属性。即使其他指标全部漂亮，Critical Veto 仍然是 Veto。",
+      "body": "继承下来的候选版本故意很有迷惑性：Retrieval 与 Context 已经相对可辩护，真正具有决定性风险的是 Prompt Authority、Execution Control、Graph Topology 与 Evaluation Evidence。因此，把预算平均花在所有子系统上并不叫“全面”，反而意味着没有识别 Binding Constraint。生产工程师要做的是找到真正限制发布的约束，进行有限修改，重放候选版本，然后用证据而不是架构潮流来辩护最终 Release Decision。",
+      "points": [
+        "先修真正具有约束力的问题，再去调一个本来健康的子系统。",
+        "Safety、Authority 与不可逆操作边界，不能被一个很高的 Architecture Score 平均掉。",
+        "只要 Evidence Posture 与 Operating Trade-off 是显式的，两种不同架构都可能同时具备生产可行性。",
+        "最终决定属于工程师；Simulator 提供 Evidence，但它没有替你批准上线的权力。"
+      ]
+    },
+    "next": {
+      "title": "你已经到达 v0.8 的内容边界。",
+      "description": "接下来 AhaFrame 不再继续堆第四个旗舰 Mission，而是进入开发者体验预览与 Validation Alpha 证据阶段。",
+      "href": "/en/early-access/",
+      "query": "?intent=validation-alpha",
+      "button": "加入 Validation Alpha"
+    }
+  }
+}
