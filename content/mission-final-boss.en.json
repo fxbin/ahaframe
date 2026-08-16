@@ -1,0 +1,153 @@
+{
+  "locale": "en",
+  "mission": {
+    "name": "Ship the Production Support Agent",
+    "seoTitle": "Ship the Production Support Agent — AI Engineering Final Boss | AhaFrame",
+    "description": "Final Boss: inspect a flawed support Agent, spend a finite engineering budget across six AI engineering layers, replay the candidate, and defend a production release decision.",
+    "level": "Final Boss · Production Launch",
+    "layer": "Prompt × Context × Harness × Loop × Graph × Evaluation",
+    "minutes": 25,
+    "hero": "Three incidents are behind you. Now the whole support system is yours. The inherited candidate has real cross-layer weaknesses, five engineering changes are available, and launch review starts today.",
+    "quick": "Production readiness is a system property: a strong average score cannot cancel a critical safety veto, weak evidence, or an unsafe execution boundary.",
+    "brief": {
+      "eyebrow": "FINAL BOSS · LAUNCH REVIEW",
+      "title": "The candidate looks plausible. It is not ready to ship.",
+      "role": "You are the engineer accountable for the production launch decision.",
+      "body": "The candidate inherits the same failure families you have already seen: instruction authority is loose, execution is too autonomous, graph coordination is heavier than the task earns, and evaluation is still demo-biased. Retrieval and context are not obviously broken, which makes unnecessary changes expensive distractions.",
+      "objective": "Use at most five engineering changes. Inspect evidence first, repair the highest-leverage cross-layer blockers, replay the candidate, compare attempts, then defend SHIP, BLOCK, or INCONCLUSIVE.",
+      "stakes": "A release score is advisory. Safety vetoes and hard production constraints cannot be averaged away."
+    },
+    "incidentLedger": [
+      ["Evidence integrity", "Broken RAG taught you that more context is not better evidence."],
+      ["Irreversible actions", "$47,000 Retry taught you that recovery and idempotency are one design problem."],
+      ["Trust and capability", "Prompt Injection taught you that untrusted data must not acquire runtime authority."],
+      ["Launch evidence", "Now all of those boundaries must coexist inside one production decision."]
+    ],
+    "ui": {
+      "start": "Take ownership",
+      "workspace": "Launch control room",
+      "evidence": "Evidence console",
+      "policy": "Engineering interventions",
+      "budget": "change points left",
+      "run": "Replay candidate",
+      "reset": "Reset launch review",
+      "attempts": "Candidate attempts",
+      "noAttempts": "No candidate replay yet.",
+      "release": "Your release decision",
+      "releaseHint": "Run at least one candidate, then choose SHIP, BLOCK, or INCONCLUSIVE and give a short engineering rationale.",
+      "ship": "SHIP",
+      "block": "BLOCK",
+      "inconclusive": "INCONCLUSIVE",
+      "rationale": "Engineering rationale",
+      "rationalePlaceholder": "What evidence makes this decision defensible?",
+      "rationaleRequired": "Write a short rationale before submitting the release decision.",
+      "submitDecision": "Submit release decision",
+      "complete": "Complete Final Boss",
+      "outcome": "Modeled candidate outcome",
+      "waiting": "Inspect the inherited evidence before spending change budget.",
+      "compared": "Inherited baseline → latest attempt",
+      "blockers": "Release blockers",
+      "warnings": "Trade-off warnings",
+      "noBlockers": "No modeled release blockers.",
+      "noWarnings": "No additional modeled warnings."
+    },
+    "evidenceLabels": {
+      "release-scorecard": "Release scorecard",
+      "release-blockers": "Hard blockers",
+      "tradeoff-warnings": "Trade-off warnings",
+      "prompt-evidence": "Prompt evidence",
+      "context-evidence": "Context evidence",
+      "runtime-evidence": "Runtime evidence",
+      "graph-evidence": "Graph evidence",
+      "evaluation-evidence": "Evaluation evidence"
+    },
+    "groups": {
+      "prompt": {"label": "Prompt authority", "intervention": "prompt-policy", "options": {"loose": "Loose instruction contract", "scoped": "Scoped authority", "typed": "Typed prompt contract"}},
+      "retrieval": {"label": "Retrieval", "intervention": "retrieval-policy", "options": {"cheap": "Cheap vector search", "balanced": "Balanced hybrid + rerank", "recall": "Recall-heavy hybrid"}},
+      "context": {"label": "Working context", "intervention": "context-policy", "options": {"lean": "Lean context", "balanced": "Balanced protected context", "rich": "Rich context"}},
+      "execution": {"label": "Harness + Loop", "intervention": "execution-policy", "options": {"fast": "Fast bounded loop", "autonomous": "Validated autonomous loop", "bounded": "Bounded + approval"}},
+      "graph": {"label": "Workflow graph", "intervention": "graph-policy", "options": {"simple": "Simple single-loop graph", "bounded": "Bounded branched graph", "complex": "Coordinator-heavy graph"}},
+      "evaluation": {"label": "Release evaluation", "intervention": "evaluation-policy", "options": {"demo": "Demo-biased evaluation", "production": "Production evaluation", "safety": "Safety-heavy evaluation"}}
+    },
+    "metrics": [
+      {"key": "architectureScore", "label": "Architecture", "format": "score"},
+      {"key": "taskReadiness", "label": "Task readiness", "format": "score"},
+      {"key": "reliability", "label": "Reliability", "format": "score"},
+      {"key": "safety", "label": "Safety", "format": "score"},
+      {"key": "latencyIndex", "label": "Latency index", "format": "score"},
+      {"key": "costIndex", "label": "Cost index", "format": "score"}
+    ],
+    "metricLabels": {
+      "architectureScore": "Architecture score",
+      "taskReadiness": "Task readiness",
+      "reliability": "Reliability",
+      "safety": "Safety readiness",
+      "latencyIndex": "Latency index",
+      "costIndex": "Cost index",
+      "blockerCount": "Blockers",
+      "warningCount": "Warnings",
+      "instructionAdherence": "Instruction adherence",
+      "policyViolationRisk": "Policy violation risk",
+      "promptQuality": "Prompt quality",
+      "conflictCount": "Prompt conflicts",
+      "recallPercent": "Retrieval recall",
+      "precisionPercent": "Retrieval precision",
+      "contextTokens": "Context tokens",
+      "overflowTokens": "Context overflow",
+      "criticalRetentionPercent": "Critical retention",
+      "successPercent": "Success rate",
+      "runawayPercent": "Runaway risk",
+      "unsafeActionPercent": "Unsafe action risk",
+      "humanReviewsPer100": "Human reviews / 100",
+      "failurePropagationPercent": "Failure propagation",
+      "coordinationOverhead": "Coordination overhead",
+      "confidenceWidth": "Evidence width"
+    },
+    "blockers": {
+      "prompt-conflicts": "Prompt contract still has {count} unresolved conflict(s).",
+      "context-overflow": "Context exceeds the fixed working budget by {tokens} tokens.",
+      "graph-propagation": "Graph failure propagation is {percent}%, above the modeled architecture limit.",
+      "loop-runaway": "Loop runaway risk is {percent}%, above the modeled execution limit.",
+      "architecture-threshold": "Architecture score {score} is below the {threshold} release threshold.",
+      "safety-floor": "Safety readiness {score} is below the {floor}-point consequential-action floor.",
+      "retrieval-recall-floor": "Retrieval recall {recall}% is below the production evidence floor.",
+      "critical-retention-floor": "Critical context retention {retention}% is below the production floor.",
+      "cost-budget": "Cost index {cost} exceeds the configured budget of {limit}."
+    },
+    "warnings": {
+      "prompt-open": "Prompt authority is not fully closed; runtime controls cannot repair an ambiguous instruction contract.",
+      "graph-coordination": "Graph coordination overhead is {value}; simplify unless decomposition creates measured value.",
+      "approval-load": "Approval improves control but creates about {reviews} reviews per 100 modeled runs.",
+      "demo-evaluation": "Demo evaluation underweights production-tail failures; a positive dashboard is weak release evidence.",
+      "weak-context-economics": "Context quality is strong but context economics are weak."
+    },
+    "outcomes": {
+      "CRITICAL_SAFETY_VETO": "Critical safety veto",
+      "RELEASE_BLOCKED": "Release blocked",
+      "EVIDENCE_INCONCLUSIVE": "Evidence inconclusive",
+      "VIABLE_BUT_OUTSIDE_OPERATING_BUDGET": "Viable, but outside operating budget",
+      "CONSTRAINT_MISS": "Production constraint miss",
+      "PRODUCTION_VIABLE_BALANCED": "Production viable · balanced evidence",
+      "PRODUCTION_VIABLE_SAFETY_HEAVY": "Production viable · safety-heavy evidence"
+    },
+    "debrief": {
+      "eyebrow": "FINAL ENGINEERING DEBRIEF",
+      "title": "You were not optimizing a score. You were defending a system.",
+      "rule": "Production readiness is a system property. Critical vetoes remain vetoes even when every other metric looks excellent.",
+      "body": "The inherited candidate was intentionally deceptive: retrieval and context were already defensible, while Prompt authority, execution control, graph topology, and evaluation evidence carried the decisive risk. Spending budget on every subsystem is therefore not a sign of thoroughness; it is a failure to prioritize evidence. A production engineer must identify the binding constraints, make bounded changes, replay the candidate, and defend the release decision with evidence rather than architecture fashion.",
+      "points": [
+        "Fix the binding constraint before tuning a healthy subsystem.",
+        "Safety, authority, and irreversible-action boundaries cannot be averaged away by a high architecture score.",
+        "Two architectures can both be viable when their evidence posture and operating trade-offs are explicit.",
+        "The final decision belongs to the engineer; the simulator provides evidence, not permission to ship."
+      ]
+    },
+    "next": {
+      "title": "You have reached the v0.8 content boundary.",
+      "description": "AhaFrame now moves from content construction to developer preview and Validation Alpha evidence.",
+      "href": "/en/early-access/",
+      "query": "?intent=validation-alpha",
+      "button": "Join Validation Alpha"
+    }
+  }
+}
