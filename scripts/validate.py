@@ -29,8 +29,8 @@ for locale in SUPPORTED_LOCALES:
     for relative in load_locale_source(locale).get("availableRoutes",[]):
         EXPECTED_HTML.add(route_file(locale,relative))
 
+LANDING_HTML=route_files("")
 INTERACTIVE_RELATIVES={
-    "",
     "lessons/token-playground/","lessons/context-window/","lessons/agent-loop/",
     "labs/rag-failure/","labs/agent-reliability/","labs/evaluation-failure/",
     "labs/context-compression/","labs/instruction-conflict/","labs/agent-workflow-graph/",
@@ -111,6 +111,14 @@ for file in html_files:
     for script in soup.find_all("script",attrs={"type":"application/ld+json"}):
         try: json.loads(script.string or script.get_text())
         except Exception as exc: errors.append(f"{rel}: invalid JSON-LD: {exc}")
+
+    if rel in LANDING_HTML:
+        scripts=[node.get("src") for node in soup.find_all("script",src=True)]
+        if "/assets/home.js" not in scripts: errors.append(f"{rel}: missing homepage runtime")
+        if "/assets/lab-engine.js" in scripts or "/assets/lab-scenarios.js" in scripts: errors.append(f"{rel}: landing page must not eagerly load Lab Engine runtime")
+        if "/assets/validation-ui.js" in scripts: errors.append(f"{rel}: landing page must lazy-load validation UI")
+        stylesheets=[node.get("href") for node in soup.find_all("link",attrs={"rel":"stylesheet"})]
+        if "/assets/home.css" not in stylesheets: errors.append(f"{rel}: missing homepage-specific stylesheet")
 
     if rel in INTERACTIVE_HTML:
         scripts=[node.get("src") for node in soup.find_all("script",src=True)]; engine="/assets/lab-engine.js"; scenarios="/assets/lab-scenarios.js"
