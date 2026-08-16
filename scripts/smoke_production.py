@@ -180,6 +180,17 @@ def main():
         'attribution': {'source': 'github-actions', 'runId': run_id, 'cohortId': cohort},
         'submittedAt': now,
     }
+    product_feedback = {
+        **common,
+        'productFeedbackId': f'smoke-product-feedback-{run_id}',
+        'pageType': 'lab',
+        'feedbackType': 'other',
+        'message': 'production smoke test global product feedback persistence',
+        'email': '',
+        'pageUrl': base + '/zh-cn/labs/instruction-conflict/',
+        'attribution': {'source': 'github-actions', 'runId': run_id, 'cohortId': cohort},
+        'submittedAt': now,
+    }
     waitlist = {
         **common,
         'email': f'ahaframe-smoke+{run_id}@example.invalid',
@@ -192,7 +203,12 @@ def main():
         'referrer': '',
     }
 
-    for label, payload in [('event', event), ('feedback', feedback), ('waitlist', waitlist)]:
+    for label, payload in [
+        ('event', event),
+        ('feedback', feedback),
+        ('product_feedback', product_feedback),
+        ('waitlist', waitlist),
+    ]:
         status, body, headers = request(endpoint, method='POST', body=payload, origin=origin)
         expect(status, 200, f'validation {label}', body)
         try:
@@ -204,7 +220,11 @@ def main():
         print(f'PASS POST {label}: {parsed}')
 
     print(f'PASS AhaFrame bilingual production smoke run_id={run_id} cohort={cohort}')
-    print(f'Expected DB IDs with locale=zh-CN and cohort_id={cohort}: smoke-event-{run_id}, smoke-feedback-{run_id}, ahaframe-smoke+{run_id}@example.invalid')
+    print(
+        f'Expected DB IDs with locale=zh-CN and cohort_id={cohort}: '
+        f'smoke-event-{run_id}, smoke-feedback-{run_id}, smoke-product-feedback-{run_id}, '
+        f'ahaframe-smoke+{run_id}@example.invalid'
+    )
 
 
 if __name__ == '__main__':
