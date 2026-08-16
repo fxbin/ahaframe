@@ -1,6 +1,6 @@
 # AhaFrame Product Spec — v0.3 Content MVP + Platform Launch
 
-Date: 2026-08-13
+Date: 2026-08-16
 Status: active product source of truth
 
 ## Product thesis
@@ -247,7 +247,7 @@ The product should reward defensible architecture, not framework boilerplate cop
 
 ```text
 Free                       $0
-AI Engineer Foundations    $49 one-time hypothesis
+AI Engineer Foundations    $39 one-time hypothesis
 Production Labs            $12/month future hypothesis
 ```
 
@@ -261,11 +261,25 @@ Production Labs            $12/month future hypothesis
 
 ### Paid capability boundary
 
-- full failure simulations;
-- Production Labs;
-- Build Projects;
+The two paid offers are deliberately separate entitlements rather than a nested subscription ladder.
+
+**AI Engineer Foundations — one-time lifetime entitlement**
+
+- complete Foundations track;
+- full foundational failure simulations;
+- 3 Build Projects;
 - evaluation challenges;
-- later: durable cloud checkpoints and Live Mode capabilities.
+- lifetime access to the purchased Foundations track.
+
+**Production Labs — time-bounded subscription entitlement**
+
+- advanced production incident simulations;
+- continuously growing Mission library;
+- advanced compare / replay workflows;
+- later: durable cloud checkpoints and saved experiments;
+- later: Live Mode capabilities when real metered compute exists.
+
+Production Labs does **not** include or grant the Foundations purchase. A learner who owns Foundations keeps that lifetime entitlement if a later Production Labs subscription expires.
 
 Pricing remains a hypothesis until users make real payment decisions.
 
@@ -435,6 +449,8 @@ Production Labs subscription      → time-bounded entitlement
 future explicit support/admin grant → entitlement
 Compute Credits                    → ledger balance, not entitlement
 ```
+
+The Production Labs entitlement does not imply a Foundations entitlement, and expiration of Production Labs never revokes an independently purchased lifetime Foundations entitlement.
 
 Application access checks read AhaFrame-owned entitlement state and do not synchronously call Waffo on every request.
 
