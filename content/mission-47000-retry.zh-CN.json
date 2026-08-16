@@ -97,7 +97,8 @@
       "title": "想继续处理更多生产事故？",
       "description": "加入 Early Access，获取新的 Production Labs 与事故 Mission。",
       "button": "加入 Early Access",
-      "href": "/zh-cn/early-access/?intent=agent-reliability-production-labs",
+      "href": "/en/early-access/",
+      "query": "?intent=agent-reliability-production-labs",
       "event": "agent_reliability_paid_intent_click"
     }
   }
