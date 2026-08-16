@@ -23,21 +23,29 @@ for key in ['analyticsEndpoint','waitlistEndpoint','feedbackEndpoint']:
     if key not in parsed:
         raise SystemExit(f'config.js missing {key}')
 
-landing=SITE/'en/index.html'
-landing_source=landing.read_text(encoding='utf-8')
-landing_soup=BeautifulSoup(landing_source,'html.parser')
-landing_scripts=[node.get('src') for node in landing_soup.find_all('script',src=True)]
 landing_expected=['/assets/config.js','/assets/validation-context.js','/assets/app.js','/assets/home.js']
-for item in landing_expected:
-    if item not in landing_scripts:
-        raise SystemExit(f'{landing.relative_to(SITE)} missing {item}')
-for item in ['/assets/validation-ui.js','/assets/lab-engine.js','/assets/lab-scenarios.js']:
-    if item in landing_scripts:
-        raise SystemExit(f'{landing.relative_to(SITE)} eagerly loads {item}')
-if 'data-ahaframe-feedback-bootstrap' not in landing_source or "script.src='/assets/validation-ui.js'" not in landing_source:
-    raise SystemExit(f'{landing.relative_to(SITE)} missing lazy product feedback bootstrap')
-if 'mailto:support@ahaframe.com' not in landing_source:
-    raise SystemExit(f'{landing.relative_to(SITE)} missing support contact surface')
+for landing in [SITE/'index.html',SITE/'en/index.html']:
+    landing_source=landing.read_text(encoding='utf-8')
+    landing_soup=BeautifulSoup(landing_source,'html.parser')
+    landing_scripts=[node.get('src') for node in landing_soup.find_all('script',src=True)]
+    for item in landing_expected:
+        if item not in landing_scripts:
+            raise SystemExit(f'{landing.relative_to(SITE)} missing {item}')
+    for item in ['/assets/validation-ui.js','/assets/lab-engine.js','/assets/lab-scenarios.js']:
+        if item in landing_scripts:
+            raise SystemExit(f'{landing.relative_to(SITE)} eagerly loads {item}')
+    if 'http-equiv="refresh"' in landing_source.lower():
+        raise SystemExit(f'{landing.relative_to(SITE)} must not use meta refresh')
+    if 'data-ahaframe-feedback-bootstrap' not in landing_source or "script.src='/assets/validation-ui.js'" not in landing_source:
+        raise SystemExit(f'{landing.relative_to(SITE)} missing lazy product feedback bootstrap')
+    if 'mailto:support@ahaframe.com' not in landing_source:
+        raise SystemExit(f'{landing.relative_to(SITE)} missing support contact surface')
+    stylesheets=[node.get('href') for node in landing_soup.find_all('link',attrs={'rel':'stylesheet'})]
+    if '/assets/home.css' not in stylesheets:
+        raise SystemExit(f'{landing.relative_to(SITE)} missing homepage-specific stylesheet')
+
+if (SITE/'index.html').read_text(encoding='utf-8') != (SITE/'en/index.html').read_text(encoding='utf-8'):
+    raise SystemExit('root landing must directly serve the optimized English homepage')
 
 pages=[SITE/'en/pricing/index.html',SITE/'en/early-access/index.html']
 pages+=sorted((SITE/'en/labs').glob('*/index.html'))
@@ -103,4 +111,4 @@ backend=subprocess.run([sys.executable,str(ROOT/'scripts/test_validation_backend
 if backend.returncode:
     raise SystemExit(f'validation backend contract failed\n{backend.stdout}\n{backend.stderr}')
 
-print(f'PASS Validation Build: lean landing validation, {len(pages)} full-runtime generated pages, anonymous context, semantic analytics, production-ready Early Access conversion, Aha feedback, global product feedback/contact UX, the truthful $39 Foundations / separate Production Labs pricing contract, Lab Engine, and the storage backend contract.')
+print(f'PASS Validation Build: direct root + lean localized landing validation, {len(pages)} full-runtime generated pages, anonymous context, semantic analytics, production-ready Early Access conversion, Aha feedback, global product feedback/contact UX, the truthful $39 Foundations / separate Production Labs pricing contract, Lab Engine, and the storage backend contract.')
