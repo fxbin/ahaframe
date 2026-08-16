@@ -37,8 +37,7 @@ def assert_common(en,zh):
 
 
 def assert_legacy(en,zh,en_scripts):
-    for required in ['/assets/agent-reliability.js']:
-        assert required in en_scripts, required
+    assert '/assets/agent-reliability.js' in en_scripts
     en_mount=en.select_one('[data-agent-reliability-lab]');zh_mount=zh.select_one('[data-agent-reliability-lab]')
     assert en_mount is not None and zh_mount is not None
     en_copy=json.loads(en_mount['data-agent-reliability-copy']);zh_copy=json.loads(zh_mount['data-agent-reliability-copy'])
@@ -73,8 +72,9 @@ def assert_mission(en,zh,en_scripts):
     scenario=(SITE/'assets'/'47000-retry-scenario.js').read_text(encoding='utf-8')
     mission=(SITE/'assets'/'47000-retry-mission.js').read_text(encoding='utf-8')
     adapter=(SITE/'assets'/'47000-retry.js').read_text(encoding='utf-8')
-    for asset_text in (scenario,mission,adapter):
-        assert 'zh-CN' not in asset_text and '/zh-cn/' not in asset_text, 'locale logic leaked into Retry Mission runtime'
+    for machine_asset in (scenario,mission):
+        assert 'zh-CN' not in machine_asset and '/zh-cn/' not in machine_asset, 'locale logic leaked into Retry Mission machine model'
+    assert '/zh-cn/' not in adapter, 'locale-specific route leaked into shared Retry adapter'
     assert "id:'47000-retry-scenario'" in scenario
     assert "id:'47000-retry'" in mission
     assert "agent_reliability_parameter_changed" in adapter
