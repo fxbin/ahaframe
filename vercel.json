@@ -4,11 +4,10 @@
   "outputDirectory": "site",
   "cleanUrls": true,
   "trailingSlash": true,
-  "redirects": [
+  "rewrites": [
     {
       "source": "/",
-      "destination": "/en/",
-      "permanent": false
+      "destination": "/en/"
     }
   ],
   "headers": [
