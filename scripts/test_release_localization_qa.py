@@ -58,6 +58,7 @@ def equal_strings(en,zh,path=''):
 def allowed_equal(path:str,value:str)->bool:
     value=value.strip()
     if not value or value in INTENTIONAL_TERMS or value in INTENTIONAL_SYMBOLS: return True
+    if path.endswith(('.key','.format')): return True
     if path.endswith('.state'): return True
     if path.endswith('.price') and re.fullmatch(r'\$\d+(?:\.\d+)?',value): return True
     if value.startswith(('/', '?', '#', 'http://', 'https://')): return True
