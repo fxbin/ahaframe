@@ -6,15 +6,15 @@
     "kicker": "Pricing validation",
     "headlineBefore": "Learn the concepts free. Pay for",
     "headlineAccent": "engineering capability",
-    "intro": "AhaFrame is testing a lower-friction paid layer around failure simulations, production labs, build projects, and evaluation. No payment is collected in this MVP.",
+    "intro": "AhaFrame is testing a paid layer around flagship production incidents, a cross-layer Final Boss, interactive foundations, and evaluation. No payment is collected in this MVP.",
     "plans": [
       {"name":"Free","badge":"","description":"Build the mental models before paying for anything.","price":"$0","suffix":"/ forever","items":["Core interactive mental models","Foundational simulations","Public concept guides","Local progress tracking","Rotating production-lab previews"],"cta":"Try Evaluation Failure Lab","href":"/en/labs/evaluation-failure/","event":""},
-      {"name":"AI Engineer Foundations","badge":"Recommended hypothesis","description":"A focused path from understanding to production intuition.","price":"$39","suffix":"/ one-time concept","items":["12 interactive engineering labs","Failure simulations","3 build projects","Evaluation challenges","Lifetime access to the Foundations track"],"cta":"I’d consider $39 once","href":"/en/early-access/?intent=foundations-39","event":"pricing_foundations_click"},
+      {"name":"AI Engineer Foundations","badge":"Recommended hypothesis","description":"A focused path from understanding to production intuition.","price":"$39","suffix":"/ one-time concept","items":["3 flagship production incidents","1 cross-layer Final Boss","Interactive Foundations + specialist labs","Evaluation and release-decision challenges","Lifetime access as the Foundations track expands"],"cta":"I’d consider $39 once","href":"/en/early-access/?intent=foundations-39","event":"pricing_foundations_click"},
       {"name":"Production Labs","badge":"Future hypothesis","description":"A separate subscription for continuously growing advanced production incidents and workflows.","price":"$12","suffix":"/ month concept","items":["Advanced production incident simulations","Continuously growing Mission library","Advanced compare / replay workflows","Saved experiments when accounts launch","Live-model credits only when enabled"],"cta":"I’d consider $12/month","href":"/en/early-access/?intent=production-labs-12","event":"pricing_pro_click"}
     ],
     "compareTitle": "What are you paying for?",
     "matrixHeaders": ["Capability","Free","Foundations","Production Labs"],
-    "matrixRows": [["Mental models + concept guides","✓","✓","✓"],["Complete Foundations track","—","Lifetime","Separate purchase"],["Foundational failure simulations + builds","Preview","✓","Separate purchase"],["Growing production incident library","Preview","—","✓"],["Advanced compare / replay workflows","—","—","✓"]],
+    "matrixRows": [["Mental models + concept guides","✓","✓","✓"],["Flagship incidents + Final Boss","Preview","✓","Separate purchase"],["Interactive Foundations + specialist labs","Selected","✓","Separate purchase"],["Growing production incident library","Preview","—","✓"],["Advanced compare / replay workflows","—","—","✓"]],
     "sequenceTitle": "Development sequence",
     "sequence": [["RAG Failure Lab","Break retrieval, tune it, compare it.","Available"],["Agent Reliability Lab","Retries, limits, validation, safety, cost.","Available"],["Evaluation Failure Lab","Dataset coverage, regressions, vetoes, evidence, release gates.","New"],["Context Compression Lab","Token savings, retained evidence, retrieval, memory trade-offs.","Next"],["Optional accounts","Only when Save / Purchase / Live Mode needs identity.","Later"]],
     "ctaTitle": "Help validate the paid layer.",

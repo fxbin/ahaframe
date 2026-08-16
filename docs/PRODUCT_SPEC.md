@@ -265,11 +265,15 @@ The two paid offers are deliberately separate entitlements rather than a nested 
 
 **AI Engineer Foundations — one-time lifetime entitlement**
 
-- complete Foundations track;
-- full foundational failure simulations;
-- 3 Build Projects;
-- evaluation challenges;
-- lifetime access to the purchased Foundations track.
+The public pricing promise must describe what is actually shipped in production, not a future course-count target. During the current validation phase that means:
+
+- 3 flagship production-incident Missions;
+- 1 cross-layer Final Boss;
+- interactive Foundations and specialist Labs already available in the product;
+- evaluation and release-decision challenges;
+- lifetime access as the Foundations track expands.
+
+Do not market fixed counts such as `12 interactive labs` or `3 Build Projects` until those counts are genuinely shipped and available to the purchaser.
 
 **Production Labs — time-bounded subscription entitlement**
 
