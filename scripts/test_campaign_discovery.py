@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 from bs4 import BeautifulSoup
 
@@ -73,6 +74,24 @@ def main():
             localized(BY_ID[item_id]['route'],locale) for item_id in EXPECTED_CAMPAIGN
         ]
 
+    llms=(SITE/'llms.txt').read_text(encoding='utf-8')
+    assert llms.startswith('# AhaFrame\n\n> '), 'llms.txt must start with the required H1 and summary blockquote'
+    bullet_lines=[line for line in llms.splitlines() if line.startswith('- ')]
+    markdown_link_pattern=re.compile(r'^- \[[^\]\n]+\]\(https?://[^)\s]+\): .+$')
+    assert len(bullet_lines)>=20, 'llms.txt should expose a useful curated set of discovery links'
+    assert all(markdown_link_pattern.match(line) for line in bullet_lines), 'every llms.txt bullet must be a Markdown link with a description'
+    assert not re.search(r'^- https?://',llms,flags=re.M), 'llms.txt must not regress to bare URL bullets'
+    for required in [
+        '/en/labs/rag-failure/',
+        '/en/labs/agent-reliability/',
+        '/en/labs/instruction-conflict/',
+        '/en/build/reliable-support-agent/',
+        '/zh-cn/labs/rag-failure/',
+        '/en/pricing/',
+        '/en/early-access/',
+    ]:
+        assert required in llms, f'llms.txt missing discovery route {required}'
+
     runtime=(ROOT/'src'/'assets'/'home.js').read_text(encoding='utf-8')
     assert "homepage_flagship_impression" in runtime
     assert "homepage_flagship_click" in runtime
@@ -83,7 +102,7 @@ def main():
     assert '.campaign-grid{grid-template-columns:1fr!important}' in css
     assert '.campaign-boss{grid-template-columns:1fr;display:grid}' in css
 
-    print('PASS Campaign discovery: contract-driven 4-step Mission path, direct Hero incident entry, 10-item Knowledge Map, locale parity, mobile layout, and decision-useful flagship analytics.')
+    print('PASS Campaign discovery: contract-driven 4-step Mission path, direct Hero incident entry, 10-item Knowledge Map, llms.txt Markdown discovery links, locale parity, mobile layout, and decision-useful flagship analytics.')
 
 
 if __name__=='__main__':
