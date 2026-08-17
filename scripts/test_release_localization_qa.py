@@ -114,7 +114,7 @@ def test_sitemap_and_geo():
     tree=ET.parse(SITE/'sitemap.xml'); ns={'sm':'http://www.sitemaps.org/schemas/sitemap/0.9','x':'http://www.w3.org/1999/xhtml'}; nodes=tree.findall('sm:url',ns)
     expected={BASE+p for relative in PUBLIC_ROUTE_RELATIVES for p in equivalent_paths(f'/en/{relative}').values()}; actual={n.find('sm:loc',ns).text for n in nodes}; assert actual==expected,f'sitemap mismatch missing={expected-actual} extra={actual-expected}'
     for node in nodes: assert {x.attrib.get('hreflang') for x in node.findall('x:link',ns)}=={'en','zh-CN','x-default'},node.find('sm:loc',ns).text
-    llms=(SITE/'llms.txt').read_text(encoding='utf-8'); assert f'{BASE}/zh-cn/' in llms and '简体中文学习入口' in llms
+    llms=(SITE/'llms.txt').read_text(encoding='utf-8'); assert f'({BASE}/zh-cn/)' in llms and '## 简体中文' in llms
 
 
 def test_shared_runtime_and_backend_contract():
