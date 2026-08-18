@@ -14,142 +14,53 @@ concurrency:
 
 permissions:
   contents: read
-  actions: read
 
 jobs:
-  cloud-core-validation:
-    name: cloud-core-validation
-    runs-on: ubuntu-latest
-    continue-on-error: true
-    steps:
-      - uses: actions/checkout@v4
-      - uses: ./.github/actions/core-validation
-
-  cloud-validation-read-models:
-    name: cloud-validation-read-models
-    runs-on: ubuntu-latest
-    continue-on-error: true
-    services:
-      postgres:
-        image: postgres:17
-        env:
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: ahaframe_test
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd "pg_isready -U postgres -d ahaframe_test"
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 10
-    steps:
-      - uses: actions/checkout@v4
-      - uses: ./.github/actions/validation-read-models
-
-  route-cloud-results:
-    name: route-cloud-results
-    needs: [cloud-core-validation, cloud-validation-read-models]
-    if: ${{ always() }}
+  select-runner:
+    name: select-runner
     runs-on: [self-hosted, linux, x64]
     outputs:
-      core: ${{ steps.core.outputs.core }}
-      read_models: ${{ steps.read_models.outputs.read_models }}
+      runner: ${{ steps.select.outputs.runner }}
+      mode: ${{ steps.select.outputs.mode }}
+      reason: ${{ steps.select.outputs.reason }}
     steps:
       - uses: actions/checkout@v4
-      - name: Classify cloud core validation
-        id: core
+      - name: Select CI runner
+        id: select
         env:
-          GITHUB_TOKEN: ${{ github.token }}
-        run: python3 .github/scripts/classify-cloud-job.py --job cloud-core-validation --output core
-      - name: Classify cloud read-model validation
-        id: read_models
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        run: python3 .github/scripts/classify-cloud-job.py --job cloud-validation-read-models --output read_models
-
-  fallback-core-validation:
-    name: fallback-core-validation
-    needs: route-cloud-results
-    if: ${{ needs.route-cloud-results.outputs.core == 'fallback' }}
-    runs-on: [self-hosted, linux, x64]
-    steps:
-      - uses: actions/checkout@v4
-      - uses: ./.github/actions/core-validation
-
-  fallback-validation-read-models:
-    name: fallback-validation-read-models
-    needs: route-cloud-results
-    if: ${{ needs.route-cloud-results.outputs.read_models == 'fallback' }}
-    runs-on: [self-hosted, linux, x64]
-    services:
-      postgres:
-        image: postgres:17
-        env:
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: ahaframe_test
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd "pg_isready -U postgres -d ahaframe_test"
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 10
-    steps:
-      - uses: actions/checkout@v4
-      - uses: ./.github/actions/validation-read-models
+          GH_BILLING_READ_TOKEN: ${{ secrets.GH_BILLING_READ_TOKEN }}
+          ACTIONS_CLOUD_RESERVE_MINUTES: '60'
+        run: python3 .github/scripts/select-ci-runner.py
+      - name: Report selection
+        run: |
+          echo "Runner mode: ${{ steps.select.outputs.mode }}"
+          echo "Reason: ${{ steps.select.outputs.reason }}"
 
   validate:
     name: validate
-    needs: [route-cloud-results, fallback-core-validation]
-    if: ${{ always() }}
-    runs-on: [self-hosted, linux, x64]
+    needs: select-runner
+    runs-on: ${{ fromJSON(needs.select-runner.outputs.runner) }}
     steps:
-      - name: Enforce core validation result
-        env:
-          CLOUD_STATE: ${{ needs.route-cloud-results.outputs.core }}
-          FALLBACK_RESULT: ${{ needs.fallback-core-validation.result }}
-        run: |
-          case "$CLOUD_STATE" in
-            passed)
-              echo 'Core validation passed on GitHub-hosted runner.'
-              ;;
-            fallback)
-              if [ "$FALLBACK_RESULT" != 'success' ]; then
-                echo "Self-hosted core fallback did not pass: $FALLBACK_RESULT"
-                exit 1
-              fi
-              echo 'Core validation passed on self-hosted fallback.'
-              ;;
-            *)
-              echo "Core validation failed in code or could not be classified: $CLOUD_STATE"
-              exit 1
-              ;;
-          esac
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/core-validation
 
   validation-read-models:
     name: validation-read-models
-    needs: [route-cloud-results, fallback-validation-read-models]
-    if: ${{ always() }}
-    runs-on: [self-hosted, linux, x64]
-    steps:
-      - name: Enforce read-model validation result
+    needs: select-runner
+    runs-on: ${{ fromJSON(needs.select-runner.outputs.runner) }}
+    services:
+      postgres:
+        image: postgres:17
         env:
-          CLOUD_STATE: ${{ needs.route-cloud-results.outputs.read_models }}
-          FALLBACK_RESULT: ${{ needs.fallback-validation-read-models.result }}
-        run: |
-          case "$CLOUD_STATE" in
-            passed)
-              echo 'Validation read models passed on GitHub-hosted runner.'
-              ;;
-            fallback)
-              if [ "$FALLBACK_RESULT" != 'success' ]; then
-                echo "Self-hosted read-model fallback did not pass: $FALLBACK_RESULT"
-                exit 1
-              fi
-              echo 'Validation read models passed on self-hosted fallback.'
-              ;;
-            *)
-              echo "Validation read models failed in code or could not be classified: $CLOUD_STATE"
-              exit 1
-              ;;
-          esac
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: ahaframe_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d ahaframe_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/validation-read-models
