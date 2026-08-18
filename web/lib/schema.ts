@@ -13,6 +13,14 @@ export function campaignSchemas(locale: Locale, content: CampaignDiscoveryConten
   return [
     {
       "@context": "https://schema.org",
+      "@type": "Organization",
+      "@id": `${BASE_URL}/#organization`,
+      name: "AhaFrame",
+      url: BASE_URL,
+      description: "Interactive visual lessons for understanding and building AI systems.",
+    },
+    {
+      "@context": "https://schema.org",
       "@type": "WebSite",
       name: "AhaFrame",
       url: absolute(locale),
