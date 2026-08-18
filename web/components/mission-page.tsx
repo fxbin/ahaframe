@@ -1,0 +1,58 @@
+import Link from "next/link";
+import { localizedPath, type Locale } from "@/lib/content";
+import type { MissionContent } from "@/lib/mission";
+
+interface MissionPageProps {
+  locale: Locale;
+  mission: MissionContent;
+}
+
+export function MissionPage({ locale, mission }: MissionPageProps) {
+  const controls = mission.controls ?? mission.groups ?? {};
+
+  return (
+    <main className="py-12 sm:py-16">
+      <section className="shell">
+        <div className="flex flex-wrap items-center gap-2 text-xs font-bold uppercase tracking-[0.12em] text-[var(--muted)]"><span>{mission.layer}</span><span>·</span><span>{mission.level}</span><span>·</span><span>{mission.minutes} min</span></div>
+        <h1 className="mt-4 max-w-5xl text-5xl font-black leading-[0.98] tracking-[-0.055em] sm:text-6xl">{mission.name}</h1>
+        <p className="mt-5 max-w-4xl text-lg leading-8 text-[var(--muted)]">{mission.hero}</p>
+
+        <article className="mt-10 rounded-[28px] bg-[var(--text)] p-7 text-white sm:p-9">
+          <div className="text-xs font-extrabold uppercase tracking-[0.14em] text-[var(--accent)]">{mission.brief.eyebrow}</div>
+          <h2 className="mt-3 max-w-4xl text-3xl font-black tracking-[-0.04em]">{mission.brief.title}</h2>
+          <p className="mt-3 text-sm font-bold text-white/80">{mission.brief.role}</p>
+          <p className="mt-5 max-w-4xl text-lg leading-8 text-white/65">{mission.brief.body}</p>
+          <div className="mt-7 grid gap-3 md:grid-cols-2"><div className="rounded-2xl border border-white/10 bg-white/5 p-5"><div className="text-xs font-bold uppercase tracking-[0.1em] text-white/45">Objective</div><p className="mt-2 text-sm leading-6 text-white/75">{mission.brief.objective}</p></div><div className="rounded-2xl border border-white/10 bg-white/5 p-5"><div className="text-xs font-bold uppercase tracking-[0.1em] text-white/45">Stakes</div><p className="mt-2 text-sm leading-6 text-white/75">{mission.brief.stakes}</p></div></div>
+        </article>
+
+        <div className="mt-4 grid gap-4 lg:grid-cols-[1.2fr_.8fr]">
+          <section className="rounded-[28px] border border-[var(--border)] bg-white p-6 sm:p-8">
+            <div className="flex flex-wrap items-center justify-between gap-3"><div><div className="text-xs font-bold uppercase tracking-[0.12em] text-[var(--primary)]">{mission.ui.workspace ?? "Mission workspace"}</div><h2 className="mt-1 text-2xl font-black tracking-[-0.04em]">{mission.ui.policy ?? "Engineering policy"}</h2></div><span className="rounded-full bg-[var(--surface-soft)] px-3 py-1 text-xs text-[var(--muted)]">M2 · content parity</span></div>
+            <div className="mt-6 grid gap-3 sm:grid-cols-2">{Object.entries(controls).map(([key, control]) => <div key={key} className="rounded-2xl bg-[var(--surface-soft)] p-4"><div className="text-xs font-bold uppercase tracking-[0.09em] text-[var(--muted)]">{control.label}</div><div className="mt-3 flex flex-wrap gap-2">{Object.values(control.options).map((option) => <span key={option} className="rounded-full border border-[var(--border)] bg-white px-3 py-1.5 text-xs">{option}</span>)}</div></div>)}</div>
+            <div className="mt-6 rounded-2xl border border-dashed border-[var(--primary)] bg-[color-mix(in_srgb,var(--primary)_5%,white)] p-4 text-sm leading-6 text-[var(--muted)]"><strong className="text-[var(--text)]">M3 interaction boundary:</strong> this route already uses the current Mission copy and control contract. #28 will mount the existing deterministic Mission/Lab Engine rather than duplicate its state machine in React.</div>
+          </section>
+
+          <aside className="space-y-4">
+            <div className="rounded-[26px] border border-[var(--border)] bg-white p-6"><div className="text-xs font-bold uppercase tracking-[0.1em] text-[var(--primary)]">In one sentence</div><p className="mt-3 text-lg font-semibold leading-7">{mission.quick}</p></div>
+            <div className="rounded-[26px] border border-[var(--border)] bg-white p-6"><div className="text-xs font-bold uppercase tracking-[0.1em] text-[var(--primary)]">{mission.ui.evidence ?? "Evidence"}</div><div className="mt-4 flex flex-wrap gap-2">{Object.values(mission.evidenceLabels).map((label) => <span key={label} className="rounded-full bg-[var(--surface-soft)] px-3 py-1.5 text-xs text-[var(--muted)]">{label}</span>)}</div></div>
+            <div className="rounded-[26px] border border-[var(--border)] bg-white p-6"><div className="text-xs font-bold uppercase tracking-[0.1em] text-[var(--primary)]">Metrics</div><div className="mt-4 grid grid-cols-2 gap-2">{mission.metrics.map((metric) => <div key={metric.key} className="rounded-xl bg-[var(--surface-soft)] p-3 text-xs font-semibold">{metric.label}</div>)}</div></div>
+          </aside>
+        </div>
+      </section>
+
+      {mission.incidentLedger?.length ? <section className="shell mt-16"><h2 className="text-3xl font-black tracking-[-0.04em]">Incident ledger</h2><div className="mt-6 grid gap-3 md:grid-cols-2">{mission.incidentLedger.map(([title, body]) => <article key={title} className="rounded-[22px] border border-[var(--border)] bg-white p-5"><h3 className="font-bold">{title}</h3><p className="mt-2 text-sm leading-6 text-[var(--muted)]">{body}</p></article>)}</div></section> : null}
+
+      {mission.takeaways?.length ? <section className="shell mt-16"><h2 className="text-3xl font-black tracking-[-0.04em]">Key takeaways</h2><div className="mt-6 grid gap-3 md:grid-cols-3">{mission.takeaways.map(([title, body]) => <article key={title} className="rounded-[22px] border border-[var(--border)] bg-white p-5"><h3 className="font-bold">{title}</h3><p className="mt-2 text-sm leading-6 text-[var(--muted)]">{body}</p></article>)}</div></section> : null}
+
+      <section className="shell mt-16 grid gap-10 lg:grid-cols-[.7fr_1.3fr]">
+        <div><p className="text-xs font-bold uppercase tracking-[0.12em] text-[var(--primary)]">{mission.debrief.eyebrow}</p><h2 className="mt-3 text-3xl font-black tracking-[-0.04em]">{mission.debrief.title}</h2><p className="mt-4 font-semibold leading-7">{mission.debrief.rule}</p></div>
+        <div><p className="leading-8 text-[var(--muted)]">{mission.debrief.body}</p><ul className="mt-6 space-y-3">{mission.debrief.points.map((point) => <li key={point} className="flex gap-3 rounded-2xl bg-white p-4 text-sm leading-6"><span className="font-bold text-[var(--primary)]">✓</span><span>{point}</span></li>)}</ul></div>
+      </section>
+
+      <section className="shell mt-16 grid gap-4 lg:grid-cols-2">
+        <div className="rounded-[26px] bg-[var(--surface-soft)] p-7"><h2 className="text-2xl font-black tracking-[-0.04em]">{mission.next.title}</h2><p className="mt-3 leading-7 text-[var(--muted)]">{mission.next.description}</p><Link className="mt-5 inline-flex rounded-full bg-[var(--text)] px-5 py-3 text-sm font-bold text-white" href={`${localizedPath(mission.next.href, locale)}${mission.next.query ?? ""}`}>{mission.next.button}</Link></div>
+        {mission.earlyAccess ? <div className="rounded-[26px] border border-[var(--border)] bg-white p-7"><h2 className="text-2xl font-black tracking-[-0.04em]">{mission.earlyAccess.title}</h2><p className="mt-3 leading-7 text-[var(--muted)]">{mission.earlyAccess.description}</p><Link className="mt-5 inline-flex rounded-full border border-[var(--border)] px-5 py-3 text-sm font-bold" href={`${localizedPath(mission.earlyAccess.href, locale)}${mission.earlyAccess.query ?? ""}`}>{mission.earlyAccess.button}</Link></div> : null}
+      </section>
+    </main>
+  );
+}
