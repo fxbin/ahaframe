@@ -1,20 +1,19 @@
-import type { Metadata } from "next";
-import type { MetadataRoute } from "next";
+import type { Metadata, MetadataRoute } from "next";
+import { INDEXING_ENABLED } from "@/.generated/build-mode";
 
 export function indexingEnabled(): boolean {
-  return process.env.AHAFRAME_BUILD_INDEXING_ENABLED === "1";
+  return INDEXING_ENABLED;
 }
 
 export function indexingMetadata(): Metadata["robots"] {
-  const enabled = indexingEnabled();
   return {
-    index: enabled,
-    follow: enabled,
+    index: INDEXING_ENABLED,
+    follow: INDEXING_ENABLED,
   };
 }
 
 export function indexingRobotsRules(): MetadataRoute.Robots["rules"] {
-  return indexingEnabled()
+  return INDEXING_ENABLED
     ? { userAgent: "*", allow: "/" }
     : { userAgent: "*", disallow: "/" };
 }
