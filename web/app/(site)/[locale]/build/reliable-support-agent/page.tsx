@@ -29,7 +29,7 @@ export default async function ReliableSupportAgentRoute({ params }: PageProps) {
   return (
     <>
       <StructuredData value={missionSchema(locale, "build/reliable-support-agent/", mission)} />
-      <MissionPage locale={locale} mission={mission} />
+      <MissionPage locale={locale} mission={mission} experienceKey="reliable-support-agent" />
     </>
   );
 }

@@ -1,15 +1,17 @@
 import Link from "next/link";
+import { MissionRuntimeWorkspace } from "@/components/runtime/mission-runtime-workspace";
 import { localizedPath, type Locale } from "@/lib/content";
 import type { MissionContent } from "@/lib/mission";
+import type { RuntimeExperienceKey } from "@/lib/runtime-manifest";
 import { commonUi } from "@/lib/ui-copy";
 
 interface MissionPageProps {
   locale: Locale;
   mission: MissionContent;
+  experienceKey: RuntimeExperienceKey;
 }
 
-export function MissionPage({ locale, mission }: MissionPageProps) {
-  const controls = mission.controls ?? mission.groups ?? {};
+export function MissionPage({ locale, mission, experienceKey }: MissionPageProps) {
   const copy = commonUi(locale);
 
   return (
@@ -27,19 +29,10 @@ export function MissionPage({ locale, mission }: MissionPageProps) {
           <div className="mt-7 grid gap-3 md:grid-cols-2"><div className="rounded-2xl border border-white/10 bg-white/5 p-5"><div className="text-xs font-bold uppercase tracking-[0.1em] text-white/45">{copy.objective}</div><p className="mt-2 text-sm leading-6 text-white/75">{mission.brief.objective}</p></div><div className="rounded-2xl border border-white/10 bg-white/5 p-5"><div className="text-xs font-bold uppercase tracking-[0.1em] text-white/45">{copy.stakes}</div><p className="mt-2 text-sm leading-6 text-white/75">{mission.brief.stakes}</p></div></div>
         </article>
 
-        <div className="mt-4 grid gap-4 lg:grid-cols-[1.2fr_.8fr]">
-          <section className="rounded-[28px] border border-[var(--border)] bg-white p-6 sm:p-8">
-            <div><div className="text-xs font-bold uppercase tracking-[0.12em] text-[var(--primary)]">{mission.ui.workspace ?? mission.name}</div><h2 className="mt-1 text-2xl font-black tracking-[-0.04em]">{mission.ui.policy ?? copy.objective}</h2></div>
-            <div className="mt-6 grid gap-3 sm:grid-cols-2">{Object.entries(controls).map(([key, control]) => <div key={key} className="rounded-2xl bg-[var(--surface-soft)] p-4"><div className="text-xs font-bold uppercase tracking-[0.09em] text-[var(--muted)]">{control.label}</div><div className="mt-3 flex flex-wrap gap-2">{Object.values(control.options).map((option) => <span key={option} className="rounded-full border border-[var(--border)] bg-white px-3 py-1.5 text-xs">{option}</span>)}</div></div>)}</div>
-          </section>
-
-          <aside className="space-y-4">
-            <div className="rounded-[26px] border border-[var(--border)] bg-white p-6"><div className="text-xs font-bold uppercase tracking-[0.1em] text-[var(--primary)]">{copy.inOneSentence}</div><p className="mt-3 text-lg font-semibold leading-7">{mission.quick}</p></div>
-            <div className="rounded-[26px] border border-[var(--border)] bg-white p-6"><div className="text-xs font-bold uppercase tracking-[0.1em] text-[var(--primary)]">{mission.ui.evidence ?? copy.evidence}</div><div className="mt-4 flex flex-wrap gap-2">{Object.values(mission.evidenceLabels).map((label) => <span key={label} className="rounded-full bg-[var(--surface-soft)] px-3 py-1.5 text-xs text-[var(--muted)]">{label}</span>)}</div></div>
-            <div className="rounded-[26px] border border-[var(--border)] bg-white p-6"><div className="text-xs font-bold uppercase tracking-[0.1em] text-[var(--primary)]">{copy.metrics}</div><div className="mt-4 grid grid-cols-2 gap-2">{mission.metrics.map((metric) => <div key={metric.key} className="rounded-xl bg-[var(--surface-soft)] p-3 text-xs font-semibold">{metric.label}</div>)}</div></div>
-          </aside>
-        </div>
+        <div className="mt-4 rounded-[24px] border border-[var(--border)] bg-white p-6"><div className="text-xs font-bold uppercase tracking-[0.1em] text-[var(--primary)]">{copy.inOneSentence}</div><p className="mt-3 max-w-4xl text-lg font-semibold leading-7">{mission.quick}</p></div>
       </section>
+
+      <section className="shell mt-8"><MissionRuntimeWorkspace locale={locale} mission={mission} experienceKey={experienceKey} /></section>
 
       {mission.incidentLedger?.length ? <section className="shell mt-16"><h2 className="text-3xl font-black tracking-[-0.04em]">{copy.incidentLedger}</h2><div className="mt-6 grid gap-3 md:grid-cols-2">{mission.incidentLedger.map(([title, body]) => <article key={title} className="rounded-[22px] border border-[var(--border)] bg-white p-5"><h3 className="font-bold">{title}</h3><p className="mt-2 text-sm leading-6 text-[var(--muted)]">{body}</p></article>)}</div></section> : null}
 

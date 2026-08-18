@@ -6,6 +6,7 @@ import { StructuredData } from "@/components/structured-data";
 import { getLabContent, localeFromSegment } from "@/lib/content";
 import { pageMetadata } from "@/lib/metadata";
 import { getMissionContent } from "@/lib/mission";
+import { hasRuntimeExperience } from "@/lib/runtime-manifest";
 import { labSchema, missionSchema } from "@/lib/schema";
 
 const LAB_SLUGS = [
@@ -47,10 +48,11 @@ export default async function LabRoute({ params }: PageProps) {
 
   const mission = await getMissionContent(locale, slug);
   if (mission) {
+    if (!hasRuntimeExperience(slug)) notFound();
     return (
       <>
         <StructuredData value={missionSchema(locale, `labs/${slug}/`, mission)} />
-        <MissionPage locale={locale} mission={mission} />
+        <MissionPage locale={locale} mission={mission} experienceKey={slug} />
       </>
     );
   }
@@ -60,7 +62,7 @@ export default async function LabRoute({ params }: PageProps) {
   return (
     <>
       <StructuredData value={labSchema(locale, slug, lab)} />
-      <LabPage locale={locale} lab={lab} />
+      <LabPage locale={locale} lab={lab} experienceKey={hasRuntimeExperience(slug) ? slug : undefined} />
     </>
   );
 }

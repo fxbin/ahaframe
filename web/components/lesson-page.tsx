@@ -1,10 +1,13 @@
 import Link from "next/link";
+import { FoundationRuntimeWorkspace } from "@/components/runtime/foundation-runtime-workspace";
 import { localizedPath, type FoundationContent, type LessonContent, type Locale } from "@/lib/content";
+import type { RuntimeExperienceKey } from "@/lib/runtime-manifest";
 
 interface LessonPageProps {
   locale: Locale;
   ui: FoundationContent["ui"];
   lesson: LessonContent;
+  experienceKey?: RuntimeExperienceKey;
 }
 
 type LessonPathStep = LessonContent["path"][number];
@@ -31,7 +34,7 @@ function resolveLessonPath(lesson: LessonContent): LessonPathStep[] {
   throw new Error(`Lesson path contract missing for ${lesson.name}: expected path or nodes + timeline.`);
 }
 
-export function LessonPage({ locale, ui, lesson }: LessonPageProps) {
+export function LessonPage({ locale, ui, lesson, experienceKey }: LessonPageProps) {
   const lessonPath = resolveLessonPath(lesson);
 
   return (
@@ -57,6 +60,8 @@ export function LessonPage({ locale, ui, lesson }: LessonPageProps) {
           </aside>
         </div>
       </section>
+
+      {experienceKey ? <section className="shell mt-16"><FoundationRuntimeWorkspace locale={locale} experienceKey={experienceKey} /></section> : null}
 
       <section className="shell mt-16">
         <h2 className="text-3xl font-black tracking-[-0.04em]">{ui.keyTakeaways}</h2>

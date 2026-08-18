@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "assets": [
+    "lab-engine.js",
+    "lab-scenarios.js",
+    "instruction-conflict-scenario.js",
+    "context-compression-scenario.js",
+    "agent-workflow-graph-scenario.js",
+    "evaluation-scenario.js",
+    "mission-engine.js",
+    "broken-rag-pipeline-scenario.js",
+    "broken-rag-pipeline-mission.js",
+    "47000-retry-scenario.js",
+    "47000-retry-mission.js",
+    "prompt-injection-attack-scenario.js",
+    "prompt-injection-attack-mission.js",
+    "reliable-support-scenario.js",
+    "production-support-launch-mission.js"
+  ]
+}
