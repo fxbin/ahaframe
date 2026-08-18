@@ -16,7 +16,7 @@ export function PricingPage({ locale, content }: MarketingPageProps) {
       <section className="shell">
         <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-[var(--primary)]">{pricing.kicker}</p>
         <h1 className="mt-4 max-w-4xl text-5xl font-black leading-[0.98] tracking-[-0.055em] sm:text-6xl">
-          {pricing.headlineBefore} <span className="text-[var(--primary)]">{pricing.headlineAccent}</span>
+          {pricing.headlineBefore} <span className="text-[var(--primary)]">{pricing.headlineAccent}</span>.
         </h1>
         <p className="mt-6 max-w-3xl text-lg leading-8 text-[var(--muted)]">{pricing.intro}</p>
 
@@ -68,7 +68,7 @@ export function EarlyAccessPage({ locale, content }: MarketingPageProps) {
       <section className="shell grid gap-12 lg:grid-cols-[1fr_.85fr]">
         <div>
           <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-[var(--primary)]">{page.eyebrow}</p>
-          <h1 className="mt-4 text-5xl font-black leading-[0.98] tracking-[-0.055em] sm:text-6xl">{page.headlineBefore} <span className="text-[var(--primary)]">{page.headlineAccent}</span></h1>
+          <h1 className="mt-4 text-5xl font-black leading-[0.98] tracking-[-0.055em] sm:text-6xl">{page.headlineBefore} <span className="text-[var(--primary)]">{page.headlineAccent}</span>.</h1>
           <p className="mt-6 max-w-2xl text-lg leading-8 text-[var(--muted)]">{page.intro}</p>
           <div className="mt-8 grid gap-3">{page.cards.map(([number, title, description]) => <div key={number} className="rounded-[22px] border border-[var(--border)] bg-white p-5"><div className="text-xs font-bold text-[var(--primary)]">{number}</div><div className="mt-2 font-bold">{title}</div><div className="mt-1 text-sm leading-6 text-[var(--muted)]">{description}</div></div>)}</div>
         </div>
