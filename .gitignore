@@ -7,6 +7,7 @@ dist/
 coverage/
 *.log
 site/
+web/.generated/
 web/public/runtime/
 web/public/assets/build-meta.json
 __pycache__/
