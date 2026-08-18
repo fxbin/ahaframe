@@ -34,14 +34,15 @@ const gitCommitRef =
   "unknown";
 
 const environment = process.env.VERCEL_ENV || process.env.AHAFRAME_BUILD_ENV || (process.env.CI ? "ci" : "local");
+const indexingEnabled = process.env.AHAFRAME_INDEXING_ENABLED === "1";
 const targetDir = resolve(process.cwd(), "public", "assets");
 const target = resolve(targetDir, "build-meta.json");
 
 await mkdir(targetDir, { recursive: true });
 await writeFile(
   target,
-  `${JSON.stringify({ schemaVersion: 1, gitCommitSha, gitCommitRef, environment }, null, 2)}\n`,
+  `${JSON.stringify({ schemaVersion: 1, gitCommitSha, gitCommitRef, environment, indexingEnabled }, null, 2)}\n`,
   "utf8",
 );
 
-console.log(`Wrote Next release marker ${gitCommitSha} (${environment}) to public/assets/build-meta.json.`);
+console.log(`Wrote Next release marker ${gitCommitSha} (${environment}, indexing=${indexingEnabled ? "enabled" : "blocked"}) to public/assets/build-meta.json.`);
