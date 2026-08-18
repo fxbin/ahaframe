@@ -5,6 +5,8 @@ import type { MissionContent } from "@/lib/mission";
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") || "https://ahaframe.com";
 const UPDATED = process.env.AHAFRAME_UPDATED || "2026-08-13";
 
+type LearningEntity = Pick<LessonContent | LabContent | MissionContent, "name" | "description" | "level" | "minutes">;
+
 function absolute(locale: Locale, relativePath = ""): string {
   return `${BASE_URL}/${segmentForLocale(locale)}/${relativePath.replace(/^\/+/, "")}`;
 }
@@ -103,36 +105,74 @@ export function lessonSchema(locale: Locale, slug: string, lesson: LessonContent
   ];
 }
 
-export function labSchema(locale: Locale, slug: string, lab: LabContent) {
-  return {
-    "@context": "https://schema.org",
-    "@type": "LearningResource",
-    name: lab.name,
-    description: lab.description,
-    url: absolute(locale, `labs/${slug}/`),
-    inLanguage: locale,
-    educationalLevel: lab.level,
-    learningResourceType: "Interactive AI engineering production lab",
-    timeRequired: `PT${lab.minutes}M`,
-    isAccessibleForFree: true,
-  };
+export function productionLabSchemas(
+  locale: Locale,
+  slug: string,
+  entity: LearningEntity,
+  productionLabsLabel: string,
+) {
+  const root = absolute(locale);
+  const url = absolute(locale, `labs/${slug}/`);
+  return [
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebPage",
+          "@id": `${url}#webpage`,
+          url,
+          name: entity.name,
+          description: entity.description,
+          inLanguage: locale,
+          dateModified: UPDATED,
+          mainEntity: { "@id": `${url}#learning-resource` },
+        },
+        {
+          "@type": "LearningResource",
+          "@id": `${url}#learning-resource`,
+          name: entity.name,
+          description: entity.description,
+          url,
+          inLanguage: locale,
+          educationalLevel: entity.level,
+          learningResourceType: "Interactive simulation",
+          timeRequired: `PT${entity.minutes}M`,
+          isAccessibleForFree: true,
+          publisher: { "@id": `${BASE_URL}/#organization` },
+        },
+      ],
+    },
+    breadcrumbSchema([
+      ["AhaFrame", root],
+      [productionLabsLabel, `${root}#production-labs`],
+      [entity.name, url],
+    ]),
+  ];
 }
 
-export function missionSchema(locale: Locale, relativePath: string, mission: MissionContent) {
-  return {
-    "@context": "https://schema.org",
-    "@type": "LearningResource",
-    name: mission.name,
-    description: mission.description,
-    url: absolute(locale, relativePath),
-    inLanguage: locale,
-    educationalLevel: mission.level,
-    learningResourceType: mission.level.includes("Final Boss")
-      ? "Interactive production launch challenge"
-      : "Interactive production incident Mission",
-    timeRequired: `PT${mission.minutes}M`,
-    isAccessibleForFree: true,
-  };
+export function finalBossSchemas(locale: Locale, mission: MissionContent) {
+  const root = absolute(locale);
+  const url = absolute(locale, "build/reliable-support-agent/");
+  const finalBossLabel = locale === "en" ? "Final Boss" : "最终挑战";
+  return [
+    {
+      "@context": "https://schema.org",
+      "@type": "LearningResource",
+      name: mission.name,
+      description: mission.description,
+      url,
+      inLanguage: locale,
+      educationalLevel: mission.level,
+      learningResourceType: "Interactive production launch challenge",
+      timeRequired: `PT${mission.minutes}M`,
+      isAccessibleForFree: true,
+    },
+    breadcrumbSchema([
+      ["AhaFrame", root],
+      [finalBossLabel, url],
+      [mission.name, url],
+    ]),
+  ];
 }
 
 export function webPageSchema(locale: Locale, relativePath: string, name: string, description: string) {
