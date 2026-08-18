@@ -6,6 +6,7 @@ import { ThirdPartyAnalytics } from "@/components/third-party-analytics";
 import { SiteFrame } from "@/components/site-frame";
 import { ValidationBootstrap } from "@/components/validation-bootstrap";
 import { getLocaleSource, localeFromSegment, SUPPORTED_SEGMENTS } from "@/lib/content";
+import { indexingMetadata } from "@/lib/indexing";
 import { organizationSchema } from "@/lib/schema";
 import "../../globals.css";
 
@@ -15,10 +16,7 @@ export const metadata: Metadata = {
     template: "%s | AhaFrame",
   },
   description: "Interactive AI Engineering labs for developers becoming AI engineers.",
-  robots: {
-    index: false,
-    follow: false,
-  },
+  robots: indexingMetadata(),
 };
 
 export function generateStaticParams() {
