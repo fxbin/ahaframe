@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { Locale, LocaleSource } from "@/lib/content";
 
@@ -21,12 +22,12 @@ export function LocaleSwitch({ locale, labels }: LocaleSwitchProps) {
   const otherLocale: Locale = locale === "en" ? "zh-CN" : "en";
 
   return (
-    <a
+    <Link
       className="inline-flex items-center rounded-full border border-[var(--border)] bg-white px-3 py-1.5 text-sm text-[var(--muted)] transition hover:border-[var(--primary)] hover:text-[var(--primary)]"
       href={targetPath(pathname, otherLocale)}
       hrefLang={otherLocale}
     >
       {labels[otherLocale]}
-    </a>
+    </Link>
   );
 }
