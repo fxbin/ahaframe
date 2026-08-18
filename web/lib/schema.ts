@@ -3,9 +3,23 @@ import type { CampaignContract, CampaignDiscoveryContent } from "@/lib/campaign"
 import type { MissionContent } from "@/lib/mission";
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") || "https://ahaframe.com";
+const UPDATED = process.env.AHAFRAME_UPDATED || "2026-08-13";
 
 function absolute(locale: Locale, relativePath = ""): string {
   return `${BASE_URL}/${segmentForLocale(locale)}/${relativePath.replace(/^\/+/, "")}`;
+}
+
+function breadcrumbSchema(items: Array<[string, string]>) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: items.map(([name, item], index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name,
+      item,
+    })),
+  };
 }
 
 export function organizationSchema() {
@@ -49,19 +63,44 @@ export function campaignSchemas(locale: Locale, content: CampaignDiscoveryConten
   ];
 }
 
-export function lessonSchema(locale: Locale, slug: string, lesson: LessonContent) {
-  return {
-    "@context": "https://schema.org",
-    "@type": "LearningResource",
-    name: lesson.name,
-    description: lesson.description,
-    url: absolute(locale, `lessons/${slug}/`),
-    inLanguage: locale,
-    educationalLevel: lesson.level,
-    learningResourceType: "Interactive AI engineering lesson",
-    timeRequired: `PT${lesson.minutes}M`,
-    isAccessibleForFree: true,
-  };
+export function lessonSchema(locale: Locale, slug: string, lesson: LessonContent, lessonsLabel: string) {
+  const root = absolute(locale);
+  const url = absolute(locale, `lessons/${slug}/`);
+  return [
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebPage",
+          "@id": `${url}#webpage`,
+          url,
+          name: lesson.name,
+          description: lesson.description,
+          inLanguage: locale,
+          dateModified: UPDATED,
+          mainEntity: { "@id": `${url}#learning-resource` },
+        },
+        {
+          "@type": "LearningResource",
+          "@id": `${url}#learning-resource`,
+          name: lesson.name,
+          description: lesson.description,
+          url,
+          inLanguage: locale,
+          educationalLevel: lesson.level,
+          learningResourceType: "Interactive resource",
+          timeRequired: `PT${lesson.minutes}M`,
+          isAccessibleForFree: true,
+          publisher: { "@id": `${BASE_URL}/#organization` },
+        },
+      ],
+    },
+    breadcrumbSchema([
+      ["AhaFrame", root],
+      [lessonsLabel, `${root}#lessons`],
+      [lesson.name, url],
+    ]),
+  ];
 }
 
 export function labSchema(locale: Locale, slug: string, lab: LabContent) {
