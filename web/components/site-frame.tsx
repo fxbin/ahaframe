@@ -16,15 +16,15 @@ export function SiteFrame({ locale, source, children }: SiteFrameProps) {
   return (
     <>
       <header className="sticky top-0 z-50 border-b border-[var(--border)] bg-[color-mix(in_srgb,var(--bg)_92%,transparent)] backdrop-blur-xl">
-        <div className="shell flex min-h-17 items-center justify-between gap-5">
+        <div className="shell flex min-h-[68px] items-center justify-between gap-5">
           <Link className="text-lg font-black tracking-[-0.04em]" href={home}>
             {source.brand}
           </Link>
           <nav className="hidden items-center gap-6 text-sm text-[var(--muted)] md:flex" aria-label="Primary navigation">
-            <Link className="transition hover:text-[var(--text)]" href={`${home}#foundations`}>
+            <Link className="transition hover:text-[var(--text)]" href={`${home}#campaign`}>
               {source.ui.nav.lessons}
             </Link>
-            <Link className="transition hover:text-[var(--text)]" href={`${home}#stack`}>
+            <Link className="transition hover:text-[var(--text)]" href={`${home}#roadmap`}>
               {source.ui.nav.roadmap}
             </Link>
             <Link className="transition hover:text-[var(--text)]" href={`/${segment}/pricing/`}>
