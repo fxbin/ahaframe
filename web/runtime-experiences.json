@@ -1,0 +1,55 @@
+{
+  "version": 1,
+  "experiences": {
+    "token-playground": {
+      "kind": "lab",
+      "runtimeId": "token-playground",
+      "scripts": ["lab-engine.js", "lab-scenarios.js"]
+    },
+    "context-window": {
+      "kind": "lab",
+      "runtimeId": "context-window",
+      "scripts": ["lab-engine.js", "lab-scenarios.js"]
+    },
+    "agent-loop": {
+      "kind": "lab",
+      "runtimeId": "agent-loop",
+      "scripts": ["lab-engine.js", "lab-scenarios.js"]
+    },
+    "context-compression": {
+      "kind": "lab",
+      "runtimeId": "context-compression",
+      "scripts": ["lab-engine.js", "context-compression-scenario.js"]
+    },
+    "agent-workflow-graph": {
+      "kind": "lab",
+      "runtimeId": "agent-workflow-graph",
+      "scripts": ["lab-engine.js", "agent-workflow-graph-scenario.js"]
+    },
+    "evaluation-failure": {
+      "kind": "lab",
+      "runtimeId": "evaluation-failure",
+      "scripts": ["lab-engine.js", "evaluation-scenario.js"]
+    },
+    "rag-failure": {
+      "kind": "mission",
+      "runtimeId": "broken-rag-pipeline",
+      "scripts": ["lab-engine.js", "broken-rag-pipeline-scenario.js", "mission-engine.js", "broken-rag-pipeline-mission.js"]
+    },
+    "agent-reliability": {
+      "kind": "mission",
+      "runtimeId": "47000-retry",
+      "scripts": ["lab-engine.js", "47000-retry-scenario.js", "mission-engine.js", "47000-retry-mission.js"]
+    },
+    "instruction-conflict": {
+      "kind": "mission",
+      "runtimeId": "prompt-injection-attack",
+      "scripts": ["lab-engine.js", "prompt-injection-attack-scenario.js", "mission-engine.js", "prompt-injection-attack-mission.js"]
+    },
+    "reliable-support-agent": {
+      "kind": "mission",
+      "runtimeId": "production-support-launch",
+      "scripts": ["lab-engine.js", "reliable-support-scenario.js", "mission-engine.js", "production-support-launch-mission.js"]
+    }
+  }
+}

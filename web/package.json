@@ -8,10 +8,11 @@
   "scripts": {
     "sync:runtime": "node scripts/sync-runtime-assets.mjs",
     "check:runtime": "node scripts/check-runtime-assets.mjs",
-    "predev": "npm run sync:runtime && npm run check:runtime",
+    "check:experiences": "node scripts/check-runtime-experiences.mjs",
+    "predev": "npm run sync:runtime && npm run check:runtime && npm run check:experiences",
     "dev": "next dev",
     "check:routes": "node scripts/check-route-parity.mjs",
-    "build": "npm run check:routes && npm run sync:runtime && npm run check:runtime && next build",
+    "build": "npm run check:routes && npm run sync:runtime && npm run check:runtime && npm run check:experiences && next build",
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit"
