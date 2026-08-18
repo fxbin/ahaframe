@@ -74,7 +74,7 @@ test.describe("AhaFrame deterministic interaction adapters", () => {
     await page.getByRole("button", { name: "Proceed to release decision" }).click();
     await expect(page.getByText("DECIDE", { exact: true })).toBeVisible();
     await page.getByRole("button", { name: "BLOCK", exact: true }).click();
-    await expect(page.getByRole("alert")).toContainText("Write a short rationale before submitting the release decision.");
+    await expect(page.getByText("Write a short rationale before submitting the release decision.", { exact: true })).toBeVisible();
     await expect(page.getByText("DECIDE", { exact: true })).toBeVisible();
 
     await page.getByPlaceholder("What evidence makes this decision defensible?").fill("Critical safety and execution blockers remain unresolved in the current candidate.");
