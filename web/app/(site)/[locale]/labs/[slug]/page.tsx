@@ -48,10 +48,11 @@ export default async function LabRoute({ params }: PageProps) {
 
   const mission = await getMissionContent(locale, slug);
   if (mission) {
+    if (!hasRuntimeExperience(slug)) notFound();
     return (
       <>
         <StructuredData value={missionSchema(locale, `labs/${slug}/`, mission)} />
-        <MissionPage locale={locale} mission={mission} />
+        <MissionPage locale={locale} mission={mission} experienceKey={slug} />
       </>
     );
   }
