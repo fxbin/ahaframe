@@ -20,7 +20,7 @@ jobs:
       mode: ${{ steps.select.outputs.mode }}
       reason: ${{ steps.select.outputs.reason }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Select CI runner
         id: select
         env:
@@ -37,7 +37,7 @@ jobs:
     needs: select-runner
     runs-on: ${{ fromJSON(needs.select-runner.outputs.runner) }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: ./.github/actions/core-validation
 
   validation-read-models:
@@ -58,5 +58,5 @@ jobs:
           --health-timeout 5s
           --health-retries 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: ./.github/actions/validation-read-models

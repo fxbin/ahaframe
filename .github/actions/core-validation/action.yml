@@ -4,12 +4,13 @@ description: Shared validation steps for GitHub-hosted and self-hosted runners.
 runs:
   using: composite
   steps:
-    - uses: actions/setup-python@v5
+    - uses: actions/setup-python@v6
       with:
         python-version: '3.13'
-    - uses: actions/setup-node@v4
+    - uses: actions/setup-node@v5
       with:
         node-version: '24'
+        package-manager-cache: false
     - name: Install validation dependencies
       shell: bash
       run: pip install -r requirements-dev.txt

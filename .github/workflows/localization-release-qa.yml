@@ -20,7 +20,7 @@ jobs:
       mode: ${{ steps.select.outputs.mode }}
       reason: ${{ steps.select.outputs.reason }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Select CI runner
         id: select
         env:
@@ -37,5 +37,5 @@ jobs:
     needs: select-runner
     runs-on: ${{ fromJSON(needs.select-runner.outputs.runner) }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: ./.github/actions/localization-release-qa
