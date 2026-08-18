@@ -20,40 +20,16 @@ permissions:
   contents: read
 
 jobs:
-  select-runner:
-    name: select-runner
+  smoke:
     if: >-
       github.event_name == 'workflow_dispatch' ||
       github.event.workflow_run.conclusion == 'success'
-    runs-on: self-hosted
-    outputs:
-      runner: ${{ steps.select.outputs.runner }}
-      mode: ${{ steps.select.outputs.mode }}
-      reason: ${{ steps.select.outputs.reason }}
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
         with:
           ref: ${{ github.event.workflow_run.head_sha || github.sha }}
-      - name: Select CI runner
-        id: select
-        env:
-          GH_BILLING_READ_TOKEN: ${{ secrets.GH_BILLING_READ_TOKEN }}
-          ACTIONS_INCLUDED_MINUTES: '2000'
-          ACTIONS_CLOUD_RESERVE_MINUTES: '120'
-        run: python3 .github/scripts/select-ci-runner.py
-      - name: Report selection
-        run: |
-          echo "Runner mode: ${{ steps.select.outputs.mode }}"
-          echo "Reason: ${{ steps.select.outputs.reason }}"
-
-  smoke:
-    needs: select-runner
-    runs-on: ${{ fromJSON(needs.select-runner.outputs.runner) }}
-    steps:
-      - uses: actions/checkout@v5
-        with:
-          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
-      - uses: ./.github/actions/setup-python-runtime
+      - uses: actions/setup-python@v6
         with:
           python-version: '3.13'
       - name: Wait for exact Vercel production commit and run smoke

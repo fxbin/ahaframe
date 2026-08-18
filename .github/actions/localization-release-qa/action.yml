@@ -1,10 +1,10 @@
 name: AhaFrame localization release QA
-description: Shared localization release checks for GitHub-hosted and self-hosted runners.
+description: Shared localization release checks for GitHub-hosted CI.
 
 runs:
   using: composite
   steps:
-    - uses: ./.github/actions/setup-python-runtime
+    - uses: actions/setup-python@v6
       with:
         python-version: '3.13'
     - uses: actions/setup-node@v5

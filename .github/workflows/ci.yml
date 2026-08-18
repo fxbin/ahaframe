@@ -12,38 +12,16 @@ permissions:
   contents: read
 
 jobs:
-  select-runner:
-    name: select-runner
-    runs-on: self-hosted
-    outputs:
-      runner: ${{ steps.select.outputs.runner }}
-      mode: ${{ steps.select.outputs.mode }}
-      reason: ${{ steps.select.outputs.reason }}
-    steps:
-      - uses: actions/checkout@v5
-      - name: Select CI runner
-        id: select
-        env:
-          GH_BILLING_READ_TOKEN: ${{ secrets.GH_BILLING_READ_TOKEN }}
-          ACTIONS_CLOUD_RESERVE_MINUTES: '120'
-        run: python3 .github/scripts/select-ci-runner.py
-      - name: Report selection
-        run: |
-          echo "Runner mode: ${{ steps.select.outputs.mode }}"
-          echo "Reason: ${{ steps.select.outputs.reason }}"
-
   validate:
     name: validate
-    needs: select-runner
-    runs-on: ${{ fromJSON(needs.select-runner.outputs.runner) }}
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
       - uses: ./.github/actions/core-validation
 
   validation-read-models:
     name: validation-read-models
-    needs: select-runner
-    runs-on: ${{ fromJSON(needs.select-runner.outputs.runner) }}
+    runs-on: ubuntu-latest
     services:
       postgres:
         image: postgres:17
