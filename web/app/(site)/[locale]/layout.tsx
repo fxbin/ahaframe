@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { notFound } from "next/navigation";
 import { ThirdPartyAnalytics } from "@/components/third-party-analytics";
 import { SiteFrame } from "@/components/site-frame";
+import { ValidationBootstrap } from "@/components/validation-bootstrap";
 import { getLocaleSource, localeFromSegment, SUPPORTED_SEGMENTS } from "@/lib/content";
 import "../../globals.css";
 
@@ -38,6 +39,7 @@ export default async function LocaleRootLayout({
   return (
     <html lang={locale}>
       <body>
+        <ValidationBootstrap />
         <SiteFrame locale={locale} source={source}>
           {children}
         </SiteFrame>
