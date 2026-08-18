@@ -27,7 +27,7 @@ export function LocaleSwitch({ locale, labels }: LocaleSwitchProps) {
 
   return (
     <Link
-      className="inline-flex items-center rounded-full border border-[var(--border)] bg-white px-3 py-1.5 text-sm text-[var(--muted)] transition hover:border-[var(--primary)] hover:text-[var(--primary)]"
+      className="inline-flex items-center text-sm font-semibold text-[var(--muted)] transition hover:text-[var(--primary)]"
       href={`${targetPath(pathname, otherLocale)}${search}`}
       hrefLang={otherLocale}
     >
