@@ -1,0 +1,34 @@
+name: Runner Routing Probe
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  select-runner:
+    name: routing-select-runner
+    runs-on: self-hosted
+    outputs:
+      runner: ${{ steps.select.outputs.runner }}
+    steps:
+      - name: Select self-hosted
+        id: select
+        shell: bash
+        run: echo 'runner="self-hosted"' >> "$GITHUB_OUTPUT"
+
+  routed-job:
+    name: routing-routed-job
+    needs: select-runner
+    runs-on: ${{ fromJSON(needs.select-runner.outputs.runner) }}
+    steps:
+      - name: Confirm routed execution
+        run: |
+          echo "runner_name=${RUNNER_NAME:-unknown}"
+          echo "runner_os=${RUNNER_OS:-unknown}"
+          echo "runner_arch=${RUNNER_ARCH:-unknown}"
+          echo "dynamic runner routing passed"
