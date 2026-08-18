@@ -4,8 +4,8 @@ import path from "node:path";
 
 export type Locale = "en" | "zh-CN";
 export type LocaleSegment = "en" | "zh-cn";
+export type Pair = [string, string];
 
-export const SUPPORTED_LOCALES: readonly Locale[] = ["en", "zh-CN"];
 export const SUPPORTED_SEGMENTS: readonly LocaleSegment[] = ["en", "zh-cn"];
 
 const SEGMENT_TO_LOCALE: Record<LocaleSegment, Locale> = {
@@ -20,10 +20,7 @@ const LOCALE_TO_SEGMENT: Record<Locale, LocaleSegment> = {
 
 const CONTENT_ROOT = (() => {
   const fromRepositoryRoot = path.join(process.cwd(), "content");
-  if (existsSync(fromRepositoryRoot)) {
-    return fromRepositoryRoot;
-  }
-  return path.resolve(process.cwd(), "..", "content");
+  return existsSync(fromRepositoryRoot) ? fromRepositoryRoot : path.resolve(process.cwd(), "..", "content");
 })();
 
 export interface LocaleSource {
@@ -47,88 +44,6 @@ export interface LocaleSource {
       early_access: string;
     };
     language: Record<Locale, string>;
-  };
-}
-
-export type Pair = [string, string];
-
-export interface HomeContent {
-  locale: Locale;
-  title: string;
-  description: string;
-  hero: {
-    eyebrow: string;
-    headlineBefore: string;
-    headlineAccent: string;
-    headlineAfter: string;
-    subheadline: string;
-    primary: string;
-    secondary: string;
-    proofs: string[];
-    demoTitle: string;
-    demoBadge: string;
-    promptLabel: string;
-    predictionLabel: string;
-    settings: string;
-    temperature: string;
-    sampling: string;
-    sampleToken: string;
-  };
-  foundations: {
-    kicker: string;
-    title: string;
-    copy: string;
-    progressTitle: string;
-    progressCopy: string;
-    notStarted: string;
-    cards: Array<{
-      slug: string;
-      number: string;
-      category: string;
-      name: string;
-      description: string;
-      link: string;
-    }>;
-  };
-  production: {
-    kicker: string;
-    title: string;
-    copy: string;
-    cards: Array<{
-      slug: string;
-      status: string;
-      layer: string;
-      icon: string;
-      name: string;
-      description: string;
-      firstLabel: string;
-      first: string;
-      secondLabel: string;
-      second: string;
-      link: string;
-    }>;
-  };
-  method: {
-    kicker: string;
-    title: string;
-    items: Array<{ name: string; description: string }>;
-  };
-  stack: {
-    kicker: string;
-    title: string;
-    copy: string;
-    layers: Pair[];
-  };
-  audience: {
-    title: string;
-    items: Pair[];
-  };
-  cta: {
-    title: string;
-    copy: string;
-    email: string;
-    placeholder: string;
-    button: string;
   };
 }
 
@@ -198,7 +113,6 @@ export interface LessonContent {
   quick: string;
   learn: string[];
   path: Array<{ name: string; description: string; state?: string }>;
-  labels?: Record<string, string>;
   takeaways: Pair[];
   challenge: { title: string; body: string };
   guide: GuideContent;
@@ -250,37 +164,7 @@ export interface LabContent {
 
 interface LabDomainContent {
   locale: Locale;
-  ui: Record<string, string>;
   labs: Record<string, LabContent>;
-}
-
-export interface IntegratedBuildContent {
-  locale: Locale;
-  ui: Record<string, string>;
-  build: {
-    name: string;
-    seoTitle: string;
-    description: string;
-    hero: string;
-    level: string;
-    minutes: number;
-    badges: string[];
-    quick: string;
-    groups: Record<string, { label: string; options: Record<string, string> }>;
-    interactive: Record<string, unknown>;
-    explainer: {
-      eyebrow: string;
-      title: string;
-      paragraphs: string[];
-    };
-    next: {
-      title: string;
-      description: string;
-      href: string;
-      query?: string;
-      button: string;
-    };
-  };
 }
 
 async function loadJson<T>(filename: string): Promise<T> {
@@ -303,9 +187,7 @@ export function segmentForLocale(locale: Locale): LocaleSegment {
 }
 
 export function localizedPath(href: string, locale: Locale): string {
-  if (!href.startsWith("/")) {
-    return href;
-  }
+  if (!href.startsWith("/")) return href;
   const segment = segmentForLocale(locale);
   if (/^\/(en|zh-cn)(\/|$)/.test(href)) {
     return href.replace(/^\/(en|zh-cn)(?=\/|$)/, `/${segment}`);
@@ -326,10 +208,6 @@ export async function getLocaleSource(locale: Locale): Promise<LocaleSource> {
   return loadJson<LocaleSource>(localizedFilename(null, locale));
 }
 
-export async function getHomeContent(locale: Locale): Promise<HomeContent> {
-  return loadJson<HomeContent>(localizedFilename("home", locale));
-}
-
 export async function getMarketingContent(locale: Locale): Promise<MarketingContent> {
   return loadJson<MarketingContent>(localizedFilename("marketing", locale));
 }
@@ -344,13 +222,7 @@ export async function getLabContent(locale: Locale, slug: string): Promise<LabCo
   for (const domain of LAB_DOMAINS) {
     const source = await loadJson<LabDomainContent>(localizedFilename(domain, locale));
     const lab = source.labs[slug];
-    if (lab) {
-      return lab;
-    }
+    if (lab) return lab;
   }
   return null;
-}
-
-export async function getIntegratedBuildContent(locale: Locale): Promise<IntegratedBuildContent> {
-  return loadJson<IntegratedBuildContent>(localizedFilename("integrated-build", locale));
 }
