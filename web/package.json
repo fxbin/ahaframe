@@ -7,7 +7,8 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "check:routes": "node scripts/check-route-parity.mjs",
+    "build": "npm run check:routes && next build",
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit"
