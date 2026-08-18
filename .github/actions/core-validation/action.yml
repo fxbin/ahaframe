@@ -147,11 +147,16 @@ runs:
       working-directory: web
       run: |
         set -euo pipefail
+        if curl -fsS --max-time 1 http://127.0.0.1:3000/ >/dev/null 2>&1; then
+          echo 'Port 3000 is unexpectedly occupied before Next runtime smoke.'
+          exit 1
+        fi
         log_file="${RUNNER_TEMP}/ahaframe-next-runtime.log"
-        npm run start -- --hostname 127.0.0.1 --port 3000 >"$log_file" 2>&1 &
+        setsid ./node_modules/.bin/next start --hostname 127.0.0.1 --port 3000 >"$log_file" 2>&1 &
         server_pid=$!
         cleanup() {
-          kill "$server_pid" >/dev/null 2>&1 || true
+          kill -TERM -- "-$server_pid" >/dev/null 2>&1 || true
+          wait "$server_pid" >/dev/null 2>&1 || true
         }
         trap cleanup EXIT
 
@@ -195,3 +200,10 @@ runs:
 
         print(f"PASS Next runtime smoke: {checked} HTTP routes served successfully (root + 13 routes × 2 locales).")
         PY
+
+        cleanup
+        trap - EXIT
+        if curl -fsS --max-time 1 http://127.0.0.1:3000/ >/dev/null 2>&1; then
+          echo 'Next runtime smoke server did not release port 3000.'
+          exit 1
+        fi
