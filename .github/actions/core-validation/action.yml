@@ -142,3 +142,56 @@ runs:
       shell: bash
       working-directory: web
       run: npm run build
+    - name: Smoke Next.js public routes at runtime
+      shell: bash
+      working-directory: web
+      run: |
+        set -euo pipefail
+        log_file="${RUNNER_TEMP}/ahaframe-next-runtime.log"
+        npm run start -- --hostname 127.0.0.1 --port 3000 >"$log_file" 2>&1 &
+        server_pid=$!
+        cleanup() {
+          kill "$server_pid" >/dev/null 2>&1 || true
+        }
+        trap cleanup EXIT
+
+        python3 - <<'PY'
+        import json
+        import time
+        import urllib.error
+        import urllib.request
+        from pathlib import Path
+
+        base = "http://127.0.0.1:3000"
+
+        def fetch(path: str, retries: int = 1) -> str:
+            url = f"{base}{path}"
+            last_error = None
+            for _ in range(retries):
+                try:
+                    with urllib.request.urlopen(url, timeout=10) as response:
+                        if response.status != 200:
+                            raise RuntimeError(f"{path} returned HTTP {response.status}")
+                        return response.read().decode("utf-8")
+                except (urllib.error.URLError, ConnectionError, TimeoutError) as exc:
+                    last_error = exc
+                    time.sleep(0.5)
+            raise RuntimeError(f"{path} did not become ready: {last_error}")
+
+        root_html = fetch("/", retries=40)
+        if "<html" not in root_html.lower() or "AhaFrame" not in root_html:
+            raise RuntimeError("root route did not return the expected AhaFrame HTML shell")
+
+        repo_root = Path.cwd().parent
+        checked = 1
+        for locale, segment in (("en", "en"), ("zh-CN", "zh-cn")):
+            source = json.loads((repo_root / "content" / f"{locale}.json").read_text(encoding="utf-8"))
+            for route in source["availableRoutes"]:
+                path = f"/{segment}/{route}" if route else f"/{segment}/"
+                html = fetch(path)
+                if "<html" not in html.lower() or "AhaFrame" not in html:
+                    raise RuntimeError(f"{path} did not return the expected AhaFrame HTML shell")
+                checked += 1
+
+        print(f"PASS Next runtime smoke: {checked} HTTP routes served successfully (root + 13 routes × 2 locales).")
+        PY
