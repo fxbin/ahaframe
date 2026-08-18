@@ -14,6 +14,7 @@
     "check:routes": "node scripts/check-route-parity.mjs",
     "build": "npm run check:routes && npm run sync:runtime && npm run check:runtime && npm run check:experiences && next build",
     "start": "next start",
+    "test:interaction": "playwright test --config=playwright.interaction.config.ts",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit"
   },
@@ -26,6 +27,7 @@
     "react-dom": "^19.2.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.62.0",
     "@tailwindcss/postcss": "^4.0.0",
     "@types/node": "^22.0.0",
     "@types/react": "^19.2.0",

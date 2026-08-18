@@ -17,6 +17,12 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - uses: ./.github/actions/core-validation
+      - name: Install Playwright Chromium
+        working-directory: web
+        run: npx playwright install --with-deps chromium
+      - name: Test Next interaction adapters in Chromium
+        working-directory: web
+        run: npm run test:interaction
 
   validation-read-models:
     name: validation-read-models
