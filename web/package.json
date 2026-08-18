@@ -6,9 +6,12 @@
     "node": ">=20.9.0"
   },
   "scripts": {
+    "sync:runtime": "node scripts/sync-runtime-assets.mjs",
+    "check:runtime": "node scripts/check-runtime-assets.mjs",
+    "predev": "npm run sync:runtime && npm run check:runtime",
     "dev": "next dev",
     "check:routes": "node scripts/check-route-parity.mjs",
-    "build": "npm run check:routes && next build",
+    "build": "npm run check:routes && npm run sync:runtime && npm run check:runtime && next build",
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit"
