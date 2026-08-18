@@ -1,10 +1,13 @@
 import Link from "next/link";
+import { SpecialistRuntimeWorkspace } from "@/components/runtime/specialist-runtime-workspace";
 import { localizedPath, type LabContent, type Locale } from "@/lib/content";
+import type { RuntimeExperienceKey } from "@/lib/runtime-manifest";
 import { commonUi } from "@/lib/ui-copy";
 
 interface LabPageProps {
   locale: Locale;
   lab: LabContent;
+  experienceKey?: RuntimeExperienceKey;
 }
 
 function previewEntries(source: Record<string, unknown> | undefined): Array<[string, string]> {
@@ -28,7 +31,7 @@ function titleCase(key: string): string {
   return key.replace(/([a-z])([A-Z])/g, "$1 $2").replace(/[-_]/g, " ").replace(/^./, (letter) => letter.toUpperCase());
 }
 
-export function LabPage({ locale, lab }: LabPageProps) {
+export function LabPage({ locale, lab, experienceKey }: LabPageProps) {
   const controls = previewEntries(lab.interactive);
   const copy = commonUi(locale);
 
@@ -48,6 +51,8 @@ export function LabPage({ locale, lab }: LabPageProps) {
           <aside className="rounded-[28px] bg-[var(--text)] p-6 text-white sm:p-8"><div className="text-xs font-bold uppercase tracking-[0.12em] text-[var(--accent)]">{copy.inOneSentence}</div><p className="mt-4 text-xl font-semibold leading-8">{lab.quick}</p></aside>
         </div>
       </section>
+
+      {experienceKey ? <section className="shell mt-16"><SpecialistRuntimeWorkspace locale={locale} experienceKey={experienceKey} /></section> : null}
 
       {lab.takeaways?.length ? <section className="shell mt-16"><h2 className="text-3xl font-black tracking-[-0.04em]">{copy.keyTakeaways}</h2><div className="mt-6 grid gap-3 md:grid-cols-2">{lab.takeaways.map(([title, body]) => <article key={title} className="rounded-[22px] border border-[var(--border)] bg-white p-5"><h3 className="font-bold">{title}</h3><p className="mt-2 text-sm leading-6 text-[var(--muted)]">{body}</p></article>)}</div></section> : null}
 
