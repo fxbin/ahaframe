@@ -10,9 +10,6 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   reactStrictMode: true,
   trailingSlash: true,
-  env: {
-    AHAFRAME_BUILD_INDEXING_ENABLED: process.env.AHAFRAME_INDEXING_ENABLED === "1" ? "1" : "0",
-  },
   async headers() {
     return [
       {
