@@ -33,10 +33,14 @@ The Next app owns these contracts before Vercel is switched:
 - Next emits `X-Content-Type-Options: nosniff`;
 - Next emits `Referrer-Policy: strict-origin-when-cross-origin`;
 - Next emits `Permissions-Policy: camera=(), microphone=(), geolocation=()`;
-- every production build writes `/assets/build-meta.json`;
-- `AHAFRAME_INDEXING_ENABLED` is fail-closed: only the exact value `1` enables indexing;
+- every production build writes `/assets/build-meta.json` with the exact commit SHA, environment and `indexingEnabled` mode;
+- `AHAFRAME_INDEXING_ENABLED` is a **build input**, not a mutable runtime switch;
+- `prebuild` generates the ignored `web/.generated/build-mode.ts`, making indexability an immutable property of that deployment artifact;
+- the indexing build input is fail-closed: only the exact value `1` generates an index-enabled artifact;
 - when indexing is disabled, page metadata is `noindex,nofollow` and `robots.txt` disallows `/`;
 - when indexing is enabled, page metadata is `index,follow` and `robots.txt` allows `/`.
+
+A running deployment must not change indexability merely because an environment variable is edited after the build. Changing indexability requires a fresh deployment artifact.
 
 ## Staged production cutover
 
@@ -55,9 +59,9 @@ In the existing AhaFrame Vercel project:
 
 1. Set the project Root Directory to `web`.
 2. Keep framework detection on Next.js; do not set a second custom static output directory.
-3. Set Production `AHAFRAME_INDEXING_ENABLED=0` (or leave it unset; unset is intentionally fail-closed).
+3. Set Production build input `AHAFRAME_INDEXING_ENABLED=0` (or leave it unset; unset is intentionally fail-closed).
 4. Deploy the exact approved `main` commit.
-5. Confirm `/assets/build-meta.json` equals that exact commit SHA.
+5. Confirm `/assets/build-meta.json` reports that exact SHA and `indexingEnabled: false`.
 6. Confirm the 27-route runtime smoke, security headers, trailing-slash redirects, bilingual pages, waitlist/validation smoke and browser-secret boundary.
 
 At this point the new runtime may serve production traffic, but crawlers remain blocked while the operator verifies the deployment.
@@ -66,9 +70,9 @@ At this point the new runtime may serve production traffic, but crawlers remain 
 
 After Stage 1 is green:
 
-1. Set Production `AHAFRAME_INDEXING_ENABLED=1`.
-2. Redeploy the same approved `main` commit.
-3. Confirm `/assets/build-meta.json` still reports the same approved SHA.
+1. Set Production build input `AHAFRAME_INDEXING_ENABLED=1`.
+2. Redeploy the same approved `main` commit so a fresh index-enabled artifact is created.
+3. Confirm `/assets/build-meta.json` still reports the same approved SHA and now reports `indexingEnabled: true`.
 4. Confirm `robots.txt` allows `/` and still advertises `https://ahaframe.com/sitemap.xml`.
 5. Confirm representative EN and zh-CN pages emit `index,follow`.
 6. Run Production Smoke again against the exact commit.
