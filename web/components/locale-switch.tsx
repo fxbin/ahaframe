@@ -1,14 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
+import { useSyncExternalStore } from "react";
 import type { Locale, LocaleSource } from "@/lib/content";
 
 interface LocaleSwitchProps {
   locale: Locale;
   labels: LocaleSource["ui"]["language"];
 }
+
+const noopSubscribe = () => () => {};
 
 function targetPath(pathname: string, locale: Locale): string {
   const segment = locale === "zh-CN" ? "zh-cn" : "en";
@@ -20,12 +22,8 @@ function targetPath(pathname: string, locale: Locale): string {
 
 export function LocaleSwitch({ locale, labels }: LocaleSwitchProps) {
   const pathname = usePathname() || "/";
-  const [search, setSearch] = useState("");
+  const search = useSyncExternalStore(noopSubscribe, () => window.location.search, () => "");
   const otherLocale: Locale = locale === "en" ? "zh-CN" : "en";
-
-  useEffect(() => {
-    setSearch(window.location.search);
-  }, []);
 
   return (
     <Link
