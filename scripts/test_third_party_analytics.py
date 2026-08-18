@@ -91,8 +91,15 @@ def test_next_migration_contract():
     assert 'NEXT_PUBLIC_GA_MEASUREMENT_ID' in component
     assert 'G-EWPR5QXGWJ' in component
     assert 'googletagmanager.com/gtag/js' in component
-    layout=(ROOT/'web/app/layout.tsx').read_text(encoding='utf-8')
-    assert '<ThirdPartyAnalytics />' in layout
+
+    layouts = [
+        ROOT/'web/app/(root)/layout.tsx',
+        ROOT/'web/app/(site)/[locale]/layout.tsx',
+    ]
+    for layout_path in layouts:
+        assert layout_path.exists(), f'missing Next.js route-group layout: {layout_path.relative_to(ROOT)}'
+        layout=layout_path.read_text(encoding='utf-8')
+        assert '<ThirdPartyAnalytics />' in layout, f'analytics missing from {layout_path.relative_to(ROOT)}'
 
 
 def main():
