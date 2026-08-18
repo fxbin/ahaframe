@@ -6,24 +6,23 @@ import { runtimeExperience, type RuntimeExperienceKey } from "@/lib/runtime-mani
 
 export type RuntimeStatus = "loading" | "ready" | "error";
 
+type LabRuntimeState = {
+  key: RuntimeExperienceKey;
+  status: RuntimeStatus;
+  frame: LabFrame | null;
+  error: string | null;
+};
+
 export function useLabRuntime(experienceKey: RuntimeExperienceKey) {
   const definition = runtimeExperience(experienceKey);
   const runtimeRef = useRef<LabRuntime | null>(null);
-  const [status, setStatus] = useState<RuntimeStatus>("loading");
-  const [frame, setFrame] = useState<LabFrame | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [runtimeState, setRuntimeState] = useState<LabRuntimeState>({ key: experienceKey, status: "loading", frame: null, error: null });
 
   useEffect(() => {
-    if (definition.kind !== "lab") {
-      setStatus("error");
-      setError(`${experienceKey} is not a Lab runtime experience.`);
-      return;
-    }
+    if (definition.kind !== "lab") return;
 
     let cancelled = false;
     let unsubscribe: (() => void) | null = null;
-    setStatus("loading");
-    setError(null);
 
     loadRuntimeScripts(definition.scripts)
       .then((api) => {
@@ -31,15 +30,13 @@ export function useLabRuntime(experienceKey: RuntimeExperienceKey) {
         const runtime = api.createLab(definition.runtimeId, { track: false });
         runtimeRef.current = runtime;
         unsubscribe = runtime.subscribe((nextFrame) => {
-          if (!cancelled) setFrame(nextFrame);
+          if (!cancelled) setRuntimeState({ key: experienceKey, status: "ready", frame: nextFrame, error: null });
         });
-        setStatus("ready");
       })
       .catch((reason: unknown) => {
         if (cancelled) return;
         runtimeRef.current = null;
-        setStatus("error");
-        setError(reason instanceof Error ? reason.message : String(reason));
+        setRuntimeState({ key: experienceKey, status: "error", frame: null, error: reason instanceof Error ? reason.message : String(reason) });
       });
 
     return () => {
@@ -54,10 +51,13 @@ export function useLabRuntime(experienceKey: RuntimeExperienceKey) {
     return runtimeRef.current;
   }, [experienceKey]);
 
+  const kindError = definition.kind === "lab" ? null : `${experienceKey} is not a Lab runtime experience.`;
+  const visibleState = runtimeState.key === experienceKey ? runtimeState : { key: experienceKey, status: "loading" as const, frame: null, error: null };
+
   return {
-    status,
-    error,
-    frame,
+    status: kindError ? "error" as const : visibleState.status,
+    error: kindError ?? visibleState.error,
+    frame: kindError ? null : visibleState.frame,
     dispatch: useCallback((typeOrAction: string | RuntimeRecord, payload?: RuntimeRecord) => requireRuntime().dispatch(typeOrAction, payload), [requireRuntime]),
     reset: useCallback(() => requireRuntime().reset(), [requireRuntime]),
     checkpoint: useCallback((name?: string) => requireRuntime().checkpoint(name), [requireRuntime]),
