@@ -5,13 +5,13 @@ import sys
 import urllib.error
 import urllib.request
 
-SELF_HOSTED = '["self-hosted","linux","x64"]'
+SELF_HOSTED = '"self-hosted"'
 GITHUB_HOSTED = '"ubuntu-latest"'
 PLAN_MINUTES = {
     "free": 2000,
     "pro": 3000,
 }
-RESERVE_MINUTES = int(os.environ.get("ACTIONS_CLOUD_RESERVE_MINUTES", "60"))
+RESERVE_MINUTES = int(os.environ.get("ACTIONS_CLOUD_RESERVE_MINUTES", "120"))
 
 
 def write_output(name: str, value: str) -> None:
