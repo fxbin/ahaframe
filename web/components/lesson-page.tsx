@@ -7,7 +7,33 @@ interface LessonPageProps {
   lesson: LessonContent;
 }
 
+type LessonPathStep = LessonContent["path"][number];
+type CanonicalLessonContent = Omit<LessonContent, "path"> & {
+  path?: LessonContent["path"];
+  nodes?: string[];
+  timeline?: string[];
+};
+
+function resolveLessonPath(lesson: LessonContent): LessonPathStep[] {
+  const source = lesson as CanonicalLessonContent;
+  if (source.path?.length) return source.path;
+
+  if (source.nodes?.length && source.timeline?.length) {
+    if (source.nodes.length !== source.timeline.length) {
+      throw new Error(`Lesson path contract mismatch for ${lesson.name}: nodes and timeline must have equal length.`);
+    }
+    return source.nodes.map((name, index) => ({
+      name,
+      description: source.timeline![index],
+    }));
+  }
+
+  throw new Error(`Lesson path contract missing for ${lesson.name}: expected path or nodes + timeline.`);
+}
+
 export function LessonPage({ locale, ui, lesson }: LessonPageProps) {
+  const lessonPath = resolveLessonPath(lesson);
+
   return (
     <main className="py-12 sm:py-16">
       <section className="shell">
@@ -20,7 +46,7 @@ export function LessonPage({ locale, ui, lesson }: LessonPageProps) {
         <div className="mt-10 grid gap-4 lg:grid-cols-[1.2fr_.8fr]">
           <div className="rounded-[28px] border border-[var(--border)] bg-white p-6 sm:p-8">
             <h2 className="text-xl font-black tracking-[-0.03em]">{ui.lessonPath}</h2>
-            <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{lesson.path.map((step, index) => <div key={step.name} className={`rounded-2xl border p-4 ${step.state === "active" ? "border-[var(--primary)] bg-[color-mix(in_srgb,var(--primary)_7%,white)]" : "border-[var(--border)] bg-[var(--bg)]"}`}><div className="text-xs font-bold text-[var(--primary)]">0{index + 1}</div><div className="mt-2 font-bold">{step.name}</div><div className="mt-1 text-sm text-[var(--muted)]">{step.description}</div></div>)}</div>
+            <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{lessonPath.map((step, index) => <div key={step.name} className={`rounded-2xl border p-4 ${step.state === "active" ? "border-[var(--primary)] bg-[color-mix(in_srgb,var(--primary)_7%,white)]" : "border-[var(--border)] bg-[var(--bg)]"}`}><div className="text-xs font-bold text-[var(--primary)]">0{index + 1}</div><div className="mt-2 font-bold">{step.name}</div><div className="mt-1 text-sm text-[var(--muted)]">{step.description}</div></div>)}</div>
           </div>
 
           <aside className="rounded-[28px] bg-[var(--text)] p-6 text-white sm:p-8">
