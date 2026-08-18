@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import type { MetadataRoute } from "next";
 
 export function indexingEnabled(): boolean {
-  return process.env.AHAFRAME_INDEXING_ENABLED === "1";
+  return process.env.AHAFRAME_BUILD_INDEXING_ENABLED === "1";
 }
 
 export function indexingMetadata(): Metadata["robots"] {
