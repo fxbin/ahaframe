@@ -3,6 +3,9 @@ name: M3 Stack CI
 on:
   push:
     branches: [platform/m3-interaction-engine]
+  pull_request:
+    branches: [platform/m2-route-parity]
+    types: [opened, synchronize, reopened, ready_for_review]
 
 permissions:
   contents: read
