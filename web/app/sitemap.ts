@@ -20,7 +20,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return LOCALES.flatMap((locale) =>
     sources[locale].availableRoutes.map((relative) => ({
       url: routeUrl(locale, relative),
-      lastModified: new Date(sources[locale].meta.updated),
       alternates: {
         languages: {
           en: routeUrl("en", relative),
