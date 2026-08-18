@@ -5,40 +5,35 @@ import { loadRuntimeScripts, type MissionRuntime, type MissionSnapshot, type Run
 import { runtimeExperience, type RuntimeExperienceKey } from "@/lib/runtime-manifest";
 import type { RuntimeStatus } from "@/hooks/use-lab-runtime";
 
+type MissionRuntimeState = {
+  key: RuntimeExperienceKey;
+  status: RuntimeStatus;
+  snapshot: MissionSnapshot | null;
+  error: string | null;
+};
+
 export function useMissionRuntime(experienceKey: RuntimeExperienceKey) {
   const definition = runtimeExperience(experienceKey);
   const runtimeRef = useRef<MissionRuntime | null>(null);
-  const [status, setStatus] = useState<RuntimeStatus>("loading");
-  const [snapshot, setSnapshot] = useState<MissionSnapshot | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [runtimeState, setRuntimeState] = useState<MissionRuntimeState>({ key: experienceKey, status: "loading", snapshot: null, error: null });
 
   useEffect(() => {
-    if (definition.kind !== "mission") {
-      setStatus("error");
-      setError(`${experienceKey} is not a Mission runtime experience.`);
-      return;
-    }
+    if (definition.kind !== "mission") return;
 
     let cancelled = false;
-    setStatus("loading");
-    setError(null);
 
     loadRuntimeScripts(definition.scripts)
       .then((api) => {
         if (cancelled) return;
-        if (!api.createMission) {
-          throw new Error("AhaFrame Mission Engine API is not available after runtime load.");
-        }
+        if (!api.createMission) throw new Error("AhaFrame Mission Engine API is not available after runtime load.");
         const runtime = api.createMission(definition.runtimeId, { labOptions: { track: false } });
         runtimeRef.current = runtime;
-        setSnapshot(runtime.getSnapshot());
-        setStatus("ready");
+        setRuntimeState({ key: experienceKey, status: "ready", snapshot: runtime.getSnapshot(), error: null });
       })
       .catch((reason: unknown) => {
         if (cancelled) return;
         runtimeRef.current = null;
-        setStatus("error");
-        setError(reason instanceof Error ? reason.message : String(reason));
+        setRuntimeState({ key: experienceKey, status: "error", snapshot: null, error: reason instanceof Error ? reason.message : String(reason) });
       });
 
     return () => {
@@ -52,21 +47,20 @@ export function useMissionRuntime(experienceKey: RuntimeExperienceKey) {
     return runtimeRef.current;
   }, [experienceKey]);
 
-  const refresh = useCallback(() => {
-    const next = requireRuntime().getSnapshot();
-    setSnapshot(next);
-    return next;
-  }, [requireRuntime]);
+  const commitSnapshot = useCallback((snapshot: MissionSnapshot) => {
+    setRuntimeState({ key: experienceKey, status: "ready", snapshot, error: null });
+    return snapshot;
+  }, [experienceKey]);
+
+  const refresh = useCallback(() => commitSnapshot(requireRuntime().getSnapshot()), [commitSnapshot, requireRuntime]);
+  const kindError = definition.kind === "mission" ? null : `${experienceKey} is not a Mission runtime experience.`;
+  const visibleState = runtimeState.key === experienceKey ? runtimeState : { key: experienceKey, status: "loading" as const, snapshot: null, error: null };
 
   return {
-    status,
-    error,
-    snapshot,
-    start: useCallback(() => {
-      const next = requireRuntime().start();
-      setSnapshot(next);
-      return next;
-    }, [requireRuntime]),
+    status: kindError ? "error" as const : visibleState.status,
+    error: kindError ?? visibleState.error,
+    snapshot: kindError ? null : visibleState.snapshot,
+    start: useCallback(() => commitSnapshot(requireRuntime().start()), [commitSnapshot, requireRuntime]),
     inspectEvidence: useCallback((id: string) => {
       const result = requireRuntime().inspectEvidence(id);
       refresh();
@@ -88,26 +82,10 @@ export function useMissionRuntime(experienceKey: RuntimeExperienceKey) {
       refresh();
       return result;
     }, [refresh, requireRuntime]),
-    readyToDecide: useCallback(() => {
-      const next = requireRuntime().readyToDecide();
-      setSnapshot(next);
-      return next;
-    }, [requireRuntime]),
-    submitReleaseDecision: useCallback((decision: string) => {
-      const next = requireRuntime().submitReleaseDecision(decision);
-      setSnapshot(next);
-      return next;
-    }, [requireRuntime]),
-    complete: useCallback(() => {
-      const next = requireRuntime().complete();
-      setSnapshot(next);
-      return next;
-    }, [requireRuntime]),
-    reset: useCallback(() => {
-      const next = requireRuntime().reset();
-      setSnapshot(next);
-      return next;
-    }, [requireRuntime]),
+    readyToDecide: useCallback(() => commitSnapshot(requireRuntime().readyToDecide()), [commitSnapshot, requireRuntime]),
+    submitReleaseDecision: useCallback((decision: string) => commitSnapshot(requireRuntime().submitReleaseDecision(decision)), [commitSnapshot, requireRuntime]),
+    complete: useCallback(() => commitSnapshot(requireRuntime().complete()), [commitSnapshot, requireRuntime]),
+    reset: useCallback(() => commitSnapshot(requireRuntime().reset()), [commitSnapshot, requireRuntime]),
     listAttempts: useCallback(() => requireRuntime().listAttempts(), [requireRuntime]),
   };
 }
