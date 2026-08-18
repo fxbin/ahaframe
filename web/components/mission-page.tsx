@@ -15,7 +15,7 @@ export function MissionPage({ locale, mission }: MissionPageProps) {
   return (
     <main className="py-12 sm:py-16">
       <section className="shell">
-        <div className="flex flex-wrap items-center gap-2 text-xs font-bold uppercase tracking-[0.12em] text-[var(--muted)]"><span>{mission.layer}</span><span>·</span><span>{mission.level}</span><span>·</span><span>{mission.minutes} min</span></div>
+        <div className="flex flex-wrap items-center gap-2 text-xs font-bold uppercase tracking-[0.12em] text-[var(--muted)]"><span>{mission.layer}</span><span>·</span><span>{mission.level}</span><span>·</span><span>{mission.minutes} {copy.minutes}</span></div>
         <h1 className="mt-4 max-w-5xl text-5xl font-black leading-[0.98] tracking-[-0.055em] sm:text-6xl">{mission.name}</h1>
         <p className="mt-5 max-w-4xl text-lg leading-8 text-[var(--muted)]">{mission.hero}</p>
 
