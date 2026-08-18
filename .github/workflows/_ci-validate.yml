@@ -1,0 +1,124 @@
+name: Reusable Core Validation
+
+on:
+  workflow_call:
+    inputs:
+      runner:
+        description: JSON runner selector, e.g. "ubuntu-latest" or ["self-hosted","linux","x64"]
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  core-validation:
+    runs-on: ${{ fromJSON(inputs.runner) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install validation dependencies
+        run: pip install -r requirements-dev.txt
+      - name: Verify legacy source branding is gone
+        run: |
+          test ! -d scripts/seeai
+          if grep -R -n -E 'SeeAI|SEEAI_|window\.SeeAI|seeai_' scripts src content; then
+            echo 'Legacy SeeAI branding remains in source.'
+            exit 1
+          fi
+      - name: Test Lab Engine
+        run: node scripts/test_lab_engine.js
+      - name: Test Mission Engine
+        run: node scripts/test_mission_engine.js
+      - name: Test flagship Mission scenarios
+        run: |
+          set -euo pipefail
+          found=0
+          for test_file in scripts/test_mission_*.js; do
+            [ -e "$test_file" ] || continue
+            [ "$test_file" = "scripts/test_mission_engine.js" ] && continue
+            found=1
+            echo "Running $test_file"
+            node "$test_file"
+          done
+          if [ "$found" -eq 0 ]; then
+            echo 'No flagship Mission scenario tests found yet.'
+          fi
+      - name: Test Integrated Build
+        run: node scripts/test_integrated_build.js
+      - name: Test Validation Runtime
+        run: node scripts/test_validation_runtime.js
+      - name: Test i18n Foundation
+        run: python3 scripts/test_i18n_foundation.py
+      - name: Test Lab reconciliation contract
+        run: python3 scripts/test_lab_reconciliation.py
+      - name: Validate production smoke harness
+        run: python3 -m py_compile scripts/smoke_production.py
+      - name: Test exact production release marker
+        run: python3 scripts/test_production_release_marker.py
+      - name: Test Validation operator report
+        run: python3 scripts/test_validation_report.py
+      - name: Test Product Gate memo
+        run: python3 scripts/test_product_gate_memo.py
+      - name: Build static site
+        env:
+          AHAFRAME_BASE_URL: https://ahaframe.com
+        run: python3 scripts/build_site.py
+      - name: Test Campaign-first discovery
+        run: python3 scripts/test_campaign_discovery.py
+      - name: Test Content & Experience preview contract
+        run: python3 scripts/test_content_preview_contract.py
+      - name: Test generated Mission pages
+        run: |
+          set -euo pipefail
+          found=0
+          for test_file in scripts/test_mission_page_*.py; do
+            [ -e "$test_file" ] || continue
+            found=1
+            echo "Running $test_file"
+            python3 "$test_file"
+          done
+          if [ "$found" -eq 0 ]; then
+            echo 'No generated Mission page tests found yet.'
+          fi
+      - name: Validate language switcher
+        run: python3 scripts/test_language_switcher.py
+      - name: Validate third-party analytics
+        run: python3 scripts/test_third_party_analytics.py
+      - name: Validate Foundation localization
+        run: python3 scripts/test_foundation_localization.py
+      - name: Validate Prompt and Context localization
+        run: python3 scripts/test_prompt_context_localization.py
+      - name: Validate Harness localization
+        run: python3 scripts/test_harness_localization.py
+      - name: Validate Graph and Evaluation localization
+        run: python3 scripts/test_graph_evaluation_localization.py
+      - name: Validate Integrated Build localization
+        run: python3 scripts/test_integrated_build_localization.py
+      - name: Validate
+        run: python3 scripts/validate.py
+      - name: Validate instrumentation build
+        run: python3 scripts/test_validation_build.py
+      - name: Verify generated brand migration
+        run: |
+          if grep -R -n -E 'SeeAI|SEEAI_|window\.SeeAI|seeai_' site; then
+            echo 'Legacy SeeAI branding remains in generated output.'
+            exit 1
+          fi
+      - name: Install Next.js migration dependencies
+        working-directory: web
+        run: npm install --no-audit --no-fund
+      - name: Lint Next.js migration app
+        working-directory: web
+        run: npm run lint
+      - name: Typecheck Next.js migration app
+        working-directory: web
+        run: npm run typecheck
+      - name: Build Next.js migration app
+        working-directory: web
+        run: npm run build
