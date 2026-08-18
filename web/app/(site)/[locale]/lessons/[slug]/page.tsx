@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { LessonPage } from "@/components/lesson-page";
+import { StructuredData } from "@/components/structured-data";
 import { getFoundationContent, localeFromSegment } from "@/lib/content";
 import { pageMetadata } from "@/lib/metadata";
+import { lessonSchema } from "@/lib/schema";
 
 const LESSON_SLUGS = ["token-playground", "context-window", "agent-loop"] as const;
 
@@ -31,5 +33,10 @@ export default async function LessonRoute({ params }: PageProps) {
   const content = await getFoundationContent(locale);
   const lesson = content.lessons[slug];
   if (!lesson) notFound();
-  return <LessonPage locale={locale} ui={content.ui} lesson={lesson} />;
+  return (
+    <>
+      <StructuredData value={lessonSchema(locale, slug, lesson)} />
+      <LessonPage locale={locale} ui={content.ui} lesson={lesson} />
+    </>
+  );
 }
