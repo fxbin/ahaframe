@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { EarlyAccessPage } from "@/components/marketing-pages";
+import { StructuredData } from "@/components/structured-data";
 import { getMarketingContent, localeFromSegment } from "@/lib/content";
 import { pageMetadata } from "@/lib/metadata";
+import { webPageSchema } from "@/lib/schema";
 
 interface PageProps {
   params: Promise<{ locale: string }>;
@@ -21,5 +23,10 @@ export default async function EarlyAccessRoute({ params }: PageProps) {
   const locale = localeFromSegment(segment);
   if (!locale) notFound();
   const content = await getMarketingContent(locale);
-  return <EarlyAccessPage locale={locale} content={content} />;
+  return (
+    <>
+      <StructuredData value={webPageSchema(locale, "early-access/", content.earlyAccess.title, content.earlyAccess.description)} />
+      <EarlyAccessPage locale={locale} content={content} />
+    </>
+  );
 }
