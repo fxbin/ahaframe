@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { localeAlternates, segmentForLocale, type Locale } from "@/lib/content";
+import { indexingMetadata } from "@/lib/indexing";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") || "https://ahaframe.com";
 
@@ -12,6 +13,7 @@ export function pageMetadata(locale: Locale, title: string, description: string,
   return {
     title: { absolute: title },
     description,
+    robots: indexingMetadata(),
     alternates: {
       canonical,
       languages: Object.fromEntries(
