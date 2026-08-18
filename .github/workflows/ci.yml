@@ -18,7 +18,7 @@ permissions:
 jobs:
   select-runner:
     name: select-runner
-    runs-on: [self-hosted, linux, x64]
+    runs-on: self-hosted
     outputs:
       runner: ${{ steps.select.outputs.runner }}
       mode: ${{ steps.select.outputs.mode }}
@@ -29,7 +29,7 @@ jobs:
         id: select
         env:
           GH_BILLING_READ_TOKEN: ${{ secrets.GH_BILLING_READ_TOKEN }}
-          ACTIONS_CLOUD_RESERVE_MINUTES: '60'
+          ACTIONS_CLOUD_RESERVE_MINUTES: '120'
         run: python3 .github/scripts/select-ci-runner.py
       - name: Report selection
         run: |
