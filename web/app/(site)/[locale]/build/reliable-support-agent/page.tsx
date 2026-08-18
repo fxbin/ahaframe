@@ -5,7 +5,7 @@ import { StructuredData } from "@/components/structured-data";
 import { localeFromSegment } from "@/lib/content";
 import { pageMetadata } from "@/lib/metadata";
 import { getMissionContent } from "@/lib/mission";
-import { missionSchema } from "@/lib/schema";
+import { finalBossSchemas } from "@/lib/schema";
 
 interface PageProps {
   params: Promise<{ locale: string }>;
@@ -28,7 +28,7 @@ export default async function ReliableSupportAgentRoute({ params }: PageProps) {
   if (!mission) notFound();
   return (
     <>
-      <StructuredData value={missionSchema(locale, "build/reliable-support-agent/", mission)} />
+      <StructuredData value={finalBossSchemas(locale, mission)} />
       <MissionPage locale={locale} mission={mission} experienceKey="reliable-support-agent" />
     </>
   );
