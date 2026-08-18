@@ -12,43 +12,48 @@ interface SiteFrameProps {
 export function SiteFrame({ locale, source, children }: SiteFrameProps) {
   const segment = segmentForLocale(locale);
   const home = `/${segment}/`;
+  const startLabel = locale === "zh-CN" ? "开始实验" : "Start Lab";
 
   return (
     <>
-      <header className="sticky top-0 z-50 border-b border-[var(--border)] bg-[color-mix(in_srgb,var(--bg)_92%,transparent)] backdrop-blur-xl">
-        <div className="shell flex min-h-[68px] items-center justify-between gap-5">
-          <Link className="text-lg font-black tracking-[-0.04em]" href={home}>
+      <header className="sticky top-0 z-50 border-b border-[var(--border)] bg-[color-mix(in_srgb,var(--bg)_94%,transparent)] backdrop-blur-xl">
+        <div className="shell flex min-h-[64px] items-center justify-between gap-5">
+          <Link className="text-lg font-black tracking-[-0.045em]" href={home}>
             {source.brand}
           </Link>
-          <nav className="hidden items-center gap-6 text-sm text-[var(--muted)] md:flex" aria-label="Primary navigation">
-            <Link className="transition hover:text-[var(--text)]" href={`${home}#campaign`}>
-              {source.ui.nav.lessons}
-            </Link>
-            <Link className="transition hover:text-[var(--text)]" href={`${home}#roadmap`}>
-              {source.ui.nav.roadmap}
-            </Link>
-            <Link className="transition hover:text-[var(--text)]" href={`${home}#about`}>
-              {source.ui.nav.about}
-            </Link>
-            <Link className="transition hover:text-[var(--text)]" href={`/${segment}/pricing/`}>
-              {source.ui.nav.pricing}
-            </Link>
+
+          <div className="flex items-center gap-5">
+            <nav className="hidden items-center gap-7 text-sm text-[var(--muted)] md:flex" aria-label="Primary navigation">
+              <Link className="transition hover:text-[var(--text)]" href={`${home}#campaign`}>
+                {source.ui.nav.lessons}
+              </Link>
+              <Link className="transition hover:text-[var(--text)]" href={`${home}#roadmap`}>
+                {source.ui.nav.roadmap}
+              </Link>
+              <Link className="transition hover:text-[var(--text)]" href={`/${segment}/pricing/`}>
+                {source.ui.nav.pricing}
+              </Link>
+            </nav>
+
+            <LocaleSwitch locale={locale} labels={source.ui.language} />
+
             <Link
-              className="rounded-full bg-[var(--text)] px-4 py-2 font-semibold text-white transition hover:opacity-85"
-              href={`/${segment}/early-access/`}
+              className="hidden rounded-full bg-[var(--text)] px-4 py-2 text-sm font-extrabold text-white transition hover:opacity-85 sm:inline-flex"
+              href={`/${segment}/labs/rag-failure/`}
             >
-              {source.ui.nav.early_access}
+              {startLabel} <span className="ml-1" aria-hidden="true">→</span>
             </Link>
-          </nav>
-          <LocaleSwitch locale={locale} labels={source.ui.language} />
+          </div>
         </div>
       </header>
+
       {children}
-      <footer className="mt-24 border-t border-[var(--border)] py-10">
-        <div className="shell flex flex-col gap-6 text-sm text-[var(--muted)] md:flex-row md:items-center md:justify-between">
+
+      <footer className="border-t border-[var(--border)] py-10">
+        <div className="shell flex flex-col gap-7 text-sm text-[var(--muted)] md:flex-row md:items-end md:justify-between">
           <div>
             <div className="font-bold text-[var(--text)]">{source.brand}</div>
-            <p className="mt-1">{source.ui.footer.tagline}</p>
+            <p className="mt-2 max-w-md leading-6">{source.ui.footer.tagline}</p>
           </div>
           <div className="flex flex-wrap gap-x-5 gap-y-2">
             <Link href={`${home}#about`}>{source.ui.footer.about}</Link>
