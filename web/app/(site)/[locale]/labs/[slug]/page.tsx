@@ -7,7 +7,7 @@ import { getLabContent, localeFromSegment } from "@/lib/content";
 import { pageMetadata } from "@/lib/metadata";
 import { getMissionContent } from "@/lib/mission";
 import { hasRuntimeExperience } from "@/lib/runtime-manifest";
-import { labSchema, missionSchema } from "@/lib/schema";
+import { productionLabSchemas } from "@/lib/schema";
 
 const LAB_SLUGS = [
   "instruction-conflict",
@@ -45,13 +45,14 @@ export default async function LabRoute({ params }: PageProps) {
   const { locale: segment, slug } = await params;
   const locale = localeFromSegment(segment);
   if (!locale) notFound();
+  const productionLabsLabel = locale === "en" ? "Production Labs" : "生产实验";
 
   const mission = await getMissionContent(locale, slug);
   if (mission) {
     if (!hasRuntimeExperience(slug)) notFound();
     return (
       <>
-        <StructuredData value={missionSchema(locale, `labs/${slug}/`, mission)} />
+        <StructuredData value={productionLabSchemas(locale, slug, mission, productionLabsLabel)} />
         <MissionPage locale={locale} mission={mission} experienceKey={slug} />
       </>
     );
@@ -61,7 +62,7 @@ export default async function LabRoute({ params }: PageProps) {
   if (!lab) notFound();
   return (
     <>
-      <StructuredData value={labSchema(locale, slug, lab)} />
+      <StructuredData value={productionLabSchemas(locale, slug, lab, productionLabsLabel)} />
       <LabPage locale={locale} lab={lab} experienceKey={hasRuntimeExperience(slug) ? slug : undefined} />
     </>
   );
