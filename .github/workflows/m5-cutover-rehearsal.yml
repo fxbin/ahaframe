@@ -60,7 +60,10 @@ jobs:
           AHAFRAME_BUILD_COMMIT_REF: ${{ github.ref_name }}
           AHAFRAME_BUILD_ENV: production
           AHAFRAME_INDEXING_ENABLED: '1'
-        run: npm run build
+        run: |
+          set -euo pipefail
+          rm -rf .next
+          npm run build
 
       - name: Re-check browser secret boundary after production-equivalent build
         working-directory: web
@@ -75,7 +78,7 @@ jobs:
         run: |
           set -euo pipefail
           log_file="${RUNNER_TEMP}/ahaframe-cutover-enabled.log"
-          AHAFRAME_INDEXING_ENABLED=1 npm run start -- --hostname 127.0.0.1 --port 4300 >"$log_file" 2>&1 &
+          npm run start -- --hostname 127.0.0.1 --port 4300 >"$log_file" 2>&1 &
           server_pid=$!
           cleanup() { kill "$server_pid" >/dev/null 2>&1 || true; }
           trap cleanup EXIT
@@ -95,7 +98,7 @@ jobs:
             echo '- exact Next release marker: PASS'
             echo '- canonical trailing-slash redirects: PASS'
             echo '- inherited production security headers: PASS'
-            echo '- production-equivalent indexing-enabled rebuild: PASS'
+            echo '- clean production-equivalent indexing-enabled rebuild: PASS'
             echo '- browser-secret boundary before/after index flip: PASS'
             echo '- rollback runbook: docs/NEXT_RUNTIME_CUTOVER.md'
           } >> "$GITHUB_STEP_SUMMARY"
