@@ -4,6 +4,7 @@ import { LessonPage } from "@/components/lesson-page";
 import { StructuredData } from "@/components/structured-data";
 import { getFoundationContent, localeFromSegment } from "@/lib/content";
 import { pageMetadata } from "@/lib/metadata";
+import { hasRuntimeExperience } from "@/lib/runtime-manifest";
 import { lessonSchema } from "@/lib/schema";
 
 const LESSON_SLUGS = ["token-playground", "context-window", "agent-loop"] as const;
@@ -32,11 +33,11 @@ export default async function LessonRoute({ params }: PageProps) {
   if (!locale) notFound();
   const content = await getFoundationContent(locale);
   const lesson = content.lessons[slug];
-  if (!lesson) notFound();
+  if (!lesson || !hasRuntimeExperience(slug)) notFound();
   return (
     <>
       <StructuredData value={lessonSchema(locale, slug, lesson)} />
-      <LessonPage locale={locale} ui={content.ui} lesson={lesson} />
+      <LessonPage locale={locale} ui={content.ui} lesson={lesson} experienceKey={slug} />
     </>
   );
 }
