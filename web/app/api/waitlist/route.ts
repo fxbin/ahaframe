@@ -24,12 +24,23 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: "invalid email" }, { status: 400 });
   }
 
-  const locale = text(input.locale, 16) === "zh-CN" ? "zh-CN" : "en";
   const payload = {
     email,
-    locale,
     intent: text(input.intent, 120) || "waitlist",
     source: text(input.source, 500),
+    anonymousUserId: text(input.anonymousUserId, 120),
+    sessionId: text(input.sessionId, 120),
+    cohortId: text(input.cohortId, 80),
+    locale: text(input.locale, 16) === "zh-CN" ? "zh-CN" : "en",
+    layer: text(input.layer, 80),
+    labId: text(input.labId, 120),
+    labVersion: text(input.labVersion, 40),
+    utmSource: text(input.utmSource, 180),
+    utmMedium: text(input.utmMedium, 180),
+    utmCampaign: text(input.utmCampaign, 240),
+    firstUtmSource: text(input.firstUtmSource, 180),
+    referrer: text(input.referrer, 1000),
+    deviceClass: text(input.deviceClass, 40),
   };
 
   try {
