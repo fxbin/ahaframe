@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { useState, type FormEvent } from "react";
-import { segmentForLocale, type Locale } from "@/lib/content";
 import { getValidationContext } from "@/lib/validation-context";
+
+type Locale = "en" | "zh-CN";
 
 interface WaitlistFormProps {
   locale: Locale;
@@ -28,7 +29,7 @@ export function WaitlistForm({
 }: WaitlistFormProps) {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
-  const segment = segmentForLocale(locale);
+  const segment = locale === "zh-CN" ? "zh-cn" : "en";
   const isZh = locale === "zh-CN";
 
   async function submit(event: FormEvent<HTMLFormElement>) {
