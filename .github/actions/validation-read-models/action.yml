@@ -1,0 +1,39 @@
+name: AhaFrame validation read models
+description: Shared Supabase-compatible read-model checks for GitHub-hosted and self-hosted runners.
+
+runs:
+  using: composite
+  steps:
+    - name: Ensure PostgreSQL client
+      shell: bash
+      run: |
+        if command -v psql >/dev/null 2>&1; then
+          psql --version
+          exit 0
+        fi
+        sudo apt-get update
+        sudo apt-get install -y postgresql-client
+    - name: Prepare Supabase-compatible test roles
+      shell: bash
+      env:
+        PGPASSWORD: postgres
+      run: |
+        psql -h 127.0.0.1 -U postgres -d ahaframe_test -v ON_ERROR_STOP=1 <<'SQL'
+        create role anon noinherit;
+        create role authenticated noinherit;
+        create role service_role noinherit;
+        SQL
+    - name: Apply validation migrations
+      shell: bash
+      env:
+        PGPASSWORD: postgres
+      run: |
+        for migration in supabase/migrations/*.sql; do
+          echo "Applying $migration"
+          psql -h 127.0.0.1 -U postgres -d ahaframe_test -v ON_ERROR_STOP=1 -f "$migration"
+        done
+    - name: Test Validation read models
+      shell: bash
+      env:
+        PGPASSWORD: postgres
+      run: psql -h 127.0.0.1 -U postgres -d ahaframe_test -v ON_ERROR_STOP=1 -f scripts/test_validation_read_models.sql
