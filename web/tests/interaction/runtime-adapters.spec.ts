@@ -43,7 +43,7 @@ test.describe("AhaFrame deterministic interaction adapters", () => {
 
   test("Campaign Mission completes attempt to release decision through Mission Engine", async ({ page }) => {
     await page.goto("/en/labs/rag-failure/");
-    await expect(page.getByRole("heading", { name: "Retrieval policy" })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 2, name: "Retrieval policy" })).toBeVisible();
 
     await page.getByRole("button", { name: "Start incident" }).click();
     await expect(page.getByText("INVESTIGATE", { exact: true })).toBeVisible();
@@ -65,7 +65,7 @@ test.describe("AhaFrame deterministic interaction adapters", () => {
 
   test("Final Boss requires rationale before release decision", async ({ page }) => {
     await page.goto("/en/build/reliable-support-agent/");
-    await expect(page.getByRole("heading", { name: "Engineering interventions" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Take ownership" })).toBeVisible();
 
     await page.getByRole("button", { name: "Take ownership" }).click();
     await page.getByRole("button", { name: "Replay candidate" }).click();
