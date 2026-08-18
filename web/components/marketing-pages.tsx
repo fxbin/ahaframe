@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { localizedPath, segmentForLocale, type Locale, type MarketingContent } from "@/lib/content";
+import { WaitlistForm } from "@/components/waitlist-form";
 
 interface MarketingPageProps {
   locale: Locale;
@@ -21,7 +22,7 @@ export function PricingPage({ locale, content }: MarketingPageProps) {
 
         <div className="mt-12 grid gap-4 lg:grid-cols-3">
           {pricing.plans.map((plan) => (
-            <article key={plan.name} className="flex rounded-[26px] border border-[var(--border)] bg-white p-6 shadow-sm flex-col">
+            <article key={plan.name} className="flex flex-col rounded-[26px] border border-[var(--border)] bg-white p-6 shadow-sm">
               <div className="min-h-7 text-xs font-bold uppercase tracking-[0.12em] text-[var(--primary)]">{plan.badge}</div>
               <h2 className="mt-2 text-2xl font-black tracking-[-0.04em]">{plan.name}</h2>
               <p className="mt-2 min-h-14 leading-6 text-[var(--muted)]">{plan.description}</p>
@@ -61,7 +62,6 @@ export function PricingPage({ locale, content }: MarketingPageProps) {
 
 export function EarlyAccessPage({ locale, content }: MarketingPageProps) {
   const page = content.earlyAccess;
-  const segment = segmentForLocale(locale);
 
   return (
     <main className="py-16 sm:py-20">
@@ -75,18 +75,18 @@ export function EarlyAccessPage({ locale, content }: MarketingPageProps) {
 
         <aside className="self-start rounded-[28px] border border-[var(--border)] bg-white p-6 shadow-[var(--shadow)] sm:p-8">
           <h2 className="text-2xl font-black tracking-[-0.04em]">{page.eyebrow}</h2>
-          <form className="mt-6" action={`/${segment}/early-access/`} method="get">
-            <label className="text-sm font-bold" htmlFor="early-access-email">{page.emailLabel}</label>
-            <input id="early-access-email" name="email" type="email" autoComplete="email" placeholder={page.placeholder} className="mt-2 w-full rounded-2xl border border-[var(--border)] bg-[var(--bg)] px-4 py-3 outline-none focus:border-[var(--primary)]" />
-            <button className="mt-3 w-full rounded-full bg-[var(--text)] px-5 py-3 text-sm font-bold text-white" type="submit">{page.button}</button>
-          </form>
-          <p className="mt-4 text-xs leading-5 text-[var(--muted)]">{page.trustNote}</p>
-          <div className="mt-7 rounded-2xl bg-[var(--surface-soft)] p-4">
-            <div className="font-bold">{page.successTitle}</div>
-            <div className="mt-1 text-sm leading-6 text-[var(--muted)]">{page.successCopy}</div>
-            <Link className="mt-3 inline-flex text-sm font-bold text-[var(--primary)]" href={`/${segment}/#foundations`}>{page.successLink}</Link>
+          <div className="mt-6">
+            <WaitlistForm
+              locale={locale}
+              emailLabel={page.emailLabel}
+              placeholder={page.placeholder}
+              button={page.button}
+              trustNote={page.trustNote}
+              successTitle={page.successTitle}
+              successCopy={page.successCopy}
+              successLink={page.successLink}
+            />
           </div>
-          <p className="mt-5 text-xs leading-5 text-[var(--muted)]">M2 preserves the public content surface. Durable waitlist submission remains on the legacy runtime until the validation adapter is mounted in Next.js.</p>
         </aside>
       </section>
     </main>
