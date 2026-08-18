@@ -1,0 +1,69 @@
+name: AhaFrame Python runtime
+description: Configure Python consistently across GitHub-hosted and self-hosted runners.
+
+inputs:
+  python-version:
+    description: Python major.minor version to use.
+    required: false
+    default: '3.13'
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Python on GitHub-hosted or non-macOS runners
+      if: ${{ runner.environment != 'self-hosted' || runner.os != 'macOS' }}
+      uses: actions/setup-python@v6
+      with:
+        python-version: ${{ inputs.python-version }}
+
+    - name: Set up Python on self-hosted macOS
+      if: ${{ runner.environment == 'self-hosted' && runner.os == 'macOS' }}
+      shell: bash
+      env:
+        PYTHON_VERSION: ${{ inputs.python-version }}
+      run: |
+        set -euo pipefail
+
+        python_matches() {
+          command -v python3 >/dev/null 2>&1 && \
+            python3 -c "import sys; raise SystemExit(0 if sys.version_info[:2] == tuple(map(int, '${PYTHON_VERSION}'.split('.'))) else 1)"
+        }
+
+        if python_matches; then
+          echo "Using existing $(python3 --version) at $(command -v python3)"
+          exit 0
+        fi
+
+        brew_bin="$(command -v brew || true)"
+        if [ -z "$brew_bin" ] && [ -x /opt/homebrew/bin/brew ]; then
+          brew_bin=/opt/homebrew/bin/brew
+        fi
+        if [ -z "$brew_bin" ] && [ -x /usr/local/bin/brew ]; then
+          brew_bin=/usr/local/bin/brew
+        fi
+
+        if [ -z "$brew_bin" ]; then
+          echo "Python ${PYTHON_VERSION} is not available and Homebrew was not found." >&2
+          echo "Install Homebrew or Python ${PYTHON_VERSION} on this self-hosted macOS runner." >&2
+          exit 1
+        fi
+
+        formula="python@${PYTHON_VERSION}"
+        if ! "$brew_bin" list --versions "$formula" >/dev/null 2>&1; then
+          "$brew_bin" install "$formula"
+        fi
+
+        prefix="$("$brew_bin" --prefix "$formula")"
+        echo "$prefix/libexec/bin" >> "$GITHUB_PATH"
+        echo "$prefix/bin" >> "$GITHUB_PATH"
+        "$prefix/bin/python${PYTHON_VERSION}" --version
+
+    - name: Verify Python runtime
+      shell: bash
+      env:
+        PYTHON_VERSION: ${{ inputs.python-version }}
+      run: |
+        set -euo pipefail
+        python3 --version
+        python3 -c "import sys; expected=tuple(map(int, '${PYTHON_VERSION}'.split('.'))); assert sys.version_info[:2] == expected, (sys.version_info, expected)"
+        python3 -m pip --version

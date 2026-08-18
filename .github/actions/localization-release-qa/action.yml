@@ -4,7 +4,7 @@ description: Shared localization release checks for GitHub-hosted and self-hoste
 runs:
   using: composite
   steps:
-    - uses: actions/setup-python@v6
+    - uses: ./.github/actions/setup-python-runtime
       with:
         python-version: '3.13'
     - uses: actions/setup-node@v5
@@ -13,7 +13,7 @@ runs:
         package-manager-cache: false
     - name: Install validation dependencies
       shell: bash
-      run: pip install -r requirements-dev.txt
+      run: python3 -m pip install -r requirements-dev.txt
     - name: Test bilingual validation runtime
       shell: bash
       run: node scripts/test_validation_runtime.js
