@@ -1,0 +1,64 @@
+name: M4 Stack CI
+
+on:
+  push:
+    branches: [platform/m4-parity-proof]
+  pull_request:
+    branches: [platform/m3-interaction-engine]
+    types: [opened, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/core-validation
+      - name: Check browser secret boundary
+        working-directory: web
+        run: npm run check:browser-secrets
+      - name: Install Playwright Chromium
+        working-directory: web
+        run: npx playwright install --with-deps chromium
+      - name: Re-run M3 interaction gate
+        working-directory: web
+        run: npm run test:interaction
+      - name: Prove legacy-to-Next parity
+        working-directory: web
+        run: npm run test:parity
+      - name: Summarize M4 parity evidence
+        if: success()
+        run: |
+          {
+            echo '## M4 parity gate'
+            echo '- core validation: PASS'
+            echo '- browser secret boundary: PASS'
+            echo '- M3 Chromium interaction gate: PASS'
+            echo '- 26-route SEO / structured-data / crawlability parity: PASS'
+            echo '- internal-link contract: PASS'
+            echo '- sitemap + pre-cutover robots safeguard: PASS'
+            echo '- mobile critical-path visual/runtime gate: PASS'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  validation-read-models:
+    name: validation-read-models
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: ahaframe_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d ahaframe_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/validation-read-models
