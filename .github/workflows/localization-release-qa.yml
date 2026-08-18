@@ -14,27 +14,65 @@ concurrency:
 
 permissions:
   contents: read
+  actions: read
 
 jobs:
-  zh-cn-release-gate:
+  cloud-localization-release-qa:
+    name: cloud-localization-release-qa
     runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.13'
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '24'
-      - name: Install validation dependencies
-        run: pip install -r requirements-dev.txt
-      - name: Test bilingual validation runtime
-        run: node scripts/test_validation_runtime.js
-      - name: Build bilingual static site
+      - uses: ./.github/actions/localization-release-qa
+
+  route-cloud-result:
+    name: route-cloud-result
+    needs: cloud-localization-release-qa
+    if: ${{ always() }}
+    runs-on: [self-hosted, linux, x64]
+    outputs:
+      localization: ${{ steps.localization.outputs.localization }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Classify cloud localization QA
+        id: localization
         env:
-          AHAFRAME_BASE_URL: https://ahaframe.com
-        run: python3 scripts/build_site.py
-      - name: Run localization release QA
-        run: python3 scripts/test_release_localization_qa.py
-      - name: Compile production smoke harness
-        run: python3 -m py_compile scripts/smoke_production.py
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python3 .github/scripts/classify-cloud-job.py --job cloud-localization-release-qa --output localization
+
+  fallback-localization-release-qa:
+    name: fallback-localization-release-qa
+    needs: route-cloud-result
+    if: ${{ needs.route-cloud-result.outputs.localization == 'fallback' }}
+    runs-on: [self-hosted, linux, x64]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/localization-release-qa
+
+  zh-cn-release-gate:
+    name: zh-cn-release-gate
+    needs: [route-cloud-result, fallback-localization-release-qa]
+    if: ${{ always() }}
+    runs-on: [self-hosted, linux, x64]
+    steps:
+      - name: Enforce localization QA result
+        env:
+          CLOUD_STATE: ${{ needs.route-cloud-result.outputs.localization }}
+          FALLBACK_RESULT: ${{ needs.fallback-localization-release-qa.result }}
+        run: |
+          case "$CLOUD_STATE" in
+            passed)
+              echo 'Localization QA passed on GitHub-hosted runner.'
+              ;;
+            fallback)
+              if [ "$FALLBACK_RESULT" != 'success' ]; then
+                echo "Self-hosted localization fallback did not pass: $FALLBACK_RESULT"
+                exit 1
+              fi
+              echo 'Localization QA passed on self-hosted fallback.'
+              ;;
+            *)
+              echo "Localization QA failed in code or could not be classified: $CLOUD_STATE"
+              exit 1
+              ;;
+          esac
