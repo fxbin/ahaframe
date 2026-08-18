@@ -2,9 +2,11 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { LabPage } from "@/components/lab-page";
 import { MissionPage } from "@/components/mission-page";
+import { StructuredData } from "@/components/structured-data";
 import { getLabContent, localeFromSegment } from "@/lib/content";
 import { pageMetadata } from "@/lib/metadata";
 import { getMissionContent } from "@/lib/mission";
+import { labSchema, missionSchema } from "@/lib/schema";
 
 const LAB_SLUGS = [
   "instruction-conflict",
@@ -44,9 +46,21 @@ export default async function LabRoute({ params }: PageProps) {
   if (!locale) notFound();
 
   const mission = await getMissionContent(locale, slug);
-  if (mission) return <MissionPage locale={locale} mission={mission} />;
+  if (mission) {
+    return (
+      <>
+        <StructuredData value={missionSchema(locale, `labs/${slug}/`, mission)} />
+        <MissionPage locale={locale} mission={mission} />
+      </>
+    );
+  }
 
   const lab = await getLabContent(locale, slug);
   if (!lab) notFound();
-  return <LabPage locale={locale} lab={lab} />;
+  return (
+    <>
+      <StructuredData value={labSchema(locale, slug, lab)} />
+      <LabPage locale={locale} lab={lab} />
+    </>
+  );
 }
