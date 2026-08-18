@@ -42,16 +42,29 @@ jobs:
           CUTOVER_EXPECT_INDEXING: '0'
         run: |
           set -euo pipefail
+          if curl -fsS --max-time 1 http://127.0.0.1:4300/assets/build-meta.json >/dev/null 2>&1; then
+            echo 'Port 4300 is unexpectedly occupied before fail-closed rehearsal.'
+            exit 1
+          fi
           log_file="${RUNNER_TEMP}/ahaframe-cutover-default.log"
-          npm run start -- --hostname 127.0.0.1 --port 4300 >"$log_file" 2>&1 &
+          setsid ./node_modules/.bin/next start --hostname 127.0.0.1 --port 4300 >"$log_file" 2>&1 &
           server_pid=$!
-          cleanup() { kill "$server_pid" >/dev/null 2>&1 || true; }
+          cleanup() {
+            kill -TERM -- "-$server_pid" >/dev/null 2>&1 || true
+            wait "$server_pid" >/dev/null 2>&1 || true
+          }
           trap cleanup EXIT
           for attempt in {1..40}; do
             if curl -fsS http://127.0.0.1:4300/assets/build-meta.json >/dev/null; then break; fi
             sleep 0.5
           done
           node scripts/check-cutover-runtime.mjs
+          cleanup
+          trap - EXIT
+          if curl -fsS --max-time 1 http://127.0.0.1:4300/assets/build-meta.json >/dev/null 2>&1; then
+            echo 'Fail-closed Next server did not release port 4300.'
+            exit 1
+          fi
 
       - name: Build exact production-equivalent candidate with indexing enabled
         working-directory: web
@@ -77,16 +90,29 @@ jobs:
           CUTOVER_EXPECT_INDEXING: '1'
         run: |
           set -euo pipefail
+          if curl -fsS --max-time 1 http://127.0.0.1:4300/assets/build-meta.json >/dev/null 2>&1; then
+            echo 'Port 4300 is unexpectedly occupied before index-enabled rehearsal.'
+            exit 1
+          fi
           log_file="${RUNNER_TEMP}/ahaframe-cutover-enabled.log"
-          npm run start -- --hostname 127.0.0.1 --port 4300 >"$log_file" 2>&1 &
+          setsid ./node_modules/.bin/next start --hostname 127.0.0.1 --port 4300 >"$log_file" 2>&1 &
           server_pid=$!
-          cleanup() { kill "$server_pid" >/dev/null 2>&1 || true; }
+          cleanup() {
+            kill -TERM -- "-$server_pid" >/dev/null 2>&1 || true
+            wait "$server_pid" >/dev/null 2>&1 || true
+          }
           trap cleanup EXIT
           for attempt in {1..40}; do
             if curl -fsS http://127.0.0.1:4300/assets/build-meta.json >/dev/null; then break; fi
             sleep 0.5
           done
           node scripts/check-cutover-runtime.mjs
+          cleanup
+          trap - EXIT
+          if curl -fsS --max-time 1 http://127.0.0.1:4300/assets/build-meta.json >/dev/null 2>&1; then
+            echo 'Index-enabled Next server did not release port 4300.'
+            exit 1
+          fi
 
       - name: Summarize M5 rehearsal evidence
         if: success()
@@ -95,9 +121,10 @@ jobs:
             echo '## M5 cutover rehearsal'
             echo '- M2/M3/M4 regression gates: PASS'
             echo '- default fail-closed indexing mode: PASS'
-            echo '- exact Next release marker: PASS'
+            echo '- exact Next release marker + indexing mode identity: PASS'
             echo '- canonical trailing-slash redirects: PASS'
             echo '- inherited production security headers: PASS'
+            echo '- isolated server lifecycle between blocked/enabled rehearsals: PASS'
             echo '- clean production-equivalent indexing-enabled rebuild: PASS'
             echo '- browser-secret boundary before/after index flip: PASS'
             echo '- rollback runbook: docs/NEXT_RUNTIME_CUTOVER.md'
