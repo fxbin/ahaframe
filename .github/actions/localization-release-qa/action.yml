@@ -1,0 +1,29 @@
+name: AhaFrame localization release QA
+description: Shared localization release checks for GitHub-hosted and self-hosted runners.
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.13'
+    - uses: actions/setup-node@v4
+      with:
+        node-version: '24'
+    - name: Install validation dependencies
+      shell: bash
+      run: pip install -r requirements-dev.txt
+    - name: Test bilingual validation runtime
+      shell: bash
+      run: node scripts/test_validation_runtime.js
+    - name: Build bilingual static site
+      shell: bash
+      env:
+        AHAFRAME_BASE_URL: https://ahaframe.com
+      run: python3 scripts/build_site.py
+    - name: Run localization release QA
+      shell: bash
+      run: python3 scripts/test_release_localization_qa.py
+    - name: Compile production smoke harness
+      shell: bash
+      run: python3 -m py_compile scripts/smoke_production.py
