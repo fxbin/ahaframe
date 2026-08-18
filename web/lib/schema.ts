@@ -8,17 +8,20 @@ function absolute(locale: Locale, relativePath = ""): string {
   return `${BASE_URL}/${segmentForLocale(locale)}/${relativePath.replace(/^\/+/, "")}`;
 }
 
+export function organizationSchema() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "@id": `${BASE_URL}/#organization`,
+    name: "AhaFrame",
+    url: BASE_URL,
+    description: "Interactive visual lessons for understanding and building AI systems.",
+  };
+}
+
 export function campaignSchemas(locale: Locale, content: CampaignDiscoveryContent, contract: CampaignContract) {
   const byId = Object.fromEntries(contract.experiences.map((item) => [item.id, item]));
   return [
-    {
-      "@context": "https://schema.org",
-      "@type": "Organization",
-      "@id": `${BASE_URL}/#organization`,
-      name: "AhaFrame",
-      url: BASE_URL,
-      description: "Interactive visual lessons for understanding and building AI systems.",
-    },
     {
       "@context": "https://schema.org",
       "@type": "WebSite",
