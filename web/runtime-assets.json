@@ -3,6 +3,7 @@
   "assets": [
     "lab-engine.js",
     "lab-scenarios.js",
+    "instruction-conflict-scenario.js",
     "context-compression-scenario.js",
     "agent-workflow-graph-scenario.js",
     "evaluation-scenario.js",
