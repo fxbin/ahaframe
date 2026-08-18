@@ -20,6 +20,18 @@ const EXPECTED = [
   "reliable-support-agent",
 ].sort();
 
+const FINAL_BOSS_SCRIPTS = [
+  "lab-engine.js",
+  "lab-scenarios.js",
+  "instruction-conflict-scenario.js",
+  "context-compression-scenario.js",
+  "agent-workflow-graph-scenario.js",
+  "evaluation-scenario.js",
+  "reliable-support-scenario.js",
+  "mission-engine.js",
+  "production-support-launch-mission.js",
+];
+
 const experiences = runtimeExperiences?.experiences;
 if (!experiences || runtimeExperiences.version !== 1 || typeof experiences !== "object") {
   throw new Error("runtime-experiences.json must declare a version 1 experiences object.");
@@ -67,4 +79,8 @@ for (const [key, experience] of Object.entries(experiences)) {
   }
 }
 
-console.log(`PASS Runtime experience manifest: ${keys.length} interactive routes have deterministic IDs and canonical script order.`);
+if (JSON.stringify(experiences["reliable-support-agent"].scripts) !== JSON.stringify(FINAL_BOSS_SCRIPTS)) {
+  throw new Error("Final Boss must load every canonical component scenario before reliable-support-scenario.js and Mission Engine.");
+}
+
+console.log(`PASS Runtime experience manifest: ${keys.length} interactive routes have deterministic IDs, canonical script order, and Final Boss transitive scenario dependencies.`);
