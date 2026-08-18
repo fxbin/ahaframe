@@ -7,10 +7,7 @@ import urllib.request
 
 SELF_HOSTED = '"self-hosted"'
 GITHUB_HOSTED = '"ubuntu-latest"'
-PLAN_MINUTES = {
-    "free": 2000,
-    "pro": 3000,
-}
+INCLUDED_MINUTES = int(os.environ.get("ACTIONS_INCLUDED_MINUTES", "2000"))
 RESERVE_MINUTES = int(os.environ.get("ACTIONS_CLOUD_RESERVE_MINUTES", "120"))
 
 
@@ -50,18 +47,15 @@ def main() -> int:
         choose_self_hosted("GH_BILLING_READ_TOKEN is not configured")
         return 0
 
+    owner = os.environ.get("GITHUB_REPOSITORY_OWNER", "").strip()
+    if not owner:
+        choose_self_hosted("GITHUB_REPOSITORY_OWNER is unavailable")
+        return 0
+
     api = os.environ.get("GITHUB_API_URL", "https://api.github.com")
     try:
-        user = request_json(f"{api}/user", token)
-        login = user.get("login")
-        plan_name = ((user.get("plan") or {}).get("name") or "").lower()
-        included = PLAN_MINUTES.get(plan_name)
-        if not login or included is None:
-            choose_self_hosted(f"unsupported or unknown GitHub plan: {plan_name or 'unknown'}")
-            return 0
-
         usage = request_json(
-            f"{api}/users/{login}/settings/billing/usage/summary?product=Actions",
+            f"{api}/users/{owner}/settings/billing/usage/summary?product=Actions",
             token,
         )
         minute_items = [
@@ -70,15 +64,13 @@ def main() -> int:
             if str(item.get("product", "")).lower() == "actions"
             and str(item.get("unitType", "")).lower() == "minutes"
         ]
-        discounted = sum(float(item.get("discountQuantity") or 0) for item in minute_items)
         gross = sum(float(item.get("grossQuantity") or 0) for item in minute_items)
-        used_included = discounted if discounted > 0 else min(gross, included)
-        remaining = max(0.0, included - used_included)
+        used_included = min(gross, INCLUDED_MINUTES)
+        remaining = max(0.0, INCLUDED_MINUTES - used_included)
 
         print(
-            f"GitHub plan={plan_name}, included={included}, "
-            f"used_included={used_included:.1f}, remaining={remaining:.1f}, "
-            f"reserve={RESERVE_MINUTES}"
+            f"Actions included={INCLUDED_MINUTES}, gross_minutes={gross:.1f}, "
+            f"remaining_included={remaining:.1f}, reserve={RESERVE_MINUTES}"
         )
 
         if remaining > RESERVE_MINUTES:
