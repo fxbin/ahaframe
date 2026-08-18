@@ -8,8 +8,7 @@ if (!/^[0-9a-f]{40}$/i.test(expectedCommit)) {
 }
 
 async function request(path, options = {}) {
-  const response = await fetch(`${baseUrl}${path}`, options);
-  return response;
+  return fetch(`${baseUrl}${path}`, options);
 }
 
 function requireHeader(response, name, expected) {
@@ -28,6 +27,9 @@ if (marker.gitCommitSha !== expectedCommit) {
 }
 if (expectedEnvironment && marker.environment !== expectedEnvironment) {
   throw new Error(`release marker environment mismatch: expected ${expectedEnvironment}; got ${marker.environment}`);
+}
+if (marker.indexingEnabled !== expectIndexing) {
+  throw new Error(`release marker indexing mismatch: expected ${expectIndexing}; got ${marker.indexingEnabled}`);
 }
 
 const slashRedirect = await request("/en", { redirect: "manual" });
@@ -55,27 +57,33 @@ for (const path of criticalRoutes) {
   requireHeader(response, "permissions-policy", "camera=(), microphone=(), geolocation=()");
 }
 
-const home = await request("/en/");
+const [home, robotsResponse] = await Promise.all([request("/en/"), request("/robots.txt")]);
 const html = await home.text();
 const robotsMeta = html.match(/<meta[^>]+name=["']robots["'][^>]+content=["']([^"']+)["']/i)?.[1]?.toLowerCase() || "";
-if (expectIndexing) {
-  if (!robotsMeta.includes("index") || !robotsMeta.includes("follow") || robotsMeta.includes("noindex") || robotsMeta.includes("nofollow")) {
-    throw new Error(`index-enabled build has unexpected robots meta: ${robotsMeta}`);
-  }
-} else if (!robotsMeta.includes("noindex") || !robotsMeta.includes("nofollow")) {
-  throw new Error(`fail-closed build must emit noindex,nofollow; got: ${robotsMeta}`);
-}
-
-const robotsResponse = await request("/robots.txt");
 if (robotsResponse.status !== 200) throw new Error(`robots.txt returned HTTP ${robotsResponse.status}`);
 const robots = await robotsResponse.text();
-if (!robots.includes("https://ahaframe.com/sitemap.xml")) throw new Error("robots.txt lost the canonical sitemap URL.");
+
+const errors = [];
 if (expectIndexing) {
-  if (!/Allow:\s*\//i.test(robots) || /Disallow:\s*\//i.test(robots)) {
-    throw new Error(`index-enabled robots.txt must allow root without a root disallow:\n${robots}`);
+  if (!robotsMeta.includes("index") || !robotsMeta.includes("follow") || robotsMeta.includes("noindex") || robotsMeta.includes("nofollow")) {
+    errors.push(`page robots meta expected index,follow; got ${robotsMeta || "<missing>"}`);
   }
-} else if (!/Disallow:\s*\//i.test(robots)) {
-  throw new Error(`fail-closed robots.txt must disallow root:\n${robots}`);
+  if (!/Allow:\s*\//i.test(robots) || /Disallow:\s*\//i.test(robots)) {
+    errors.push(`robots.txt expected Allow: / without root Disallow; got ${JSON.stringify(robots)}`);
+  }
+} else {
+  if (!robotsMeta.includes("noindex") || !robotsMeta.includes("nofollow")) {
+    errors.push(`page robots meta expected noindex,nofollow; got ${robotsMeta || "<missing>"}`);
+  }
+  if (!/Disallow:\s*\//i.test(robots)) {
+    errors.push(`robots.txt expected Disallow: /; got ${JSON.stringify(robots)}`);
+  }
+}
+if (!robots.includes("https://ahaframe.com/sitemap.xml")) errors.push("robots.txt lost the canonical sitemap URL");
+if (errors.length) {
+  throw new Error(
+    `indexing artifact mismatch (marker.indexingEnabled=${marker.indexingEnabled}):\n${errors.map((error) => `- ${error}`).join("\n")}`,
+  );
 }
 
 const sitemapResponse = await request("/sitemap.xml");
