@@ -11,6 +11,8 @@ export interface CommonUiCopy {
   buildChallenge: string;
   productionLab: string;
   evidence: string;
+  minutes: string;
+  experiences: string;
 }
 
 const COPY: Record<Locale, CommonUiCopy> = {
@@ -25,6 +27,8 @@ const COPY: Record<Locale, CommonUiCopy> = {
     buildChallenge: "Build challenge",
     productionLab: "Production Lab",
     evidence: "Evidence",
+    minutes: "min",
+    experiences: "experiences",
   },
   "zh-CN": {
     inOneSentence: "一句话理解",
@@ -37,6 +41,8 @@ const COPY: Record<Locale, CommonUiCopy> = {
     buildChallenge: "构建挑战",
     productionLab: "生产实验",
     evidence: "证据",
+    minutes: "分钟",
+    experiences: "个体验",
   },
 };
 
