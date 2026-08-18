@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { CampaignHomePage } from "@/components/campaign-home-page";
+import { StructuredData } from "@/components/structured-data";
 import { getCampaignContract, getCampaignDiscovery } from "@/lib/campaign";
 import { localeFromSegment } from "@/lib/content";
 import { pageMetadata } from "@/lib/metadata";
+import { campaignSchemas } from "@/lib/schema";
 
 interface PageProps {
   params: Promise<{ locale: string }>;
@@ -22,5 +24,10 @@ export default async function LocaleHomePage({ params }: PageProps) {
   const locale = localeFromSegment(segment);
   if (!locale) notFound();
   const [content, contract] = await Promise.all([getCampaignDiscovery(locale), getCampaignContract()]);
-  return <CampaignHomePage locale={locale} content={content} contract={contract} />;
+  return (
+    <>
+      <StructuredData value={campaignSchemas(locale, content, contract)} />
+      <CampaignHomePage locale={locale} content={content} contract={contract} />
+    </>
+  );
 }
