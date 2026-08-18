@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState, type FormEvent } from "react";
 import { segmentForLocale, type Locale } from "@/lib/content";
+import { getValidationContext } from "@/lib/validation-context";
 
 interface WaitlistFormProps {
   locale: Locale;
@@ -36,15 +37,16 @@ export function WaitlistForm({
     setStatus("submitting");
 
     const search = new URLSearchParams(window.location.search);
+    const context = getValidationContext();
     try {
       const response = await fetch("/api/waitlist", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
           email,
-          locale,
           intent: search.get("intent") || "waitlist",
-          source: window.location.href,
+          source: window.location.pathname,
+          ...context,
         }),
       });
       if (!response.ok) throw new Error("submission failed");
