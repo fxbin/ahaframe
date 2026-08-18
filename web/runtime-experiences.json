@@ -49,7 +49,17 @@
     "reliable-support-agent": {
       "kind": "mission",
       "runtimeId": "production-support-launch",
-      "scripts": ["lab-engine.js", "reliable-support-scenario.js", "mission-engine.js", "production-support-launch-mission.js"]
+      "scripts": [
+        "lab-engine.js",
+        "lab-scenarios.js",
+        "instruction-conflict-scenario.js",
+        "context-compression-scenario.js",
+        "agent-workflow-graph-scenario.js",
+        "evaluation-scenario.js",
+        "reliable-support-scenario.js",
+        "mission-engine.js",
+        "production-support-launch-mission.js"
+      ]
     }
   }
 }
