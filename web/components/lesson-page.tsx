@@ -19,9 +19,8 @@ export function LessonPage({ locale, ui, lesson }: LessonPageProps) {
 
         <div className="mt-10 grid gap-4 lg:grid-cols-[1.2fr_.8fr]">
           <div className="rounded-[28px] border border-[var(--border)] bg-white p-6 sm:p-8">
-            <div className="flex items-center justify-between gap-4"><h2 className="text-xl font-black tracking-[-0.03em]">{ui.lessonPath}</h2><span className="rounded-full bg-[var(--surface-soft)] px-3 py-1 text-xs text-[var(--muted)]">M2 · server rendered</span></div>
+            <h2 className="text-xl font-black tracking-[-0.03em]">{ui.lessonPath}</h2>
             <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{lesson.path.map((step, index) => <div key={step.name} className={`rounded-2xl border p-4 ${step.state === "active" ? "border-[var(--primary)] bg-[color-mix(in_srgb,var(--primary)_7%,white)]" : "border-[var(--border)] bg-[var(--bg)]"}`}><div className="text-xs font-bold text-[var(--primary)]">0{index + 1}</div><div className="mt-2 font-bold">{step.name}</div><div className="mt-1 text-sm text-[var(--muted)]">{step.description}</div></div>)}</div>
-            {lesson.labels ? <div className="mt-6 rounded-2xl bg-[var(--surface-soft)] p-5"><div className="text-xs font-bold uppercase tracking-[0.12em] text-[var(--primary)]">Interactive surface contract</div><div className="mt-4 grid gap-2 sm:grid-cols-2">{Object.values(lesson.labels).slice(0, 8).map((label) => <div key={label} className="rounded-xl bg-white px-3 py-2 text-sm">{label.replace(/<br\s*\/?>(.*)?/gi, " ")}</div>)}</div><p className="mt-4 text-xs leading-5 text-[var(--muted)]">The deterministic Lab Engine is intentionally mounted in Platform M3 (#28). M2 keeps the learning content crawlable without client JavaScript.</p></div> : null}
           </div>
 
           <aside className="rounded-[28px] bg-[var(--text)] p-6 text-white sm:p-8">
