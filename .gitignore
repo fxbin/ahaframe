@@ -8,6 +8,7 @@ coverage/
 *.log
 site/
 web/public/runtime/
+web/public/assets/build-meta.json
 __pycache__/
 *.py[cod]
 .venv/
