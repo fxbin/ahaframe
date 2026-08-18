@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { notFound } from "next/navigation";
+import { StructuredData } from "@/components/structured-data";
 import { ThirdPartyAnalytics } from "@/components/third-party-analytics";
 import { SiteFrame } from "@/components/site-frame";
 import { ValidationBootstrap } from "@/components/validation-bootstrap";
 import { getLocaleSource, localeFromSegment, SUPPORTED_SEGMENTS } from "@/lib/content";
+import { organizationSchema } from "@/lib/schema";
 import "../../globals.css";
 
 export const metadata: Metadata = {
@@ -39,6 +41,7 @@ export default async function LocaleRootLayout({
   return (
     <html lang={locale}>
       <body>
+        <StructuredData value={organizationSchema()} />
         <ValidationBootstrap />
         <SiteFrame locale={locale} source={source}>
           {children}

@@ -36,7 +36,7 @@ export default async function LessonRoute({ params }: PageProps) {
   if (!lesson || !hasRuntimeExperience(slug)) notFound();
   return (
     <>
-      <StructuredData value={lessonSchema(locale, slug, lesson)} />
+      <StructuredData value={lessonSchema(locale, slug, lesson, content.ui.lessons)} />
       <LessonPage locale={locale} ui={content.ui} lesson={lesson} experienceKey={slug} />
     </>
   );
