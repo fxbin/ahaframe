@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { LabPage } from "@/components/lab-page";
+import { MissionPage } from "@/components/mission-page";
 import { getLabContent, localeFromSegment } from "@/lib/content";
 import { pageMetadata } from "@/lib/metadata";
+import { getMissionContent } from "@/lib/mission";
 
 const LAB_SLUGS = [
   "instruction-conflict",
@@ -25,6 +27,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { locale: segment, slug } = await params;
   const locale = localeFromSegment(segment);
   if (!locale) return {};
+
+  const mission = await getMissionContent(locale, slug);
+  if (mission) {
+    return pageMetadata(locale, mission.seoTitle, mission.description, `labs/${slug}/`);
+  }
+
   const lab = await getLabContent(locale, slug);
   if (!lab) return {};
   return pageMetadata(locale, lab.seoTitle, lab.description, `labs/${slug}/`);
@@ -34,6 +42,10 @@ export default async function LabRoute({ params }: PageProps) {
   const { locale: segment, slug } = await params;
   const locale = localeFromSegment(segment);
   if (!locale) notFound();
+
+  const mission = await getMissionContent(locale, slug);
+  if (mission) return <MissionPage locale={locale} mission={mission} />;
+
   const lab = await getLabContent(locale, slug);
   if (!lab) notFound();
   return <LabPage locale={locale} lab={lab} />;
