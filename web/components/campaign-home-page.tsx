@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { localizedPath, segmentForLocale, type Locale } from "@/lib/content";
 import type { CampaignContract, CampaignDiscoveryContent, CampaignExperience } from "@/lib/campaign";
+import { commonUi } from "@/lib/ui-copy";
 
 interface CampaignHomePageProps {
   locale: Locale;
@@ -20,6 +21,7 @@ function experienceHref(experience: CampaignExperience, locale: Locale): string 
 
 export function CampaignHomePage({ locale, content, contract }: CampaignHomePageProps) {
   const segment = segmentForLocale(locale);
+  const ui = commonUi(locale);
   const byId = Object.fromEntries(contract.experiences.map((experience) => [experience.id, experience]));
   const campaign = contract.primaryCampaign.map((id) => byId[id]).filter(Boolean);
   if (campaign.length !== 4) {
@@ -88,7 +90,7 @@ export function CampaignHomePage({ locale, content, contract }: CampaignHomePage
 
       <section id="roadmap" className="py-20 sm:py-24">
         <div className="shell">
-          <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between"><div><p className="text-xs font-extrabold uppercase tracking-[0.18em] text-[var(--primary)]">{content.knowledge.kicker}</p><h2 className="mt-3 max-w-3xl text-3xl font-black tracking-[-0.04em] sm:text-4xl">{content.knowledge.title}</h2><p className="mt-4 max-w-3xl text-lg leading-8 text-[var(--muted)]">{content.knowledge.copy}</p></div><span className="rounded-full border border-[var(--border)] bg-white px-3 py-1 text-xs text-[var(--muted)]">{contract.experiences.length} experiences</span></div>
+          <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between"><div><p className="text-xs font-extrabold uppercase tracking-[0.18em] text-[var(--primary)]">{content.knowledge.kicker}</p><h2 className="mt-3 max-w-3xl text-3xl font-black tracking-[-0.04em] sm:text-4xl">{content.knowledge.title}</h2><p className="mt-4 max-w-3xl text-lg leading-8 text-[var(--muted)]">{content.knowledge.copy}</p></div><span className="rounded-full border border-[var(--border)] bg-white px-3 py-1 text-xs text-[var(--muted)]">{contract.experiences.length} {ui.experiences}</span></div>
           <div className="mt-10 grid gap-4 lg:grid-cols-2">{groups.map(([key, items]) => { const group = content.knowledge.groups[key]; return <article key={key} className="rounded-[24px] border border-[var(--border)] bg-white p-6"><h3 className="text-xl font-black">{group.title}</h3><p className="mt-2 text-sm leading-6 text-[var(--muted)]">{group.description}</p><div className="mt-5 divide-y divide-[var(--border)]">{items.map((experience) => { const copy = content.knowledge.experiences[experience.id]; return <Link key={experience.id} className="flex items-center justify-between gap-4 py-4" href={experienceHref(experience, locale)}><span><strong className="block">{copy.name}</strong><small className="mt-1 block leading-5 text-[var(--muted)]">{copy.note}</small></span><span aria-hidden="true" className="text-[var(--primary)]">→</span></Link>; })}</div></article>; })}</div>
         </div>
       </section>
