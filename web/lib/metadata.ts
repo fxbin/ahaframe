@@ -10,7 +10,7 @@ export function pageMetadata(locale: Locale, title: string, description: string,
   const canonical = `${SITE_URL}${pathname}`;
 
   return {
-    title,
+    title: { absolute: title },
     description,
     alternates: {
       canonical,
