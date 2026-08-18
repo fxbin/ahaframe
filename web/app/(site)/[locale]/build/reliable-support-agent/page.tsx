@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { MissionPage } from "@/components/mission-page";
+import { StructuredData } from "@/components/structured-data";
 import { localeFromSegment } from "@/lib/content";
 import { pageMetadata } from "@/lib/metadata";
 import { getMissionContent } from "@/lib/mission";
+import { missionSchema } from "@/lib/schema";
 
 interface PageProps {
   params: Promise<{ locale: string }>;
@@ -24,5 +26,10 @@ export default async function ReliableSupportAgentRoute({ params }: PageProps) {
   if (!locale) notFound();
   const mission = await getMissionContent(locale, "reliable-support-agent");
   if (!mission) notFound();
-  return <MissionPage locale={locale} mission={mission} />;
+  return (
+    <>
+      <StructuredData value={missionSchema(locale, "build/reliable-support-agent/", mission)} />
+      <MissionPage locale={locale} mission={mission} />
+    </>
+  );
 }
