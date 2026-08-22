@@ -1,0 +1,49 @@
+name: Prune merged branches
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  prune:
+    name: prune-merged-branches
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete branches fully merged into main
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const branches = await github.paginate(github.rest.repos.listBranches, {
+              owner,
+              repo,
+              per_page: 100,
+            });
+
+            for (const { name } of branches) {
+              if (name === 'main') continue;
+
+              const comparison = await github.rest.repos.compareCommitsWithBasehead({
+                owner,
+                repo,
+                basehead: `main...${name}`,
+              });
+
+              const { ahead_by: aheadBy, behind_by: behindBy } = comparison.data;
+              if (aheadBy !== 0) {
+                core.info(`KEEP ${name}: ahead=${aheadBy}, behind=${behindBy}`);
+                continue;
+              }
+
+              core.info(`DELETE ${name}: fully contained in main`);
+              await github.rest.git.deleteRef({
+                owner,
+                repo,
+                ref: `heads/${name}`,
+              });
+            }
