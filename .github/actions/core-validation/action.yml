@@ -53,6 +53,10 @@ runs:
       shell: bash
       run: node scripts/test_validation_runtime.js
 
+    - name: Test Validation backend boundary
+      shell: bash
+      run: python3 scripts/test_validation_backend.py
+
     - name: Test Lab reconciliation contract
       shell: bash
       run: python3 scripts/test_lab_reconciliation.py
