@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { loadRuntimeScripts, type MissionRuntime, type MissionSnapshot, type RuntimeRecord } from "@/lib/runtime-client";
 import { runtimeExperience, type RuntimeExperienceKey } from "@/lib/runtime-manifest";
+import { trackValidationEvent } from "@/lib/validation-client";
 import type { RuntimeStatus } from "@/hooks/use-lab-runtime";
 
 type MissionRuntimeState = {
@@ -11,6 +12,17 @@ type MissionRuntimeState = {
   snapshot: MissionSnapshot | null;
   error: string | null;
 };
+
+const INTERVENTION_EVENTS: Record<string, string> = {
+  "broken-rag-pipeline": "rag_parameter_changed",
+  "47000-retry": "agent_reliability_parameter_changed",
+  "prompt-injection-attack": "instruction_conflict_parameter_changed",
+  "production-support-launch": "reliable_support_agent_architecture_changed",
+};
+
+function record(value: unknown): RuntimeRecord {
+  return value && typeof value === "object" && !Array.isArray(value) ? (value as RuntimeRecord) : {};
+}
 
 export function useMissionRuntime(experienceKey: RuntimeExperienceKey) {
   const definition = runtimeExperience(experienceKey);
@@ -55,12 +67,17 @@ export function useMissionRuntime(experienceKey: RuntimeExperienceKey) {
   const refresh = useCallback(() => commitSnapshot(requireRuntime().getSnapshot()), [commitSnapshot, requireRuntime]);
   const kindError = definition.kind === "mission" ? null : `${experienceKey} is not a Mission runtime experience.`;
   const visibleState = runtimeState.key === experienceKey ? runtimeState : { key: experienceKey, status: "loading" as const, snapshot: null, error: null };
+  const missionId = definition.runtimeId;
 
   return {
     status: kindError ? "error" as const : visibleState.status,
     error: kindError ?? visibleState.error,
     snapshot: kindError ? null : visibleState.snapshot,
-    start: useCallback(() => commitSnapshot(requireRuntime().start()), [commitSnapshot, requireRuntime]),
+    start: useCallback(() => {
+      const snapshot = commitSnapshot(requireRuntime().start());
+      trackValidationEvent("mission_started", { missionId });
+      return snapshot;
+    }, [commitSnapshot, missionId, requireRuntime]),
     inspectEvidence: useCallback((id: string) => {
       const result = requireRuntime().inspectEvidence(id);
       refresh();
@@ -69,13 +86,24 @@ export function useMissionRuntime(experienceKey: RuntimeExperienceKey) {
     intervene: useCallback((id: string, payload?: RuntimeRecord) => {
       const result = requireRuntime().intervene(id, payload);
       refresh();
+      trackValidationEvent(INTERVENTION_EVENTS[missionId] || "mission_parameter_changed", {
+        missionId,
+        interventionId: id,
+        value: typeof payload?.value === "string" || typeof payload?.value === "number" || typeof payload?.value === "boolean" ? payload.value : null,
+      });
       return result;
-    }, [refresh, requireRuntime]),
+    }, [missionId, refresh, requireRuntime]),
     runSimulation: useCallback(() => {
       const result = requireRuntime().runSimulation();
       refresh();
+      const attempt = record(result.attempt);
+      trackValidationEvent("simulation_run", {
+        missionId,
+        attemptNumber: typeof attempt.attemptNumber === "number" ? attempt.attemptNumber : null,
+        outcomeCode: typeof attempt.outcomeCode === "string" ? attempt.outcomeCode : null,
+      });
       return result;
-    }, [refresh, requireRuntime]),
+    }, [missionId, refresh, requireRuntime]),
     compareAttempts: useCallback((left: number, right: number) => requireRuntime().compareAttempts(left, right), [requireRuntime]),
     restoreAttempt: useCallback((number: number) => {
       const result = requireRuntime().restoreAttempt(number);
@@ -83,8 +111,26 @@ export function useMissionRuntime(experienceKey: RuntimeExperienceKey) {
       return result;
     }, [refresh, requireRuntime]),
     readyToDecide: useCallback(() => commitSnapshot(requireRuntime().readyToDecide()), [commitSnapshot, requireRuntime]),
-    submitReleaseDecision: useCallback((decision: string) => commitSnapshot(requireRuntime().submitReleaseDecision(decision)), [commitSnapshot, requireRuntime]),
-    complete: useCallback(() => commitSnapshot(requireRuntime().complete()), [commitSnapshot, requireRuntime]),
+    submitReleaseDecision: useCallback((decision: string) => {
+      const snapshot = commitSnapshot(requireRuntime().submitReleaseDecision(decision));
+      const mission = record(snapshot.mission);
+      trackValidationEvent("release_decision_submitted", {
+        missionId,
+        decision,
+        outcomeCode: typeof mission.outcomeCode === "string" ? mission.outcomeCode : null,
+      });
+      return snapshot;
+    }, [commitSnapshot, missionId, requireRuntime]),
+    complete: useCallback(() => {
+      const snapshot = commitSnapshot(requireRuntime().complete());
+      const mission = record(snapshot.mission);
+      trackValidationEvent("mission_completed", {
+        missionId,
+        decision: typeof mission.releaseDecision === "string" ? mission.releaseDecision : null,
+        outcomeCode: typeof mission.outcomeCode === "string" ? mission.outcomeCode : null,
+      });
+      return snapshot;
+    }, [commitSnapshot, missionId, requireRuntime]),
     reset: useCallback(() => commitSnapshot(requireRuntime().reset()), [commitSnapshot, requireRuntime]),
     listAttempts: useCallback(() => requireRuntime().listAttempts(), [requireRuntime]),
   };
