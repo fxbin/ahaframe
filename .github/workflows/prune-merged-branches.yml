@@ -1,4 +1,4 @@
-name: Prune merged branches
+name: Prune stale branches
 
 on:
   workflow_dispatch:
@@ -7,13 +7,14 @@ on:
 
 permissions:
   contents: write
+  pull-requests: read
 
 jobs:
   prune:
-    name: prune-merged-branches
+    name: prune-stale-branches
     runs-on: ubuntu-latest
     steps:
-      - name: Delete branches fully merged into main
+      - name: Delete branches whose work is already closed
         uses: actions/github-script@v8
         with:
           script: |
@@ -28,22 +29,47 @@ jobs:
             for (const { name } of branches) {
               if (name === 'main') continue;
 
+              const pulls = await github.paginate(github.rest.pulls.list, {
+                owner,
+                repo,
+                state: 'all',
+                head: `${owner}:${name}`,
+                per_page: 100,
+              });
+
+              const openPull = pulls.find((pull) => pull.state === 'open');
+              if (openPull) {
+                core.info(`KEEP ${name}: open PR #${openPull.number}`);
+                continue;
+              }
+
+              if (pulls.length > 0) {
+                const refs = pulls.map((pull) => `#${pull.number}:${pull.merged_at ? 'merged' : 'closed'}`).join(', ');
+                core.info(`DELETE ${name}: no open PR; historical PRs=${refs}`);
+                await github.rest.git.deleteRef({
+                  owner,
+                  repo,
+                  ref: `heads/${name}`,
+                });
+                continue;
+              }
+
               const comparison = await github.rest.repos.compareCommitsWithBasehead({
                 owner,
                 repo,
                 basehead: `main...${name}`,
               });
-
               const { ahead_by: aheadBy, behind_by: behindBy } = comparison.data;
-              if (aheadBy !== 0) {
-                core.info(`KEEP ${name}: ahead=${aheadBy}, behind=${behindBy}`);
+
+              if (aheadBy === 0) {
+                core.info(`DELETE ${name}: fully contained in main`);
+                await github.rest.git.deleteRef({
+                  owner,
+                  repo,
+                  ref: `heads/${name}`,
+                });
                 continue;
               }
 
-              core.info(`DELETE ${name}: fully contained in main`);
-              await github.rest.git.deleteRef({
-                owner,
-                repo,
-                ref: `heads/${name}`,
-              });
+              core.info(`KEEP ${name}: no PR history and unique commits remain (ahead=${aheadBy}, behind=${behindBy})`);
             }
