@@ -22,8 +22,7 @@
     "prebuild": "npm run write:build-mode",
     "build": "npm run check:routes && npm run sync:runtime && npm run check:runtime && npm run check:experiences && npm run write:build-meta && next build",
     "start": "next start",
-    "test:interaction": "playwright test --config=playwright.interaction.config.ts",
-    "test:parity": "playwright test --config=playwright.parity.config.ts"
+    "test:interaction": "playwright test --config=playwright.interaction.config.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.10.0",

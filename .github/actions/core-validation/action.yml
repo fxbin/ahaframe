@@ -1,5 +1,5 @@
 name: AhaFrame core validation
-description: Shared validation steps for GitHub-hosted CI.
+description: Shared validation steps for the current Next.js production runtime.
 
 runs:
   using: composite
@@ -11,23 +11,23 @@ runs:
       with:
         node-version: '24'
         package-manager-cache: false
-    - name: Install validation dependencies
-      shell: bash
-      run: python3 -m pip install -r requirements-dev.txt
-    - name: Verify legacy source branding is gone
+
+    - name: Verify legacy branding is gone
       shell: bash
       run: |
-        test ! -d scripts/seeai
-        if grep -R -n -E 'SeeAI|SEEAI_|window\.SeeAI|seeai_' scripts src content; then
-          echo 'Legacy SeeAI branding remains in source.'
+        if grep -R -n -E 'SeeAI|SEEAI_|window\.SeeAI|seeai_' src/assets content web; then
+          echo 'Legacy SeeAI branding remains in current runtime sources.'
           exit 1
         fi
-    - name: Test Lab Engine
+
+    - name: Test deterministic Lab Engine
       shell: bash
       run: node scripts/test_lab_engine.js
-    - name: Test Mission Engine
+
+    - name: Test deterministic Mission Engine
       shell: bash
       run: node scripts/test_mission_engine.js
+
     - name: Test flagship Mission scenarios
       shell: bash
       run: |
@@ -41,107 +41,67 @@ runs:
           node "$test_file"
         done
         if [ "$found" -eq 0 ]; then
-          echo 'No flagship Mission scenario tests found yet.'
+          echo 'No flagship Mission scenario tests found.'
+          exit 1
         fi
+
     - name: Test Integrated Build
       shell: bash
       run: node scripts/test_integrated_build.js
+
     - name: Test Validation Runtime
       shell: bash
       run: node scripts/test_validation_runtime.js
-    - name: Test i18n Foundation
+
+    - name: Test Validation backend boundary
       shell: bash
-      run: python3 scripts/test_i18n_foundation.py
+      run: python3 scripts/test_validation_backend.py
+
     - name: Test Lab reconciliation contract
       shell: bash
       run: python3 scripts/test_lab_reconciliation.py
-    - name: Validate production smoke harness
-      shell: bash
-      run: python3 -m py_compile scripts/smoke_production.py
-    - name: Test exact production release marker
-      shell: bash
-      run: python3 scripts/test_production_release_marker.py
-    - name: Test Validation operator report
-      shell: bash
-      run: python3 scripts/test_validation_report.py
-    - name: Test Product Gate memo
-      shell: bash
-      run: python3 scripts/test_product_gate_memo.py
-    - name: Build static site
-      shell: bash
-      env:
-        AHAFRAME_BASE_URL: https://ahaframe.com
-      run: python3 scripts/build_site.py
-    - name: Test Campaign-first discovery
-      shell: bash
-      run: python3 scripts/test_campaign_discovery.py
+
     - name: Test Content & Experience preview contract
       shell: bash
       run: python3 scripts/test_content_preview_contract.py
-    - name: Test generated Mission pages
+
+    - name: Validate production smoke harness
       shell: bash
-      run: |
-        set -euo pipefail
-        found=0
-        for test_file in scripts/test_mission_page_*.py; do
-          [ -e "$test_file" ] || continue
-          found=1
-          echo "Running $test_file"
-          python3 "$test_file"
-        done
-        if [ "$found" -eq 0 ]; then
-          echo 'No generated Mission page tests found yet.'
-        fi
-    - name: Validate language switcher
+      run: python3 -m py_compile scripts/smoke_production.py
+
+    - name: Test Validation operator report
       shell: bash
-      run: python3 scripts/test_language_switcher.py
-    - name: Validate third-party analytics
+      run: python3 scripts/test_validation_report.py
+
+    - name: Test Product Gate memo
       shell: bash
-      run: python3 scripts/test_third_party_analytics.py
-    - name: Validate Foundation localization
-      shell: bash
-      run: python3 scripts/test_foundation_localization.py
-    - name: Validate Prompt and Context localization
-      shell: bash
-      run: python3 scripts/test_prompt_context_localization.py
-    - name: Validate Harness localization
-      shell: bash
-      run: python3 scripts/test_harness_localization.py
-    - name: Validate Graph and Evaluation localization
-      shell: bash
-      run: python3 scripts/test_graph_evaluation_localization.py
-    - name: Validate Integrated Build localization
-      shell: bash
-      run: python3 scripts/test_integrated_build_localization.py
-    - name: Validate
-      shell: bash
-      run: python3 scripts/validate.py
-    - name: Validate instrumentation build
-      shell: bash
-      run: python3 scripts/test_validation_build.py
-    - name: Verify generated brand migration
-      shell: bash
-      run: |
-        if grep -R -n -E 'SeeAI|SEEAI_|window\.SeeAI|seeai_' site; then
-          echo 'Legacy SeeAI branding remains in generated output.'
-          exit 1
-        fi
-    - name: Install Next.js migration dependencies
+      run: python3 scripts/test_product_gate_memo.py
+
+    - name: Install Next.js dependencies
       shell: bash
       working-directory: web
       run: npm install --no-audit --no-fund
-    - name: Lint Next.js migration app
+
+    - name: Lint Next.js app
       shell: bash
       working-directory: web
       run: npm run lint
-    - name: Typecheck Next.js migration app
+
+    - name: Typecheck Next.js app
       shell: bash
       working-directory: web
       run: npm run typecheck
-    - name: Build Next.js migration app
+
+    - name: Build Next.js app
       shell: bash
       working-directory: web
       run: npm run build
+
+    - name: Check browser secret boundary
+      shell: bash
+      working-directory: web
+      run: npm run check:browser-secrets
+
     - name: Smoke Next.js public routes at runtime
       shell: bash
       working-directory: web
@@ -187,6 +147,10 @@ runs:
         if "<html" not in root_html.lower() or "AhaFrame" not in root_html:
             raise RuntimeError("root route did not return the expected AhaFrame HTML shell")
 
+        marker = json.loads(fetch("/assets/build-meta.json"))
+        if marker.get("gitCommitSha") == "unknown":
+            raise RuntimeError("Next release marker must contain an exact commit SHA")
+
         repo_root = Path.cwd().parent
         checked = 1
         for locale, segment in (("en", "en"), ("zh-CN", "zh-cn")):
@@ -207,3 +171,13 @@ runs:
           echo 'Next runtime smoke server did not release port 3000.'
           exit 1
         fi
+
+    - name: Install Playwright Chromium
+      shell: bash
+      working-directory: web
+      run: npx playwright install --with-deps chromium
+
+    - name: Test current Lab and Mission interactions
+      shell: bash
+      working-directory: web
+      run: npm run test:interaction

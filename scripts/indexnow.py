@@ -1,14 +1,13 @@
-"""Submit the built sitemap URLs to IndexNow after deployment.
+"""Submit the deployed Next.js sitemap URLs to IndexNow.
 
 Workflow:
-  1. Build/deploy with INDEXNOW_KEY set so /{key}.txt is published.
-  2. Verify the deployed key file is publicly reachable.
-  3. Run this script with the same INDEXNOW_KEY and production AHAFRAME_BASE_URL.
+  1. Deploy AhaFrame with INDEXNOW_KEY so /{key}.txt is publicly reachable.
+  2. Verify the deployed key file.
+  3. Run this script against the production origin.
 
 Usage:
   INDEXNOW_KEY=... AHAFRAME_BASE_URL=https://ahaframe.com python3 scripts/indexnow.py
 """
-from pathlib import Path
 from urllib.parse import urlparse
 import json
 import os
@@ -16,7 +15,6 @@ import re
 import urllib.request
 import xml.etree.ElementTree as ET
 
-ROOT = Path(__file__).resolve().parents[1]
 BASE = os.environ.get("AHAFRAME_BASE_URL", "").rstrip("/")
 KEY = os.environ.get("INDEXNOW_KEY", "")
 
@@ -29,11 +27,14 @@ parsed = urlparse(BASE)
 if parsed.scheme not in {"http", "https"} or not parsed.netloc or parsed.path not in {"", "/"}:
     raise SystemExit("AHAFRAME_BASE_URL must be an origin such as https://ahaframe.com (no path).")
 
-sitemap = ROOT / "site" / "sitemap.xml"
-if not sitemap.exists():
-    raise SystemExit("site/sitemap.xml is missing. Run scripts/build_site.py first.")
+sitemap_url = f"{BASE}/sitemap.xml"
+try:
+    with urllib.request.urlopen(sitemap_url, timeout=15) as response:
+        sitemap_xml = response.read()
+except Exception as exc:
+    raise SystemExit(f"Deployed sitemap is not reachable at {sitemap_url}: {exc}") from exc
 
-root = ET.parse(sitemap).getroot()
+root = ET.fromstring(sitemap_xml)
 ns = {"s": "http://www.sitemaps.org/schemas/sitemap/0.9"}
 urls = [x.text for x in root.findall("s:url/s:loc", ns) if x.text]
 if not urls or any(urlparse(url).netloc != parsed.netloc for url in urls):
