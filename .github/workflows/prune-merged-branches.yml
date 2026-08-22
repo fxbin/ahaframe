@@ -20,6 +20,11 @@ jobs:
           script: |
             const owner = context.repo.owner;
             const repo = context.repo.repo;
+            const explicitlyRetired = new Set([
+              'feature/reliable-support-agent-build',
+              'feature/46-zh-harness-graph-evaluation',
+            ]);
+
             const branches = await github.paginate(github.rest.repos.listBranches, {
               owner,
               repo,
@@ -28,6 +33,16 @@ jobs:
 
             for (const { name } of branches) {
               if (name === 'main') continue;
+
+              if (explicitlyRetired.has(name)) {
+                core.info(`DELETE ${name}: explicitly retired after post-cutover review`);
+                await github.rest.git.deleteRef({
+                  owner,
+                  repo,
+                  ref: `heads/${name}`,
+                });
+                continue;
+              }
 
               const pulls = await github.paginate(github.rest.pulls.list, {
                 owner,
