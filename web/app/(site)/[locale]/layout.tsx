@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { notFound } from "next/navigation";
+import { ProductFeedback } from "@/components/validation-feedback";
 import { StructuredData } from "@/components/structured-data";
 import { ThirdPartyAnalytics } from "@/components/third-party-analytics";
 import { SiteFrame } from "@/components/site-frame";
@@ -44,6 +45,7 @@ export default async function LocaleRootLayout({
         <SiteFrame locale={locale} source={source}>
           {children}
         </SiteFrame>
+        <ProductFeedback locale={locale} />
         <ThirdPartyAnalytics />
       </body>
     </html>
