@@ -92,15 +92,15 @@ runs:
       working-directory: web
       run: npm run typecheck
 
-    - name: Check browser secret boundary
-      shell: bash
-      working-directory: web
-      run: npm run check:browser-secrets
-
     - name: Build Next.js app
       shell: bash
       working-directory: web
       run: npm run build
+
+    - name: Check browser secret boundary
+      shell: bash
+      working-directory: web
+      run: npm run check:browser-secrets
 
     - name: Smoke Next.js public routes at runtime
       shell: bash
