@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { MissionRuntimeWorkspace } from "@/components/runtime/mission-runtime-workspace";
+import { AhaFeedback } from "@/components/validation-feedback";
 import { localizedPath, type Locale } from "@/lib/content";
 import type { MissionContent } from "@/lib/mission";
 import type { RuntimeExperienceKey } from "@/lib/runtime-manifest";
@@ -33,6 +34,7 @@ export function MissionPage({ locale, mission, experienceKey }: MissionPageProps
       </section>
 
       <section className="shell mt-8"><MissionRuntimeWorkspace locale={locale} mission={mission} experienceKey={experienceKey} /></section>
+      <AhaFeedback locale={locale} />
 
       {mission.incidentLedger?.length ? <section className="shell mt-16"><h2 className="text-3xl font-black tracking-[-0.04em]">{copy.incidentLedger}</h2><div className="mt-6 grid gap-3 md:grid-cols-2">{mission.incidentLedger.map(([title, body]) => <article key={title} className="rounded-[22px] border border-[var(--border)] bg-white p-5"><h3 className="font-bold">{title}</h3><p className="mt-2 text-sm leading-6 text-[var(--muted)]">{body}</p></article>)}</div></section> : null}
 
