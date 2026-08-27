@@ -2,9 +2,11 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import type { Locale } from "@/lib/content";
 import type { FirstAhaChoiceId, FirstAhaContent } from "@/lib/campaign";
 
 interface FirstAhaPanelProps {
+  locale: Locale;
   content: FirstAhaContent;
   href: string;
   ctaLabel: string;
@@ -23,9 +25,13 @@ const TRACE_STATE_CLASS = {
   success: "text-[var(--success)]",
 } as const;
 
-export function FirstAhaPanel({ content, href, ctaLabel }: FirstAhaPanelProps) {
+export function FirstAhaPanel({ locale, content, href, ctaLabel }: FirstAhaPanelProps) {
   const [selectedId, setSelectedId] = useState<FirstAhaChoiceId | null>(null);
   const selected = content.choices.find((choice) => choice.id === selectedId) ?? null;
+  const idleCopy = content.idleCopy || (locale === "zh-CN"
+    ? "选择一个改动。场景保持确定性，这样你比较的是工程后果，而不是靠猜。"
+    : "Choose one change. The scenario stays deterministic so you can compare the consequence instead of guessing.");
+  const resultLabel = locale === "zh-CN" ? "结果" : "Result";
 
   return (
     <aside className="report-panel overflow-hidden" aria-labelledby="first-aha-title">
@@ -37,9 +43,9 @@ export function FirstAhaPanel({ content, href, ctaLabel }: FirstAhaPanelProps) {
       </div>
 
       <div className="grid lg:grid-cols-[1.02fr_.98fr]">
-        <div className="border-b border-[var(--border)] p-5 sm:p-7 lg:border-b-0 lg:border-r">
+        <div className="border-b border-[var(--border)] p-5 sm:p-7 lg:border-b-0 lg:border-r lg:border-[var(--border)]">
           <ol className="space-y-0" aria-label={content.title}>
-            {content.trace.map((row, index) => (
+            {content.trace.map((row) => (
               <li key={`${row.time}-${row.detail}`} className="grid grid-cols-[76px_70px_1fr] gap-3 border-b border-[var(--border)] py-3 font-mono text-[12px] leading-5 last:border-b-0 sm:grid-cols-[82px_82px_1fr] sm:text-[13px]">
                 <time className="text-[var(--muted)]">{row.time}</time>
                 <span className="font-semibold text-[var(--muted)]">{row.actor}</span>
@@ -49,7 +55,7 @@ export function FirstAhaPanel({ content, href, ctaLabel }: FirstAhaPanelProps) {
           </ol>
 
           <div className="incident-note mt-5 font-mono text-sm">
-            <strong>Result:</strong> {content.result}
+            <strong>{resultLabel}:</strong> {content.result}
           </div>
 
           <div className="mt-6 border-t border-[var(--border)] pt-5">
@@ -91,9 +97,7 @@ export function FirstAhaPanel({ content, href, ctaLabel }: FirstAhaPanelProps) {
                 <p className="mt-3 text-sm leading-6 text-[var(--muted)]">{selected.consequence}</p>
               </div>
             ) : (
-              <p className="text-sm leading-6 text-[var(--muted)]">
-                Choose one change. The scenario stays deterministic so you can compare the consequence instead of guessing.
-              </p>
+              <p className="text-sm leading-6 text-[var(--muted)]">{idleCopy}</p>
             )}
           </div>
 
