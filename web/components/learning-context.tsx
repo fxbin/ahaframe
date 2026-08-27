@@ -1,5 +1,5 @@
 import type { Locale } from "@/lib/content";
-import { getLearningGraph, getLearningUxContent } from "@/lib/learning-graph";
+import { getLearningGraph, getLearningUxContent } from "@/lib/learning-graph-server";
 import { LearningContextPanel } from "@/components/learning-context-panel";
 
 interface LearningContextProps {
