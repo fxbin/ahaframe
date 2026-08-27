@@ -1,25 +1,22 @@
 import Link from "next/link";
 import { FirstAhaPanel } from "@/components/first-aha-panel";
+import { LearningMapPreview } from "@/components/learning-map-preview";
 import { localizedPath, segmentForLocale, type Locale } from "@/lib/content";
 import type { CampaignContract, CampaignDiscoveryContent, CampaignExperience } from "@/lib/campaign";
+import type { LearningStage } from "@/lib/learning-graph";
 
 interface CampaignHomePageProps {
   locale: Locale;
   content: CampaignDiscoveryContent;
   contract: CampaignContract;
+  learningStages: LearningStage[];
 }
-
-const GROUP_STATUS: Record<string, string> = {
-  foundation: "KEEP AS FOUNDATION",
-  specialist: "MERGE INTO FLAGSHIP",
-  prerequisite: "PREREQUISITE NODE",
-};
 
 function experienceHref(experience: CampaignExperience, locale: Locale): string {
   return localizedPath(experience.route, locale);
 }
 
-export function CampaignHomePage({ locale, content, contract }: CampaignHomePageProps) {
+export function CampaignHomePage({ locale, content, contract, learningStages }: CampaignHomePageProps) {
   const segment = segmentForLocale(locale);
   const byId = Object.fromEntries(contract.experiences.map((experience) => [experience.id, experience]));
   const campaign = contract.primaryCampaign.map((id) => byId[id]).filter(Boolean);
@@ -36,23 +33,14 @@ export function CampaignHomePage({ locale, content, contract }: CampaignHomePage
 
   const boss = campaign[3];
   const bossCopy = content.campaign.cards[boss.id];
-  const groups: Array<[string, CampaignExperience[]]> = [
-    ["foundation", contract.experiences.filter((item) => item.primaryStatus === GROUP_STATUS.foundation)],
-    ["campaign", campaign],
-    ["specialist", contract.experiences.filter((item) => item.primaryStatus === GROUP_STATUS.specialist)],
-    ["prerequisite", contract.experiences.filter((item) => item.primaryStatus === GROUP_STATUS.prerequisite)],
-  ];
-
   const labels = locale === "zh-CN"
     ? {
         campaignIndex: "事故索引",
         finalBoss: "最终发布挑战",
-        mapCount: "个体验",
       }
     : {
         campaignIndex: "Incident index",
         finalBoss: "Final release challenge",
-        mapCount: "experiences",
       };
 
   return (
@@ -167,47 +155,13 @@ export function CampaignHomePage({ locale, content, contract }: CampaignHomePage
         </div>
       </section>
 
-      <section id="roadmap" className="py-20 sm:py-28">
-        <div className="shell">
-          <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
-            <div className="max-w-3xl">
-              <p className="eyebrow-label">{content.knowledge.kicker}</p>
-              <h2 className="section-title">{content.knowledge.title}</h2>
-              <p className="section-copy">{content.knowledge.copy}</p>
-            </div>
-            <span className="shrink-0 font-mono text-xs text-[var(--muted)]">{contract.experiences.length} {labels.mapCount}</span>
-          </div>
-
-          <div className="mt-12 grid gap-x-12 gap-y-10 border-t border-[var(--border)] pt-10 lg:grid-cols-2">
-            {groups.map(([key, items]) => {
-              const group = content.knowledge.groups[key];
-              return (
-                <section key={key}>
-                  <div className="flex items-baseline justify-between gap-4">
-                    <h3 className="text-lg font-black tracking-[-0.03em]">{group.title}</h3>
-                    <span className="font-mono text-xs text-[var(--muted)]">{items.length}</span>
-                  </div>
-                  <p className="mt-2 text-sm leading-6 text-[var(--muted)]">{group.description}</p>
-                  <div className="mt-4 divide-y divide-[var(--border)]">
-                    {items.map((experience) => {
-                      const copy = content.knowledge.experiences[experience.id];
-                      return (
-                        <Link key={experience.id} className="group flex items-center justify-between gap-5 py-3.5" href={experienceHref(experience, locale)}>
-                          <span>
-                            <strong className="block text-sm">{copy.name}</strong>
-                            <small className="mt-1 block leading-5 text-[var(--muted)]">{copy.note}</small>
-                          </span>
-                          <span className="text-[var(--primary)] transition-transform group-hover:translate-x-1" aria-hidden="true">→</span>
-                        </Link>
-                      );
-                    })}
-                  </div>
-                </section>
-              );
-            })}
-          </div>
-        </div>
-      </section>
+      <LearningMapPreview
+        locale={locale}
+        stages={learningStages}
+        kicker={content.knowledge.kicker}
+        title={content.knowledge.title}
+        copy={content.knowledge.copy}
+      />
 
       <section id="about" className="border-y border-[var(--border)] bg-[var(--surface-soft)] py-20 sm:py-24">
         <div className="shell">
