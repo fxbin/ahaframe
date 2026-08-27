@@ -23,6 +23,7 @@ export const LEARNING_NODE_TYPES = [
 
 export type LearningNodeType = (typeof LEARNING_NODE_TYPES)[number];
 export type LearningEffortBand = "SHORT" | "MEDIUM" | "DEEP";
+export type LearningProgressState = "UNSEEN" | "SEEN" | "PRACTICED" | "TRANSFERRED" | "REVIEW_DUE";
 
 export interface LearningStageDefinition {
   id: string;
@@ -106,6 +107,41 @@ export interface LearningGraph {
   sourceRefs: LearningGraphSource["sourceRefs"];
 }
 
+export interface LearningUxContent {
+  locale: Locale;
+  meta: { title: string; description: string };
+  page: {
+    kicker: string;
+    title: string;
+    intro: string;
+    nextLabel: string;
+    nextEmpty: string;
+    nextReasonNew: string;
+    nextReasonContinue: string;
+    pathTitle: string;
+    pathCopy: string;
+    mapTitle: string;
+    mapCopy: string;
+    available: string;
+    models: string;
+    open: string;
+    continue: string;
+    reset: string;
+    resetConfirm: string;
+    anonymousNote: string;
+    specialist: string;
+    prerequisite: string;
+    backfillNone: string;
+    returnToMap: string;
+    transfer: string;
+    transferAction: string;
+    transferDone: string;
+    debrief: string;
+  };
+  states: Record<LearningProgressState, string>;
+  content: Record<string, { debrief: string; transfer: string }>;
+}
+
 async function loadJson<T>(filename: string): Promise<T> {
   const source = await readFile(path.join(CONTENT_ROOT, filename), "utf8");
   return JSON.parse(source) as T;
@@ -153,6 +189,12 @@ export async function getLearningGraph(locale: Locale): Promise<LearningGraph> {
     contentNodes,
     sourceRefs: graph.sourceRefs,
   };
+}
+
+export async function getLearningUxContent(locale: Locale): Promise<LearningUxContent> {
+  const content = await loadJson<LearningUxContent>(`learning-ux.${locale}.json`);
+  if (content.locale !== locale) throw new Error(`Learning UX locale mismatch for ${locale}.`);
+  return content;
 }
 
 export function localizeLearningRoute(route: string, locale: Locale): string {
