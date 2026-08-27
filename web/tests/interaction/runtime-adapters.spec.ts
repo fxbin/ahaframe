@@ -1,6 +1,6 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 
-async function switchLocale(page: Parameters<typeof test>[0] extends never ? never : any, locale: "en" | "zh-CN") {
+async function switchLocale(page: Page, locale: "en" | "zh-CN") {
   const selector = page.getByTestId("locale-switch");
   await selector.locator("summary").click();
   await selector.locator(`a[hreflang="${locale}"]`).click();
