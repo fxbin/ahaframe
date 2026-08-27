@@ -3,6 +3,7 @@
   "routePrefix": "zh-cn",
   "availableRoutes": [
     "",
+    "learning/",
     "pricing/",
     "early-access/",
     "lessons/token-playground/",

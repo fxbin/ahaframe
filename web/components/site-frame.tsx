@@ -27,7 +27,7 @@ export function SiteFrame({ locale, source, children }: SiteFrameProps) {
               <Link className="transition hover:text-[var(--text)]" href={`${home}#campaign`}>
                 {source.ui.nav.lessons}
               </Link>
-              <Link className="transition hover:text-[var(--text)]" href={`${home}#roadmap`}>
+              <Link className="transition hover:text-[var(--text)]" href={`/${segment}/learning/`}>
                 {source.ui.nav.roadmap}
               </Link>
               <Link className="transition hover:text-[var(--text)]" href={`/${segment}/pricing/`}>
@@ -57,6 +57,7 @@ export function SiteFrame({ locale, source, children }: SiteFrameProps) {
           </div>
           <div className="flex flex-wrap gap-x-5 gap-y-2">
             <Link href={`${home}#about`}>{source.ui.footer.about}</Link>
+            <Link href={`/${segment}/learning/`}>{source.ui.nav.roadmap}</Link>
             <Link href={`/${segment}/pricing/`}>{source.ui.nav.pricing}</Link>
             <Link href={`/${segment}/early-access/`}>{source.ui.footer.early_access}</Link>
             <a href="mailto:support@ahaframe.com">support@ahaframe.com</a>

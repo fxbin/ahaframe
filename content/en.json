@@ -3,6 +3,7 @@
   "routePrefix": "en",
   "availableRoutes": [
     "",
+    "learning/",
     "pricing/",
     "early-access/",
     "lessons/token-playground/",

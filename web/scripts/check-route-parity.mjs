@@ -8,6 +8,7 @@ const CONTENT_ROOT = path.join(REPO_ROOT, "content");
 
 const PUBLIC_ROUTES = [
   "",
+  "learning/",
   "pricing/",
   "early-access/",
   "lessons/token-playground/",
@@ -25,6 +26,7 @@ const PUBLIC_ROUTES = [
 const REQUIRED_APP_FILES = [
   "app/(root)/page.tsx",
   "app/(site)/[locale]/page.tsx",
+  "app/(site)/[locale]/learning/page.tsx",
   "app/(site)/[locale]/pricing/page.tsx",
   "app/(site)/[locale]/early-access/page.tsx",
   "app/(site)/[locale]/lessons/[slug]/page.tsx",
@@ -81,4 +83,4 @@ for (const relativePath of REQUIRED_APP_FILES) {
   await access(path.join(WEB_ROOT, relativePath));
 }
 
-console.log(`Next.js public-route parity contract OK (${PUBLIC_ROUTES.length} routes × 2 locales; v0.8 Campaign + waitlist adapter verified).`);
+console.log(`Next.js public-route parity contract OK (${PUBLIC_ROUTES.length} routes × 2 locales; v0.9 Learning Path + v0.8 Campaign + waitlist adapter verified).`);

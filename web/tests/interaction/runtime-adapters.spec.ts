@@ -1,4 +1,10 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
+
+async function switchLocale(page: Page, locale: "en" | "zh-CN") {
+  const selector = page.getByTestId("locale-switch");
+  await selector.locator("summary").click();
+  await selector.locator(`a[hreflang="${locale}"]`).click();
+}
 
 test.describe("AhaFrame deterministic interaction adapters", () => {
   test("Foundation Lab dispatches, resets, and remounts cleanly across locale navigation", async ({ page }) => {
@@ -15,12 +21,12 @@ test.describe("AhaFrame deterministic interaction adapters", () => {
     await expect(temperature).toHaveValue("0.7");
 
     await temperature.fill("1.4");
-    await page.locator('a[hreflang="zh-CN"]').click();
+    await switchLocale(page, "zh-CN");
     await expect(page).toHaveURL(/\/zh-cn\/lessons\/token-playground\/?$/);
     await expect(page.getByRole("heading", { name: "实时实验控制台" })).toBeVisible();
     await expect(page.locator('input[type="range"]').first()).toHaveValue("0.7");
 
-    await page.locator('a[hreflang="en"]').click();
+    await switchLocale(page, "en");
     await expect(page).toHaveURL(/\/en\/lessons\/token-playground\/?$/);
     await expect(page.locator('input[type="range"]').first()).toHaveValue("0.7");
   });

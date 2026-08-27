@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { LearningContext } from "@/components/learning-context";
 import { MissionRuntimeWorkspace } from "@/components/runtime/mission-runtime-workspace";
 import { localizedPath, type Locale } from "@/lib/content";
 import type { MissionContent } from "@/lib/mission";
@@ -42,6 +43,8 @@ export function MissionPage({ locale, mission, experienceKey }: MissionPageProps
         <div><p className="text-xs font-bold uppercase tracking-[0.12em] text-[var(--primary)]">{mission.debrief.eyebrow}</p><h2 className="mt-3 text-3xl font-black tracking-[-0.04em]">{mission.debrief.title}</h2><p className="mt-4 font-semibold leading-7">{mission.debrief.rule}</p></div>
         <div><p className="leading-8 text-[var(--muted)]">{mission.debrief.body}</p><ul className="mt-6 space-y-3">{mission.debrief.points.map((point) => <li key={point} className="flex gap-3 rounded-2xl bg-white p-4 text-sm leading-6"><span className="font-bold text-[var(--primary)]">✓</span><span>{point}</span></li>)}</ul></div>
       </section>
+
+      <LearningContext locale={locale} contentId={experienceKey} />
 
       <section className="shell mt-16 grid gap-4 lg:grid-cols-2">
         <div className="rounded-[26px] bg-[var(--surface-soft)] p-7"><h2 className="text-2xl font-black tracking-[-0.04em]">{mission.next.title}</h2><p className="mt-3 leading-7 text-[var(--muted)]">{mission.next.description}</p><Link className="mt-5 inline-flex rounded-full bg-[var(--text)] px-5 py-3 text-sm font-bold text-white" href={`${localizedPath(mission.next.href, locale)}${mission.next.query ?? ""}`}>{mission.next.button}</Link></div>
