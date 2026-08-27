@@ -16,9 +16,9 @@ export function SiteFrame({ locale, source, children }: SiteFrameProps) {
 
   return (
     <>
-      <header className="sticky top-0 z-50 border-b border-[var(--border)] bg-[color-mix(in_srgb,var(--bg)_94%,transparent)] backdrop-blur-xl">
-        <div className="shell flex min-h-[64px] items-center justify-between gap-5">
-          <Link className="text-lg font-black tracking-[-0.045em]" href={home}>
+      <header className="site-header sticky top-0 z-50 backdrop-blur-lg">
+        <div className="shell site-header__inner">
+          <Link className="brand text-xl" href={home}>
             {source.brand}
           </Link>
 
@@ -38,7 +38,7 @@ export function SiteFrame({ locale, source, children }: SiteFrameProps) {
             <LocaleSwitch locale={locale} labels={source.ui.language} />
 
             <Link
-              className="hidden rounded-full bg-[var(--text)] px-4 py-2 text-sm font-extrabold text-white transition hover:opacity-85 sm:inline-flex"
+              className="hidden min-h-10 items-center rounded-[6px] border border-[var(--text)] bg-[var(--text)] px-4 py-2 text-sm font-bold text-white transition hover:border-[var(--primary)] hover:bg-[var(--primary)] sm:inline-flex"
               href={`/${segment}/labs/rag-failure/`}
             >
               {startLabel} <span className="ml-1" aria-hidden="true">→</span>
@@ -52,7 +52,7 @@ export function SiteFrame({ locale, source, children }: SiteFrameProps) {
       <footer className="border-t border-[var(--border)] py-10">
         <div className="shell flex flex-col gap-7 text-sm text-[var(--muted)] md:flex-row md:items-end md:justify-between">
           <div>
-            <div className="font-bold text-[var(--text)]">{source.brand}</div>
+            <div className="brand text-base text-[var(--text)]">{source.brand}</div>
             <p className="mt-2 max-w-md leading-6">{source.ui.footer.tagline}</p>
           </div>
           <div className="flex flex-wrap gap-x-5 gap-y-2">
