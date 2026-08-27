@@ -61,6 +61,10 @@ runs:
       shell: bash
       run: python3 scripts/test_lab_reconciliation.py
 
+    - name: Test Content System v0.9 graph contract
+      shell: bash
+      run: python3 scripts/test_learning_content_system.py
+
     - name: Test Content & Experience preview contract
       shell: bash
       run: python3 scripts/test_content_preview_contract.py
