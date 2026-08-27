@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import type { ReactNode } from "react";
+import { Suspense, type ReactNode } from "react";
 import { notFound } from "next/navigation";
 import { LearningProgressTracker } from "@/components/learning-progress-tracker";
 import { LearningReturnBar } from "@/components/learning-return-bar";
@@ -48,7 +48,9 @@ export default async function LocaleRootLayout({
         <ValidationBootstrap />
         <LearningProgressTracker locale={locale} nodes={progressNodes} />
         <SiteFrame locale={locale} source={source}>
-          <LearningReturnBar locale={locale} nodes={returnNodes} />
+          <Suspense fallback={null}>
+            <LearningReturnBar locale={locale} nodes={returnNodes} />
+          </Suspense>
           {children}
         </SiteFrame>
         <ThirdPartyAnalytics />
