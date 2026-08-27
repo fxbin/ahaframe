@@ -50,6 +50,7 @@ export interface FirstAhaContent {
   insightTitle: string;
   insightCopy: string;
   question: string;
+  idleCopy: string;
   choices: FirstAhaChoice[];
 }
 
