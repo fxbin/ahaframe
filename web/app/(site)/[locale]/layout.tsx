@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { notFound } from "next/navigation";
+import { LearningProgressTracker } from "@/components/learning-progress-tracker";
 import { StructuredData } from "@/components/structured-data";
 import { ThirdPartyAnalytics } from "@/components/third-party-analytics";
 import { SiteFrame } from "@/components/site-frame";
 import { ValidationBootstrap } from "@/components/validation-bootstrap";
 import { getLocaleSource, localeFromSegment, SUPPORTED_SEGMENTS } from "@/lib/content";
 import { indexingMetadata } from "@/lib/indexing";
+import { getLearningGraph } from "@/lib/learning-graph";
 import { organizationSchema } from "@/lib/schema";
 import "../../globals.css";
 
@@ -34,13 +36,14 @@ export default async function LocaleRootLayout({
   const locale = localeFromSegment(segment);
   if (!locale) notFound();
 
-  const source = await getLocaleSource(locale);
+  const [source, graph] = await Promise.all([getLocaleSource(locale), getLearningGraph(locale)]);
 
   return (
     <html lang={locale}>
       <body>
         <StructuredData value={organizationSchema()} />
         <ValidationBootstrap />
+        <LearningProgressTracker locale={locale} nodes={graph.contentNodes.map(({ id, route }) => ({ id, route }))} />
         <SiteFrame locale={locale} source={source}>
           {children}
         </SiteFrame>
