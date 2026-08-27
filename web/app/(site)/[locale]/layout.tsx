@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { notFound } from "next/navigation";
 import { LearningProgressTracker } from "@/components/learning-progress-tracker";
+import { LearningReturnBar } from "@/components/learning-return-bar";
 import { StructuredData } from "@/components/structured-data";
 import { ThirdPartyAnalytics } from "@/components/third-party-analytics";
 import { SiteFrame } from "@/components/site-frame";
@@ -37,14 +38,17 @@ export default async function LocaleRootLayout({
   if (!locale) notFound();
 
   const [source, graph] = await Promise.all([getLocaleSource(locale), getLearningGraph(locale)]);
+  const progressNodes = graph.contentNodes.map(({ id, route }) => ({ id, route }));
+  const returnNodes = graph.contentNodes.map(({ id, title, route }) => ({ id, title, route }));
 
   return (
     <html lang={locale}>
       <body>
         <StructuredData value={organizationSchema()} />
         <ValidationBootstrap />
-        <LearningProgressTracker locale={locale} nodes={graph.contentNodes.map(({ id, route }) => ({ id, route }))} />
+        <LearningProgressTracker locale={locale} nodes={progressNodes} />
         <SiteFrame locale={locale} source={source}>
+          <LearningReturnBar locale={locale} nodes={returnNodes} />
           {children}
         </SiteFrame>
         <ThirdPartyAnalytics />
