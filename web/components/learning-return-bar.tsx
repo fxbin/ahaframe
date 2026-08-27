@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import type { Locale } from "@/lib/content";
 
 interface ReturnNode {
@@ -16,12 +16,9 @@ interface LearningReturnBarProps {
 }
 
 export function LearningReturnBar({ locale, nodes }: LearningReturnBarProps) {
-  const [target, setTarget] = useState<ReturnNode | null>(null);
-
-  useEffect(() => {
-    const id = new URLSearchParams(window.location.search).get("returnTo");
-    setTarget(id ? nodes.find((node) => node.id === id) ?? null : null);
-  }, [nodes]);
+  const searchParams = useSearchParams();
+  const id = searchParams.get("returnTo");
+  const target = id ? nodes.find((node) => node.id === id) ?? null : null;
 
   if (!target) return null;
   const segment = locale === "zh-CN" ? "zh-cn" : "en";
