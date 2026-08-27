@@ -27,17 +27,24 @@ test("Learning Path recommendation continues from real anonymous state", async (
   await expect(recommendation.getByRole("link", { name: /Continue/ })).toHaveAttribute("href", "/en/lessons/context-window/");
 });
 
-test("Incident-first learner can inspect models, backfill and attempt transfer", async ({ page }) => {
+test("Incident-first learner can inspect models, backfill, return and attempt transfer", async ({ page }) => {
   await page.goto("/en/labs/agent-reliability/");
 
   const context = page.locator("section").filter({ hasText: "LEARNING CONTEXT" }).last();
   await expect(context).toContainText("Timeout ambiguity");
   await expect(context).toContainText("Idempotency boundary");
-  await expect(context.getByRole("link", { name: /Agent Loop Simulator/ })).toHaveAttribute("href", /\/en\/lessons\/agent-loop\/\?returnTo=agent-reliability/);
+  const backfill = context.getByRole("link", { name: /Agent Loop Simulator/ });
+  await expect(backfill).toHaveAttribute("href", /\/en\/lessons\/agent-loop\/\?returnTo=agent-reliability/);
   await expect(context).toContainText("order-creation API times out");
 
-  await context.getByRole("button", { name: "I worked through this changed case" }).click();
-  await expect(context).toContainText("Transferred");
+  await backfill.click();
+  await expect(page.getByText(/You are backfilling a prerequisite/)).toBeVisible();
+  await expect(page.getByRole("link", { name: /Return to incident/ })).toHaveAttribute("href", "/en/labs/agent-reliability/");
+  await page.getByRole("link", { name: /Return to incident/ }).click();
+
+  const returned = page.locator("section").filter({ hasText: "LEARNING CONTEXT" }).last();
+  await returned.getByRole("button", { name: "I worked through this changed case" }).click();
+  await expect(returned).toContainText("Transferred");
   const state = await page.evaluate(() => JSON.parse(localStorage.getItem("ahaframe_learning_progress_v1") || "{}"));
   expect(state["agent-reliability"].state).toBe("TRANSFERRED");
 });
@@ -48,6 +55,6 @@ test("Chinese Learning Path preserves the same structure without fake mastery", 
   await expect(page.getByRole("heading", { level: 1 })).toContainText("完整的 AI Engineering 路径");
   await expect(page.getByText("STAGE 00", { exact: true })).toBeVisible();
   await expect(page.getByText("STAGE 09", { exact: true })).toBeVisible();
-  await expect(page.getByText("模型行为与应用层保证", { exact: true })).toBeVisible();
+  await expect(page.getByText("概率性模型行为 vs 应用系统保证", { exact: true })).toBeVisible();
   await expect(page.getByText(/Mastered|已掌握/i)).toHaveCount(0);
 });
