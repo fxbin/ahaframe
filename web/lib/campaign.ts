@@ -26,6 +26,34 @@ export interface CampaignContract {
   experiences: CampaignExperience[];
 }
 
+export type FirstAhaChoiceId = "timeout" | "retry" | "idempotency";
+
+export interface FirstAhaChoice {
+  id: FirstAhaChoiceId;
+  label: string;
+  description: string;
+  consequence: string;
+  signal: string;
+  tone: "neutral" | "danger" | "success";
+}
+
+export interface FirstAhaContent {
+  label: string;
+  title: string;
+  trace: Array<{
+    time: string;
+    actor: string;
+    detail: string;
+    state: "normal" | "warning" | "danger" | "success";
+  }>;
+  result: string;
+  insightTitle: string;
+  insightCopy: string;
+  question: string;
+  idleCopy: string;
+  choices: FirstAhaChoice[];
+}
+
 export interface CampaignDiscoveryContent {
   locale: Locale;
   meta: { title: string; description: string };
@@ -39,6 +67,7 @@ export interface CampaignDiscoveryContent {
     queueTitle: string;
     queueStatus: string;
     queue: Array<[string, string, string]>;
+    firstAha: FirstAhaContent;
   };
   campaign: {
     kicker: string;

@@ -5,11 +5,11 @@
     "description": "通过真实感生产事故学习 AI Engineering：失效的 RAG 证据、不安全 Retry、Prompt Injection，以及最终跨层发布决策。"
   },
   "hero": {
-    "eyebrow": "AI ENGINEERING · 生产事故模拟器",
-    "headline": "在生产事故里，真正学会 AI Engineering。",
-    "subheadline": "先看 Evidence，再做有限工程变更，重放确定性系统，最后为 Release Decision 负责。不注册也可以直接开始。",
-    "primaryCta": "开始失效的 RAG 管道",
-    "secondaryCta": "查看 Campaign",
+    "eyebrow": "AI ENGINEERING · 事故 0047",
+    "headline": "不是 Agent 失效了，是系统失效了。",
+    "subheadline": "AI 系统真正棘手的故障，往往发生在模型之外。先看证据，找到真实原因，再修改模型周围的系统。",
+    "primaryCta": "调查这起事故",
+    "secondaryCta": "查看全部事故",
     "proof": [
       ["3", "个生产事故"],
       ["1", "个跨层 Final Boss"],
@@ -22,7 +22,27 @@
       ["02", "不可逆操作", "一次 Timeout，两次退款，47,000 美元风险暴露。"],
       ["03", "Trust Boundary", "危险指令，是以 Data 的身份进入系统的。"],
       ["最终", "生产发布", "六层 AI Engineering 约束，现在必须同时成立。"]
-    ]
+    ],
+    "firstAha": {
+      "label": "事故 0047 · RELIABILITY / IDEMPOTENCY",
+      "title": "Timeout 之后，退款被执行了两次",
+      "trace": [
+        {"time": "09:41:03", "actor": "Agent", "detail": "发起 refund()", "state": "normal"},
+        {"time": "09:41:13", "actor": "Client", "detail": "请求 Timeout", "state": "warning"},
+        {"time": "09:41:14", "actor": "Agent", "detail": "发起 Retry", "state": "normal"},
+        {"time": "09:41:16", "actor": "Provider", "detail": "重试退款确认成功", "state": "success"},
+        {"time": "09:41:18", "actor": "Provider", "detail": "第一次请求也完成结算", "state": "danger"}
+      ],
+      "result": "同一个客户被退款两次。",
+      "insightTitle": "第一次退款其实成功了，只是 Agent 不知道。",
+      "insightCopy": "Timeout 描述的是你观察到了什么，而不是远端系统实际做了什么。没有收到确认，不等于操作失败。",
+      "question": "你会先改什么？",
+      "choices": [
+        {"id": "timeout", "label": "增加 Timeout", "description": "等待更久，再把请求判断为未确认。", "consequence": "模糊状态会变少，但只要 Timeout 仍然发生，结果是否执行过依旧未知。", "signal": "Latency ↑ · 风险仍在", "tone": "neutral"},
+        {"id": "retry", "label": "继续 Retry", "description": "对未收到响应的请求更积极地恢复。", "consequence": "可用性可能提高，但不可逆操作被重复执行的概率也会上升。", "signal": "Recovery ↑ · 重复风险 ↑", "tone": "danger"},
+        {"id": "idempotency", "label": "加入 Idempotency", "description": "让同一个业务 Intent 的重复请求只产生一次副作用。", "consequence": "Retry 仍然可以执行，但同一笔退款不会再被创建第二次。", "signal": "重复操作被阻断", "tone": "success"}
+      ]
+    }
   },
   "campaign": {
     "kicker": "主 Campaign",

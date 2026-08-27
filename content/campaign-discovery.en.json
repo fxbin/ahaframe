@@ -5,11 +5,11 @@
     "description": "Learn AI engineering by debugging production incidents: stale RAG evidence, unsafe retries, prompt injection, and a final cross-layer launch decision."
   },
   "hero": {
-    "eyebrow": "AI ENGINEERING · INCIDENT SIMULATOR",
-    "headline": "Learn AI engineering by surviving production incidents.",
-    "subheadline": "Inspect evidence, make bounded engineering changes, replay deterministic systems, and defend a release decision. No signup required to start.",
-    "primaryCta": "Start The Broken RAG Pipeline",
-    "secondaryCta": "See the Campaign",
+    "eyebrow": "AI ENGINEERING · INCIDENT 0047",
+    "headline": "Your agent didn't fail. Your system did.",
+    "subheadline": "AI systems often fail outside the model. Read the evidence, find the real cause, and change the system around it.",
+    "primaryCta": "Investigate the incident",
+    "secondaryCta": "Explore all incidents",
     "proof": [
       ["3", "production incidents"],
       ["1", "cross-layer Final Boss"],
@@ -22,7 +22,27 @@
       ["02", "Irreversible actions", "One timeout. Two refunds. $47,000 exposed."],
       ["03", "Trust boundary", "The dangerous instruction arrived as data."],
       ["FINAL", "Production launch", "All six engineering layers now have to survive together."]
-    ]
+    ],
+    "firstAha": {
+      "label": "INCIDENT 0047 · RELIABILITY / IDEMPOTENCY",
+      "title": "Refund duplicated after timeout",
+      "trace": [
+        {"time": "09:41:03", "actor": "Agent", "detail": "refund() requested", "state": "normal"},
+        {"time": "09:41:13", "actor": "Client", "detail": "request timed out", "state": "warning"},
+        {"time": "09:41:14", "actor": "Agent", "detail": "retry issued", "state": "normal"},
+        {"time": "09:41:16", "actor": "Provider", "detail": "retry refund confirmed", "state": "success"},
+        {"time": "09:41:18", "actor": "Provider", "detail": "first request also settles", "state": "danger"}
+      ],
+      "result": "Customer refunded twice.",
+      "insightTitle": "The refund succeeded. Your agent just never knew.",
+      "insightCopy": "A timeout describes what you observed, not what the remote system did. Missing confirmation is not proof of failure.",
+      "question": "What would you change?",
+      "choices": [
+        {"id": "timeout", "label": "Increase timeout", "description": "Wait longer before declaring the request unresolved.", "consequence": "Fewer ambiguous timeouts, but the ambiguity still exists when one happens.", "signal": "Latency ↑ · Risk remains", "tone": "neutral"},
+        {"id": "retry", "label": "Retry again", "description": "Recover aggressively from missing responses.", "consequence": "Availability can improve, but repeated irreversible side effects become more likely.", "signal": "Recovery ↑ · Duplicate risk ↑", "tone": "danger"},
+        {"id": "idempotency", "label": "Add idempotency", "description": "Make repeated intent resolve to the same side effect.", "consequence": "The retry can proceed without creating a second refund for the same operation.", "signal": "Duplicate blocked", "tone": "success"}
+      ]
+    }
   },
   "campaign": {
     "kicker": "PRIMARY CAMPAIGN",

@@ -1,7 +1,7 @@
 import Link from "next/link";
+import { FirstAhaPanel } from "@/components/first-aha-panel";
 import { localizedPath, segmentForLocale, type Locale } from "@/lib/content";
 import type { CampaignContract, CampaignDiscoveryContent, CampaignExperience } from "@/lib/campaign";
-import { commonUi } from "@/lib/ui-copy";
 
 interface CampaignHomePageProps {
   locale: Locale;
@@ -21,7 +21,6 @@ function experienceHref(experience: CampaignExperience, locale: Locale): string 
 
 export function CampaignHomePage({ locale, content, contract }: CampaignHomePageProps) {
   const segment = segmentForLocale(locale);
-  const ui = commonUi(locale);
   const byId = Object.fromEntries(contract.experiences.map((experience) => [experience.id, experience]));
   const campaign = contract.primaryCampaign.map((id) => byId[id]).filter(Boolean);
 
@@ -30,7 +29,11 @@ export function CampaignHomePage({ locale, content, contract }: CampaignHomePage
   }
 
   const first = campaign[0];
-  const firstCopy = content.campaign.cards[first.id];
+  const firstAhaExperience = byId["agent-reliability"];
+  if (!firstAhaExperience) {
+    throw new Error("The First Aha homepage experience requires agent-reliability.");
+  }
+
   const boss = campaign[3];
   const bossCopy = content.campaign.cards[boss.id];
   const groups: Array<[string, CampaignExperience[]]> = [
@@ -42,15 +45,11 @@ export function CampaignHomePage({ locale, content, contract }: CampaignHomePage
 
   const labels = locale === "zh-CN"
     ? {
-        preview: "事故预览",
-        status: "READY",
         campaignIndex: "生产事故路径",
         finalBoss: "最终发布挑战",
         mapCount: "个体验",
       }
     : {
-        preview: "Incident preview",
-        status: "READY",
         campaignIndex: "Production incident path",
         finalBoss: "Final release challenge",
         mapCount: "experiences",
@@ -58,18 +57,18 @@ export function CampaignHomePage({ locale, content, contract }: CampaignHomePage
 
   return (
     <main>
-      <section className="hero-section border-b border-[var(--border)]">
-        <div className="shell grid gap-14 py-20 sm:py-28 lg:grid-cols-[1.08fr_.92fr] lg:items-center lg:py-32">
+      <section className="hero-section border-b border-[var(--border)]" data-event="first_aha_incident_viewed">
+        <div className="shell grid gap-12 py-16 sm:py-24 lg:grid-cols-[.82fr_1.18fr] lg:items-center lg:gap-16 lg:py-28">
           <div>
             <p className="eyebrow-label">{content.hero.eyebrow}</p>
-            <h1 className="mt-5 max-w-4xl text-5xl font-black leading-[0.94] tracking-[-0.065em] sm:text-6xl lg:text-[4.6rem]">
+            <h1 className="mt-5 max-w-3xl text-5xl leading-[0.98] sm:text-6xl lg:text-[4.35rem]">
               {content.hero.headline}
             </h1>
-            <p className="mt-7 max-w-2xl text-lg leading-8 text-[var(--muted)] sm:text-xl">
+            <p className="mt-7 max-w-xl text-lg leading-8 text-[var(--muted)] sm:text-xl">
               {content.hero.subheadline}
             </p>
             <div className="mt-9 flex flex-wrap items-center gap-5">
-              <Link className="primary-action" href={experienceHref(first, locale)}>
+              <Link className="primary-action" href={experienceHref(firstAhaExperience, locale)} data-event="first_aha_cta_clicked">
                 {content.hero.primaryCta} <span aria-hidden="true">→</span>
               </Link>
               <a className="text-link" href="#campaign">
@@ -78,33 +77,12 @@ export function CampaignHomePage({ locale, content, contract }: CampaignHomePage
             </div>
           </div>
 
-          <aside className="lab-preview" aria-label={labels.preview}>
-            <div className="flex items-center justify-between gap-4 border-b border-[var(--border)] pb-4">
-              <div>
-                <p className="text-[11px] font-extrabold uppercase tracking-[0.16em] text-[var(--muted)]">{labels.preview}</p>
-                <p className="mt-1 text-sm font-bold">{firstCopy.step}</p>
-              </div>
-              <span className="status-dot"><span aria-hidden="true" />{labels.status}</span>
-            </div>
-            <div className="py-6">
-              <h2 className="text-2xl font-black tracking-[-0.04em]">{firstCopy.title}</h2>
-              <p className="mt-4 leading-7 text-[var(--muted)]">{firstCopy.incident}</p>
-            </div>
-            <div className="border-y border-[var(--border)] py-5">
-              <p className="text-[11px] font-extrabold uppercase tracking-[0.16em] text-[var(--muted)]">{ui.evidence}</p>
-              <div className="mt-4 grid grid-cols-2 gap-x-6 gap-y-4">
-                {firstCopy.dimensions.map((dimension, index) => (
-                  <div key={dimension} className="flex items-center gap-3 text-sm">
-                    <span className="font-mono text-xs text-[var(--primary)]">0{index + 1}</span>
-                    <span>{dimension}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <Link className="mt-5 inline-flex items-center gap-2 text-sm font-extrabold text-[var(--primary)]" href={experienceHref(first, locale)}>
-              {firstCopy.cta} <span aria-hidden="true">→</span>
-            </Link>
-          </aside>
+          <FirstAhaPanel
+            locale={locale}
+            content={content.hero.firstAha}
+            href={experienceHref(firstAhaExperience, locale)}
+            ctaLabel={content.hero.primaryCta}
+          />
         </div>
       </section>
 
@@ -188,7 +166,7 @@ export function CampaignHomePage({ locale, content, contract }: CampaignHomePage
               <h2 className="section-title">{content.knowledge.title}</h2>
               <p className="section-copy">{content.knowledge.copy}</p>
             </div>
-            <span className="shrink-0 font-mono text-xs text-[var(--muted)]">{contract.experiences.length} {locale === "zh-CN" ? labels.mapCount : ui.experiences}</span>
+            <span className="shrink-0 font-mono text-xs text-[var(--muted)]">{contract.experiences.length} {labels.mapCount}</span>
           </div>
 
           <div className="mt-12 grid gap-x-12 gap-y-10 border-t border-[var(--border)] pt-10 lg:grid-cols-2">
