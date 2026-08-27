@@ -45,36 +45,36 @@
     }
   },
   "campaign": {
-    "kicker": "PRIMARY CAMPAIGN",
-    "title": "Three incidents. One production launch.",
-    "copy": "Start with the failure that looks most interesting. The Campaign is ordered, but not locked: each Mission teaches a production decision you will reuse in the Final Boss.",
+    "kicker": "FEATURED INCIDENTS",
+    "title": "Failures worth investigating.",
+    "copy": "Each incident begins with a system that looks plausible. Pick the failure that makes you want to know what actually happened.",
     "cards": {
       "rag-failure": {
         "step": "INCIDENT 01 · CONTEXT × EVALUATION",
         "title": "The Broken RAG Pipeline",
         "incident": "The new refund policy is already indexed. The support Agent still denies a valid return using the stale policy.",
-        "decision": "Fix freshness, authority, grounding, context, latency, and cost without hiding behind “retrieve more.”",
+        "decision": "The correct document was retrieved. Why did the agent still answer from the wrong one?",
         "dimensions": ["retrieval trace", "freshness", "authority", "grounding"],
         "minutes": "15 min",
-        "cta": "Start incident"
+        "cta": "Investigate"
       },
       "agent-reliability": {
         "step": "INCIDENT 02 · HARNESS × LOOP",
         "title": "The $47,000 Retry",
         "incident": "The client timed out. The provider succeeded. The Agent retried the same irreversible refund and created $47,000 of exposure.",
-        "decision": "Keep recovery while making repeated intent safe under latency, cost, and human-review budgets.",
+        "decision": "A timeout triggered a retry. Both requests eventually succeeded. What made the second action unsafe?",
         "dimensions": ["retry", "idempotency", "approval", "side effects"],
         "minutes": "15 min",
-        "cta": "Take the incident"
+        "cta": "Investigate"
       },
       "instruction-conflict": {
         "step": "INCIDENT 03 · PROMPT × CONTEXT × HARNESS",
         "title": "The Prompt Injection Attack",
         "incident": "Untrusted external content contains instruction-shaped text and tries to steer real CRM capabilities.",
-        "decision": "Build defense in depth without winning by denying every useful external-content workflow.",
+        "decision": "The model followed the instruction perfectly. Why was that the vulnerability?",
         "dimensions": ["provenance", "least privilege", "runtime gate", "false positives"],
         "minutes": "15 min",
-        "cta": "Defend the Agent"
+        "cta": "Investigate"
       },
       "reliable-support-agent": {
         "step": "FINAL BOSS · SIX-LAYER LAUNCH REVIEW",
@@ -90,14 +90,16 @@
     "bossCopy": "The Final Boss does not give you a reference architecture button. It gives you evidence, a finite change budget, and responsibility for the release decision."
   },
   "method": {
-    "kicker": "HOW A MISSION WORKS",
-    "title": "Evidence first. Decision last.",
-    "copy": "AhaFrame Missions model engineering work, not trivia. You can make a plausible change and still fail because another constraint becomes binding.",
+    "kicker": "HOW YOU LEARN",
+    "title": "See the failure. Change one thing. Run it again.",
+    "copy": "AhaFrame starts with an incident, not a lecture. You inspect evidence, form a hypothesis, make one bounded change, and use the consequence to build a mental model that transfers.",
     "steps": [
-      ["01", "Inspect", "Read traces, timelines, permission scopes, blockers, and scorecards before changing anything."],
-      ["02", "Intervene", "Spend bounded engineering budget on policies that change real system behavior."],
-      ["03", "Replay", "Run the same deterministic scenario and compare attempts instead of arguing from intuition."],
-      ["04", "Decide", "Own SHIP, BLOCK, or INCONCLUSIVE. The simulator supplies evidence; it does not grant permission to ship."]
+      ["01", "See it fail", "Start with a production incident where a plausible system breaks."],
+      ["02", "Inspect", "Read the trace, evidence, context, and constraints before changing anything."],
+      ["03", "Hypothesize", "Name the most likely root cause before touching a policy or parameter."],
+      ["04", "Change", "Make one bounded engineering intervention so cause and effect stay visible."],
+      ["05", "Run again", "Replay the deterministic scenario and compare the consequence with the baseline."],
+      ["06", "Understand", "Turn the observed trade-off into a reusable engineering mental model."]
     ]
   },
   "knowledge": {

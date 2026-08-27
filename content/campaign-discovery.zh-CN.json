@@ -45,36 +45,36 @@
     }
   },
   "campaign": {
-    "kicker": "主 Campaign",
-    "title": "三次事故，一次生产发布。",
-    "copy": "可以从最吸引你的事故直接开始。Campaign 有推荐顺序，但不设强制锁：每个 Mission 都训练一个会在 Final Boss 里再次出现的生产决策。",
+    "kicker": "精选事故",
+    "title": "值得追进去的故障。",
+    "copy": "每起事故都从一个“看起来没什么问题”的系统开始。挑一个最让你想知道真实原因的故障进去。",
     "cards": {
       "rag-failure": {
         "step": "事故 01 · CONTEXT × EVALUATION",
         "title": "失效的 RAG 管道",
         "incident": "新版退款政策早已完成索引，客服 Agent 却仍然引用旧政策，拒绝了一次本来有效的退款。",
-        "decision": "同时处理 Freshness、Authority、Grounding、Context、Latency 与 Cost，而不是用“多检索一些”掩盖问题。",
+        "decision": "正确文档明明已经被检索出来，Agent 为什么还是从错误证据里给出了答案？",
         "dimensions": ["Retrieval Trace", "Freshness", "Authority", "Grounding"],
         "minutes": "15 分钟",
-        "cta": "开始事故"
+        "cta": "调查事故"
       },
       "agent-reliability": {
         "step": "事故 02 · HARNESS × LOOP",
         "title": "47,000 美元重试事故",
         "incident": "Client Timeout 了，Provider 却成功了；Agent 随后重试同一个不可逆退款操作，制造 47,000 美元风险暴露。",
-        "decision": "保留瞬时故障恢复能力，同时让重复 Intent 在延迟、成本与人工审核预算下变得安全。",
+        "decision": "一次 Timeout 触发了 Retry，最后两个请求都成功了。真正危险的到底是哪一步？",
         "dimensions": ["Retry", "Idempotency", "Approval", "Side Effects"],
         "minutes": "15 分钟",
-        "cta": "接手事故"
+        "cta": "调查事故"
       },
       "instruction-conflict": {
         "step": "事故 03 · PROMPT × CONTEXT × HARNESS",
         "title": "Prompt Injection 攻击",
         "incident": "不可信外部内容里出现了像 Instruction 一样的文字，并试图操纵真实 CRM Capability。",
-        "decision": "建立 Defense in Depth，同时避免靠“拒绝所有外部内容”获得虚假的安全。",
+        "decision": "模型非常准确地执行了那条指令。为什么“执行正确”反而正是漏洞？",
         "dimensions": ["Provenance", "Least Privilege", "Runtime Gate", "False Positive"],
         "minutes": "15 分钟",
-        "cta": "防守 Agent"
+        "cta": "调查事故"
       },
       "reliable-support-agent": {
         "step": "FINAL BOSS · 六层发布评审",
@@ -90,14 +90,16 @@
     "bossCopy": "Final Boss 不提供“一键参考架构”。它只给你 Evidence、有限 Change Budget，以及最终 Release Decision 的责任。"
   },
   "method": {
-    "kicker": "MISSION 如何工作",
-    "title": "先看 Evidence，最后才做 Decision。",
-    "copy": "AhaFrame Mission 模拟的是工程工作，而不是知识问答。一个看起来合理的改动，仍可能因为新的 Binding Constraint 出现而失败。",
+    "kicker": "你会怎么学",
+    "title": "先看到失败，再只改一件事，然后重新运行。",
+    "copy": "AhaFrame 从事故开始，而不是从讲义开始。你先看证据、提出假设，再做一次有边界的改动，用系统后果建立能够迁移到别处的 Mental Model。",
     "steps": [
-      ["01", "检查证据", "先看 Trace、Timeline、Permission Scope、Blocker 与 Scorecard，不急着改参数。"],
-      ["02", "有限干预", "使用有限工程预算，修改真正会改变系统行为的 Policy。"],
-      ["03", "重新运行", "重放同一个确定性 Scenario，比较 Attempts，而不是凭直觉争论。"],
-      ["04", "做出决策", "自己选择 SHIP、BLOCK 或 INCONCLUSIVE。Simulator 提供 Evidence，但它没有替你批准上线的权力。"]
+      ["01", "先看它失败", "从一个看起来合理、却在生产约束下失败的系统开始。"],
+      ["02", "检查证据", "先读 Trace、Context、Evidence 和约束，不急着动参数。"],
+      ["03", "提出假设", "在改 Policy 之前，先说清楚你认为最可能的根因是什么。"],
+      ["04", "只改一件事", "做一次有边界的工程干预，让因果关系仍然看得见。"],
+      ["05", "重新运行", "重放同一个确定性场景，把结果和 Baseline 放在一起比较。"],
+      ["06", "形成理解", "把观察到的 Trade-off 提炼成可以迁移到其他系统的工程 Mental Model。"]
     ]
   },
   "knowledge": {
