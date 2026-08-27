@@ -1,17 +1,36 @@
 # AhaFrame Curriculum — Canonical Entry
 
-Date: 2026-08-16
+Date: 2026-08-27  
 Status: **active curriculum source of truth**
 
 The active learner-facing curriculum is:
 
-> [`docs/CURRICULUM_V0_8.md`](./CURRICULUM_V0_8.md) — **Game Learning & Production Incident Edition**
+> [`docs/CURRICULUM_V0_9.md`](./CURRICULUM_V0_9.md) — **Complete AI Engineering Learning Path**
+
+The previous v0.8 source remains preserved for provenance:
+
+> [`docs/CURRICULUM_V0_8.md`](./CURRICULUM_V0_8.md) — Game Learning & Production Incident Edition
 
 ## Product thesis
 
 > **Learn AI Engineering by surviving production incidents.**
 
-AhaFrame is designed for experienced software engineers moving into AI Engineering. It is not a 500-lesson encyclopedia and does not require learners to begin with a complete math/ML curriculum.
+AhaFrame is designed for experienced software engineers moving into production AI Engineering. It is not a 500-lesson encyclopedia and does not require learners to begin with a complete math/ML curriculum.
+
+## Learner-facing path
+
+```text
+00  AI Systems Mental Model
+01  Behavior, Prompt & Output Contracts
+02  Context, Retrieval & RAG
+03  Memory, Knowledge & Source of Truth
+04  Tools, MCP & Capability Boundaries
+05  Agent Loop, State & Long-Running Work
+06  Reliability, Security & Human Control
+07  Evaluation, Observability & Production Economics
+08  Graphs, Delegation & Multi-Agent Systems
+09  Production Architecture & Capstones
+```
 
 The six engineering layers remain the internal cognitive framework:
 
@@ -24,44 +43,64 @@ Graph Engineering       shapes orchestration
 Evaluation Engineering  proves whether it works
 ```
 
-Learner-facing organization is now **Mission / Incident first**, not taxonomy first.
+They are not the primary course-navigation hierarchy.
+
+## Learning loop
 
 ```text
-Mission Brief
-→ Production Incident
-→ Evidence / Trace
-→ Hypothesis
-→ Engineering Intervention
-→ Simulation
-→ Consequence
-→ Compare / Retry
-→ SHIP / BLOCK / INCONCLUSIVE
-→ Engineering Debrief
+See the failure
+→ Inspect evidence
+→ Form a hypothesis
+→ Change one bounded decision
+→ Run / replay
+→ Observe consequences
+→ Compare
+→ Explain
+→ Transfer
+→ Review later
 ```
 
-## Canonical content boundaries
+## Canonical v0.9 boundaries
 
-See `CURRICULUM_V0_8.md` for:
+`CURRICULUM_V0_9.md` defines:
 
-- research coverage matrix;
-- the 9-chapter AI Engineer Campaign;
-- 38 decision-changing mental models;
-- `SHIP / MAP / LATER` scope boundaries;
-- Trace/Observability as first-class learning primitives;
-- #86/#87/#88 flagship Incident dependencies;
-- #89 Final Boss integration;
-- preliminary existing-Lab migration for #90;
-- the explicit stop line before #92 and #19.
+- the complete 10-stage learner path;
+- **52** decision-changing mental models with stable IDs;
+- primary teaching format for every model;
+- prerequisite edges;
+- EN/zh-CN terminology keys;
+- current coverage and version-sensitivity markers;
+- a complete audit of the prior v0.8 38-model graph;
+- specialist-path projections without duplicate curricula;
+- flagship Incident / Build / Final Boss dependencies;
+- version-sensitive policy for MCP, provider APIs, tracing and cost data;
+- explicit exclusions that keep AhaFrame focused on production engineering judgment.
 
-## Source-use invariant
+## Current source-use invariant
 
-AhaFrame may study external repositories for concepts, coverage gaps and experiment methodology, but AhaFrame scenarios, prose, evidence, controls, formulas, simulations and visuals remain original.
+AhaFrame may study external material for concepts, coverage gaps, protocol facts and experiment methodology, but AhaFrame scenarios, prose, diagrams, evidence, controls, formulas, simulations and debriefs remain original.
 
-Research references:
+Research provenance includes:
 
 - `https://github.com/rohitg00/ai-engineering-from-scratch`
 - `https://github.com/bojieli/ai-agent-book`
+- MCP specification / release material, currently anchored to `2026-07-28`
+- current provider/research engineering material where implementation details are version-sensitive
 
-The previous v1.1 taxonomy-first curriculum remains available through git history for provenance; it is no longer the active learner-facing source of truth.
+The canonical stable model IDs must not churn merely because a provider changes an API name.
 
-Refs: #83 #84 #85 #86 #87 #88 #89 #90 #91 #92 #19
+## Downstream contract
+
+```text
+#118 canonical curriculum
+        ↓
+#119 machine-readable content-node contract
+        ↓
+#124 progression / Knowledge Map semantics
+        ↓
+#131 homepage Learning Map projection
+```
+
+The older v1.1 taxonomy-first curriculum remains available through git history; v0.8 remains available as a versioned provenance document.
+
+Refs: #117 #118 #119 #120 #121 #122 #123 #124 #125 #83 #84
