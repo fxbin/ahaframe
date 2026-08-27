@@ -9,7 +9,7 @@ import { SiteFrame } from "@/components/site-frame";
 import { ValidationBootstrap } from "@/components/validation-bootstrap";
 import { getLocaleSource, localeFromSegment, SUPPORTED_SEGMENTS } from "@/lib/content";
 import { indexingMetadata } from "@/lib/indexing";
-import { getLearningGraph } from "@/lib/learning-graph";
+import { getLearningGraph } from "@/lib/learning-graph-server";
 import { organizationSchema } from "@/lib/schema";
 import "../../globals.css";
 
