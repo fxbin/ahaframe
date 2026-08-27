@@ -1,0 +1,84 @@
+{
+  "locale": "zh-CN",
+  "meta": {
+    "title": "AI Engineering 学习路径",
+    "description": "探索 AhaFrame 的 10 阶段 AI Engineering 学习路径、Mental Model 知识地图、生产事故、前置补课、迁移练习与复习状态。"
+  },
+  "page": {
+    "kicker": "LEARNING PATH · V0.9",
+    "title": "一条完整的 AI Engineering 路径，但不要求你从第一课开始。",
+    "intro": "需要结构时，就沿 10 个 Stage 往前走；更有经验时，也可以直接进入生产事故，只补真正缺失的 Mental Model。",
+    "nextLabel": "建议下一步",
+    "nextEmpty": "当前已发布的学习体验你都看过了。可以从知识地图选择专项方向，或回到某个 Transfer Prompt 做迁移练习。",
+    "nextReasonNew": "从 canonical graph 中最靠前、已经发布的体验开始。",
+    "nextReasonContinue": "从你最近的本地学习状态出发，沿 graph 的 recommended next edges 继续。",
+    "pathTitle": "Guided Path",
+    "pathCopy": "从模型行为一直到生产架构，共 10 个 Stage。即使某些 Mental Model 还没有独立页面，完整知识结构仍然会展示出来。",
+    "mapTitle": "Knowledge Map",
+    "mapCopy": "Mental Model 才是长期稳定的知识单元；一个 Lab、Mission 或 Incident 可以同时训练多个模型。",
+    "available": "已发布体验",
+    "models": "Mental Model",
+    "open": "打开",
+    "continue": "继续",
+    "reset": "重置本地学习状态",
+    "resetConfirm": "确定清除这个浏览器里保存的匿名学习状态吗？",
+    "anonymousNote": "当前进度只保存在这个浏览器里，不要求登录账号。",
+    "specialist": "可选专项深入",
+    "prerequisite": "建议补充前置",
+    "backfillNone": "进入这起事故前，没有必须完成的已发布前置内容。",
+    "returnToMap": "查看完整学习路径",
+    "transfer": "迁移这个模型",
+    "transferAction": "我已经推演过这个变体",
+    "transferDone": "已在本地记录迁移练习",
+    "debrief": "可复用的 Mental Model"
+  },
+  "states": {
+    "UNSEEN": "未看过",
+    "SEEN": "已看过",
+    "PRACTICED": "已实践",
+    "TRANSFERRED": "已迁移",
+    "REVIEW_DUE": "待复习"
+  },
+  "content": {
+    "token-playground": {
+      "debrief": "模型行为是概率性的；应用层保证必须在系统中显式设计，不能从流畅输出里默认获得。",
+      "transfer": "模型返回了一个看起来合理、但不符合枚举约束的值。哪些保证属于模型，哪些必须由应用代码承担？"
+    },
+    "context-window": {
+      "debrief": "Context Window 变大，并不会消除信息选择策略；每个 Token 仍然在争夺注意力与预算。",
+      "transfer": "一个客服长对话超过 Working Context 预算。哪些证据应该保留、压缩、重新检索或丢弃？"
+    },
+    "agent-loop": {
+      "debrief": "Agent Loop 本质上是一个控制系统，需要明确的停止、恢复和升级策略。",
+      "transfer": "一个工具持续返回可重试错误。在哪个节点 Agent 应继续 Retry、换策略，或升级给人？"
+    },
+    "rag-failure": {
+      "debrief": "Retrieval Quality 是整条证据管道的属性：Freshness、Authority、Selection 与 Grounding 必须彼此一致。",
+      "transfer": "最新文档已经检索出来，但更旧的一份文件才具有法律权威。Evidence Policy 应该如何决定？"
+    },
+    "context-compression": {
+      "debrief": "Compression 是否成功，要看决策关键证据有没有被保留下来，而不是只看 Token 是否减少。",
+      "transfer": "压缩一段事故 Trace，同时必须保留一个很少出现、但决定能否上线的关键信号。你会怎么做？"
+    },
+    "agent-reliability": {
+      "debrief": "Timeout 只说明你观察到了什么；Idempotency 才决定重复同一个 Intent 是否安全。",
+      "transfer": "创建订单的 API Timeout 了，但 Provider 可能已经提交订单。请设计安全的恢复路径。"
+    },
+    "instruction-conflict": {
+      "debrief": "一段文字长得像 Instruction，并不会因此获得系统 Authority；Capability Policy 必须由 Runtime Boundary 执行。",
+      "transfer": "同一条恶意指令不再来自检索文档，而是来自 Tool Result。哪些防线仍然有效？"
+    },
+    "evaluation-failure": {
+      "debrief": "当关键 Slice、不确定性或 Hard Veto 失败时，一个漂亮的 Aggregate Score 仍然是很弱的发布证据。",
+      "transfer": "新模型提高了平均成功率，却让最高风险的 2% 请求发生回归。什么证据会改变你的发布决定？"
+    },
+    "agent-workflow-graph": {
+      "debrief": "只有当任务拆分带来的价值，高于 Coordination、Shared State 与 Failure Propagation 成本时，Graph Complexity 才值得。",
+      "transfer": "两个独立 Worker 现在开始共享可变状态。把协调风险算进去以后，并行仍然值得吗？"
+    },
+    "reliable-support-agent": {
+      "debrief": "Production Readiness 是系统属性；关键 Veto 不能被其他局部高分平均掉。",
+      "transfer": "人工审批延迟翻倍，但业务 SLA 不变。重新判断 SHIP、BLOCK 或 INCONCLUSIVE，并解释为什么。"
+    }
+  }
+}
