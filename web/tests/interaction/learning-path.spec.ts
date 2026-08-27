@@ -55,6 +55,26 @@ test("Chinese Learning Path preserves the same structure without fake mastery", 
   await expect(page.getByRole("heading", { level: 1 })).toContainText("完整的 AI Engineering 路径");
   await expect(page.getByText("STAGE 00", { exact: true })).toBeVisible();
   await expect(page.getByText("STAGE 09", { exact: true })).toBeVisible();
-  await expect(page.getByText("概率性模型行为 vs 应用系统保证", { exact: true })).toBeVisible();
+
+  const stageZero = page.locator("details").filter({ hasText: "AI 系统心智模型" }).first();
+  await stageZero.locator("summary").click();
+  await expect(stageZero.getByText("概率性模型行为 vs 应用系统保证", { exact: true })).toBeVisible();
   await expect(page.getByText(/Mastered|已掌握/i)).toHaveCount(0);
+});
+
+test("Language selector uses a neutral current-locale control and preserves route context", async ({ page }) => {
+  await page.goto("/en/learning/?cohort=preview&source=nav");
+
+  const selector = page.getByTestId("locale-switch");
+  await expect(selector.locator("summary")).toContainText("EN");
+  await expect(selector.locator("summary")).not.toContainText("简体中文");
+
+  await selector.locator("summary").click();
+  await expect(selector.getByText("English", { exact: true })).toBeVisible();
+  const chinese = selector.getByRole("link", { name: /简体中文/ });
+  await expect(chinese).toHaveAttribute("href", "/zh-cn/learning/?cohort=preview&source=nav");
+
+  await chinese.click();
+  await expect(page).toHaveURL(/\/zh-cn\/learning\/\?cohort=preview&source=nav$/);
+  await expect(page.getByTestId("locale-switch").locator("summary")).toContainText("ZH-CN");
 });
