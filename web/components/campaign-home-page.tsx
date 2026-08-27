@@ -78,6 +78,7 @@ export function CampaignHomePage({ locale, content, contract }: CampaignHomePage
           </div>
 
           <FirstAhaPanel
+            locale={locale}
             content={content.hero.firstAha}
             href={experienceHref(firstAhaExperience, locale)}
             ctaLabel={content.hero.primaryCta}
