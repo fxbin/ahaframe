@@ -45,12 +45,12 @@ export function CampaignHomePage({ locale, content, contract }: CampaignHomePage
 
   const labels = locale === "zh-CN"
     ? {
-        campaignIndex: "生产事故路径",
+        campaignIndex: "事故索引",
         finalBoss: "最终发布挑战",
         mapCount: "个体验",
       }
     : {
-        campaignIndex: "Production incident path",
+        campaignIndex: "Incident index",
         finalBoss: "Final release challenge",
         mapCount: "experiences",
       };
@@ -86,6 +86,32 @@ export function CampaignHomePage({ locale, content, contract }: CampaignHomePage
         </div>
       </section>
 
+      <section className="border-b border-[var(--border)] bg-[var(--surface)] py-16 sm:py-20">
+        <div className="shell">
+          <div className="max-w-3xl">
+            <p className="eyebrow-label">{content.method.kicker}</p>
+            <h2 className="section-title">{content.method.title}</h2>
+            <p className="section-copy">{content.method.copy}</p>
+          </div>
+
+          <div className="mt-10 grid border-y border-[var(--border)] sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+            {content.method.steps.map(([number, title, text], index) => (
+              <article
+                key={number}
+                className={`relative py-5 sm:px-5 xl:py-6 ${index > 0 ? "xl:border-l xl:border-[var(--border)]" : ""}`}
+              >
+                <div className="font-mono text-[11px] font-bold text-[var(--primary)]">{number}</div>
+                <h3 className="mt-3 text-base font-bold tracking-[-0.02em]">{title}</h3>
+                <p className="mt-2 text-[13px] leading-5 text-[var(--muted)]">{text}</p>
+                {index < content.method.steps.length - 1 ? (
+                  <span className="absolute right-[-7px] top-6 hidden text-sm text-[var(--border-strong)] xl:block" aria-hidden="true">→</span>
+                ) : null}
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section id="campaign" className="py-20 sm:py-28">
         <div className="shell">
           <div className="max-w-3xl">
@@ -95,66 +121,49 @@ export function CampaignHomePage({ locale, content, contract }: CampaignHomePage
           </div>
 
           <div className="mt-12 border-t border-[var(--border)]">
-            <p className="py-4 text-[11px] font-extrabold uppercase tracking-[0.16em] text-[var(--muted)]">{labels.campaignIndex}</p>
+            <p className="py-4 font-mono text-[11px] font-bold uppercase tracking-[0.1em] text-[var(--muted)]">{labels.campaignIndex}</p>
             {campaign.slice(0, 3).map((experience, index) => {
               const card = content.campaign.cards[experience.id];
               return (
                 <Link
                   key={experience.id}
-                  className="incident-row group grid gap-5 border-t border-[var(--border)] py-7 sm:grid-cols-[64px_1fr_auto] sm:items-start"
+                  className="incident-row group grid gap-5 border-t border-[var(--border)] py-8 sm:grid-cols-[54px_1fr_auto] sm:items-start"
                   href={experienceHref(experience, locale)}
                 >
                   <span className="font-mono text-sm font-bold text-[var(--primary)]">0{index + 1}</span>
                   <span>
-                    <strong className="block text-xl font-black tracking-[-0.035em] sm:text-2xl">{card.title}</strong>
-                    <span className="mt-2 block max-w-3xl text-sm leading-6 text-[var(--muted)]">{card.decision}</span>
-                    <span className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-[var(--muted)]">
+                    <span className="technical-label block text-[10px] text-[var(--muted)]">{card.step}</span>
+                    <strong className="mt-2 block font-[family-name:var(--font-editorial)] text-2xl font-semibold tracking-[-0.035em] sm:text-3xl">
+                      {card.title}
+                    </strong>
+                    <span className="mt-3 block max-w-3xl text-base leading-7 text-[var(--text)]">{card.decision}</span>
+                    <span className="mt-4 flex flex-wrap gap-x-4 gap-y-1 font-mono text-[11px] text-[var(--muted)]">
                       {card.dimensions.map((dimension) => <span key={dimension}>{dimension}</span>)}
                     </span>
                   </span>
-                  <span className="flex items-center gap-4 text-sm font-bold text-[var(--muted)] sm:pt-1">
-                    {card.minutes}
-                    <span className="text-[var(--primary)] transition-transform group-hover:translate-x-1" aria-hidden="true">→</span>
+                  <span className="flex items-center gap-3 text-sm font-bold text-[var(--primary)] sm:pt-8">
+                    <span>{card.cta}</span>
+                    <span className="transition-transform group-hover:translate-x-1" aria-hidden="true">→</span>
                   </span>
                 </Link>
               );
             })}
           </div>
 
-          <article className="final-boss mt-10 grid gap-8 rounded-[20px] bg-[var(--text)] p-7 text-white sm:p-10 lg:grid-cols-[1fr_auto] lg:items-end">
+          <article className="final-boss mt-10 grid gap-8 rounded-[var(--radius)] bg-[var(--text)] p-7 text-white sm:p-10 lg:grid-cols-[1fr_auto] lg:items-end">
             <div>
-              <p className="text-[11px] font-extrabold uppercase tracking-[0.16em] text-[var(--accent)]">{labels.finalBoss}</p>
+              <p className="font-mono text-[11px] font-bold uppercase tracking-[0.1em] text-[var(--accent)]">{labels.finalBoss}</p>
               <p className="mt-3 text-sm font-bold text-white/55">{bossCopy.step}</p>
-              <h3 className="mt-4 text-3xl font-black tracking-[-0.045em] sm:text-4xl">{bossCopy.title}</h3>
+              <h3 className="mt-4 font-[family-name:var(--font-editorial)] text-3xl font-semibold tracking-[-0.04em] sm:text-4xl">{bossCopy.title}</h3>
               <p className="mt-4 max-w-3xl text-lg leading-8 text-white/72">{bossCopy.incident}</p>
               <p className="mt-4 max-w-3xl text-sm leading-6 text-white/55">{content.campaign.bossCopy}</p>
             </div>
             <div className="flex flex-col items-start gap-4 lg:items-end">
-              <span className="text-sm text-white/50">{bossCopy.minutes}</span>
-              <Link className="rounded-full bg-white px-5 py-3 text-sm font-extrabold text-[var(--text)] transition hover:opacity-90" href={experienceHref(boss, locale)}>
+              <Link className="rounded-[6px] bg-white px-5 py-3 text-sm font-bold text-[var(--text)] transition hover:opacity-90" href={experienceHref(boss, locale)}>
                 {bossCopy.cta} <span aria-hidden="true">→</span>
               </Link>
             </div>
           </article>
-        </div>
-      </section>
-
-      <section className="border-y border-[var(--border)] bg-white py-20 sm:py-24">
-        <div className="shell">
-          <div className="max-w-3xl">
-            <p className="eyebrow-label">{content.method.kicker}</p>
-            <h2 className="section-title">{content.method.title}</h2>
-            <p className="section-copy">{content.method.copy}</p>
-          </div>
-          <div className="mt-12 grid border-y border-[var(--border)] sm:grid-cols-2 lg:grid-cols-4">
-            {content.method.steps.map(([number, title, text], index) => (
-              <article key={number} className={`py-7 sm:px-6 lg:py-8 ${index > 0 ? "lg:border-l lg:border-[var(--border)]" : ""}`}>
-                <div className="font-mono text-xs font-bold text-[var(--primary)]">{number}</div>
-                <h3 className="mt-4 text-xl font-black tracking-[-0.03em]">{title}</h3>
-                <p className="mt-3 text-sm leading-6 text-[var(--muted)]">{text}</p>
-              </article>
-            ))}
-          </div>
         </div>
       </section>
 
@@ -223,7 +232,7 @@ export function CampaignHomePage({ locale, content, contract }: CampaignHomePage
         <div className="shell flex flex-col gap-7 border-b border-[var(--border)] pb-20 sm:flex-row sm:items-end sm:justify-between sm:pb-24">
           <div>
             <p className="eyebrow-label">AhaFrame</p>
-            <h2 className="mt-3 text-3xl font-black tracking-[-0.045em] sm:text-4xl">{content.closing.title}</h2>
+            <h2 className="mt-3 font-[family-name:var(--font-editorial)] text-3xl font-semibold tracking-[-0.04em] sm:text-4xl">{content.closing.title}</h2>
             <p className="mt-4 max-w-2xl leading-7 text-[var(--muted)]">{content.closing.copy}</p>
           </div>
           <div className="flex shrink-0 flex-wrap gap-5">
