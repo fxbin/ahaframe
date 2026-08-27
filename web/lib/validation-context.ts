@@ -58,6 +58,7 @@ export interface ValidationContext {
 
 const ROUTES: Record<string, RouteMeta> = {
   "": { pageType: "landing", layer: "Overview" },
+  "learning/": { pageType: "learning", layer: "Learning System" },
   "lessons/token-playground/": { pageType: "lesson", labId: "token-playground", labVersion: "1.0.0", layer: "Foundation" },
   "lessons/context-window/": { pageType: "lesson", labId: "context-window", labVersion: "1.0.0", layer: "Context" },
   "lessons/agent-loop/": { pageType: "lesson", labId: "agent-loop", labVersion: "1.0.0", layer: "Loop" },
