@@ -1,17 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useSyncExternalStore } from "react";
 import type { LearningGraph, LearningProgressState, LearningUxContent } from "@/lib/learning-graph";
 import { localizeLearningRoute } from "@/lib/learning-graph";
 import {
   effectiveLearningState,
   LEARNING_PROGRESS_EVENT,
-  readLearningProgress,
+  LEARNING_PROGRESS_KEY,
+  parseLearningProgress,
   recommendNextLearningNode,
   resetLearningProgress,
   reviewDueNodes,
-  type LearningProgress,
 } from "@/lib/learning-progress";
 
 interface LearningPathClientProps {
@@ -26,23 +26,27 @@ function stateClass(state: LearningProgressState) {
   return "border-[var(--border)] text-[var(--muted)]";
 }
 
+function subscribeProgress(callback: () => void) {
+  window.addEventListener(LEARNING_PROGRESS_EVENT, callback);
+  window.addEventListener("storage", callback);
+  return () => {
+    window.removeEventListener(LEARNING_PROGRESS_EVENT, callback);
+    window.removeEventListener("storage", callback);
+  };
+}
+
+function progressSnapshot() {
+  return window.localStorage.getItem(LEARNING_PROGRESS_KEY) ?? "";
+}
+
+function serverProgressSnapshot() {
+  return "";
+}
+
 export function LearningPathClient({ graph, ux }: LearningPathClientProps) {
   const validIds = useMemo(() => new Set(graph.contentNodes.map((node) => node.id)), [graph.contentNodes]);
-  const [progress, setProgress] = useState<LearningProgress>({});
-
-  useEffect(() => {
-    setProgress(readLearningProgress(validIds));
-    function sync() {
-      setProgress(readLearningProgress(validIds));
-    }
-    window.addEventListener(LEARNING_PROGRESS_EVENT, sync);
-    window.addEventListener("storage", sync);
-    return () => {
-      window.removeEventListener(LEARNING_PROGRESS_EVENT, sync);
-      window.removeEventListener("storage", sync);
-    };
-  }, [validIds]);
-
+  const rawProgress = useSyncExternalStore(subscribeProgress, progressSnapshot, serverProgressSnapshot);
+  const progress = useMemo(() => parseLearningProgress(rawProgress, validIds), [rawProgress, validIds]);
   const recommendation = useMemo(() => recommendNextLearningNode(graph, progress), [graph, progress]);
   const due = useMemo(() => reviewDueNodes(graph.contentNodes, progress), [graph.contentNodes, progress]);
   const modelsById = useMemo(() => new Map(graph.models.map((model) => [model.id, model])), [graph.models]);
@@ -51,12 +55,11 @@ export function LearningPathClient({ graph, ux }: LearningPathClientProps) {
     for (const stage of graph.stages) map.set(stage.id, []);
     for (const node of graph.contentNodes) map.get(node.stageId)?.push(node);
     return map;
-  }, [graph.contentNodes, graph.stages]);
+  }, [graph]);
 
   function reset() {
     if (!window.confirm(ux.page.resetConfirm)) return;
     resetLearningProgress();
-    setProgress({});
   }
 
   return (
