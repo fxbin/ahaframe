@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { LearningPathClient } from "@/components/learning-path-client";
 import { localeFromSegment } from "@/lib/content";
-import { getLearningGraph, getLearningUxContent } from "@/lib/learning-graph";
+import { getLearningGraph, getLearningUxContent } from "@/lib/learning-graph-server";
 import { pageMetadata } from "@/lib/metadata";
 
 interface PageProps {
