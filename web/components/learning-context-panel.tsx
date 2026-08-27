@@ -1,14 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useMemo, useSyncExternalStore } from "react";
 import type { Locale } from "@/lib/content";
-import type { LearningProgressState, LearningUxContent } from "@/lib/learning-graph";
+import type { LearningUxContent } from "@/lib/learning-graph";
 import { localizeLearningRoute } from "@/lib/learning-graph";
 import {
   effectiveLearningState,
   LEARNING_PROGRESS_EVENT,
-  readLearningProgress,
+  LEARNING_PROGRESS_KEY,
+  parseLearningProgress,
   setLearningState,
 } from "@/lib/learning-progress";
 
@@ -24,6 +25,23 @@ interface LearningContextPanelProps {
   states: LearningUxContent["states"];
 }
 
+function subscribeProgress(callback: () => void) {
+  window.addEventListener(LEARNING_PROGRESS_EVENT, callback);
+  window.addEventListener("storage", callback);
+  return () => {
+    window.removeEventListener(LEARNING_PROGRESS_EVENT, callback);
+    window.removeEventListener("storage", callback);
+  };
+}
+
+function progressSnapshot() {
+  return window.localStorage.getItem(LEARNING_PROGRESS_KEY) ?? "";
+}
+
+function serverProgressSnapshot() {
+  return "";
+}
+
 export function LearningContextPanel({
   locale,
   contentId,
@@ -35,21 +53,12 @@ export function LearningContextPanel({
   labels,
   states,
 }: LearningContextPanelProps) {
-  const [state, setState] = useState<LearningProgressState>("UNSEEN");
-
-  useEffect(() => {
-    function sync() {
-      const progress = readLearningProgress();
-      setState(effectiveLearningState({ id: contentId, reviewEligible }, progress));
-    }
-    sync();
-    window.addEventListener(LEARNING_PROGRESS_EVENT, sync);
-    return () => window.removeEventListener(LEARNING_PROGRESS_EVENT, sync);
-  }, [contentId, reviewEligible]);
+  const rawProgress = useSyncExternalStore(subscribeProgress, progressSnapshot, serverProgressSnapshot);
+  const progress = useMemo(() => parseLearningProgress(rawProgress), [rawProgress]);
+  const state = effectiveLearningState({ id: contentId, reviewEligible }, progress);
 
   function markTransferred() {
     setLearningState(contentId, "TRANSFERRED");
-    setState("TRANSFERRED");
   }
 
   return (
