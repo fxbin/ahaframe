@@ -1,0 +1,84 @@
+{
+  "locale": "en",
+  "meta": {
+    "title": "AI Engineering Learning Path",
+    "description": "Explore AhaFrame's 10-stage AI Engineering path, mental-model map, production incidents, prerequisites, transfer practice, and review-ready learning state."
+  },
+  "page": {
+    "kicker": "LEARNING PATH · V0.9",
+    "title": "A complete AI Engineering path, without forcing you to start at the beginning.",
+    "intro": "Follow the 10-stage path when you want structure, or enter through a production incident and backfill only the models you actually need.",
+    "nextLabel": "Recommended next",
+    "nextEmpty": "You have seen every currently shipped learning experience. Use the model map to choose a specialist branch or revisit a transfer prompt.",
+    "nextReasonNew": "Start with the earliest shipped experience in the canonical graph.",
+    "nextReasonContinue": "Continue from your most recent learning state through the graph's recommended next edges.",
+    "pathTitle": "Guided Path",
+    "pathCopy": "Ten stages from model behavior to production architecture. Stages show the full curriculum even when every mental model does not yet have its own page.",
+    "mapTitle": "Knowledge Map",
+    "mapCopy": "Mental models are the durable units. Experiences are practice surfaces that can exercise several models at once.",
+    "available": "Shipped experience",
+    "models": "Mental models",
+    "open": "Open",
+    "continue": "Continue",
+    "reset": "Reset local learning state",
+    "resetConfirm": "Reset the anonymous learning state stored in this browser?",
+    "anonymousNote": "Progress is stored only in this browser for now. No account is required.",
+    "specialist": "Optional specialist depth",
+    "prerequisite": "Suggested backfill",
+    "backfillNone": "No shipped prerequisite is required before entering this incident.",
+    "returnToMap": "View full learning path",
+    "transfer": "Transfer the model",
+    "transferAction": "I worked through this changed case",
+    "transferDone": "Transfer attempted locally",
+    "debrief": "Reusable mental model"
+  },
+  "states": {
+    "UNSEEN": "Not seen",
+    "SEEN": "Seen",
+    "PRACTICED": "Practiced",
+    "TRANSFERRED": "Transferred",
+    "REVIEW_DUE": "Review due"
+  },
+  "content": {
+    "token-playground": {
+      "debrief": "Application guarantees must be designed around probabilistic model behavior, not assumed from fluent output.",
+      "transfer": "A model returns a plausible but invalid enum value. Which guarantee belongs to the model, and which belongs to application code?"
+    },
+    "context-window": {
+      "debrief": "More context capacity does not eliminate selection policy; every token still competes for attention and budget.",
+      "transfer": "A support thread grows beyond the working budget. Which evidence would you retain, summarize, retrieve again, or drop?"
+    },
+    "agent-loop": {
+      "debrief": "An Agent loop is a control system with explicit stopping, recovery and escalation policy.",
+      "transfer": "A tool keeps returning a retriable error. Define the point where the Agent should retry, change strategy, or escalate."
+    },
+    "rag-failure": {
+      "debrief": "Retrieval quality is a pipeline property: freshness, authority, selection and grounding must agree.",
+      "transfer": "The newest document is retrieved, but an older source is legally authoritative. How should the evidence policy decide?"
+    },
+    "context-compression": {
+      "debrief": "Compression succeeds only when decision-critical evidence survives, not when token count merely falls.",
+      "transfer": "Compress an incident trace while preserving one rare signal that determines whether the release is safe."
+    },
+    "agent-reliability": {
+      "debrief": "A timeout describes what you observed; idempotency determines whether repeating intent is safe.",
+      "transfer": "An order-creation API times out after the provider may have committed the order. Design the safe recovery path."
+    },
+    "instruction-conflict": {
+      "debrief": "Instruction-shaped text does not gain authority merely because a model can read it; capability policy belongs at the runtime boundary.",
+      "transfer": "The same malicious instruction arrives inside a tool result instead of a retrieved document. Which defenses still hold?"
+    },
+    "evaluation-failure": {
+      "debrief": "A good aggregate score is weak release evidence when critical slices, uncertainty or hard vetoes fail.",
+      "transfer": "A new model improves average success but regresses the highest-risk 2% of requests. What evidence would change your release decision?"
+    },
+    "agent-workflow-graph": {
+      "debrief": "Graph complexity is justified only when decomposition creates more value than coordination, state and failure-propagation cost.",
+      "transfer": "Two independent workers now share mutable state. Decide whether parallelism still improves the system after coordination risk is included."
+    },
+    "reliable-support-agent": {
+      "debrief": "Production readiness is a system property; a critical veto cannot be averaged away by locally good metrics.",
+      "transfer": "Human approval latency doubles while the business SLA stays fixed. Revisit SHIP, BLOCK or INCONCLUSIVE and defend the change."
+    }
+  }
+}
