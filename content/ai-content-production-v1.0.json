@@ -1,0 +1,34 @@
+{
+  "version": "1.0.0",
+  "status": "PLANNED",
+  "principles": {
+    "knowledgeMapOpen": true,
+    "reuseCanonicalConcepts": true,
+    "billingActivation": false,
+    "accessPolicyIds": ["access-open", "access-free-choice", "access-membership"]
+  },
+  "waves": [
+    {"id":"wave-1-first-value","order":0,"goal":"Deliver the strongest first-value experiences across foundations, coding, knowledge, agents, research and data.","experienceIds":["token-playground","ai-code-review-mission","rag-failure","agent-reliability","research-evidence-mission","data-analysis-verification-lab"]},
+    {"id":"wave-2-build-systems","order":1,"goal":"Turn isolated concepts into end-to-end application and outcome workflows.","experienceIds":["structured-output-contract-lab","mcp-capability-boundary-mission","long-running-agent-recovery-mission","write-book-with-ai-build","knowledge-base-build","customer-support-build","course-knowledge-product-build"]},
+    {"id":"wave-3-scale-production","order":2,"goal":"Teach system-level orchestration, production release judgment, model adaptation and AI-native business operations.","experienceIds":["multi-agent-coordination-incident","production-release-gate-build","model-adaptation-decision-lab","solo-business-operating-system-build"]}
+  ],
+  "experiences": [
+    {"id":"token-playground","nodeType":"PLAYGROUND","status":"EXISTING","pathIds":["path-ai-foundations"],"conceptIds":["concept-probabilistic-behavior","concept-tokenization","concept-context-window"],"accessPolicyId":"access-open"},
+    {"id":"ai-code-review-mission","nodeType":"MISSION","status":"SEEDED","pathIds":["path-vibe-coding"],"conceptIds":["concept-specification-before-generation","concept-ai-code-review","concept-test-first-ai","concept-evaluation-evidence"],"accessPolicyId":"access-free-choice"},
+    {"id":"rag-failure","nodeType":"INCIDENT","status":"EXISTING","pathIds":["path-rag-knowledge-systems","path-build-knowledge-base"],"conceptIds":["concept-retrieval-pipeline","concept-source-authority","concept-retrieval-evaluation","concept-evaluation-evidence"],"accessPolicyId":"access-free-choice"},
+    {"id":"agent-reliability","nodeType":"INCIDENT","status":"EXISTING","pathIds":["path-agent-engineering","path-production-ai-reliability"],"conceptIds":["concept-agent-loop","concept-timeout-ambiguity","concept-idempotency-boundary","concept-evaluation-evidence"],"accessPolicyId":"access-free-choice"},
+    {"id":"research-evidence-mission","nodeType":"MISSION","status":"PLANNED","pathIds":["path-research-with-ai"],"conceptIds":["concept-research-question-decomposition","concept-source-triangulation","concept-claim-evidence-matrix","concept-research-synthesis","concept-evaluation-evidence"],"accessPolicyId":"access-free-choice"},
+    {"id":"data-analysis-verification-lab","nodeType":"LAB","status":"PLANNED","pathIds":["path-data-analysis-ai"],"conceptIds":["concept-document-extraction","concept-structured-analysis","concept-data-analysis-verification","concept-confidence-variance","concept-verification-over-introspection"],"accessPolicyId":"access-free-choice"},
+    {"id":"structured-output-contract-lab","nodeType":"LAB","status":"PLANNED","pathIds":["path-llm-application-engineering"],"conceptIds":["concept-structured-output-contract","concept-streaming-backpressure","concept-model-vs-runtime-fact"],"accessPolicyId":"access-free-choice"},
+    {"id":"mcp-capability-boundary-mission","nodeType":"MISSION","status":"PLANNED","pathIds":["path-agent-engineering"],"conceptIds":["concept-mcp-boundaries","concept-mcp-capability-negotiation","concept-tool-contract","concept-least-privilege"],"accessPolicyId":"access-membership"},
+    {"id":"long-running-agent-recovery-mission","nodeType":"MISSION","status":"PLANNED","pathIds":["path-agent-engineering"],"conceptIds":["concept-async-long-running","concept-checkpoint-resume","concept-interrupt-cancel","concept-bounded-autonomy"],"accessPolicyId":"access-membership"},
+    {"id":"write-book-with-ai-build","nodeType":"BUILD","status":"SEEDED","pathIds":["path-write-book-ai"],"conceptIds":["concept-research-to-outline","concept-source-authority","concept-context-management","concept-long-form-consistency","concept-fact-check-revision"],"accessPolicyId":"access-membership"},
+    {"id":"knowledge-base-build","nodeType":"BUILD","status":"SEEDED","pathIds":["path-build-knowledge-base"],"conceptIds":["concept-knowledge-base-lifecycle","concept-retrieval-pipeline","concept-memory-lifecycle","concept-retrieval-evaluation"],"accessPolicyId":"access-membership"},
+    {"id":"customer-support-build","nodeType":"BUILD","status":"PLANNED","pathIds":["path-ai-customer-support"],"conceptIds":["concept-customer-support-copilot","concept-knowledge-base-lifecycle","concept-tool-contract","concept-bounded-autonomy","concept-human-review-boundary"],"accessPolicyId":"access-membership"},
+    {"id":"course-knowledge-product-build","nodeType":"BUILD","status":"PLANNED","pathIds":["path-course-knowledge-product"],"conceptIds":["concept-learning-objective-design","concept-curriculum-decomposition","concept-editorial-voice-control","concept-media-quality-review","concept-copyright-provenance"],"accessPolicyId":"access-membership"},
+    {"id":"multi-agent-coordination-incident","nodeType":"INCIDENT","status":"PLANNED","pathIds":["path-multi-agent-orchestration"],"conceptIds":["concept-loop-vs-graph","concept-delegation-state","concept-independent-verification","concept-coordination-overhead"],"accessPolicyId":"access-membership"},
+    {"id":"production-release-gate-build","nodeType":"BUILD","status":"PLANNED","pathIds":["path-production-ai-reliability"],"conceptIds":["concept-failure-attribution","concept-release-economics","concept-ship-block-inconclusive","concept-rollout-fallback"],"accessPolicyId":"access-membership"},
+    {"id":"model-adaptation-decision-lab","nodeType":"LAB","status":"PLANNED","pathIds":["path-model-engineering"],"conceptIds":["concept-finetune-dataset-design","concept-adapter-finetuning","concept-inference-serving","concept-model-selection-tradeoff"],"accessPolicyId":"access-membership"},
+    {"id":"solo-business-operating-system-build","nodeType":"BUILD","status":"PLANNED","pathIds":["path-solo-business-ai"],"conceptIds":["concept-customer-problem-research","concept-workflow-automation-boundary","concept-automation-maintenance","concept-customer-support-copilot","concept-human-review-boundary"],"accessPolicyId":"access-membership"}
+  ]
+}

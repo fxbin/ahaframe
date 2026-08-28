@@ -73,6 +73,10 @@ runs:
       shell: bash
       run: python3 scripts/test_ai_knowledge_graph_v1.py
 
+    - name: Test AI content production v1.0 plan
+      shell: bash
+      run: python3 scripts/test_ai_content_production_v1.py
+
     - name: Test Content & Experience preview contract
       shell: bash
       run: python3 scripts/test_content_preview_contract.py
