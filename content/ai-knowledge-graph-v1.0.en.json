@@ -1,0 +1,87 @@
+{
+  "schemaVersion": "1.0.0",
+  "graphVersion": "1.0.0",
+  "locale": "en",
+  "domains": {
+    "domain-understand-ai": {"title":"Understand AI","description":"Build durable mental models for how AI behaves, where it fails, and what software or humans must still guarantee."},
+    "domain-build-ai": {"title":"Build AI","description":"Engineer AI-native software, knowledge systems, Agents, evaluation and production reliability."},
+    "domain-use-ai": {"title":"Use AI","description":"Apply AI to real outcomes such as writing, research, knowledge work and business workflows."}
+  },
+  "branches": {
+    "branch-ai-foundations": {"title":"AI Foundations","description":"Shared foundations for understanding model behavior."},
+    "branch-ai-limits": {"title":"Limits & Guarantees","description":"Separate model capability from runtime facts and application guarantees."},
+    "branch-ai-native-software": {"title":"AI-Native Software","description":"Software workflows designed around AI-assisted and agentic development."},
+    "branch-vibe-coding": {"title":"Vibe Coding & Agentic Coding","description":"Move from ad-hoc generation to specification, context, review and verification."},
+    "branch-llm-apps": {"title":"LLM Application Engineering","description":"Build reliable model-backed product behavior and context flows."},
+    "branch-knowledge-systems": {"title":"Knowledge Systems","description":"Design systems that collect, retrieve, update and govern knowledge."},
+    "branch-rag": {"title":"RAG & Retrieval","description":"Select and ground evidence with explicit retrieval and authority policy."},
+    "branch-agents": {"title":"Agent Engineering","description":"Build bounded systems that act, observe, verify and escalate."},
+    "branch-agent-runtime": {"title":"Agent Runtime","description":"Control loops, state, recovery and long-running work."},
+    "branch-production-ai": {"title":"Production AI","description":"Turn prototypes into observable, recoverable and defensible systems."},
+    "branch-eval-reliability": {"title":"Evaluation & Reliability","description":"Use evidence to diagnose failures and make release decisions."},
+    "branch-create-with-ai": {"title":"Create with AI","description":"Use AI for meaningful creative workflows rather than one-shot generation."},
+    "branch-long-form-creation": {"title":"Long-Form Creation","description":"Research, plan, draft and verify coherent long-form work."},
+    "branch-knowledge-work": {"title":"Knowledge Work","description":"Use AI to collect, structure, reason over and maintain knowledge."},
+    "branch-knowledge-base": {"title":"AI Knowledge Base","description":"Create living knowledge systems that stay retrievable and current."}
+  },
+  "concepts": {
+    "concept-probabilistic-behavior": {"title":"Probabilistic model behavior","summary":"Fluent output is not a deterministic application guarantee."},
+    "concept-model-vs-runtime-fact": {"title":"Model claim vs runtime fact","summary":"What the model says happened must be separated from what the runtime can verify."},
+    "concept-context-management": {"title":"Context management","summary":"Select, order, compress and refresh context according to the task."},
+    "concept-specification-before-generation": {"title":"Specification before generation","summary":"Define intent, constraints and acceptance evidence before asking AI to produce an artifact."},
+    "concept-ai-code-review": {"title":"AI code review","summary":"Treat generated code as an untrusted change set that requires review and evidence."},
+    "concept-source-authority": {"title":"Source authority","summary":"Freshness and authority may disagree, so systems need an explicit source-priority policy."},
+    "concept-retrieval-pipeline": {"title":"Retrieval pipeline","summary":"Retrieval is a multi-stage evidence-selection system, not one vector-search call."},
+    "concept-agent-loop": {"title":"Act → observe → verify loop","summary":"An Agent is a bounded control loop that must decide whether to continue, recover or stop."},
+    "concept-workflow-decomposition": {"title":"Workflow decomposition","summary":"Break work into stages only when decomposition improves control, verification or parallelism."},
+    "concept-timeout-ambiguity": {"title":"Timeout ambiguity","summary":"A missing response describes what you observed, not whether the remote side committed the action."},
+    "concept-idempotency-boundary": {"title":"Idempotency boundary","summary":"Repeated intent must not duplicate irreversible side effects."},
+    "concept-evaluation-evidence": {"title":"Evaluation evidence","summary":"Release decisions need representative tasks, observable evidence and an aligned verifier."},
+    "concept-long-form-consistency": {"title":"Long-form consistency","summary":"Long-form AI output needs explicit control of facts, terminology, voice and cross-section dependencies."},
+    "concept-knowledge-base-lifecycle": {"title":"Knowledge-base lifecycle","summary":"A useful knowledge base needs ingestion, retrieval, updating, authority and evaluation over time."},
+    "concept-human-review-boundary": {"title":"Human review boundary","summary":"Place human review where error cost, ambiguity or irreversibility justifies interruption."}
+  },
+  "edges": {
+    "edge-probability-runtime": {"rationale":"Probabilistic behavior must be understood before reasoning about runtime guarantees."},
+    "edge-context-retrieval": {"rationale":"Retrieval only helps when the system knows how evidence will enter and compete inside context."},
+    "edge-spec-review": {"rationale":"A review needs a specification to judge whether the generated change is acceptable."},
+    "edge-source-retrieval": {"rationale":"A retrieval pipeline needs source-authority rules before ranking evidence."},
+    "edge-agent-workflow": {"rationale":"Workflow decomposition builds on understanding the Agent control loop."},
+    "edge-timeout-idempotency": {"rationale":"Timeout ambiguity explains why idempotency is required for safe retries."},
+    "edge-review-evaluation": {"rationale":"Code review creates concrete evidence that can feed evaluation."},
+    "edge-retrieval-kb": {"rationale":"Retrieval is one core subsystem inside a maintained knowledge base."},
+    "edge-workflow-longform": {"rationale":"Long-form consistency improves when work is decomposed into verifiable stages."},
+    "edge-context-longform": {"rationale":"Long-form creation depends on deliberate context management."},
+    "edge-human-code-review": {"rationale":"Human review belongs at coding boundaries where automated evidence is insufficient."},
+    "edge-human-longform": {"rationale":"Human review is useful when long-form factual or editorial risk becomes expensive."},
+    "edge-source-evaluation": {"rationale":"Evaluation quality depends on the authority of the evidence used as ground truth."}
+  },
+  "paths": {
+    "path-agent-engineering": {"title":"Agent Engineering","description":"From Agent loops to reliability and evaluation.","goal":"Build and defend a production Agent architecture.","deliverable":"A production Agent decision backed by reliability and evaluation evidence."},
+    "path-vibe-coding": {"title":"Vibe Coding & Agentic Software Engineering","description":"Turn AI coding from ad-hoc generation into a controlled engineering workflow.","goal":"Use AI to change real codebases while preserving architecture, tests and review quality.","deliverable":"A reviewed AI-generated change with explicit specification and evidence."},
+    "path-write-book-ai": {"title":"Write a Book with AI","description":"Use AI across research, planning, drafting and consistency review.","goal":"Produce coherent long-form work with source-backed claims and controlled context.","deliverable":"A book-length draft with provenance, workflow and consistency review."},
+    "path-build-knowledge-base": {"title":"Build an AI Knowledge Base","description":"Create a living knowledge system instead of a static document dump.","goal":"Build a knowledge base that retrieves current, authoritative evidence and can be evaluated.","deliverable":"A knowledge-base design with retrieval, update and evaluation policy."}
+  },
+  "milestones": {
+    "milestone-agent-loop": {"title":"Control the Agent loop"},
+    "milestone-agent-reliability": {"title":"Handle ambiguous failure and side effects"},
+    "milestone-agent-evaluation": {"title":"Evaluate and review Agent behavior"},
+    "milestone-vibe-spec": {"title":"Specify the change and context"},
+    "milestone-vibe-review": {"title":"Review AI-generated changes"},
+    "milestone-vibe-workflow": {"title":"Scale the coding workflow"},
+    "milestone-book-source": {"title":"Build the source base"},
+    "milestone-book-context": {"title":"Control context and specification"},
+    "milestone-book-workflow": {"title":"Produce and review the manuscript"},
+    "milestone-kb-source": {"title":"Define source authority"},
+    "milestone-kb-retrieval": {"title":"Build retrieval and lifecycle"},
+    "milestone-kb-evaluation": {"title":"Evaluate the knowledge system"}
+  },
+  "content": {
+    "token-playground": {"title":"Token Playground","promise":"See how model constraints shape what the system can receive and generate.","debrief":"Model behavior remains probabilistic and context remains finite.","transferPrompt":"A model gets a larger context window. Which selection problems still remain?"},
+    "rag-failure": {"title":"The Broken RAG Pipeline","promise":"Diagnose why weak evidence wins even when the right source exists.","debrief":"Retrieval quality is a pipeline property: context, authority and evaluation must agree.","transferPrompt":"The newest source conflicts with the legally authoritative source. Which should win?"},
+    "agent-reliability": {"title":"The $47,000 Retry","promise":"Stabilize an Agent runtime where retry duplicates an irreversible action.","debrief":"Timeout describes observation; idempotency determines whether repeating intent is safe.","transferPrompt":"An order API times out after the provider may have committed. Design a safe recovery path."},
+    "ai-code-review-mission": {"title":"Your AI Changed 17 Files","promise":"Review an AI-generated change that passes tests but hides an architectural regression.","debrief":"Generated code is an untrusted proposal; specification, review and evidence decide whether it should merge.","transferPrompt":"The same change now touches a migration and permission boundary. What extra evidence is required?"},
+    "write-book-with-ai-build": {"title":"Write a Book with AI","promise":"Build a source-backed workflow from research through consistency review.","debrief":"AI writing quality depends on source authority, context, decomposition and human review—not one perfect prompt.","transferPrompt":"A key source changes halfway through drafting. What must be invalidated or rewritten?"},
+    "knowledge-base-build": {"title":"Build an AI Knowledge Base","promise":"Design a knowledge system that stays retrievable, current and evaluable.","debrief":"A knowledge base is a lifecycle system: source authority, retrieval, updating and evaluation must work together.","transferPrompt":"A frequently retrieved document becomes obsolete. Design the update and regression path."}
+  }
+}
