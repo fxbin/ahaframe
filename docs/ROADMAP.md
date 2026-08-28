@@ -1,376 +1,239 @@
 # AhaFrame Development Roadmap
 
-Date: 2026-08-15  
-Version: v0.7 — Validation Alpha Ready  
+Date: 2026-08-28  
+Version: v1.0 — AI Knowledge Graph expansion  
 Status: active execution roadmap
 
-## Product direction
+## Current product direction
 
-AhaFrame is an **Interactive AI Engineering Lab** for experienced software developers becoming AI engineers.
-
-```text
-Prompt shapes behavior.
-Context shapes knowledge.
-Harness shapes reliability.
-Loop shapes iteration.
-Graph shapes orchestration.
-Evaluation proves whether it works.
-```
-
-Learning loop:
+AhaFrame is an interactive **AI Knowledge & Practice Map**.
 
 ```text
-SEE → PLAY → BREAK → AHA → BUILD
+AI
+├── Understand AI
+├── Build AI
+└── Use AI
 ```
 
-Architecture principles:
+The learner browses a tree, but the canonical curriculum is a reusable graph:
 
-> **Simulate the concept. Spend compute only to validate reality.**
+```text
+Domain / Branch
+    ↓ browse hierarchy
+Concept + typed Edge
+    ↓ canonical knowledge identity
+Path
+    ↓ goal-specific projection
+Content / Experience
+    ↓ Guide / Lab / Mission / Incident / Build
+Runtime
+    ↓ deterministic interaction / simulation
+```
 
-> **Do not let platform completeness outrun product evidence.**
+Core product rule:
 
-> **Anonymous First, Account Enhanced.**
+> **The library may be broad; each learner path must remain small and legible.**
 
-The v1 mental model is conceptually closed. Content expansion stops by default. The current job is to determine whether the existing product creates durable product value for qualified developers.
+AhaFrame keeps the Incident-first learning method:
 
-## Execution sources of truth
+```text
+SEE THE FAILURE
+→ INSPECT EVIDENCE
+→ FORM A HYPOTHESIS
+→ CHANGE POLICY / ARCHITECTURE
+→ RUN
+→ OBSERVE CONSEQUENCES
+→ COMPARE / RETRY
+→ SHIP / BLOCK / INCONCLUSIVE
+→ DEBRIEF
+→ TRANSFER
+```
 
-- `docs/ROADMAP.md` — phase order and stop lines;
-- GitHub issue #22 — master execution state;
-- GitHub issue #19 — current Validation Alpha run;
-- GitHub issue #60 — cohort/evidence-system Epic;
-- GitHub issue #64 — Product Gate M4B final decision;
-- `docs/VALIDATION.md` — validation/evidence contract;
-- `docs/VALIDATION_METRICS.md` — M2 metric definitions;
-- `docs/VALIDATION_CONSOLE.md` — M3 operator workflow;
-- `docs/PRODUCT_GATE_MEMO.md` — M4 decision process;
-- `docs/VALIDATION_ALPHA_RUNBOOK.md` — current cohort protocol;
-- `docs/PRODUCTION_RELEASE_GATE.md` — exact-production release evidence.
+## Current sources of truth
+
+- `docs/ROADMAP.md` — current phase order and stop lines;
+- #143 — AI Knowledge Graph v1.0 population Epic;
+- `content/ai-knowledge-inventory-v1.0/` — authoring inventory;
+- `content/ai-content-production-v1.0.json` — Experience production waves;
+- `docs/AI_KNOWLEDGE_GRAPH_V1.md` — graph architecture and authoring rules;
+- `docs/AI_KNOWLEDGE_FRESHNESS_V1.md` — version-sensitive source policy;
+- `docs/AI_CONTENT_PRODUCTION_V1.md` — production-wave strategy;
+- #125 — Content Readiness gate;
+- #14 — Billing implementation, still gated and not production-active.
 
 ---
 
-# Phase 0 — Product Foundation
+# Phase A — Knowledge Graph foundation
 
 **Status: COMPLETE**
 
-Foundation experiences:
+Completed:
 
-```text
-Token Playground               done
-Context Window Lab             done
-Agent Loop Simulator           done
-```
+- #141 — canonical v1 schema;
+- #144 — complete canonical inventory;
+- 3 Domains;
+- 45 browse Branches;
+- 145 reusable Concepts;
+- 80 typed relationships;
+- 15 goal-oriented Paths;
+- 52/52 v0.9 Mental Models explicitly mapped;
+- EN / zh-CN presentation parity;
+- v0.9 public content routes preserved.
 
-Failure / production experiences:
-
-```text
-Instruction Conflict Lab       done
-RAG Failure Lab                done
-Context Compression Lab        done
-Agent Reliability Lab          done
-Agent Workflow Graph Lab       done
-Evaluation Failure Lab         done
-```
-
-Integrated Build:
-
-```text
-Reliable Support Agent Build   done
-```
-
-Foundation infrastructure includes AhaFrame brand/domain, deterministic Lab Engine, static production build, bilingual `en`/`zh-CN` surface, SEO/GEO, Vercel Web Analytics, GA4, Early Access signup, and a paused Next.js migration bootstrap kept green in CI.
+The v1 graph remains schema-compatible with the original contract. Courses and Paths are projections over canonical Concepts rather than duplicated curricula.
 
 ---
 
-# Phase 1 — Conceptual Closure v1
+# Phase B — Freshness and content-production plan
 
-**Status: PASSED**
+**Status: ACTIVE / CLOSING**
 
-Goal:
+## #145 Freshness review
 
-> Give each engineering responsibility at least one meaningful failure/trade-off experience and connect all six once.
+Version-sensitive concepts are reviewed against current primary sources while durable concepts remain vendor-neutral.
 
-| Layer | Responsibility | Closure experience | Status |
-|---|---|---|---|
-| Prompt | Behavior / instruction authority | Instruction Conflict Lab | Done |
-| Context | Knowledge / retrieval / compression | Context Window + RAG + Context Compression | Done |
-| Harness | Runtime reliability / validation / approval | Agent Reliability Lab | Done |
-| Loop | Iteration / recovery / termination | Agent Loop Simulator | Done |
-| Graph | Workflow topology / state / retry / joins | Agent Workflow Graph Lab | Done |
-| Evaluation | Evidence / release decision | Evaluation Failure Lab | Done |
+Current high-change areas include:
 
-Integration:
+- MCP protocol and Tasks semantics;
+- Agent evaluation methodology;
+- agentic-coding sandbox / permission operations;
+- adapter fine-tuning / PEFT;
+- inference serving and quantization guidance.
 
-```text
-Prompt + Context + Harness + Loop + Graph + Evaluation
-                         ↓
-             Reliable Support Agent Build
-                         ↓
-              SHIP / BLOCK / INCONCLUSIVE
-```
+## #146 Production waves
 
-## Content stop line
+The first bounded content-production backlog contains 17 Experiences across 3 waves and covers all 15 v1 Paths.
 
-> **STOP CONTENT EXPANSION BY DEFAULT.**
+Follow-up implementation packs:
 
-New topics resume only when validation shows a real comprehension gap, repeated user demand, a paid-outcome dependency, or an incomplete six-layer mental model.
+- #152 — Wave 1 / first-value experiences;
+- #153 — Wave 2 / systems and outcome builds;
+- #154 — Wave 3 / orchestration, production, model adaptation and solo business.
+
+Content production may continue without reorganizing the curriculum because every Experience references canonical Concept/Path IDs.
 
 ---
 
-# Phase 2 — Validation Foundation
+# Phase C — Roadmap reconciliation
 
-**Status: COMPLETE — #16 / #42 / #58**
+**Status: CURRENT — #147**
 
-AhaFrame now has:
+The old v0.9 content-pack roadmap is historical input, not a parallel current plan.
 
-- anonymous user/session context;
-- locale-neutral semantic events;
-- Strong Aha feedback;
-- waitlist / paid-intent capture;
-- durable Supabase persistence;
-- `en` + `zh-CN` production parity;
-- stable cohort attribution;
-- production validation ingest.
+Legacy issues #117 and #120–#123 contributed the Agent Engineering depth that is now absorbed by the larger v1 graph. Their useful acceptance criteria remain provenance for #152–#154, but their 10-stage / 45–55-model boundary no longer defines product scope.
 
-Production Supabase truth:
+#126 is satisfied when this roadmap and the legacy issue states point to one current v1 execution chain.
 
-```text
-project: ahaframe-validation
-ref:     swzddvprnyjrrgpzcsgp
-```
-
-Canonical migrations:
-
-```text
-20260814023253_validation_alpha.sql
-20260815000100_validation_locale.sql
-20260815071500_validation_cohort.sql
-20260815092200_validation_read_models.sql
-```
-
-Do not use stale project refs or old migration filenames from historical notes.
+#125 remains open because Content Readiness is still a real gate; its inventory expectations must now be generated from v1 production data rather than the old fixed 45–55-model target.
 
 ---
 
-# Phase 3 — Validation Operations
+# Phase D — Knowledge Map runtime projection
 
-**Status: COMPLETE — #17 / #65 / #59 / #71 / #72 / #78**
+**Status: NEXT — #148**
 
-Minimum trustworthy Alpha operations now include:
+After the inventory and production contract are stable, migrate `/[locale]/learning` from the v0.9 10-stage projection to the v1 Knowledge Map.
 
-- `ahaframe.com` HTTPS + Vercel production;
-- event / feedback / waitlist production persistence;
-- Vercel deployment/runtime visibility;
-- Supabase Edge Function logs;
-- rollback procedure;
-- P0/P1 Alpha stop rules;
-- stable desktop/mobile language switching;
-- production-ready Early Access conversion flow;
-- bounded GitHub Actions trigger model;
-- exact production commit identity before Production Smoke can pass.
+Required behavior:
 
-## Exact production release invariant
+- progressive disclosure instead of dumping 145 nodes;
+- top-level `Understand AI / Build AI / Use AI` exploration;
+- goal-oriented Path selection;
+- Concept reuse visible across Paths;
+- current public Experience routes preserved;
+- anonymous learning state preserved/migrated;
+- EN / zh-CN parity;
+- no fake mastery, XP, streak or badge claims.
 
-Every production build publishes `/assets/build-meta.json`. Production Smoke must match its `gitCommitSha` against the exact triggering `main` SHA before route and POST smoke executes.
-
-`Vercel READY` alone is not sufficient production evidence.
+The Knowledge Map/catalog itself stays openly explorable.
 
 ---
 
-# Phase 4 — Validation Evidence System
+# Phase E — Free-choice entitlement foundation
 
-**Status: M1–M4A COMPLETE — #60**
+**Status: AFTER #148 — #149**
 
-## M1 — #61 Cohort attribution — COMPLETE
-
-Stable anonymous `cohortId`, persisted and propagated through event / feedback / waitlist without conflating locale or UTM attribution.
-
-## M2 — #62 Product-decision read models — COMPLETE
-
-Stable Postgres evidence layer:
+Commercial access policy:
 
 ```text
-validation_product_events_v1
-validation_feedback_latest_v1
-validation_user_lab_facts_v1
-validation_participant_facts_v1
-validation_data_quality_issues_v1
-validation_product_metrics_v1(...)
+Visitor
+→ browse the Knowledge Map
+→ use the flagship open experience
+
+Free Account
+→ permanently choose 3 FREE_CHOICE Experiences
+
+Membership
+→ unlock the standard membership library
 ```
 
-Every Product Gate metric has a defined numerator, denominator and grain with fixture-backed PostgreSQL regression.
+Important boundary:
 
-`production-smoke` is excluded from Product Gate evidence.
+> The number `3`, user unlocks and subscription state belong to the entitlement layer, not to curriculum data.
 
-Important semantics:
-
-- D7 and continuation are cohort-scoped;
-- `meaningful_interaction` and `failure_tradeoff_observed` are currently structurally coupled and cannot be double-weighted;
-- `Want more Labs` is currently **not directly measurable**.
-
-## M3 — #63 Internal Validation Console — COMPLETE
-
-Operator-only local Markdown/HTML reporting:
-
-- funnel and target hypotheses;
-- strongest/weakest Labs/layers;
-- locale/source/device mix;
-- qualitative feedback review;
-- data-health warnings;
-- smoke-exclusion and evidence freshness.
-
-No public `/admin` surface and no participant anonymous IDs in qualitative output.
-
-## M4A — #64 Product Gate memo system — COMPLETE
-
-A versioned memo generator now pre-fills M2/M3 evidence while leaving the final business decision to operator review.
-
-It never auto-selects a decision from thresholds.
-
-M4B remains pending until the real #19 cohort closes.
+#149 may implement the entitlement model and lock-state behavior, but it does **not** activate payment by itself.
 
 ---
 
-# Phase 5 — Validation Alpha
+# Phase F — Content Readiness and Billing
 
-**Status: CURRENT / READY TO RECRUIT — #19**
+**Status: GATED — #125 → #14**
 
-Cohort:
-
-> approximately **20–30 deliberately recruited software developers moving toward AI engineering**.
-
-Stable cohort ID:
+Paid activation requires both product and content evidence.
 
 ```text
-alpha-2026-08
-```
-
-Tracked entry URLs:
-
-```text
-https://ahaframe.com/en/?cohort=alpha-2026-08
-https://ahaframe.com/zh-cn/?cohort=alpha-2026-08
-```
-
-The cohort is intentionally not a broad Product Hunt / Hacker News / Reddit launch. The goal is interpretable product evidence, not traffic volume.
-
-## Run rule
-
-Ask participants to use AhaFrame naturally. Do not force a fixed Lab order. Do not change product mechanics, event semantics, metric formulas, or add new Labs during the cohort unless a documented P0/P1 evidence-integrity problem requires intervention.
-
-See `docs/VALIDATION_ALPHA_RUNBOOK.md`.
-
-## Primary evidence
-
-- Landing → Lab Start;
-- Meaningful Interaction;
-- failure/trade-off exposure;
-- Strong Aha with response counts;
-- second Lab / second engineering layer;
-- ≥2 meaningful Labs;
-- integrated Build start/completion;
-- return / D7;
-- pricing / paid intent / waitlist conversion;
-- qualitative save/sync/account/cross-device demand;
-- strongest and weakest Labs/layers.
-
-Initial hypotheses:
-
-| Signal | Initial target |
-|---|---:|
-| Landing → Lab Start | ≥ 40% |
-| Meaningful Interaction | ≥ 60% of Lab starters |
-| Failure / Trade-off Trigger | ≥ 40% |
-| First Lab → Second Layer | ≥ 30% |
-| Users engaging with ≥2 Labs | ≥ 25% |
-| Strong Aha Rate | ≥ 60% |
-| Want more Labs | ≥ 40% *(not directly measurable yet)* |
-| Pricing visit | ≥ 10% |
-| Paid / founding intent | ≥ 3% |
-| D7 Return | ≥ 15%; ≥20% strong |
-
-These are internal hypotheses, not industry benchmarks and not automatic pass/fail rules.
-
----
-
-# Phase 6 — Product Gate / M4B
-
-**Status: PENDING #19 COHORT CLOSE — #64**
-
-After the cohort window is deliberately closed and D7-eligible users have had enough time to mature:
-
-```text
-final M3 operator report
+Knowledge Graph + production Experiences
         ↓
-M4B versioned Product Gate memo
+repeatable multi-session learning value
         ↓
-quantitative + qualitative + contradictory evidence review
+#125 Content Readiness
         ↓
-choose exactly one decision
+READY FOR PAID CONTENT
+        ↓
+#14 Waffo test-mode + verified server reconciliation
+        ↓
+explicit production Billing decision
 ```
 
-Decision set:
+Billing is not enabled merely because entitlement code or checkout infrastructure exists.
 
-```text
-GO PLATFORM
-VALIDATE AGAIN
-REFRAME
-CONTENT / BRAND ASSET
-STOP
-```
-
-A `GO PLATFORM` decision should normally require meaningful Aha, cross-layer continuation, return/future-use intent, credible demand, clean evidence integrity, and observed reasons that account/save/sync/platform capabilities solve actual user demand.
-
-Do not reinterpret “software is deployable” as `GO PLATFORM`.
-
----
-
-# Conditional Platform Path — PAUSED
-
-Accepted future architecture remains:
-
-```text
-Next.js App Router + TypeScript
-→ reusable Product Foundation
-→ Anonymous-First Supabase identity/application layer
-→ durable progress + Entitlement
-→ Waffo billing adapter
-→ optional credits / Live Mode later
-```
-
-Paused until reviewed `GO PLATFORM`:
-
-```text
-#11 / #27–#30 full runtime migration
-#12 identity foundation
-#13 progress / checkpoint / Entitlement
-#14 Waffo billing
-#15 compute-credit ledger
-#18 platform E2E / security / billing gate
-#20 bounded Live Mode
-#21 Public Beta decision
-```
-
-No payment is collected during the current Validation Alpha.
+The final Free/Paid surface must reflect actually shipped content. Catalog visibility, free-choice selection and membership access remain provider-independent; Waffo is only the payment adapter.
 
 ---
 
 # Current next action
 
 ```text
-#66 canonical docs sync
+finish #146 production manifest
         ↓
-record #19 cohort start timestamp
+#147 reconcile legacy roadmap
         ↓
-recruit 20–30 qualified developers
+#148 ship v1 Knowledge Map runtime projection
         ↓
-monitor data health with M3 without changing experiment mechanics
+#149 ship provider-independent free-choice entitlement foundation
         ↓
-allow D7 eligibility to mature
+implement #152–#154 content waves
         ↓
-close cohort window deliberately
+run #125 Content Readiness
         ↓
-M4B / #64 final Product Gate memo
-        ↓
-choose one decision before platform work resumes
+only then decide whether #14 may activate Billing
 ```
+
+---
+
+# Historical provenance — v0.7 / v0.8 / v0.9
+
+The earlier Validation Alpha roadmap remains historically valid evidence for why AhaFrame uses deterministic Labs, Incidents, anonymous-first progression and explicit Product Gates.
+
+Completed historical work included:
+
+- six-layer Prompt / Context / Harness / Loop / Graph / Evaluation closure;
+- Token, Context, Agent Loop, RAG, Compression, Retry, Prompt Injection, Evaluation and Workflow Graph experiences;
+- Reliable Support Agent Final Boss;
+- validation runtime, Supabase evidence system and Product Gate tooling;
+- current Next.js production migration;
+- Curriculum v0.9 with 10 stages and 52 decision-changing mental models.
+
+The old instruction **“STOP CONTENT EXPANSION BY DEFAULT”** was appropriate for the validation-sized v0.7 phase. It is no longer the current execution rule after the deliberate v0.9/v1 decision to build a deeper Knowledge Graph before paid activation.
+
+History is preserved; the active product boundary has changed.
