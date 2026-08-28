@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useMemo, useSyncExternalStore } from "react";
+import { KnowledgeMapOverview } from "@/components/knowledge-map-overview";
+import type { KnowledgeMap } from "@/lib/knowledge-map";
 import type { LearningGraph, LearningProgressState, LearningUxContent } from "@/lib/learning-graph";
 import { localizeLearningRoute } from "@/lib/learning-graph";
 import {
@@ -16,6 +18,7 @@ import {
 
 interface LearningPathClientProps {
   graph: LearningGraph;
+  knowledgeMap: KnowledgeMap;
   ux: LearningUxContent;
 }
 
@@ -43,7 +46,7 @@ function serverProgressSnapshot() {
   return "";
 }
 
-export function LearningPathClient({ graph, ux }: LearningPathClientProps) {
+export function LearningPathClient({ graph, knowledgeMap, ux }: LearningPathClientProps) {
   const validIds = useMemo(() => new Set(graph.contentNodes.map((node) => node.id)), [graph.contentNodes]);
   const rawProgress = useSyncExternalStore(subscribeProgress, progressSnapshot, serverProgressSnapshot);
   const progress = useMemo(() => parseLearningProgress(rawProgress, validIds), [rawProgress, validIds]);
@@ -99,11 +102,13 @@ export function LearningPathClient({ graph, ux }: LearningPathClientProps) {
         </div>
       </section>
 
-      <section className="py-16 sm:py-20">
+      <KnowledgeMapOverview map={knowledgeMap} />
+
+      <section className="py-16 sm:py-20" data-testid="guided-path-v09-compat">
         <div className="shell">
           <div className="flex flex-col gap-6 border-b border-[var(--border)] pb-8 sm:flex-row sm:items-end sm:justify-between">
             <div className="max-w-3xl">
-              <p className="eyebrow-label">01 · PATH</p>
+              <p className="eyebrow-label">GUIDED PATH · CURRENT EXPERIENCES</p>
               <h2 className="section-title">{ux.page.pathTitle}</h2>
               <p className="section-copy">{ux.page.pathCopy}</p>
             </div>
@@ -169,7 +174,7 @@ export function LearningPathClient({ graph, ux }: LearningPathClientProps) {
       <section className="border-y border-[var(--border)] bg-white py-16 sm:py-20">
         <div className="shell">
           <div className="max-w-3xl">
-            <p className="eyebrow-label">02 · MAP</p>
+            <p className="eyebrow-label">LEGACY MODEL INDEX · V0.9</p>
             <h2 className="section-title">{ux.page.mapTitle}</h2>
             <p className="section-copy">{ux.page.mapCopy}</p>
           </div>
