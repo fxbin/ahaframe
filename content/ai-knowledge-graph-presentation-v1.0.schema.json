@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ahaframe.com/schema/ai-knowledge-graph-presentation-v1.0.schema.json",
+  "title": "AhaFrame AI Knowledge Graph presentation v1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "graphVersion", "locale", "domains", "branches", "concepts", "edges", "paths", "milestones", "content"],
+  "properties": {
+    "schemaVersion": { "const": "1.0.0" },
+    "graphVersion": { "type": "string", "pattern": "^1\\.\\d+\\.\\d+$" },
+    "locale": { "type": "string", "minLength": 2 },
+    "domains": { "type": "object", "additionalProperties": { "$ref": "#/$defs/titledDescription" } },
+    "branches": { "type": "object", "additionalProperties": { "$ref": "#/$defs/titledDescription" } },
+    "concepts": { "type": "object", "additionalProperties": { "$ref": "#/$defs/conceptCopy" } },
+    "edges": { "type": "object", "additionalProperties": { "$ref": "#/$defs/edgeCopy" } },
+    "paths": { "type": "object", "additionalProperties": { "$ref": "#/$defs/pathCopy" } },
+    "milestones": { "type": "object", "additionalProperties": { "$ref": "#/$defs/titleOnly" } },
+    "content": { "type": "object", "additionalProperties": { "$ref": "#/$defs/contentCopy" } }
+  },
+  "$defs": {
+    "text": { "type": "string", "minLength": 1 },
+    "titleOnly": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title"],
+      "properties": { "title": { "$ref": "#/$defs/text" } }
+    },
+    "titledDescription": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title", "description"],
+      "properties": {
+        "title": { "$ref": "#/$defs/text" },
+        "description": { "$ref": "#/$defs/text" }
+      }
+    },
+    "conceptCopy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title", "summary"],
+      "properties": {
+        "title": { "$ref": "#/$defs/text" },
+        "summary": { "$ref": "#/$defs/text" }
+      }
+    },
+    "edgeCopy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rationale"],
+      "properties": { "rationale": { "$ref": "#/$defs/text" } }
+    },
+    "pathCopy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title", "description", "goal", "deliverable"],
+      "properties": {
+        "title": { "$ref": "#/$defs/text" },
+        "description": { "$ref": "#/$defs/text" },
+        "goal": { "$ref": "#/$defs/text" },
+        "deliverable": { "anyOf": [{ "$ref": "#/$defs/text" }, { "type": "null" }] }
+      }
+    },
+    "contentCopy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title", "promise", "debrief", "transferPrompt"],
+      "properties": {
+        "title": { "$ref": "#/$defs/text" },
+        "promise": { "$ref": "#/$defs/text" },
+        "debrief": { "$ref": "#/$defs/text" },
+        "transferPrompt": { "$ref": "#/$defs/text" }
+      }
+    }
+  }
+}

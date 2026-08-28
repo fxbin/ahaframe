@@ -1,0 +1,87 @@
+{
+  "schemaVersion": "1.0.0",
+  "graphVersion": "1.0.0",
+  "locale": "zh-CN",
+  "domains": {
+    "domain-understand-ai": {"title":"理解 AI","description":"建立对 AI 如何工作、如何失效，以及哪些保证仍需由软件或人承担的稳定心智模型。"},
+    "domain-build-ai": {"title":"构建 AI","description":"系统学习 AI 原生软件、知识系统、Agent、评测与生产可靠性。"},
+    "domain-use-ai": {"title":"使用 AI","description":"把 AI 用到写作、研究、知识工作与业务流程等真实目标中。"}
+  },
+  "branches": {
+    "branch-ai-foundations": {"title":"AI 基础","description":"理解模型行为所需的公共基础。"},
+    "branch-ai-limits": {"title":"能力边界与系统保证","description":"区分模型能力、Runtime 事实与应用系统保证。"},
+    "branch-ai-native-software": {"title":"AI 原生软件工程","description":"围绕 AI 辅助开发与 Agentic Development 设计的软件流程。"},
+    "branch-vibe-coding": {"title":"Vibe Coding 与 Agentic Coding","description":"从随意生成代码升级到 Spec、Context、Review 与 Verification。"},
+    "branch-llm-apps": {"title":"LLM 应用工程","description":"构建可靠的模型应用行为与 Context 流程。"},
+    "branch-knowledge-systems": {"title":"知识系统","description":"设计知识的收集、检索、更新与治理系统。"},
+    "branch-rag": {"title":"RAG 与 Retrieval","description":"用明确的 Retrieval 与 Source Authority 策略筛选证据。"},
+    "branch-agents": {"title":"Agent Engineering","description":"构建能够行动、观察、验证并在边界处升级的 Agent 系统。"},
+    "branch-agent-runtime": {"title":"Agent Runtime","description":"控制 Loop、State、Recovery 与长任务。"},
+    "branch-production-ai": {"title":"Production AI","description":"把原型变成可观察、可恢复、可证明的生产系统。"},
+    "branch-eval-reliability": {"title":"评测与可靠性","description":"用证据诊断失败并完成发布决策。"},
+    "branch-create-with-ai": {"title":"用 AI 创作","description":"让 AI 参与有意义的创作流程，而不是一次性生成。"},
+    "branch-long-form-creation": {"title":"长内容创作","description":"围绕研究、规划、写作与验证完成连贯长内容。"},
+    "branch-knowledge-work": {"title":"知识工作","description":"利用 AI 收集、结构化、推理并持续维护知识。"},
+    "branch-knowledge-base": {"title":"AI 知识库","description":"构建持续更新、可检索的活知识系统。"}
+  },
+  "concepts": {
+    "concept-probabilistic-behavior": {"title":"概率性模型行为","summary":"语言流畅不等于应用系统获得了确定性保证。"},
+    "concept-model-vs-runtime-fact": {"title":"模型声称 vs Runtime 事实","summary":"模型说发生了什么，与 Runtime 能验证到什么必须分开。"},
+    "concept-context-management": {"title":"Context Management","summary":"根据任务选择、排序、压缩并刷新 Context。"},
+    "concept-specification-before-generation": {"title":"先定义 Spec，再生成","summary":"在让 AI 产出前先明确意图、约束与验收证据。"},
+    "concept-ai-code-review": {"title":"AI Code Review","summary":"把生成代码当作不可信变更集，通过 Review 与 Evidence 决定是否接受。"},
+    "concept-source-authority": {"title":"Source Authority","summary":"Freshness 与 Authority 可能冲突，因此系统需要明确的来源优先策略。"},
+    "concept-retrieval-pipeline": {"title":"Retrieval Pipeline","summary":"Retrieval 是多阶段证据筛选系统，而不是一次 Vector Search。"},
+    "concept-agent-loop": {"title":"Act → Observe → Verify Loop","summary":"Agent 是有边界的控制循环，需要判断继续、恢复还是停止。"},
+    "concept-workflow-decomposition": {"title":"Workflow Decomposition","summary":"只有当拆分能提升控制、验证或并行价值时，才把工作切成更多阶段。"},
+    "concept-timeout-ambiguity": {"title":"Timeout 歧义","summary":"没有收到响应只说明观察结果，并不能证明远端没有提交操作。"},
+    "concept-idempotency-boundary": {"title":"Idempotency Boundary","summary":"重复同一个 Intent 时不能重复制造不可逆副作用。"},
+    "concept-evaluation-evidence": {"title":"Evaluation Evidence","summary":"发布决策需要代表性任务、可观察证据与一致的 Verifier。"},
+    "concept-long-form-consistency": {"title":"长内容一致性","summary":"长内容需要显式控制事实、术语、语气与跨章节依赖。"},
+    "concept-knowledge-base-lifecycle": {"title":"知识库生命周期","summary":"有用的知识库需要长期管理采集、检索、更新、Authority 与 Evaluation。"},
+    "concept-human-review-boundary": {"title":"Human Review Boundary","summary":"在错误成本、歧义或不可逆性值得打断自动流程的地方设置人工审查。"}
+  },
+  "edges": {
+    "edge-probability-runtime": {"rationale":"先理解概率性模型行为，才能正确讨论 Runtime 保证。"},
+    "edge-context-retrieval": {"rationale":"只有理解证据如何进入并竞争 Context，Retrieval 才真正有意义。"},
+    "edge-spec-review": {"rationale":"Review 需要先有 Spec，才能判断 AI 生成变更是否满足目标。"},
+    "edge-source-retrieval": {"rationale":"Retrieval Pipeline 在排序证据前必须先有 Source Authority 规则。"},
+    "edge-agent-workflow": {"rationale":"Workflow Decomposition 建立在对 Agent Control Loop 的理解上。"},
+    "edge-timeout-idempotency": {"rationale":"Timeout 歧义解释了为什么安全 Retry 需要 Idempotency。"},
+    "edge-review-evaluation": {"rationale":"Code Review 会产生可以进入 Evaluation 的具体证据。"},
+    "edge-retrieval-kb": {"rationale":"Retrieval 是持续维护知识库的核心子系统之一。"},
+    "edge-workflow-longform": {"rationale":"把长内容拆成可验证阶段，有助于保持跨章节一致性。"},
+    "edge-context-longform": {"rationale":"长内容创作依赖有意识的 Context Management。"},
+    "edge-human-code-review": {"rationale":"当自动证据不足时，应在代码变更边界引入 Human Review。"},
+    "edge-human-longform": {"rationale":"当事实或编辑风险变高时，长内容需要 Human Review。"},
+    "edge-source-evaluation": {"rationale":"Evaluation 的 Ground Truth 质量取决于证据来源是否权威。"}
+  },
+  "paths": {
+    "path-agent-engineering": {"title":"Agent Engineering","description":"从 Agent Loop 走到 Reliability 与 Evaluation。","goal":"构建并能够解释一套可上线的 Agent 架构。","deliverable":"一份由 Reliability 与 Evaluation 证据支撑的 Agent 发布决策。"},
+    "path-vibe-coding": {"title":"Vibe Coding 与 Agentic Software Engineering","description":"把 AI Coding 从随意生成升级为可控制的软件工程流程。","goal":"利用 AI 修改真实代码库，同时保持架构、测试与审查质量。","deliverable":"一组有明确 Spec 与 Evidence 的 AI 生成代码变更。"},
+    "path-write-book-ai": {"title":"用 AI 写一本书","description":"让 AI 参与研究、规划、写作与一致性审查。","goal":"完成一份连贯、有来源支撑、Context 可控的长内容作品。","deliverable":"一份带 Provenance、Workflow 与一致性审查的书稿。"},
+    "path-build-knowledge-base": {"title":"构建 AI 知识库","description":"构建持续演化的知识系统，而不是静态文档堆。","goal":"让知识库能够检索当前且权威的证据，并持续接受评测。","deliverable":"一套包含 Retrieval、Update 与 Evaluation 策略的知识库设计。"}
+  },
+  "milestones": {
+    "milestone-agent-loop": {"title":"控制 Agent Loop"},
+    "milestone-agent-reliability": {"title":"处理失败歧义与副作用"},
+    "milestone-agent-evaluation": {"title":"评测并审查 Agent 行为"},
+    "milestone-vibe-spec": {"title":"定义变更与 Context"},
+    "milestone-vibe-review": {"title":"审查 AI 生成变更"},
+    "milestone-vibe-workflow": {"title":"扩展 AI Coding Workflow"},
+    "milestone-book-source": {"title":"建立来源基础"},
+    "milestone-book-context": {"title":"控制 Context 与 Spec"},
+    "milestone-book-workflow": {"title":"产出并审查书稿"},
+    "milestone-kb-source": {"title":"定义 Source Authority"},
+    "milestone-kb-retrieval": {"title":"构建 Retrieval 与 Lifecycle"},
+    "milestone-kb-evaluation": {"title":"评测知识系统"}
+  },
+  "content": {
+    "token-playground": {"title":"Token Playground","promise":"观察模型约束如何影响系统能够接收和生成什么。","debrief":"模型行为保持概率性，Context 也始终有限。","transferPrompt":"模型获得更大的 Context Window 后，哪些信息选择问题仍然存在？"},
+    "rag-failure": {"title":"失效的 RAG 管道","promise":"诊断为什么正确来源存在时，低质量证据仍可能胜出。","debrief":"Retrieval Quality 是 Pipeline 属性：Context、Authority 与 Evaluation 必须一致。","transferPrompt":"最新来源与具有法律权威的来源冲突时，应该让谁获胜？"},
+    "agent-reliability": {"title":"47,000 美元重试事故","promise":"稳定一个因 Retry 重复执行不可逆操作的 Agent Runtime。","debrief":"Timeout 描述观察结果；Idempotency 才决定重复 Intent 是否安全。","transferPrompt":"创建订单的 API Timeout，但 Provider 可能已经提交。设计安全恢复路径。"},
+    "ai-code-review-mission": {"title":"AI 一次改了 17 个文件","promise":"审查一组测试通过、但隐藏架构回归的 AI 生成变更。","debrief":"AI 生成代码只是一个不可信提案；Spec、Review 与 Evidence 决定它是否应该合并。","transferPrompt":"同样的变更现在涉及迁移和权限边界。合并前还需要哪些证据？"},
+    "write-book-with-ai-build": {"title":"用 AI 写一本书","promise":"从研究到一致性审查，构建一套有来源支撑的长内容工作流。","debrief":"AI 写作质量依赖 Source Authority、Context、Workflow Decomposition 与 Human Review，而不是一个完美 Prompt。","transferPrompt":"写作中途关键来源更新了。哪些内容必须失效或重写？"},
+    "knowledge-base-build": {"title":"构建 AI 知识库","promise":"设计一个长期保持可检索、最新并可评测的知识系统。","debrief":"知识库是 Lifecycle System：Source Authority、Retrieval、Update 与 Evaluation 必须协同工作。","transferPrompt":"一个高频检索文档已过期。如何更新并做 Regression，避免旧答案被保留？"}
+  }
+}

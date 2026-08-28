@@ -1,0 +1,209 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ahaframe.com/schema/ai-knowledge-graph-v1.0.schema.json",
+  "title": "AhaFrame AI Knowledge Graph v1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "graphVersion", "status", "locales", "domains", "branches", "concepts", "edges", "paths", "contentNodes", "accessPolicies", "sourceRefs", "migration"],
+  "properties": {
+    "schemaVersion": { "const": "1.0.0" },
+    "graphVersion": { "type": "string", "pattern": "^1\\.\\d+\\.\\d+$" },
+    "status": { "enum": ["DRAFT", "ACTIVE", "DEPRECATED"] },
+    "locales": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "minLength": 2 } },
+    "domains": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/domain" } },
+    "branches": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/branch" } },
+    "concepts": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/concept" } },
+    "edges": { "type": "array", "items": { "$ref": "#/$defs/edge" } },
+    "paths": { "type": "array", "items": { "$ref": "#/$defs/path" } },
+    "contentNodes": { "type": "array", "items": { "$ref": "#/$defs/contentNode" } },
+    "accessPolicies": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/accessPolicy" } },
+    "sourceRefs": { "type": "object", "additionalProperties": { "$ref": "#/$defs/sourceRef" } },
+    "migration": { "$ref": "#/$defs/migration" }
+  },
+  "$defs": {
+    "domainId": { "type": "string", "pattern": "^domain-[a-z0-9-]+$" },
+    "branchId": { "type": "string", "pattern": "^branch-[a-z0-9-]+$" },
+    "conceptId": { "type": "string", "pattern": "^concept-[a-z0-9-]+$" },
+    "pathId": { "type": "string", "pattern": "^path-[a-z0-9-]+$" },
+    "contentId": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+    "slug": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+    "nonEmpty": { "type": "string", "minLength": 1 },
+    "lifecycle": { "enum": ["PLANNED", "DRAFT", "PUBLISHED", "DEPRECATED"] },
+    "difficulty": { "enum": ["FOUNDATION", "INTERMEDIATE", "ADVANCED", "MIXED"] },
+    "nodeType": { "enum": ["GUIDE", "PLAYGROUND", "LAB", "MISSION", "INCIDENT", "DRILL", "REVIEW", "BUILD", "BOSS", "REFERENCE"] },
+    "effortBand": { "enum": ["SHORT", "MEDIUM", "DEEP"] },
+    "domain": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "slug", "order", "titleKey", "descriptionKey"],
+      "properties": {
+        "id": { "$ref": "#/$defs/domainId" },
+        "slug": { "$ref": "#/$defs/slug" },
+        "order": { "type": "integer", "minimum": 0 },
+        "titleKey": { "$ref": "#/$defs/nonEmpty" },
+        "descriptionKey": { "$ref": "#/$defs/nonEmpty" }
+      }
+    },
+    "branch": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "domainId", "parentBranchId", "slug", "order", "titleKey", "descriptionKey"],
+      "properties": {
+        "id": { "$ref": "#/$defs/branchId" },
+        "domainId": { "$ref": "#/$defs/domainId" },
+        "parentBranchId": { "anyOf": [{ "$ref": "#/$defs/branchId" }, { "type": "null" }] },
+        "slug": { "$ref": "#/$defs/slug" },
+        "order": { "type": "integer", "minimum": 0 },
+        "titleKey": { "$ref": "#/$defs/nonEmpty" },
+        "descriptionKey": { "$ref": "#/$defs/nonEmpty" }
+      }
+    },
+    "concept": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "primaryBranchId", "branchIds", "titleKey", "summaryKey", "difficulty", "maturity", "versionSensitive", "sourceRefs", "tags", "legacyIds"],
+      "properties": {
+        "id": { "$ref": "#/$defs/conceptId" },
+        "kind": { "enum": ["CONCEPT", "MENTAL_MODEL", "PATTERN", "PRACTICE", "SYSTEM_COMPONENT", "RISK", "METRIC"] },
+        "primaryBranchId": { "$ref": "#/$defs/branchId" },
+        "branchIds": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/branchId" } },
+        "titleKey": { "$ref": "#/$defs/nonEmpty" },
+        "summaryKey": { "$ref": "#/$defs/nonEmpty" },
+        "difficulty": { "$ref": "#/$defs/difficulty" },
+        "maturity": { "$ref": "#/$defs/lifecycle" },
+        "versionSensitive": { "type": "boolean" },
+        "sourceRefs": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/nonEmpty" } },
+        "tags": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/slug" } },
+        "legacyIds": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/nonEmpty" } }
+      }
+    },
+    "edge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "fromConceptId", "toConceptId", "type", "rationaleKey"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^edge-[a-z0-9-]+$" },
+        "fromConceptId": { "$ref": "#/$defs/conceptId" },
+        "toConceptId": { "$ref": "#/$defs/conceptId" },
+        "type": { "enum": ["PREREQUISITE", "RELATED", "APPLIES_TO", "CONTRASTS_WITH", "ENABLES", "COMPOSES_WITH"] },
+        "rationaleKey": { "$ref": "#/$defs/nonEmpty" }
+      }
+    },
+    "pathMilestone": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "order", "titleKey", "conceptIds", "contentNodeIds", "required"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^milestone-[a-z0-9-]+$" },
+        "order": { "type": "integer", "minimum": 0 },
+        "titleKey": { "$ref": "#/$defs/nonEmpty" },
+        "conceptIds": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/conceptId" } },
+        "contentNodeIds": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/contentId" } },
+        "required": { "type": "boolean" }
+      },
+      "anyOf": [
+        { "properties": { "conceptIds": { "minItems": 1 } } },
+        { "properties": { "contentNodeIds": { "minItems": 1 } } }
+      ]
+    },
+    "path": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "slug", "domainIds", "branchIds", "titleKey", "descriptionKey", "goalKey", "deliverableKey", "audienceTags", "difficulty", "lifecycle", "recommendedPrerequisitePathIds", "milestones", "capstoneContentIds"],
+      "properties": {
+        "id": { "$ref": "#/$defs/pathId" },
+        "kind": { "enum": ["FOUNDATION", "ENGINEERING", "OUTCOME", "ROLE", "PROJECT"] },
+        "slug": { "$ref": "#/$defs/slug" },
+        "domainIds": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/domainId" } },
+        "branchIds": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/branchId" } },
+        "titleKey": { "$ref": "#/$defs/nonEmpty" },
+        "descriptionKey": { "$ref": "#/$defs/nonEmpty" },
+        "goalKey": { "$ref": "#/$defs/nonEmpty" },
+        "deliverableKey": { "anyOf": [{ "$ref": "#/$defs/nonEmpty" }, { "type": "null" }] },
+        "audienceTags": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/slug" } },
+        "difficulty": { "$ref": "#/$defs/difficulty" },
+        "lifecycle": { "$ref": "#/$defs/lifecycle" },
+        "recommendedPrerequisitePathIds": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/pathId" } },
+        "milestones": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/pathMilestone" } },
+        "capstoneContentIds": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/contentId" } }
+      }
+    },
+    "contentNode": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version", "nodeType", "lifecycle", "route", "primaryBranchId", "conceptIds", "titleKey", "promiseKey", "debriefKey", "transferPromptKey", "prerequisiteContentIds", "recommendedBackfillIds", "nextContentIds", "effortBand", "reviewEligible", "accessPolicyId", "analyticsId", "runtimeRef", "sourceRefs", "provenance", "legacyIds"],
+      "properties": {
+        "id": { "$ref": "#/$defs/contentId" },
+        "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+        "nodeType": { "$ref": "#/$defs/nodeType" },
+        "lifecycle": { "$ref": "#/$defs/lifecycle" },
+        "route": { "anyOf": [{ "type": "string", "pattern": "^/[a-z0-9][a-z0-9/-]*/$" }, { "type": "null" }] },
+        "primaryBranchId": { "$ref": "#/$defs/branchId" },
+        "conceptIds": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/conceptId" } },
+        "titleKey": { "$ref": "#/$defs/nonEmpty" },
+        "promiseKey": { "$ref": "#/$defs/nonEmpty" },
+        "debriefKey": { "$ref": "#/$defs/nonEmpty" },
+        "transferPromptKey": { "$ref": "#/$defs/nonEmpty" },
+        "prerequisiteContentIds": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/contentId" } },
+        "recommendedBackfillIds": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/contentId" } },
+        "nextContentIds": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/contentId" } },
+        "effortBand": { "$ref": "#/$defs/effortBand" },
+        "reviewEligible": { "type": "boolean" },
+        "accessPolicyId": { "type": "string", "pattern": "^access-[a-z0-9-]+$" },
+        "analyticsId": { "$ref": "#/$defs/contentId" },
+        "runtimeRef": { "anyOf": [{ "$ref": "#/$defs/nonEmpty" }, { "type": "null" }] },
+        "sourceRefs": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/nonEmpty" } },
+        "provenance": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/nonEmpty" } },
+        "legacyIds": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/nonEmpty" } }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "lifecycle": { "const": "PUBLISHED" } }, "required": ["lifecycle"] },
+          "then": { "properties": { "route": { "type": "string" } } }
+        }
+      ]
+    },
+    "accessPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "catalogVisibility", "entitlementMode", "description"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^access-[a-z0-9-]+$" },
+        "catalogVisibility": { "enum": ["FULL", "PREVIEW", "HIDDEN"] },
+        "entitlementMode": { "enum": ["OPEN", "FREE_CHOICE", "MEMBERSHIP"] },
+        "description": { "$ref": "#/$defs/nonEmpty" }
+      }
+    },
+    "sourceRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["url", "kind", "reviewAfter"],
+      "properties": {
+        "url": { "type": "string", "pattern": "^https://" },
+        "kind": { "$ref": "#/$defs/nonEmpty" },
+        "reviewAfter": { "$ref": "#/$defs/nonEmpty" }
+      }
+    },
+    "preservedRoute": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["contentId", "route"],
+      "properties": {
+        "contentId": { "$ref": "#/$defs/contentId" },
+        "route": { "type": "string", "pattern": "^/[a-z0-9][a-z0-9/-]*/$" }
+      }
+    },
+    "migration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["fromGraphVersion", "legacyGraphFile", "strategy", "reservedLegacyModelIds", "preservedContentRoutes"],
+      "properties": {
+        "fromGraphVersion": { "const": "0.9.0" },
+        "legacyGraphFile": { "const": "learning-graph-v0.9.json" },
+        "strategy": { "const": "EXPLICIT_CONCEPT_MAPPING_BEFORE_CUTOVER" },
+        "reservedLegacyModelIds": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "pattern": "^S\\d{2}-M\\d{2}$" } },
+        "preservedContentRoutes": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/preservedRoute" } }
+      }
+    }
+  }
+}
