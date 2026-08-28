@@ -14,21 +14,34 @@ LOCALE_FILES = {
     "zh-CN": CONTENT / "ai-knowledge-graph-v1.0.zh-CN.json",
 }
 
-MCP_SOURCES = {
-    "mcp-2025-11-25-schema": {
-        "url": "https://modelcontextprotocol.io/specification/2025-11-25/schema",
-        "kind": "protocol-reference",
+# Primary references are attached only to version-sensitive concepts. Stable
+# concepts remain vendor-neutral and do not require a source merely because a
+# product currently demonstrates the pattern well.
+CURRENT_SOURCES = {
+    "mcp-2026-07-28-spec": {
+        "url": "https://blog.modelcontextprotocol.io/posts/2026-07-28/",
+        "kind": "protocol-release",
         "reviewAfter": "new-stable-mcp-specification",
     },
-    "mcp-2025-11-25-tasks": {
-        "url": "https://modelcontextprotocol.io/specification/2025-11-25/basic/utilities/tasks",
-        "kind": "protocol-reference",
-        "reviewAfter": "tasks-status-or-semantics-change",
+    "anthropic-agent-evals-2026-01-09": {
+        "url": "https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents",
+        "kind": "methodology-reference",
+        "reviewAfter": "material-agent-eval-methodology-change",
     },
-    "mcp-2025-11-25-elicitation": {
-        "url": "https://modelcontextprotocol.io/specification/2025-11-25/client/elicitation",
-        "kind": "protocol-reference",
-        "reviewAfter": "elicitation-status-or-security-guidance-change",
+    "openai-codex-safety-2026-05-08": {
+        "url": "https://openai.com/index/running-codex-safely/",
+        "kind": "agentic-coding-operations-reference",
+        "reviewAfter": "material-agentic-coding-sandbox-or-approval-change",
+    },
+    "hf-transformers-peft-current": {
+        "url": "https://huggingface.co/docs/transformers/peft",
+        "kind": "model-engineering-reference",
+        "reviewAfter": "major-peft-or-transformers-adapter-change",
+    },
+    "hf-transformers-serving-current": {
+        "url": "https://huggingface.co/docs/transformers/optimization_overview",
+        "kind": "model-serving-reference",
+        "reviewAfter": "major-serving-or-quantization-guidance-change",
     },
 }
 
@@ -56,6 +69,36 @@ def load_inventory():
         edges.extend(data.get("edges", []))
         paths.extend(data.get("paths", []))
     return branches, concepts, edges, paths
+
+
+def validate_freshness(concepts, source_refs):
+    obsolete_prefixes = ("mcp-2025-11-25",)
+    referenced = set()
+    for concept in concepts:
+        refs = concept.get("sourceRefs", [])
+        if concept.get("versionSensitive") and not refs:
+            raise ValueError(f"version-sensitive concept has no sourceRefs: {concept['id']}")
+        for ref in refs:
+            if ref.startswith(obsolete_prefixes):
+                raise ValueError(f"obsolete source reference on {concept['id']}: {ref}")
+            if ref not in source_refs:
+                raise ValueError(f"unknown source reference on {concept['id']}: {ref}")
+            referenced.add(ref)
+    for ref in referenced:
+        source = source_refs[ref]
+        if not source.get("url", "").startswith("https://"):
+            raise ValueError(f"source must use https: {ref}")
+        if not source.get("reviewAfter"):
+            raise ValueError(f"source missing reviewAfter policy: {ref}")
+    required_current = {
+        "mcp-2026-07-28-spec",
+        "anthropic-agent-evals-2026-01-09",
+        "hf-transformers-peft-current",
+        "hf-transformers-serving-current",
+    }
+    missing = required_current - referenced
+    if missing:
+        raise ValueError(f"current primary references are not exercised by version-sensitive concepts: {sorted(missing)}")
 
 
 def materialize_branch(item):
@@ -136,6 +179,8 @@ def build():
     seed = load(GRAPH_FILE)
     seed_locales = {locale: load(path) for locale, path in LOCALE_FILES.items()}
     branches, concepts, edges, paths = load_inventory()
+    source_refs = {**seed.get("sourceRefs", {}), **CURRENT_SOURCES}
+    validate_freshness(concepts, source_refs)
 
     graph = {
         "schemaVersion": "1.0.0",
@@ -149,14 +194,11 @@ def build():
         "paths": [materialize_path(item) for item in paths],
         "contentNodes": seed["contentNodes"],
         "accessPolicies": seed["accessPolicies"],
-        "sourceRefs": {**seed.get("sourceRefs", {}), **MCP_SOURCES},
+        "sourceRefs": source_refs,
         "migration": seed["migration"],
     }
 
     branch_by_id = {item["id"]: item for item in branches}
-    concept_by_id = {item["id"]: item for item in concepts}
-    path_by_id = {item["id"]: item for item in paths}
-
     presentations = {}
     for locale, seed_copy in seed_locales.items():
         is_en = locale == "en"
@@ -234,9 +276,11 @@ def main():
         write(GRAPH_FILE, graph)
         for locale, data in presentations.items():
             write(LOCALE_FILES[locale], data)
+    version_sensitive = sum(1 for concept in graph["concepts"] if concept["versionSensitive"])
     print(
         f"AI Knowledge Graph v1 inventory: {len(graph['branches'])} branches, "
-        f"{len(graph['concepts'])} concepts, {len(graph['edges'])} edges, {len(graph['paths'])} paths."
+        f"{len(graph['concepts'])} concepts ({version_sensitive} version-sensitive), "
+        f"{len(graph['edges'])} edges, {len(graph['paths'])} paths."
     )
 
 
