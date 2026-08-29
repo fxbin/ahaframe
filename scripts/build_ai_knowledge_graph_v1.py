@@ -38,10 +38,20 @@ CURRENT_SOURCES = {
         "kind": "model-engineering-reference",
         "reviewAfter": "major-peft-or-transformers-adapter-change",
     },
+    "hf-peft-quantization-current": {
+        "url": "https://huggingface.co/docs/peft/developer_guides/quantization",
+        "kind": "model-engineering-reference",
+        "reviewAfter": "major-quantized-peft-or-qlora-guidance-change",
+    },
     "hf-transformers-serving-current": {
-        "url": "https://huggingface.co/docs/transformers/optimization_overview",
+        "url": "https://huggingface.co/docs/transformers/main/optimization_overview",
         "kind": "model-serving-reference",
         "reviewAfter": "major-serving-or-quantization-guidance-change",
+    },
+    "vllm-lora-serving-current": {
+        "url": "https://docs.vllm.ai/en/latest/api/vllm/entrypoints/serve/lora/",
+        "kind": "model-serving-reference",
+        "reviewAfter": "major-vllm-lora-serving-change",
     },
 }
 
@@ -94,7 +104,9 @@ def validate_freshness(concepts, source_refs):
         "mcp-2026-07-28-spec",
         "anthropic-agent-evals-2026-01-09",
         "hf-transformers-peft-current",
+        "hf-peft-quantization-current",
         "hf-transformers-serving-current",
+        "vllm-lora-serving-current",
     }
     missing = required_current - referenced
     if missing:
