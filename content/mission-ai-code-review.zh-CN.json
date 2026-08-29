@@ -1,0 +1,83 @@
+{
+  "locale": "zh-CN",
+  "mission": {
+    "name": "这份 AI 生成的 PR，你会合并吗？",
+    "seoTitle": "AI 代码审查 Mission — 审查 Agent 生成代码 | AhaFrame",
+    "description": "审查一份测试全部通过、却隐藏架构回归的 AI 生成 PR。检查证据、收紧编码策略、重新运行并比较结果，再决定是否合并。",
+    "level": "应用 Mission",
+    "layer": "Vibe Coding × Evaluation",
+    "minutes": 14,
+    "hero": "你的 Coding Agent 修改了 17 个文件。CI 全绿，Diff 也看起来合理，但仍有一个架构边界被破坏。你需要判断：这些证据足够支持合并吗？",
+    "quick": "AI 生成代码应该依据明确的变更契约、仓库架构、针对性测试和依赖证据来判断，而不是依据 Diff 看起来是否像正确答案。",
+    "brief": {
+      "eyebrow": "MISSION · AI-NATIVE SOFTWARE ENGINEERING",
+      "title": "测试全绿，不等于可以合并。",
+      "role": "你是最终对 Merge 负责的工程师。",
+      "body": "一个 Agent 实现了缓存优化并新增了依赖。现有测试全部通过，但生成的改动绕过了事务边界，还修改了与需求无关的文件。快速接受这份 PR 很容易，真正理解它却很昂贵。",
+      "objective": "在控制审查成本的同时，把回归风险与架构漂移降到可接受范围。",
+      "stakes": "如果这个隐藏的边界问题上线，事务成功后系统仍可能向用户返回过期状态。"
+    },
+    "ui": {
+      "start": "开始审查",
+      "workspace": "PR 审查台",
+      "evidence": "审查证据",
+      "policy": "AI 编码审查策略",
+      "budget": "审查预算",
+      "run": "评估 PR",
+      "reset": "重置审查",
+      "attempts": "审查尝试",
+      "noAttempts": "尚未评估任何审查策略。",
+      "release": "合并决策",
+      "ship": "MERGE",
+      "block": "BLOCK",
+      "inconclusive": "NEEDS EVIDENCE",
+      "complete": "完成审查",
+      "outcome": "审查结果",
+      "waiting": "先检查证据，调整审查策略，再评估这份 PR。",
+      "compared": "比较首次 → 最新"
+    },
+    "evidenceLabels": {
+      "brief": "PR 简报",
+      "artifacts": "Diff 摘要",
+      "signals": "仓库约束",
+      "policy": "当前审查策略",
+      "audit": "审查诊断"
+    },
+    "controls": {
+      "review-depth": {"label": "审查深度", "options": {"accept-output": "直接接受 Agent 输出", "diff-review": "审查 Diff", "architecture-review": "审查架构 + Diff"}},
+      "test-strategy": {"label": "测试策略", "options": {"existing-only": "只跑现有测试", "targeted": "增加针对性测试", "adversarial": "增加对抗性测试"}},
+      "scope-policy": {"label": "变更范围", "options": {"unbounded": "由 Agent 自行决定", "bounded": "限制可修改区域", "spec-locked": "锁定书面变更契约"}},
+      "dependency-check": {"label": "依赖审查", "options": {"off": "不检查", "lockfile": "检查 Lockfile", "provenance": "检查来源与仓库适配性"}}
+    },
+    "metrics": [
+      {"key": "regressionRiskPercent", "label": "回归风险", "format": "percent"},
+      {"key": "testEvidenceScore", "label": "测试证据", "format": "score"},
+      {"key": "architectureDriftPercent", "label": "架构漂移", "format": "percent"},
+      {"key": "reviewMinutes", "label": "审查时间", "format": "integer"},
+      {"key": "mergeConfidenceScore", "label": "合并置信度", "format": "score"}
+    ],
+    "debrief": {
+      "eyebrow": "ENGINEERING DEBRIEF",
+      "title": "真正的审查对象是系统契约，而不是生成出来的 Patch。",
+      "rule": "测试通过是证据，不是生成代码适合进入仓库的证明。",
+      "body": "AI Coding 压缩了实现时间，也扩大了验证责任。更可靠的流程应该先限定需求范围，检查架构不变量，为新增行为和高概率失败模式建立测试，再审查依赖变化。这样，AI Code Review 才从“看起来没问题”变成可追溯的证据过程。",
+      "points": [
+        "先写变更契约，再判断 Agent 是否真的解决了目标问题。",
+        "审查行级 Diff 之外的仓库级架构不变量。",
+        "根据风险生成测试，而不是只覆盖 Happy Path。",
+        "把新增依赖当成架构决策的一部分。"
+      ]
+    },
+    "takeaways": [
+      ["先 Spec，后生成", "有稳定目标，才能判断 Agent 是解决了问题，还是只生成了看似合理的代码。"],
+      ["测试只是有限证据", "CI 全绿只证明当前测试覆盖到的内容。"],
+      ["重点审查边界", "最昂贵的回归往往来自数据、架构和运行边界被生成代码破坏。"]
+    ],
+    "next": {
+      "title": "下一步：Research Evidence Mission",
+      "description": "从生成代码转向生成结论：建立一条能说明‘为什么应该相信这句话’的研究证据链。",
+      "button": "进入研究 Mission",
+      "href": "/zh-cn/labs/research-evidence-mission/"
+    }
+  }
+}

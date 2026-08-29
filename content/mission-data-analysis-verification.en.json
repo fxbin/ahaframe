@@ -1,0 +1,83 @@
+{
+  "locale": "en",
+  "mission": {
+    "name": "Data Analysis Verification Lab",
+    "seoTitle": "AI Data Analysis Verification Lab | AhaFrame",
+    "description": "Verify an AI-generated data analysis by separating extraction, arithmetic, outlier handling, and uncertainty into explicit evidence checks.",
+    "level": "Applied Lab",
+    "layer": "Data Analysis × Verification",
+    "minutes": 15,
+    "hero": "The model says Segment B improved operating efficiency the most. The chart looks convincing. One denominator came from the wrong table row. Build a verification policy before accepting the conclusion.",
+    "quick": "AI data analysis is trustworthy only when extraction, calculation, coverage, outliers, and uncertainty can be verified independently of the model’s prose.",
+    "brief": {
+      "eyebrow": "LAB · DATA ANALYSIS WITH AI",
+      "title": "The chart can be right-looking and numerically wrong.",
+      "role": "You are reviewing an AI-generated operating analysis.",
+      "body": "The source report contains tables, footnotes, percentages, and one malformed value. The AI summary identifies a winning segment, but the derived metric depends on a denominator extracted from the wrong row.",
+      "objective": "Reduce numerical error risk and make the conclusion reproducible without manually checking every cell.",
+      "stakes": "A wrong analytical conclusion can redirect budget or strategy even when the narrative is perfectly fluent."
+    },
+    "ui": {
+      "start": "Start verification",
+      "workspace": "Analysis verification console",
+      "evidence": "Analysis evidence",
+      "policy": "Verification policy",
+      "budget": "Verification budget",
+      "run": "Verify analysis",
+      "reset": "Reset lab",
+      "attempts": "Verification attempts",
+      "noAttempts": "No verification policy evaluated yet.",
+      "release": "Analysis decision",
+      "ship": "ACCEPT",
+      "block": "REJECT",
+      "inconclusive": "NEEDS CHECKING",
+      "complete": "Complete lab",
+      "outcome": "Verification outcome",
+      "waiting": "Inspect the dataset signals, change the verification policy, then rerun the analysis.",
+      "compared": "Compare first → latest"
+    },
+    "evidenceLabels": {
+      "brief": "Analysis brief",
+      "artifacts": "Model conclusion",
+      "signals": "Dataset signals",
+      "policy": "Current verification policy",
+      "audit": "Verification diagnosis"
+    },
+    "controls": {
+      "extraction-mode": {"label": "Extraction", "options": {"model-only": "Model extraction only", "schema-validated": "Schema-validated extraction", "dual-pass": "Independent dual pass"}},
+      "numeric-check": {"label": "Arithmetic", "options": {"none": "Trust generated math", "recompute": "Recompute all derived values", "recompute-sample": "Recompute a sample"}},
+      "outlier-policy": {"label": "Outliers", "options": {"ignore": "Ignore", "flag": "Flag for review", "investigate": "Investigate before aggregation"}},
+      "confidence-policy": {"label": "Uncertainty", "options": {"single-score": "Single confidence score", "by-step": "Confidence by step", "evidence-linked": "Evidence-linked uncertainty"}}
+    },
+    "metrics": [
+      {"key": "analysisErrorRiskPercent", "label": "Analysis error risk", "format": "percent"},
+      {"key": "verifiedRowsPercent", "label": "Verified rows", "format": "percent"},
+      {"key": "coveragePercent", "label": "Evidence coverage", "format": "percent"},
+      {"key": "confidenceVariancePercent", "label": "Unresolved uncertainty", "format": "percent"},
+      {"key": "reviewMinutes", "label": "Review time", "format": "integer"}
+    ],
+    "debrief": {
+      "eyebrow": "ANALYSIS DEBRIEF",
+      "title": "Verification should be decomposed the same way the analysis is decomposed.",
+      "rule": "Do not ask the model whether its own analysis is correct; create independent checks for extraction, arithmetic, coverage, and interpretation.",
+      "body": "AI can accelerate document extraction and exploratory analysis, but it can also silently normalize malformed data, reuse the wrong denominator, or express uncertain interpretation with confident prose. A better workflow uses schema checks for extraction, deterministic recomputation for arithmetic, explicit outlier review, and uncertainty attached to the evidence step that produced it.",
+      "points": [
+        "Separate model interpretation from deterministic arithmetic.",
+        "Schema failures should become visible data quality events, not silently repaired text.",
+        "Outliers can be parsing errors or the most important signal; do not delete them by default.",
+        "Uncertainty is more useful when localized to a step and evidence source."
+      ]
+    },
+    "takeaways": [
+      ["Verify by layer", "Extraction, calculation and interpretation can fail independently and need different checks."],
+      ["Recompute critical math", "Derived metrics should be independently reproducible outside the language model."],
+      ["Make uncertainty actionable", "Attach uncertainty to the row, source or transformation that created it."]
+    ],
+    "next": {
+      "title": "Return to the Knowledge Map",
+      "description": "Wave 1 now connects coding, RAG, Agents, research and data through reusable concepts and evidence-first decisions.",
+      "button": "Explore the Knowledge Map",
+      "href": "/en/learning/"
+    }
+  }
+}

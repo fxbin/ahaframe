@@ -15,6 +15,9 @@
     "prompt-injection-attack-scenario.js",
     "prompt-injection-attack-mission.js",
     "reliable-support-scenario.js",
-    "production-support-launch-mission.js"
+    "production-support-launch-mission.js",
+    "decision-experience-scenario.js",
+    "content-wave-1-scenarios.js",
+    "content-wave-1-missions.js"
   ]
 }

@@ -1,0 +1,83 @@
+{
+  "locale": "en",
+  "mission": {
+    "name": "Would You Merge This AI-Generated PR?",
+    "seoTitle": "AI Code Review Mission — Review Agent-Generated Code | AhaFrame",
+    "description": "Review an AI-generated pull request that passes tests but hides an architectural regression. Inspect evidence, tighten the coding policy, rerun, compare, and decide whether to merge.",
+    "level": "Applied Mission",
+    "layer": "Vibe Coding × Evaluation",
+    "minutes": 14,
+    "hero": "Your coding agent changed 17 files. CI is green. The diff looks plausible. One architectural boundary is still broken. Decide whether the evidence is strong enough to merge.",
+    "quick": "AI-generated code should be judged against an explicit change contract, repository architecture, targeted tests, and dependency evidence—not against how convincing the diff looks.",
+    "brief": {
+      "eyebrow": "MISSION · AI-NATIVE SOFTWARE ENGINEERING",
+      "title": "Green tests are not a merge decision.",
+      "role": "You are the engineer responsible for the merge.",
+      "body": "An agent implemented a cache optimization and added a dependency. Existing tests pass, but the generated change bypasses a transaction boundary and touches unrelated files. The PR is fast to accept and expensive to misunderstand.",
+      "objective": "Reduce regression and architecture risk while keeping review effort bounded.",
+      "stakes": "If the hidden boundary violation ships, production can serve stale state after a successful transaction."
+    },
+    "ui": {
+      "start": "Start review",
+      "workspace": "PR review console",
+      "evidence": "Review evidence",
+      "policy": "AI coding review policy",
+      "budget": "Review budget",
+      "run": "Evaluate PR",
+      "reset": "Reset review",
+      "attempts": "Review attempts",
+      "noAttempts": "No review policy evaluated yet.",
+      "release": "Merge decision",
+      "ship": "MERGE",
+      "block": "BLOCK",
+      "inconclusive": "NEEDS EVIDENCE",
+      "complete": "Complete review",
+      "outcome": "Review outcome",
+      "waiting": "Inspect the evidence, change the review policy, then evaluate the PR.",
+      "compared": "Compare first → latest"
+    },
+    "evidenceLabels": {
+      "brief": "PR brief",
+      "artifacts": "Diff summary",
+      "signals": "Repository contracts",
+      "policy": "Current review policy",
+      "audit": "Review diagnosis"
+    },
+    "controls": {
+      "review-depth": {"label": "Review depth", "options": {"accept-output": "Accept agent output", "diff-review": "Review the diff", "architecture-review": "Review architecture + diff"}},
+      "test-strategy": {"label": "Test strategy", "options": {"existing-only": "Existing tests only", "targeted": "Add targeted tests", "adversarial": "Add adversarial tests"}},
+      "scope-policy": {"label": "Change scope", "options": {"unbounded": "Agent decides scope", "bounded": "Bound touched areas", "spec-locked": "Lock to written change contract"}},
+      "dependency-check": {"label": "Dependency review", "options": {"off": "Do not inspect", "lockfile": "Inspect lockfile", "provenance": "Check provenance + fit"}}
+    },
+    "metrics": [
+      {"key": "regressionRiskPercent", "label": "Regression risk", "format": "percent"},
+      {"key": "testEvidenceScore", "label": "Test evidence", "format": "score"},
+      {"key": "architectureDriftPercent", "label": "Architecture drift", "format": "percent"},
+      {"key": "reviewMinutes", "label": "Review time", "format": "integer"},
+      {"key": "mergeConfidenceScore", "label": "Merge confidence", "format": "score"}
+    ],
+    "debrief": {
+      "eyebrow": "ENGINEERING DEBRIEF",
+      "title": "The review target is the system contract, not the generated patch.",
+      "rule": "Passing tests are evidence, not proof that generated code belongs in the repository.",
+      "body": "AI coding compresses implementation time and expands verification responsibility. A strong workflow bounds the requested change, checks architectural invariants, creates tests for the new behavior and likely failure modes, and reviews dependency movement. This turns AI code review from aesthetic approval into an evidence process.",
+      "points": [
+        "Write the change contract before judging the generated implementation.",
+        "Review repository-level invariants that line-by-line diff inspection can miss.",
+        "Generate tests from risks, not only from the happy-path specification.",
+        "Treat new dependencies as part of the architecture decision."
+      ]
+    },
+    "takeaways": [
+      ["Spec before generation", "A stable target makes it possible to tell whether the agent solved the requested problem or merely produced plausible code."],
+      ["Tests are scoped evidence", "Green CI only proves what the current test suite checks."],
+      ["Review the boundary", "Most expensive regressions occur where generated changes violate architecture, data or operational contracts."]
+    ],
+    "next": {
+      "title": "Next: Research Evidence Mission",
+      "description": "Move from generated code to generated claims: build a research workflow that can show why each important statement should be believed.",
+      "button": "Open research mission",
+      "href": "/en/labs/research-evidence-mission/"
+    }
+  }
+}

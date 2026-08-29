@@ -6,7 +6,7 @@ const WEB_ROOT = process.cwd();
 const REPO_ROOT = path.resolve(WEB_ROOT, "..");
 const CONTENT_ROOT = path.join(REPO_ROOT, "content");
 
-const PUBLIC_ROUTES = [
+const REQUIRED_CORE_ROUTES = [
   "",
   "learning/",
   "pricing/",
@@ -42,45 +42,49 @@ const FLAGSHIP_MISSIONS = [
   "mission-final-boss",
 ];
 
-function sameRoutes(left, right) {
-  return left.length === right.length && left.every((route, index) => route === right[index]);
+function assertRouteManifest(routes, locale) {
+  if (!Array.isArray(routes) || routes.some((route) => typeof route !== "string")) {
+    throw new Error(`${locale} availableRoutes must be a string array.`);
+  }
+  if (new Set(routes).size !== routes.length) {
+    throw new Error(`${locale} availableRoutes contains duplicates.`);
+  }
+  for (const route of routes) {
+    if (route && (!route.endsWith("/") || route.startsWith("/") || route.includes("//"))) {
+      throw new Error(`${locale} contains a non-canonical public route: ${route}`);
+    }
+  }
+  for (const required of REQUIRED_CORE_ROUTES) {
+    if (!routes.includes(required)) throw new Error(`${locale} lost required existing route ${required}.`);
+  }
 }
 
 const contract = JSON.parse(await readFile(path.join(CONTENT_ROOT, "lab-reconciliation-v0.8.json"), "utf8"));
-if (contract.status !== "active") {
-  throw new Error("v0.8 lab reconciliation contract is not active.");
-}
-if (contract.primaryCampaign.length !== 4) {
-  throw new Error("v0.8 Campaign must contain exactly three incidents and one Final Boss.");
-}
+if (contract.status !== "active") throw new Error("v0.8 lab reconciliation contract is not active.");
+if (contract.primaryCampaign.length !== 4) throw new Error("v0.8 Campaign must contain exactly three incidents and one Final Boss.");
 
+const localeSources = {};
 for (const locale of ["en", "zh-CN"]) {
   const source = JSON.parse(await readFile(path.join(CONTENT_ROOT, `${locale}.json`), "utf8"));
-  if (!sameRoutes(source.availableRoutes, PUBLIC_ROUTES)) {
-    throw new Error(
-      `${locale} public route contract drifted.\nExpected: ${JSON.stringify(PUBLIC_ROUTES)}\nActual: ${JSON.stringify(source.availableRoutes)}`,
-    );
-  }
+  assertRouteManifest(source.availableRoutes, locale);
+  localeSources[locale] = source;
 
   const campaign = JSON.parse(await readFile(path.join(CONTENT_ROOT, `campaign-discovery.${locale}.json`), "utf8"));
   for (const experience of contract.experiences) {
-    if (!campaign.knowledge?.experiences?.[experience.id]) {
-      throw new Error(`${locale} Knowledge Map is missing ${experience.id}.`);
-    }
+    if (!campaign.knowledge?.experiences?.[experience.id]) throw new Error(`${locale} Knowledge Map is missing ${experience.id}.`);
   }
   for (const id of contract.primaryCampaign) {
-    if (!campaign.campaign?.cards?.[id]) {
-      throw new Error(`${locale} Campaign is missing primary card ${id}.`);
-    }
+    if (!campaign.campaign?.cards?.[id]) throw new Error(`${locale} Campaign is missing primary card ${id}.`);
   }
-
-  for (const mission of FLAGSHIP_MISSIONS) {
-    await access(path.join(CONTENT_ROOT, `${mission}.${locale}.json`));
-  }
+  for (const mission of FLAGSHIP_MISSIONS) await access(path.join(CONTENT_ROOT, `${mission}.${locale}.json`));
 }
 
-for (const relativePath of REQUIRED_APP_FILES) {
-  await access(path.join(WEB_ROOT, relativePath));
+const enRoutes = localeSources.en.availableRoutes;
+const zhRoutes = localeSources["zh-CN"].availableRoutes;
+if (JSON.stringify(enRoutes) !== JSON.stringify(zhRoutes)) {
+  throw new Error(`EN/zh-CN public route parity drifted.\nEN: ${JSON.stringify(enRoutes)}\nZH: ${JSON.stringify(zhRoutes)}`);
 }
 
-console.log(`Next.js public-route parity contract OK (${PUBLIC_ROUTES.length} routes × 2 locales; v0.9 Learning Path + v0.8 Campaign + waitlist adapter verified).`);
+for (const relativePath of REQUIRED_APP_FILES) await access(path.join(WEB_ROOT, relativePath));
+
+console.log(`Next.js public-route parity contract OK (${enRoutes.length} routes × 2 locales; stable routes preserved and locale manifests are exact peers).`);

@@ -15,6 +15,9 @@
     "labs/agent-reliability/",
     "labs/agent-workflow-graph/",
     "labs/evaluation-failure/",
+    "labs/ai-code-review-mission/",
+    "labs/research-evidence-mission/",
+    "labs/data-analysis-verification-lab/",
     "build/reliable-support-agent/"
   ],
   "brand": "AhaFrame",

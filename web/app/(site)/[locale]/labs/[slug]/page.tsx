@@ -16,6 +16,9 @@ const LAB_SLUGS = [
   "agent-reliability",
   "agent-workflow-graph",
   "evaluation-failure",
+  "ai-code-review-mission",
+  "research-evidence-mission",
+  "data-analysis-verification-lab",
 ] as const;
 
 interface PageProps {

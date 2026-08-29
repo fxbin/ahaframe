@@ -1,0 +1,83 @@
+{
+  "locale": "en",
+  "mission": {
+    "name": "Research Evidence Mission",
+    "seoTitle": "Research with AI — Evidence Verification Mission | AhaFrame",
+    "description": "Turn an AI-assisted research draft into a verifiable decision memo by improving source mix, triangulation, claim tracking, and freshness checks.",
+    "level": "Applied Mission",
+    "layer": "Research × Evidence",
+    "minutes": 16,
+    "hero": "The draft sounds authoritative. Three important claims are weakly sourced, one is stale, and the citations do not show which evidence supports which conclusion. Fix the evidence system before someone makes a decision from it.",
+    "quick": "AI research becomes trustworthy when important claims are linked to inspectable evidence, challenged by independent sources, and checked against the actual event timeline.",
+    "brief": {
+      "eyebrow": "MISSION · RESEARCH WITH AI",
+      "title": "A confident synthesis can still be an evidence failure.",
+      "role": "You are preparing a memo for a product decision.",
+      "body": "An AI research workflow has assembled a polished memo about a fast-moving AI product. The prose is coherent, but key claims rely on snippets and vendor material. One statement confuses publication date with event date.",
+      "objective": "Make the memo independently verifiable without turning the research process into an unbounded literature review.",
+      "stakes": "A decision based on stale or unsupported claims can send product, budget, or strategy in the wrong direction."
+    },
+    "ui": {
+      "start": "Start investigation",
+      "workspace": "Evidence desk",
+      "evidence": "Research evidence",
+      "policy": "Research policy",
+      "budget": "Research budget",
+      "run": "Evaluate evidence",
+      "reset": "Reset research",
+      "attempts": "Research attempts",
+      "noAttempts": "No evidence policy evaluated yet.",
+      "release": "Memo decision",
+      "ship": "USE MEMO",
+      "block": "BLOCK",
+      "inconclusive": "MORE RESEARCH",
+      "complete": "Complete mission",
+      "outcome": "Evidence outcome",
+      "waiting": "Inspect the draft and sources, then change the evidence policy.",
+      "compared": "Compare first → latest"
+    },
+    "evidenceLabels": {
+      "brief": "Research brief",
+      "artifacts": "Draft claims",
+      "signals": "Source signals",
+      "policy": "Current evidence policy",
+      "audit": "Evidence diagnosis"
+    },
+    "controls": {
+      "source-mix": {"label": "Source mix", "options": {"search-snippets": "Search snippets", "primary-plus-secondary": "Primary + independent secondary", "primary-first": "Primary first"}},
+      "triangulation": {"label": "Triangulation", "options": {"single-source": "Single source", "two-source": "Two independent sources", "claim-specific": "Triangulate high-impact claims"}},
+      "claim-matrix": {"label": "Claim tracking", "options": {"notes-only": "Free-form notes", "claim-evidence": "Claim → evidence matrix", "claim-evidence-counter": "Claim → evidence + counter-evidence"}},
+      "freshness-check": {"label": "Freshness", "options": {"off": "No explicit check", "date-filter": "Publication-date check", "event-date": "Publication + event-date check"}}
+    },
+    "metrics": [
+      {"key": "unsupportedClaimRiskPercent", "label": "Unsupported claim risk", "format": "percent"},
+      {"key": "sourceDiversityScore", "label": "Source diversity", "format": "score"},
+      {"key": "verifiabilityScore", "label": "Verifiability", "format": "score"},
+      {"key": "staleEvidenceRiskPercent", "label": "Stale evidence risk", "format": "percent"},
+      {"key": "researchMinutes", "label": "Research time", "format": "integer"}
+    ],
+    "debrief": {
+      "eyebrow": "RESEARCH DEBRIEF",
+      "title": "The output is not the research. The evidence path is.",
+      "rule": "A synthesis is useful only when its important claims can be traced, challenged, and updated.",
+      "body": "AI can accelerate discovery, extraction, comparison and drafting, but it also makes unsupported synthesis cheap. The durable workflow is to decompose the question, choose source authority deliberately, map claims to evidence, challenge high-impact claims with independent sources, distinguish publication time from event time, and then synthesize.",
+      "points": [
+        "Search results are discovery surfaces, not final evidence.",
+        "Triangulate the claims that would change the decision, not every sentence equally.",
+        "Record counter-evidence before writing the conclusion.",
+        "Freshness checks need event dates, not only page timestamps."
+      ]
+    },
+    "takeaways": [
+      ["Claim → evidence", "A research memo should expose which source supports each decision-relevant claim."],
+      ["Authority and independence differ", "Primary sources establish what a party says; independent sources help test whether it holds."],
+      ["Research is updateable", "A structured evidence matrix makes new facts easier to incorporate without rewriting from scratch."]
+    ],
+    "next": {
+      "title": "Next: Data Analysis Verification Lab",
+      "description": "Now verify a numerical conclusion where extraction, arithmetic and interpretation can fail independently.",
+      "button": "Open data analysis lab",
+      "href": "/en/labs/data-analysis-verification-lab/"
+    }
+  }
+}
