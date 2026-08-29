@@ -115,7 +115,7 @@
       }},
       'confidence-policy':{actionType:'SET_CONFIDENCE_POLICY',initial:'single-score',options:{
         'single-score':{effects:{},note:'A single confidence score can conceal where uncertainty comes from.'},
-        'by-step':{effects:{analysisErrorRiskPercent:-5,verifiabilityScore:0,confidenceVariancePercent:-12,reviewMinutes:4},note:'Step-level confidence localizes extraction, calculation, and interpretation uncertainty.'},
+        'by-step':{effects:{analysisErrorRiskPercent:-5,confidenceVariancePercent:-12,reviewMinutes:4},note:'Step-level confidence localizes extraction, calculation, and interpretation uncertainty.'},
         'evidence-linked':{effects:{analysisErrorRiskPercent:-8,verifiedRowsPercent:8,confidenceVariancePercent:-18,reviewMinutes:7},note:'Linking uncertainty to evidence makes review actionable.'}
       }}
     },
