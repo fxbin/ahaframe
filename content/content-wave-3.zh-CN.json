@@ -1,0 +1,126 @@
+{
+  "locale": "zh-CN",
+  "missions": {
+    "multi-agent-coordination-incident": {
+      "name": "Multi-Agent Coordination Incident",
+      "seoTitle": "Multi-Agent Coordination Incident — AhaFrame",
+      "description": "判断何时 Delegation、Shared State、Independent Verification 与并行执行值得引入 Multi-Agent 协调成本。",
+      "level": "Advanced",
+      "layer": "Multi-Agent 与 Orchestration",
+      "minutes": 18,
+      "hero": "四个 Agent 更快完成了工作，但它们也改了同一批文件、互相矛盾，而且没人对最终结果负责。",
+      "quick": "只有当任务拆分、责任边界、共享状态、独立验证和协调成本整体优于更简单的基线时，Multi-Agent 才真正值得。",
+      "transferPrompt": "一个强 Agent 14 分钟能完成，四个 Agent 8 分钟能完成。什么证据足以证明额外协调面是值得的？",
+      "brief": {"eyebrow":"ORCHESTRATION INCIDENT","title":"更多 Agent 反而制造了更多工作。","role":"你负责一个覆盖研究、实现、测试和代码审查的 AI 工程工作流。","body":"四 Agent swarm 产生了重复修改、冲突假设，以及 5 个没有验收责任人的输出。团队建议继续增加 Agent 来提高覆盖率。","objective":"找到最小的 Orchestration 设计，在提高覆盖和速度的同时保留清晰 Owner 与 Independent Verification。","stakes":"协调复杂度可能完全吃掉 Multi-Agent 原本想获得的并行收益。"},
+      "ui": {"workspace":"Orchestration 控制台","policy":"协调设计","start":"检查事故","run":"评估 Orchestration","reset":"重置基线","evidence":"证据","budget":"变更预算","outcome":"协调状态","attempts":"尝试记录","release":"架构决策","ship":"SHIP DESIGN","block":"BLOCK","inconclusive":"INCONCLUSIVE","complete":"完成 Incident","waiting":"尚未评估"},
+      "evidenceLabels": {"brief":"任务简报","artifacts":"协调产物","signals":"系统信号"},
+      "controls": {
+        "delegation":{"label":"Delegation 拓扑","intervention":"delegation","options":{"single-agent":"单一强 Agent","manager-worker":"Manager → Workers","peer-swarm":"Peer Swarm"}},
+        "state":{"label":"Shared State","intervention":"state","options":{"chat-transcript":"传递聊天记录","explicit-contract":"显式任务 Contract","shared-blackboard":"Shared Blackboard"}},
+        "verification":{"label":"验收证据","intervention":"verification","options":{"self-review":"Self Review","independent-verifier":"Independent Verifier","double-independent":"双 Independent Verifier"}},
+        "parallelism":{"label":"执行并行度","intervention":"parallelism","options":{"sequential":"串行","bounded":"Bounded Parallelism","maximum":"最大并行"}}
+      },
+      "metrics": [
+        {"key":"coordinationRiskPercent","label":"协调风险","format":"percent"},
+        {"key":"taskCoverageScore","label":"任务覆盖","format":"score"},
+        {"key":"independentVerificationScore","label":"独立验证","format":"score"},
+        {"key":"coordinationOverheadIndex","label":"协调开销","format":"score"},
+        {"key":"latencyMs","label":"端到端耗时","format":"ms"}
+      ],
+      "debrief": {"eyebrow":"MENTAL MODEL","title":"Delegation 是优化手段，不是默认架构。","rule":"只有当独立工作和独立证据的价值超过新增协调边界时，才应该增加 Agent。","body":"可靠的 Multi-Agent 系统必须定义任务 Owner、状态 Contract、验收证据和有界 Fan-out。比较对象始终应该是更简单的基线，而不是假设更多 Agent 没有成本。","points":["一个 Owner 可以在目标质量与时延内完成时，就先用一个 Agent。","需要验收证据时，把生成与验证拆开。","在 Coordination Overhead 成为主要工作前限制并行度。"]},
+      "takeaways":[["更多 Agent ≠ 更可靠","协调本身会引入新的失败模式。"],["Owner 本身也是状态","每个 Delegated Output 都需要明确接收者。"],["并行有价格","速度收益必须覆盖综合与审查开销。"]],
+      "next":{"title":"下一步：发布系统","description":"把 Evaluation、Observability、Rollout 与 Rollback 组合成显式 Production Release Gate。","button":"打开 Release Gate Build","href":"/build/production-release-gate-build/"}
+    },
+    "production-release-gate-build": {
+      "name": "Production Release Gate Build",
+      "seoTitle": "Production Release Gate Build — AhaFrame",
+      "description": "构建带显式 veto、有限暴露、Observability 与 Rollback 的证据驱动发布门。",
+      "level": "Advanced",
+      "layer": "Production AI Reliability",
+      "minutes": 19,
+      "hero": "Demo 是绿的，但 Release 还没有准备好。",
+      "quick": "生产 AI 只有在离线证据、线上 Observability、Rollout 暴露和 Rollback Readiness 全部满足显式 Gate 时才应该发布。",
+      "transferPrompt": "离线 Eval 提升 6%，但 Canary 的 Tool Retry 上升 40%。哪个信号应该拥有 Release 决策权？",
+      "brief": {"eyebrow":"RELEASE BUILD","title":"构建一个真的能够说 BLOCK 的 Gate。","role":"你负责一次包含新模型、Reranker 和 Tool Policy 的发布。","body":"变更通过了 Demo，但上一次发布同样通过 Demo，随后线上 Tool Retry 翻倍。当前计划依然是一次性放量到 100%。","objective":"定义 Evidence、Observability、Exposure 与 Fallback 边界，让 SHIP、BLOCK、INCONCLUSIVE 成为操作决策而不是意见。","stakes":"一个不能 veto 发布的 Release Gate 只是 Checklist。"},
+      "ui": {"workspace":"Release Control Room","policy":"Production Gate","start":"检查 Release","run":"运行 Release Gate","reset":"重置基线","evidence":"证据","budget":"变更预算","outcome":"Gate 状态","attempts":"尝试记录","release":"发布决策","ship":"SHIP RELEASE","block":"BLOCK","inconclusive":"INCONCLUSIVE","complete":"完成 Build","waiting":"尚未评估"},
+      "evidenceLabels": {"brief":"发布简报","artifacts":"Gate 产物","signals":"生产信号"},
+      "controls": {
+        "evaluation":{"label":"Offline Evidence","intervention":"evaluation","options":{"demo-only":"只看 Demo","failure-set":"版本化 Failure Set","gated-regression":"Regression Gate + Veto"}},
+        "rollout":{"label":"Production Exposure","intervention":"rollout","options":{"big-bang":"100% Big-bang","canary":"Bounded Canary","shadow-canary":"Shadow + Canary"}},
+        "observability":{"label":"Production Evidence","intervention":"observability","options":{"dashboard-only":"只有 Dashboard","traces-alerts":"Trace-linked Alerts","release-slo":"Release SLO + Traces"}},
+        "fallback":{"label":"Fallback Plan","intervention":"fallback","options":{"manual-recovery":"人工恢复","versioned-rollback":"Versioned Rollback","automatic-rollback":"Automatic Rollback"}}
+      },
+      "metrics": [
+        {"key":"releaseFailureRiskPercent","label":"发布失败风险","format":"percent"},
+        {"key":"evaluationEvidenceScore","label":"Evaluation Evidence","format":"score"},
+        {"key":"observabilityCoverageScore","label":"Observability Coverage","format":"score"},
+        {"key":"rollbackReadinessScore","label":"Rollback Readiness","format":"score"},
+        {"key":"changeExposurePercent","label":"变更暴露","format":"percent"},
+        {"key":"releaseCostIndex","label":"Release Gate 成本","format":"score"}
+      ],
+      "debrief": {"eyebrow":"PRODUCTION RULE","title":"Gate 的本质是它的 Veto。","rule":"任何 Aggregate Score 都不能抵消一个尚未解决的 Release Veto。","body":"Offline Eval 提供发布前证据，Canary 验证真实分布，Trace 定位回归来源，Rollback 限制恢复时间。Production Gate 必须把这四层合成一个明确决策边界。","points":["把已知 Failure 版本化，让 Regression 可测。","在线上证据出现前先限制 Exposure。","Rollback 必须覆盖 Model、Prompt、Retrieval 和 Policy 配置，而不仅是权重。"]},
+      "takeaways":[["Demo ≠ Evidence","Demo 只展示成功样本，不覆盖失败面。"],["Canary 是边界","它限制未知线上行为影响多少用户。"],["Rollback 是设计的一部分","需要它之前就应该已经验证过。"]],
+      "next":{"title":"下一步：判断是否真的需要改模型","description":"比较 Prompt/RAG Baseline、Adapter、Quantized PEFT 与 Full Fine-tuning 的效果和 Serving 成本。","button":"打开 Model Adaptation Lab","href":"/labs/model-adaptation-decision-lab/"}
+    },
+    "model-adaptation-decision-lab": {
+      "name": "Model Adaptation Decision Lab",
+      "seoTitle": "Model Adaptation Decision Lab — AhaFrame",
+      "description": "用可验证 Task Gap、可信数据与 Serving 经济性，选择最小复杂度的 Model Adaptation。",
+      "level": "Advanced",
+      "layer": "Model Engineering",
+      "minutes": 18,
+      "hero": "Fine-tuning 不是 Prompting 之后的自然下一步，而是需要被证明合理的一次系统变更。",
+      "quick": "先建立强 Prompt/RAG Baseline，隔离残余 Behavior Gap，再用 Held-out Data 证明是否值得引入 Adapter、Quantized PEFT 或 Full Fine-tuning。",
+      "transferPrompt": "更强的 Retrieval Baseline 已经关闭了原计划 Fine-tune 的 90% Gap，你还会训练 Adapter 吗？",
+      "brief": {"eyebrow":"MODEL DECISION","title":"先证明 Training 是正确干预。","role":"你负责一个存在持续分类与风格偏差的领域工作流。","body":"Prompt 与 Retrieval 已改善事实 Grounding，但仍存在可重复的行为 Gap。团队想在没有 Held-out Eval、也没估算 Adapter Serving 成本前直接 Full Fine-tune。","objective":"测量非训练 Baseline，提升数据质量，再选择能够关闭真实 Gap 的最小复杂度 Adaptation。","stakes":"Training 会把 Failure 从 Prompt Logic 转移到 Data、Model Lifecycle 与 Serving Infrastructure。"},
+      "ui": {"workspace":"Adaptation Decision Console","policy":"Model Adaptation","start":"检查 Task Gap","run":"评估 Adaptation","reset":"重置基线","evidence":"证据","budget":"变更预算","outcome":"Adaptation 状态","attempts":"尝试记录","release":"架构决策","ship":"SHIP ADAPTATION","block":"BLOCK","inconclusive":"INCONCLUSIVE","complete":"完成 Lab","waiting":"尚未评估"},
+      "evidenceLabels": {"brief":"任务简报","artifacts":"Dataset 与部署事实","signals":"当前实现信号"},
+      "controls": {
+        "baseline":{"label":"非训练 Baseline","intervention":"baseline","options":{"no-baseline":"没有可测 Baseline","prompt-rag-benchmark":"Prompt/RAG Benchmark","strong-prompt-rag":"强 Prompt/RAG Baseline"}},
+        "dataset":{"label":"Training Evidence","intervention":"dataset","options":{"raw-logs":"Raw Logs","curated-heldout":"Curated + Held-out Eval","synthetic-curated":"Synthetic + Curated + Held-out"}},
+        "method":{"label":"Adaptation Method","intervention":"method","options":{"prompt-rag-only":"保留 Prompt/RAG","lora":"LoRA Adapter","qlora":"QLoRA","full-finetune":"Full Fine-tune"}},
+        "serving":{"label":"Serving Model","intervention":"serving","options":{"dedicated-copy":"Dedicated Model Copy","adapter-serving":"Adapter-aware Serving","multi-adapter-router":"Multi-adapter Router"}}
+      },
+      "metrics": [
+        {"key":"residualTaskGapPercent","label":"Residual Task Gap","format":"percent"},
+        {"key":"adaptationEvidenceScore","label":"Adaptation Evidence","format":"score"},
+        {"key":"dataQualityScore","label":"Data Quality","format":"score"},
+        {"key":"servingComplexityScore","label":"Serving Complexity","format":"score"},
+        {"key":"unitCostIndex","label":"Unit Cost Index","format":"score"}
+      ],
+      "debrief": {"eyebrow":"MODEL ENGINEERING","title":"只适配你真正能够测量的 Failure。","rule":"最优 Adaptation 是在可接受 Serving Cost 下，能够关闭 Held-out Task Gap 的最小复杂度干预。","body":"LoRA 等 PEFT 方法减少需要训练和存储的参数；Quantized PEFT 可以进一步降低训练内存；Adapter-aware Serving 可以复用 Base Model。它们都不能替代强 Baseline、Curated Data、Held-out Eval 和部署经济性。","points":["没有强 Non-training Baseline 前，不要直接训练。","Training Data 与证明提升的 Held-out Eval 必须分离。","Serving 与 Adapter Lifecycle 是 Adaptation 决策的一部分。"]},
+      "takeaways":[["Training 不是条件反射","先测清 Residual Behavior Gap。"],["PEFT 改变成本结构","但不会减少 Evaluation 要求。"],["Serving 决定生产可行性","好的 Checkpoint 也可能组成一个糟糕系统。"]],
+      "next":{"title":"下一步：把 Bounded Automation 应用到整个业务","description":"用 Evidence Loop、Durable Workflow、Bounded Automation 和 Risk Gate 设计一人 AI Business OS。","button":"打开 Solo Business Build","href":"/build/solo-business-operating-system-build/"}
+    },
+    "solo-business-operating-system-build": {
+      "name": "Solo Business Operating System Build",
+      "seoTitle": "Solo Business Operating System Build — AhaFrame",
+      "description": "围绕 Evidence Loop、Durable Workflow、Bounded Automation 与 Human Review Boundary 设计一人 AI Business。",
+      "level": "Advanced",
+      "layer": "AI for Business",
+      "minutes": 19,
+      "hero": "你自动化了 23 个 Workflow，最后 Exceptions 和维护时间比原来的手工工作更多。",
+      "quick": "AI Leverage 来自选择可重复、可逆、可维护的 Workflow，并显式设计 Exception Boundary，而不是把所有业务功能都自动化。",
+      "transferPrompt": "一个 Workflow 每周节省 2 小时，但产生 40 分钟 Exception Handling，并且每月出现一次高风险失败。它还值得自动化吗？",
+      "brief": {"eyebrow":"OUTCOME BUILD","title":"提高 Leverage，而不是成为自动化清洁工。","role":"你独自运营一个覆盖 Product、Content、Sales、Support 与 Analytics 的 AI 软件业务。","body":"已经存在 23 个 Automation，但 Customer Evidence 分散，14 个 Workflow 没有明确 Owner 或 Recovery Path，每周 Exception 已经主导运营。","objective":"建立一个提高 Founder Leverage，同时约束 Customer Signal、Automation Risk、Support Load 与 Maintenance 的 Business Operating System。","stakes":"无法维护、无法安全升级的 Automation 是 Operational Debt，不是 Leverage。"},
+      "ui": {"workspace":"Solo Business Control Room","policy":"Operating System","start":"检查运营","run":"评估 Operating System","reset":"重置基线","evidence":"证据","budget":"变更预算","outcome":"运营状态","attempts":"尝试记录","release":"运营决策","ship":"SHIP OPERATING SYSTEM","block":"BLOCK","inconclusive":"INCONCLUSIVE","complete":"完成 Build","waiting":"尚未评估"},
+      "evidenceLabels": {"brief":"业务简报","artifacts":"Workflow Inventory","signals":"运营信号"},
+      "controls": {
+        "research":{"label":"Customer Signal","intervention":"research","options":{"intuition-only":"只靠 Founder Intuition","evidence-loop":"持续 Evidence Loop"}},
+        "workflow":{"label":"Workflow State","intervention":"workflow","options":{"chat-tabs":"Chat Tabs + Memory","durable-workflow":"Durable Workflow State"}},
+        "automation":{"label":"Automation Boundary","intervention":"automation","options":{"manual-everything":"全部手工","bounded-automation":"Bounded Automation","auto-everything":"Automate Everything"}},
+        "review":{"label":"Human Review","intervention":"review","options":{"no-gates":"没有显式 Gate","risk-gates":"Risk-based Review Gate","exception-queue":"Central Exception Queue"}}
+      },
+      "metrics": [
+        {"key":"customerEvidenceScore","label":"Customer Evidence","format":"score"},
+        {"key":"automationFailureRiskPercent","label":"Automation Failure Risk","format":"percent"},
+        {"key":"supportLoadScore","label":"Founder Support Load","format":"score"},
+        {"key":"maintenanceHoursPerWeek","label":"每周维护小时","format":"default"},
+        {"key":"founderLeverageScore","label":"Founder Leverage","format":"score"}
+      ],
+      "debrief": {"eyebrow":"BUSINESS SYSTEM","title":"自动化 Workflow，而不是自动化责任。","rule":"最好的 Solo Business Automation 应该有边界、可观察、尽可能可逆，并明确 Human Exception Boundary。","body":"一人 AI 公司依然需要 Customer Evidence、Durable State、Risk Classification、Exception Handling 和 Maintenance Budget。这些和 Production Agent 使用的是同一套工程 Concept，只是被应用到业务 Operating Model。","points":["先验证 Customer Problem，再围绕它扩展 Automation。","优先自动化重复、可逆的工作。","把 Maintenance 与 Exception 算进 Automation ROI。"]},
+      "takeaways":[["AI Leverage 需要 Evidence","Customer Signal 决定什么值得自动化。"],["Automation 有生命周期成本","Maintenance 必须进入 ROI。"],["Human Review 是选择性的","把注意力留给高风险与不确定工作。"]],
+      "next":{"title":"回到 Knowledge Map","description":"查看 Orchestration、Production Reliability、Model Engineering 与 Business Automation 如何连接回共享 Concept。","button":"探索 Knowledge Map","href":"/learning/"}
+    }
+  }
+}
