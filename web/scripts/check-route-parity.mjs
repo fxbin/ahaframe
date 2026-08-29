@@ -31,6 +31,7 @@ const REQUIRED_APP_FILES = [
   "app/(site)/[locale]/early-access/page.tsx",
   "app/(site)/[locale]/lessons/[slug]/page.tsx",
   "app/(site)/[locale]/labs/[slug]/page.tsx",
+  "app/(site)/[locale]/build/[slug]/page.tsx",
   "app/(site)/[locale]/build/reliable-support-agent/page.tsx",
   "app/api/waitlist/route.ts",
 ];
