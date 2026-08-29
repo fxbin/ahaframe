@@ -1,0 +1,83 @@
+{
+  "locale": "zh-CN",
+  "mission": {
+    "name": "Data Analysis Verification Lab",
+    "seoTitle": "AI 数据分析验证 Lab | AhaFrame",
+    "description": "把提取、计算、异常值处理和不确定性拆成独立证据检查，验证一份 AI 生成的数据分析。",
+    "level": "应用 Lab",
+    "layer": "Data Analysis × Verification",
+    "minutes": 15,
+    "hero": "模型判断 Segment B 的运营效率提升最大，图表也很有说服力，但一个分母取自了错误的数据行。先建立验证策略，再接受这个结论。",
+    "quick": "只有当提取、计算、覆盖率、异常值和不确定性都可以独立于模型文字被验证时，AI 数据分析才值得信任。",
+    "brief": {
+      "eyebrow": "LAB · DATA ANALYSIS WITH AI",
+      "title": "图表看起来正确，数字仍然可能是错的。",
+      "role": "你正在审查一份 AI 生成的经营分析。",
+      "body": "原始报告包含表格、脚注、百分比和一个格式异常值。AI 摘要指出了表现最好的业务分部，但这个派生指标使用了从错误数据行提取的分母。",
+      "objective": "在不手工核对每一个单元格的前提下，降低数值错误风险，并让结论可以被复现。",
+      "stakes": "即使文字完全流畅，一个错误的分析结论仍可能把预算和战略带到错误方向。"
+    },
+    "ui": {
+      "start": "开始验证",
+      "workspace": "分析验证台",
+      "evidence": "分析证据",
+      "policy": "验证策略",
+      "budget": "验证预算",
+      "run": "验证分析",
+      "reset": "重置 Lab",
+      "attempts": "验证尝试",
+      "noAttempts": "尚未评估任何验证策略。",
+      "release": "分析决策",
+      "ship": "ACCEPT",
+      "block": "REJECT",
+      "inconclusive": "NEEDS CHECKING",
+      "complete": "完成 Lab",
+      "outcome": "验证结果",
+      "waiting": "先检查数据集信号，调整验证策略，再重新运行分析。",
+      "compared": "比较首次 → 最新"
+    },
+    "evidenceLabels": {
+      "brief": "分析简报",
+      "artifacts": "模型结论",
+      "signals": "数据集信号",
+      "policy": "当前验证策略",
+      "audit": "验证诊断"
+    },
+    "controls": {
+      "extraction-mode": {"label": "提取方式", "options": {"model-only": "仅模型提取", "schema-validated": "Schema 校验提取", "dual-pass": "独立双通道提取"}},
+      "numeric-check": {"label": "数值计算", "options": {"none": "相信模型计算", "recompute": "重新计算全部派生值", "recompute-sample": "抽样重新计算"}},
+      "outlier-policy": {"label": "异常值", "options": {"ignore": "忽略", "flag": "标记复核", "investigate": "聚合前调查"}},
+      "confidence-policy": {"label": "不确定性", "options": {"single-score": "单一置信度", "by-step": "按步骤记录置信度", "evidence-linked": "与证据绑定的不确定性"}}
+    },
+    "metrics": [
+      {"key": "analysisErrorRiskPercent", "label": "分析错误风险", "format": "percent"},
+      {"key": "verifiedRowsPercent", "label": "已验证数据行", "format": "percent"},
+      {"key": "coveragePercent", "label": "证据覆盖率", "format": "percent"},
+      {"key": "confidenceVariancePercent", "label": "未解决不确定性", "format": "percent"},
+      {"key": "reviewMinutes", "label": "复核时间", "format": "integer"}
+    ],
+    "debrief": {
+      "eyebrow": "ANALYSIS DEBRIEF",
+      "title": "分析如何被拆分，验证就应该如何被拆分。",
+      "rule": "不要让模型自己回答‘我的分析对不对’；要为提取、计算、覆盖和解释建立独立检查。",
+      "body": "AI 能显著加速文档提取和探索性分析，但也可能静默修正异常格式、复用错误分母，或者用非常确定的语气表达不确定解释。更好的流程会用 Schema 检查验证提取，用确定性计算重新验证算术，对异常值做显式审查，并把不确定性绑定到产生它的证据步骤。",
+      "points": [
+        "把模型解释和确定性算术分离。",
+        "Schema 失败应该成为可观察的数据质量事件，而不是被静默修复。",
+        "异常值可能是解析错误，也可能是最重要的业务信号；不要默认删除。",
+        "当不确定性能够定位到具体步骤和来源时，它才真正可操作。"
+      ]
+    },
+    "takeaways": [
+      ["按层验证", "提取、计算和解释可以彼此独立地失败，因此需要不同的验证方式。"],
+      ["关键计算要重算", "派生指标应该能够在语言模型之外被独立复现。"],
+      ["让不确定性可操作", "把不确定性绑定到具体数据行、来源或变换步骤。"]
+    ],
+    "next": {
+      "title": "返回 Knowledge Map",
+      "description": "Wave 1 已经把 Coding、RAG、Agent、Research 和 Data 通过可复用 Concept 与 Evidence-first 决策连接起来。",
+      "button": "探索 Knowledge Map",
+      "href": "/zh-cn/learning/"
+    }
+  }
+}
