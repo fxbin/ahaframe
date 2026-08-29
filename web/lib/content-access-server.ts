@@ -11,12 +11,16 @@ const CONTENT_ROOT = (() => {
 
 interface ProductionExperience {
   id: string;
+  status: "EXISTING" | "SEEDED" | "PLANNED";
   accessPolicyId: "access-open" | "access-free-choice" | "access-membership";
 }
 
 interface ProductionManifest {
   version: string;
-  principles: { billingActivation: boolean };
+  principles: {
+    billingActivation: boolean;
+    freeChoiceActivation: boolean;
+  };
   experiences: ProductionExperience[];
 }
 
@@ -37,6 +41,9 @@ async function loadManifest(): Promise<ProductionManifest> {
   if (manifest.principles.billingActivation !== false) {
     throw new Error("Knowledge Graph entitlement foundation must not activate Billing.");
   }
+  if (typeof manifest.principles.freeChoiceActivation !== "boolean") {
+    throw new Error("Content access manifest must declare freeChoiceActivation explicitly.");
+  }
   return manifest;
 }
 
@@ -46,8 +53,20 @@ export async function getPlannedContentAccessClassification(contentId: string): 
   return experience ? CLASSIFICATION_BY_POLICY[experience.accessPolicyId] : null;
 }
 
-export async function isFreeChoiceContent(contentId: string): Promise<boolean> {
-  return (await getPlannedContentAccessClassification(contentId)) === "FREE_CHOICE";
+export async function isFreeChoiceClaimingActive(): Promise<boolean> {
+  return (await loadManifest()).principles.freeChoiceActivation;
+}
+
+/**
+ * A free-choice slot may only be consumed by a shipped Experience. SEEDED and
+ * PLANNED entries remain visible in the production backlog but cannot consume a
+ * learner's permanent quota.
+ */
+export async function isClaimableFreeChoiceContent(contentId: string): Promise<boolean> {
+  const manifest = await loadManifest();
+  if (!manifest.principles.freeChoiceActivation) return false;
+  const experience = manifest.experiences.find((item) => item.id === contentId);
+  return experience?.accessPolicyId === "access-free-choice" && experience.status === "EXISTING";
 }
 
 /**
