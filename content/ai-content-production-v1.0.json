@@ -5,6 +5,7 @@
     "knowledgeMapOpen": true,
     "reuseCanonicalConcepts": true,
     "billingActivation": false,
+    "freeChoiceActivation": false,
     "accessPolicyIds": ["access-open", "access-free-choice", "access-membership"]
   },
   "waves": [
