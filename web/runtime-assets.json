@@ -18,6 +18,8 @@
     "production-support-launch-mission.js",
     "decision-experience-scenario.js",
     "content-wave-1-scenarios.js",
-    "content-wave-1-missions.js"
+    "content-wave-1-missions.js",
+    "content-wave-2-scenarios.js",
+    "content-wave-2-missions.js"
   ]
 }
