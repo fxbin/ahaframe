@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "status": "PLANNED",
+  "status": "IN_PROGRESS",
   "principles": {
     "knowledgeMapOpen": true,
     "reuseCanonicalConcepts": true,
@@ -15,11 +15,11 @@
   ],
   "experiences": [
     {"id":"token-playground","nodeType":"PLAYGROUND","status":"EXISTING","pathIds":["path-ai-foundations"],"conceptIds":["concept-probabilistic-behavior","concept-tokenization","concept-context-window"],"accessPolicyId":"access-open"},
-    {"id":"ai-code-review-mission","nodeType":"MISSION","status":"SEEDED","pathIds":["path-vibe-coding"],"conceptIds":["concept-specification-before-generation","concept-ai-code-review","concept-test-first-ai","concept-evaluation-evidence"],"accessPolicyId":"access-free-choice"},
+    {"id":"ai-code-review-mission","nodeType":"MISSION","status":"EXISTING","pathIds":["path-vibe-coding"],"conceptIds":["concept-specification-before-generation","concept-ai-code-review","concept-test-first-ai","concept-evaluation-evidence"],"accessPolicyId":"access-free-choice"},
     {"id":"rag-failure","nodeType":"INCIDENT","status":"EXISTING","pathIds":["path-rag-knowledge-systems","path-build-knowledge-base"],"conceptIds":["concept-retrieval-pipeline","concept-source-authority","concept-retrieval-evaluation","concept-evaluation-evidence"],"accessPolicyId":"access-free-choice"},
     {"id":"agent-reliability","nodeType":"INCIDENT","status":"EXISTING","pathIds":["path-agent-engineering","path-production-ai-reliability"],"conceptIds":["concept-agent-loop","concept-timeout-ambiguity","concept-idempotency-boundary","concept-evaluation-evidence"],"accessPolicyId":"access-free-choice"},
-    {"id":"research-evidence-mission","nodeType":"MISSION","status":"PLANNED","pathIds":["path-research-with-ai"],"conceptIds":["concept-research-question-decomposition","concept-source-triangulation","concept-claim-evidence-matrix","concept-research-synthesis","concept-evaluation-evidence"],"accessPolicyId":"access-free-choice"},
-    {"id":"data-analysis-verification-lab","nodeType":"LAB","status":"PLANNED","pathIds":["path-data-analysis-ai"],"conceptIds":["concept-document-extraction","concept-structured-analysis","concept-data-analysis-verification","concept-confidence-variance","concept-verification-over-introspection"],"accessPolicyId":"access-free-choice"},
+    {"id":"research-evidence-mission","nodeType":"MISSION","status":"EXISTING","pathIds":["path-research-with-ai"],"conceptIds":["concept-research-question-decomposition","concept-source-triangulation","concept-claim-evidence-matrix","concept-research-synthesis","concept-evaluation-evidence"],"accessPolicyId":"access-free-choice"},
+    {"id":"data-analysis-verification-lab","nodeType":"LAB","status":"EXISTING","pathIds":["path-data-analysis-ai"],"conceptIds":["concept-document-extraction","concept-structured-analysis","concept-data-analysis-verification","concept-confidence-variance","concept-verification-over-introspection"],"accessPolicyId":"access-free-choice"},
     {"id":"structured-output-contract-lab","nodeType":"LAB","status":"PLANNED","pathIds":["path-llm-application-engineering"],"conceptIds":["concept-structured-output-contract","concept-streaming-backpressure","concept-model-vs-runtime-fact"],"accessPolicyId":"access-free-choice"},
     {"id":"mcp-capability-boundary-mission","nodeType":"MISSION","status":"PLANNED","pathIds":["path-agent-engineering"],"conceptIds":["concept-mcp-boundaries","concept-mcp-capability-negotiation","concept-tool-contract","concept-least-privilege"],"accessPolicyId":"access-membership"},
     {"id":"long-running-agent-recovery-mission","nodeType":"MISSION","status":"PLANNED","pathIds":["path-agent-engineering"],"conceptIds":["concept-async-long-running","concept-checkpoint-resume","concept-interrupt-cancel","concept-bounded-autonomy"],"accessPolicyId":"access-membership"},
