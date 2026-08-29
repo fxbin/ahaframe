@@ -1,80 +1,29 @@
 {
   "version": 1,
   "experiences": {
-    "token-playground": {
-      "kind": "lab",
-      "runtimeId": "token-playground",
-      "scripts": ["lab-engine.js", "lab-scenarios.js"]
-    },
-    "context-window": {
-      "kind": "lab",
-      "runtimeId": "context-window",
-      "scripts": ["lab-engine.js", "lab-scenarios.js"]
-    },
-    "agent-loop": {
-      "kind": "lab",
-      "runtimeId": "agent-loop",
-      "scripts": ["lab-engine.js", "lab-scenarios.js"]
-    },
-    "context-compression": {
-      "kind": "lab",
-      "runtimeId": "context-compression",
-      "scripts": ["lab-engine.js", "context-compression-scenario.js"]
-    },
-    "agent-workflow-graph": {
-      "kind": "lab",
-      "runtimeId": "agent-workflow-graph",
-      "scripts": ["lab-engine.js", "agent-workflow-graph-scenario.js"]
-    },
-    "evaluation-failure": {
-      "kind": "lab",
-      "runtimeId": "evaluation-failure",
-      "scripts": ["lab-engine.js", "evaluation-scenario.js"]
-    },
-    "rag-failure": {
-      "kind": "mission",
-      "runtimeId": "broken-rag-pipeline",
-      "scripts": ["lab-engine.js", "broken-rag-pipeline-scenario.js", "mission-engine.js", "broken-rag-pipeline-mission.js"]
-    },
-    "agent-reliability": {
-      "kind": "mission",
-      "runtimeId": "47000-retry",
-      "scripts": ["lab-engine.js", "47000-retry-scenario.js", "mission-engine.js", "47000-retry-mission.js"]
-    },
-    "instruction-conflict": {
-      "kind": "mission",
-      "runtimeId": "prompt-injection-attack",
-      "scripts": ["lab-engine.js", "prompt-injection-attack-scenario.js", "mission-engine.js", "prompt-injection-attack-mission.js"]
-    },
-    "ai-code-review-mission": {
-      "kind": "mission",
-      "runtimeId": "ai-code-review-mission",
-      "scripts": ["lab-engine.js", "decision-experience-scenario.js", "content-wave-1-scenarios.js", "mission-engine.js", "content-wave-1-missions.js"]
-    },
-    "research-evidence-mission": {
-      "kind": "mission",
-      "runtimeId": "research-evidence-mission",
-      "scripts": ["lab-engine.js", "decision-experience-scenario.js", "content-wave-1-scenarios.js", "mission-engine.js", "content-wave-1-missions.js"]
-    },
-    "data-analysis-verification-lab": {
-      "kind": "mission",
-      "runtimeId": "data-analysis-verification-lab",
-      "scripts": ["lab-engine.js", "decision-experience-scenario.js", "content-wave-1-scenarios.js", "mission-engine.js", "content-wave-1-missions.js"]
-    },
+    "token-playground": {"kind":"lab","runtimeId":"token-playground","scripts":["lab-engine.js","lab-scenarios.js"]},
+    "context-window": {"kind":"lab","runtimeId":"context-window","scripts":["lab-engine.js","lab-scenarios.js"]},
+    "agent-loop": {"kind":"lab","runtimeId":"agent-loop","scripts":["lab-engine.js","lab-scenarios.js"]},
+    "context-compression": {"kind":"lab","runtimeId":"context-compression","scripts":["lab-engine.js","context-compression-scenario.js"]},
+    "agent-workflow-graph": {"kind":"lab","runtimeId":"agent-workflow-graph","scripts":["lab-engine.js","agent-workflow-graph-scenario.js"]},
+    "evaluation-failure": {"kind":"lab","runtimeId":"evaluation-failure","scripts":["lab-engine.js","evaluation-scenario.js"]},
+    "rag-failure": {"kind":"mission","runtimeId":"broken-rag-pipeline","scripts":["lab-engine.js","broken-rag-pipeline-scenario.js","mission-engine.js","broken-rag-pipeline-mission.js"]},
+    "agent-reliability": {"kind":"mission","runtimeId":"47000-retry","scripts":["lab-engine.js","47000-retry-scenario.js","mission-engine.js","47000-retry-mission.js"]},
+    "instruction-conflict": {"kind":"mission","runtimeId":"prompt-injection-attack","scripts":["lab-engine.js","prompt-injection-attack-scenario.js","mission-engine.js","prompt-injection-attack-mission.js"]},
+    "ai-code-review-mission": {"kind":"mission","runtimeId":"ai-code-review-mission","scripts":["lab-engine.js","decision-experience-scenario.js","content-wave-1-scenarios.js","mission-engine.js","content-wave-1-missions.js"]},
+    "research-evidence-mission": {"kind":"mission","runtimeId":"research-evidence-mission","scripts":["lab-engine.js","decision-experience-scenario.js","content-wave-1-scenarios.js","mission-engine.js","content-wave-1-missions.js"]},
+    "data-analysis-verification-lab": {"kind":"mission","runtimeId":"data-analysis-verification-lab","scripts":["lab-engine.js","decision-experience-scenario.js","content-wave-1-scenarios.js","mission-engine.js","content-wave-1-missions.js"]},
+    "structured-output-contract-lab": {"kind":"mission","runtimeId":"structured-output-contract-lab","scripts":["lab-engine.js","decision-experience-scenario.js","content-wave-2-scenarios.js","mission-engine.js","content-wave-2-missions.js"]},
+    "mcp-capability-boundary-mission": {"kind":"mission","runtimeId":"mcp-capability-boundary-mission","scripts":["lab-engine.js","decision-experience-scenario.js","content-wave-2-scenarios.js","mission-engine.js","content-wave-2-missions.js"]},
+    "long-running-agent-recovery-mission": {"kind":"mission","runtimeId":"long-running-agent-recovery-mission","scripts":["lab-engine.js","decision-experience-scenario.js","content-wave-2-scenarios.js","mission-engine.js","content-wave-2-missions.js"]},
+    "write-book-with-ai-build": {"kind":"mission","runtimeId":"write-book-with-ai-build","scripts":["lab-engine.js","decision-experience-scenario.js","content-wave-2-scenarios.js","mission-engine.js","content-wave-2-missions.js"]},
+    "knowledge-base-build": {"kind":"mission","runtimeId":"knowledge-base-build","scripts":["lab-engine.js","decision-experience-scenario.js","content-wave-2-scenarios.js","mission-engine.js","content-wave-2-missions.js"]},
+    "customer-support-build": {"kind":"mission","runtimeId":"customer-support-build","scripts":["lab-engine.js","decision-experience-scenario.js","content-wave-2-scenarios.js","mission-engine.js","content-wave-2-missions.js"]},
+    "course-knowledge-product-build": {"kind":"mission","runtimeId":"course-knowledge-product-build","scripts":["lab-engine.js","decision-experience-scenario.js","content-wave-2-scenarios.js","mission-engine.js","content-wave-2-missions.js"]},
     "reliable-support-agent": {
-      "kind": "mission",
-      "runtimeId": "production-support-launch",
-      "scripts": [
-        "lab-engine.js",
-        "lab-scenarios.js",
-        "instruction-conflict-scenario.js",
-        "context-compression-scenario.js",
-        "agent-workflow-graph-scenario.js",
-        "evaluation-scenario.js",
-        "reliable-support-scenario.js",
-        "mission-engine.js",
-        "production-support-launch-mission.js"
-      ]
+      "kind":"mission",
+      "runtimeId":"production-support-launch",
+      "scripts":["lab-engine.js","lab-scenarios.js","instruction-conflict-scenario.js","context-compression-scenario.js","agent-workflow-graph-scenario.js","evaluation-scenario.js","reliable-support-scenario.js","mission-engine.js","production-support-launch-mission.js"]
     }
   }
 }
