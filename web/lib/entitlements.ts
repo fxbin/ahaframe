@@ -25,7 +25,9 @@ export interface ContentAccessDecision {
 }
 
 export function remainingFreeChoices(snapshot: EntitlementSnapshot): number {
-  if (snapshot.membershipStatus === "MEMBER") return FREE_CHOICE_LIMIT;
+  // Members do not consume or need free-choice slots; report zero rather than a
+  // misleading quota that no longer governs their access.
+  if (snapshot.membershipStatus === "MEMBER") return 0;
   return Math.max(0, FREE_CHOICE_LIMIT - new Set(snapshot.freeChoiceContentIds).size);
 }
 
@@ -41,7 +43,7 @@ export function resolveContentAccess(
   }
 
   if (snapshot.membershipStatus === "MEMBER") {
-    return { accessible: true, claimable: false, remainingFreeChoices: remaining, reason: "MEMBER" };
+    return { accessible: true, claimable: false, remainingFreeChoices: 0, reason: "MEMBER" };
   }
 
   if (classification === "FREE_CHOICE") {
