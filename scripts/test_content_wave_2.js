@@ -35,7 +35,7 @@ const cases=[
     id:'structured-output-contract-lab',baseline:'MALFORMED_OUTPUT',viable:'CONTRACT_READY',
     evidence:['brief','artifacts'],
     actions:[['contract','versioned-schema'],['validation','schema-semantic'],['repair','bounded-repair'],['streaming','incremental']],
-    trap:[['contract','json-schema']],trapOutcome:'SEMANTIC_CONTRACT_GAP',
+    trap:[['contract','versioned-schema'],['validation','schema']],trapOutcome:'SEMANTIC_CONTRACT_GAP',
   },
   {
     id:'mcp-capability-boundary-mission',baseline:'CAPABILITY_OVEREXPOSURE',viable:'CAPABILITY_BOUNDARY_READY',
@@ -71,7 +71,7 @@ const cases=[
     id:'course-knowledge-product-build',baseline:'LEARNING_OBJECTIVES_WEAK',viable:'KNOWLEDGE_PRODUCT_READY',
     evidence:['brief','artifacts'],
     actions:[['objectives','measurable'],['curriculum','concept-graph'],['editorial','rubric'],['provenance','qa-provenance']],
-    trap:[['objectives','measurable']],trapOutcome:'CURRICULUM_FRAGMENTED',
+    trap:[['objectives','measurable'],['curriculum','concept-graph']],trapOutcome:'EDITORIAL_DRIFT',
   },
 ];
 
