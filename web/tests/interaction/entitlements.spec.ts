@@ -19,9 +19,11 @@ test("entitlement claim endpoint rejects malformed requests before any privilege
   expect(missing.status()).toBe(400);
   expect(await missing.json()).toMatchObject({ ok: false, error: "CONTENT_ID_REQUIRED" });
 
+  // Buffer forces Playwright to send these bytes verbatim. A string payload is
+  // JSON-encoded by APIRequestContext and therefore becomes valid JSON text.
   const invalid = await request.post("/api/entitlements", {
     headers: { "content-type": "application/json" },
-    data: "{not-json",
+    data: Buffer.from("{not-json", "utf8"),
   });
   expect(invalid.status()).toBe(400);
   expect(await invalid.json()).toMatchObject({ ok: false, error: "INVALID_JSON" });
