@@ -45,6 +45,10 @@ runs:
           exit 1
         fi
 
+    - name: Test Content Wave 1 experiences
+      shell: bash
+      run: node scripts/test_content_wave_1.js
+
     - name: Test Integrated Build
       shell: bash
       run: node scripts/test_integrated_build.js
@@ -169,8 +173,10 @@ runs:
 
         repo_root = Path.cwd().parent
         checked = 1
+        locale_route_counts = []
         for locale, segment in (("en", "en"), ("zh-CN", "zh-cn")):
             source = json.loads((repo_root / "content" / f"{locale}.json").read_text(encoding="utf-8"))
+            locale_route_counts.append(len(source["availableRoutes"]))
             for route in source["availableRoutes"]:
                 path = f"/{segment}/{route}" if route else f"/{segment}/"
                 html = fetch(path)
@@ -178,7 +184,9 @@ runs:
                     raise RuntimeError(f"{path} did not return the expected AhaFrame HTML shell")
                 checked += 1
 
-        print(f"PASS Next runtime smoke: {checked} HTTP routes served successfully (root + 13 routes × 2 locales).")
+        if len(set(locale_route_counts)) != 1:
+            raise RuntimeError(f"locale public route counts drifted: {locale_route_counts}")
+        print(f"PASS Next runtime smoke: {checked} HTTP routes served successfully (root + {locale_route_counts[0]} routes × 2 locales).")
         PY
 
         cleanup
