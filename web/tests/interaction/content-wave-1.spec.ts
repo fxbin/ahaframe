@@ -18,7 +18,7 @@ test.describe("Content Wave 1 first-value experiences", () => {
     await page.getByRole("button", { name: "Check provenance + fit", exact: true }).click();
     await page.getByRole("button", { name: "Evaluate PR", exact: true }).click();
 
-    await expect(page.getByText("MERGE_READY", { exact: true })).toBeVisible();
+    await expect(page.getByText("MERGE_READY", { exact: true }).first()).toBeVisible();
     await page.getByRole("button", { name: "Proceed to release decision" }).click();
     await page.getByRole("button", { name: "MERGE", exact: true }).click();
     await expect(page.getByText("DEBRIEF", { exact: true })).toBeVisible();
@@ -35,7 +35,7 @@ test.describe("Content Wave 1 first-value experiences", () => {
     await page.getByRole("button", { name: "Publication + event-date check", exact: true }).click();
     await page.getByRole("button", { name: "Evaluate evidence", exact: true }).click();
 
-    await expect(page.getByText("EVIDENCE_READY", { exact: true })).toBeVisible();
+    await expect(page.getByText("EVIDENCE_READY", { exact: true }).first()).toBeVisible();
   });
 
   test("Data Analysis Verification independently checks extraction, arithmetic and uncertainty", async ({ page }) => {
@@ -49,7 +49,7 @@ test.describe("Content Wave 1 first-value experiences", () => {
     await page.getByRole("button", { name: "Evidence-linked uncertainty", exact: true }).click();
     await page.getByRole("button", { name: "Verify analysis", exact: true }).click();
 
-    await expect(page.getByText("ANALYSIS_VERIFIED", { exact: true })).toBeVisible();
+    await expect(page.getByText("ANALYSIS_VERIFIED", { exact: true }).first()).toBeVisible();
   });
 
   test("Wave 1 has equivalent zh-CN learning surfaces", async ({ page }) => {
