@@ -68,6 +68,9 @@ const MISSION_DOMAINS = {
   "agent-reliability": "mission-47000-retry",
   "instruction-conflict": "mission-prompt-injection",
   "reliable-support-agent": "mission-final-boss",
+  "ai-code-review-mission": "mission-ai-code-review",
+  "research-evidence-mission": "mission-research-evidence",
+  "data-analysis-verification-lab": "mission-data-analysis-verification",
 } as const;
 
 export type MissionSlug = keyof typeof MISSION_DOMAINS;
