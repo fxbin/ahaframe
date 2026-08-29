@@ -20,6 +20,10 @@
     "knowledge-base-build": {"kind":"mission","runtimeId":"knowledge-base-build","scripts":["lab-engine.js","decision-experience-scenario.js","content-wave-2-scenarios.js","mission-engine.js","content-wave-2-missions.js"]},
     "customer-support-build": {"kind":"mission","runtimeId":"customer-support-build","scripts":["lab-engine.js","decision-experience-scenario.js","content-wave-2-scenarios.js","mission-engine.js","content-wave-2-missions.js"]},
     "course-knowledge-product-build": {"kind":"mission","runtimeId":"course-knowledge-product-build","scripts":["lab-engine.js","decision-experience-scenario.js","content-wave-2-scenarios.js","mission-engine.js","content-wave-2-missions.js"]},
+    "multi-agent-coordination-incident": {"kind":"mission","runtimeId":"multi-agent-coordination-incident","scripts":["lab-engine.js","decision-experience-scenario.js","content-wave-3-scenarios.js","mission-engine.js","content-wave-3-missions.js"]},
+    "production-release-gate-build": {"kind":"mission","runtimeId":"production-release-gate-build","scripts":["lab-engine.js","decision-experience-scenario.js","content-wave-3-scenarios.js","mission-engine.js","content-wave-3-missions.js"]},
+    "model-adaptation-decision-lab": {"kind":"mission","runtimeId":"model-adaptation-decision-lab","scripts":["lab-engine.js","decision-experience-scenario.js","content-wave-3-scenarios.js","mission-engine.js","content-wave-3-missions.js"]},
+    "solo-business-operating-system-build": {"kind":"mission","runtimeId":"solo-business-operating-system-build","scripts":["lab-engine.js","decision-experience-scenario.js","content-wave-3-scenarios.js","mission-engine.js","content-wave-3-missions.js"]},
     "reliable-support-agent": {
       "kind":"mission",
       "runtimeId":"production-support-launch",
