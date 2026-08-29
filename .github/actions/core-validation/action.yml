@@ -49,6 +49,10 @@ runs:
       shell: bash
       run: node scripts/test_content_wave_1.js
 
+    - name: Test Content Wave 2 experiences
+      shell: bash
+      run: node scripts/test_content_wave_2.js
+
     - name: Test Integrated Build
       shell: bash
       run: node scripts/test_integrated_build.js
