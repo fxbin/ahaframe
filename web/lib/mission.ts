@@ -23,6 +23,7 @@ export interface MissionContent {
   minutes: number;
   hero: string;
   quick: string;
+  transferPrompt?: string;
   brief: {
     eyebrow: string;
     title: string;
