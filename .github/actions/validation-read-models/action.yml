@@ -51,3 +51,8 @@ runs:
       env:
         PGPASSWORD: postgres
       run: psql -h 127.0.0.1 -U postgres -d ahaframe_test -v ON_ERROR_STOP=1 -f scripts/test_validation_read_models.sql
+    - name: Test Content Entitlements
+      shell: bash
+      env:
+        PGPASSWORD: postgres
+      run: psql -h 127.0.0.1 -U postgres -d ahaframe_test -v ON_ERROR_STOP=1 -f scripts/test_content_entitlements.sql
