@@ -51,7 +51,9 @@ runs:
 
     - name: Test Content Wave 2 experiences
       shell: bash
-      run: node scripts/test_content_wave_2.js
+      run: |
+        node scripts/test_content_wave_2.js
+        python3 scripts/test_content_wave_2_contract.py
 
     - name: Test Integrated Build
       shell: bash
