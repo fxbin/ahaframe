@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 import { FREE_CHOICE_LIMIT, remainingFreeChoices } from "@/lib/entitlements";
-import { getCurrentEntitlementSnapshot, isFreeChoiceContent } from "@/lib/content-access-server";
+import {
+  getCurrentEntitlementSnapshot,
+  isClaimableFreeChoiceContent,
+  isFreeChoiceClaimingActive,
+} from "@/lib/content-access-server";
 import { createClient, createServiceRoleClient } from "@/lib/supabase/server";
 
 interface ClaimBody {
@@ -9,7 +13,10 @@ interface ClaimBody {
 
 export async function GET() {
   try {
-    const snapshot = await getCurrentEntitlementSnapshot();
+    const [snapshot, freeChoiceActivation] = await Promise.all([
+      getCurrentEntitlementSnapshot(),
+      isFreeChoiceClaimingActive(),
+    ]);
     return NextResponse.json({
       ok: true,
       authenticated: snapshot.membershipStatus !== "ANONYMOUS",
@@ -18,6 +25,7 @@ export async function GET() {
       freeChoicesUsed: snapshot.freeChoiceContentIds.length,
       freeChoicesRemaining: remainingFreeChoices(snapshot),
       freeChoiceContentIds: snapshot.freeChoiceContentIds,
+      freeChoiceActivation,
       billingActive: false,
     });
   } catch (error) {
@@ -39,10 +47,17 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: "CONTENT_ID_REQUIRED" }, { status: 400 });
   }
 
-  // Curriculum data is the source of truth for which Experiences are eligible.
-  // The privileged database function never receives an unvalidated content id.
-  if (!(await isFreeChoiceContent(contentId))) {
-    return NextResponse.json({ ok: false, error: "CONTENT_NOT_FREE_CHOICE" }, { status: 422 });
+  if (!(await isFreeChoiceClaimingActive())) {
+    return NextResponse.json(
+      { ok: false, error: "FREE_CHOICE_CLAIMS_PAUSED", freeChoiceActivation: false, billingActive: false },
+      { status: 409 },
+    );
+  }
+
+  // Curriculum/production data owns eligibility. A PLANNED or SEEDED item can
+  // never consume a permanent slot, even when its eventual access class is FREE_CHOICE.
+  if (!(await isClaimableFreeChoiceContent(contentId))) {
+    return NextResponse.json({ ok: false, error: "CONTENT_NOT_CLAIMABLE_FREE_CHOICE" }, { status: 422 });
   }
 
   const userClient = await createClient();
@@ -75,6 +90,7 @@ export async function POST(request: Request) {
       freeChoicesUsed: result?.free_choices_used ?? null,
       freeChoicesRemaining: result?.free_choices_remaining ?? null,
       alreadyGranted: result?.already_granted ?? false,
+      freeChoiceActivation: true,
       billingActive: false,
     });
   } catch (error) {
