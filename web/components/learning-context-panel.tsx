@@ -23,6 +23,7 @@ interface LearningContextPanelProps {
   transfer: string;
   labels: LearningUxContent["page"];
   states: LearningUxContent["states"];
+  knowledgeLabel?: string;
 }
 
 function subscribeProgress(callback: () => void) {
@@ -52,6 +53,7 @@ export function LearningContextPanel({
   transfer,
   labels,
   states,
+  knowledgeLabel,
 }: LearningContextPanelProps) {
   const rawProgress = useSyncExternalStore(subscribeProgress, progressSnapshot, serverProgressSnapshot);
   const progress = useMemo(() => parseLearningProgress(rawProgress), [rawProgress]);
@@ -77,7 +79,7 @@ export function LearningContextPanel({
 
         <div className="space-y-7">
           <div>
-            <p className="technical-label">{labels.models}</p>
+            <p className="technical-label">{knowledgeLabel ?? labels.models}</p>
             <ul className="mt-3 grid gap-2 sm:grid-cols-2">
               {modelTitles.map((model) => (
                 <li key={model.id} className="border-t border-[var(--border)] pt-2 text-sm leading-6">
