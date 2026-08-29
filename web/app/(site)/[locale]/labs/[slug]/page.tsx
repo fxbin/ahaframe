@@ -5,7 +5,7 @@ import { MissionPage } from "@/components/mission-page";
 import { StructuredData } from "@/components/structured-data";
 import { getLabContent, localeFromSegment } from "@/lib/content";
 import { pageMetadata } from "@/lib/metadata";
-import { getMissionContent, WAVE_2_LAB_SLUGS } from "@/lib/mission";
+import { CURRENT_WAVE_LAB_SLUGS, getMissionContent } from "@/lib/mission";
 import { hasRuntimeExperience } from "@/lib/runtime-manifest";
 import { productionLabSchemas } from "@/lib/schema";
 
@@ -19,7 +19,7 @@ const LAB_SLUGS = [
   "ai-code-review-mission",
   "research-evidence-mission",
   "data-analysis-verification-lab",
-  ...WAVE_2_LAB_SLUGS,
+  ...CURRENT_WAVE_LAB_SLUGS,
 ] as const;
 
 interface PageProps {

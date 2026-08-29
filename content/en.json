@@ -21,11 +21,15 @@
     "labs/structured-output-contract-lab/",
     "labs/mcp-capability-boundary-mission/",
     "labs/long-running-agent-recovery-mission/",
+    "labs/multi-agent-coordination-incident/",
+    "labs/model-adaptation-decision-lab/",
     "build/reliable-support-agent/",
     "build/write-book-with-ai-build/",
     "build/knowledge-base-build/",
     "build/customer-support-build/",
-    "build/course-knowledge-product-build/"
+    "build/course-knowledge-product-build/",
+    "build/production-release-gate-build/",
+    "build/solo-business-operating-system-build/"
   ],
   "brand": "AhaFrame",
   "ui": {

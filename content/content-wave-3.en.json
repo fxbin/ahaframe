@@ -1,0 +1,154 @@
+{
+  "locale": "en",
+  "missions": {
+    "multi-agent-coordination-incident": {
+      "name": "Multi-Agent Coordination Incident",
+      "seoTitle": "Multi-Agent Coordination Incident — AhaFrame",
+      "description": "Decide when delegation, shared state, independent verification, and parallelism justify multi-agent overhead.",
+      "level": "Advanced",
+      "layer": "Multi-Agent & Orchestration",
+      "minutes": 18,
+      "hero": "Four agents finished faster. They also edited the same files, contradicted each other, and left nobody responsible for accepting the result.",
+      "quick": "Multi-agent design is useful only when decomposition, ownership, shared state, independent verification, and coordination cost beat a simpler baseline.",
+      "transferPrompt": "A task can be done by one strong Agent in 14 minutes or by four Agents in 8 minutes. What evidence would justify the extra coordination surface?",
+      "brief": {
+        "eyebrow": "ORCHESTRATION INCIDENT",
+        "title": "More Agents created more work.",
+        "role": "You own an AI engineering workflow that researches, implements, tests, and reviews production changes.",
+        "body": "A four-agent swarm produced overlapping edits, contradictory assumptions, and five outputs without an acceptance owner. The team proposes adding even more agents to improve coverage.",
+        "objective": "Find the smallest orchestration design that improves coverage and latency while preserving explicit ownership and independent verification.",
+        "stakes": "Coordination complexity can erase the parallelism benefit that justified multi-agent architecture in the first place."
+      },
+      "ui": {"workspace":"Orchestration console","policy":"Coordination design","start":"Inspect incident","run":"Evaluate orchestration","reset":"Reset baseline","evidence":"Evidence","budget":"Change budget","outcome":"Coordination status","attempts":"Attempts","release":"Architecture decision","ship":"SHIP DESIGN","block":"BLOCK","inconclusive":"INCONCLUSIVE","complete":"Complete incident","waiting":"NOT EVALUATED"},
+      "evidenceLabels": {"brief":"Task brief","artifacts":"Coordination artifacts","signals":"System signals"},
+      "controls": {
+        "delegation":{"label":"Delegation topology","intervention":"delegation","options":{"single-agent":"Single strong Agent","manager-worker":"Manager → workers","peer-swarm":"Peer swarm"}},
+        "state":{"label":"Shared state","intervention":"state","options":{"chat-transcript":"Pass chat transcripts","explicit-contract":"Explicit task contracts","shared-blackboard":"Shared blackboard"}},
+        "verification":{"label":"Acceptance evidence","intervention":"verification","options":{"self-review":"Self review","independent-verifier":"Independent verifier","double-independent":"Two independent verifiers"}},
+        "parallelism":{"label":"Execution fan-out","intervention":"parallelism","options":{"sequential":"Sequential","bounded":"Bounded parallelism","maximum":"Maximum parallelism"}}
+      },
+      "metrics": [
+        {"key":"coordinationRiskPercent","label":"Coordination risk","format":"percent"},
+        {"key":"taskCoverageScore","label":"Task coverage","format":"score"},
+        {"key":"independentVerificationScore","label":"Independent verification","format":"score"},
+        {"key":"coordinationOverheadIndex","label":"Coordination overhead","format":"score"},
+        {"key":"latencyMs","label":"Wall-clock latency","format":"ms"}
+      ],
+      "debrief": {"eyebrow":"MENTAL MODEL","title":"Delegation is an optimization, not a default architecture.","rule":"Add an Agent only when independent work and independent evidence are worth the new coordination boundary.","body":"A reliable multi-agent system defines task ownership, state contracts, acceptance evidence, and bounded fan-out. The comparison target is always a simpler baseline, not an imagined world where more agents are free.","points":["Use one Agent when one owner can do the job within the required latency and quality envelope.","Separate generation from verification when acceptance evidence matters.","Bound parallelism before coordination overhead becomes the dominant workload."]},
+      "takeaways":[["More Agents ≠ more reliability","Coordination introduces new failure modes."],["Ownership is state","Every delegated output needs an accountable consumer."],["Parallelism has a price","Wall-clock gains must beat synthesis and review overhead."]],
+      "next":{"title":"Next: release the system","description":"Turn evaluation, observability, rollout, and rollback into an explicit production release gate.","button":"Open Release Gate Build","href":"/build/production-release-gate-build/"}
+    },
+    "production-release-gate-build": {
+      "name": "Production Release Gate Build",
+      "seoTitle": "Production Release Gate Build — AhaFrame",
+      "description": "Build an evidence-backed release gate with explicit vetoes, bounded exposure, observability, and rollback.",
+      "level": "Advanced",
+      "layer": "Production AI Reliability",
+      "minutes": 19,
+      "hero": "The demo is green. The release is not ready.",
+      "quick": "A production AI release should ship only when offline evidence, production observability, rollout exposure, and rollback readiness all satisfy explicit gates.",
+      "transferPrompt": "Your offline eval improves 6%, but canary tool retries rise 40%. Which signal owns the release decision?",
+      "brief": {
+        "eyebrow": "RELEASE BUILD",
+        "title": "Build a gate that can say BLOCK.",
+        "role": "You own a release containing a new model, reranker, and tool policy.",
+        "body": "The change passes demos, but the previous release also passed demos before doubling tool retries in production. The current rollout plan still exposes 100% of users immediately.",
+        "objective": "Define evidence, observability, exposure, and fallback boundaries that make SHIP, BLOCK, and INCONCLUSIVE operational decisions rather than opinions.",
+        "stakes": "A release gate that cannot veto a launch is only a checklist."
+      },
+      "ui": {"workspace":"Release control room","policy":"Production gate","start":"Inspect release","run":"Run release gate","reset":"Reset baseline","evidence":"Evidence","budget":"Change budget","outcome":"Gate status","attempts":"Attempts","release":"Release decision","ship":"SHIP RELEASE","block":"BLOCK","inconclusive":"INCONCLUSIVE","complete":"Complete build","waiting":"NOT EVALUATED"},
+      "evidenceLabels": {"brief":"Release brief","artifacts":"Gate artifacts","signals":"Production signals"},
+      "controls": {
+        "evaluation":{"label":"Offline evidence","intervention":"evaluation","options":{"demo-only":"Demo only","failure-set":"Versioned failure set","gated-regression":"Regression gate + vetoes"}},
+        "rollout":{"label":"Production exposure","intervention":"rollout","options":{"big-bang":"100% big-bang","canary":"Bounded canary","shadow-canary":"Shadow + canary"}},
+        "observability":{"label":"Production evidence","intervention":"observability","options":{"dashboard-only":"Dashboard only","traces-alerts":"Trace-linked alerts","release-slo":"Release SLOs + traces"}},
+        "fallback":{"label":"Fallback plan","intervention":"fallback","options":{"manual-recovery":"Manual recovery","versioned-rollback":"Versioned rollback","automatic-rollback":"Automatic rollback"}}
+      },
+      "metrics": [
+        {"key":"releaseFailureRiskPercent","label":"Release failure risk","format":"percent"},
+        {"key":"evaluationEvidenceScore","label":"Evaluation evidence","format":"score"},
+        {"key":"observabilityCoverageScore","label":"Observability coverage","format":"score"},
+        {"key":"rollbackReadinessScore","label":"Rollback readiness","format":"score"},
+        {"key":"changeExposurePercent","label":"Change exposure","format":"percent"},
+        {"key":"releaseCostIndex","label":"Release gate cost","format":"score"}
+      ],
+      "debrief": {"eyebrow":"PRODUCTION RULE","title":"A gate is defined by its vetoes.","rule":"No aggregate score can compensate for an unresolved release veto.","body":"Offline evals establish pre-release evidence; canaries test the production distribution; traces localize regressions; rollback limits time-to-recovery. A production gate joins all four into one explicit decision boundary.","points":["Version known failures so regressions stay measurable.","Bound exposure before production evidence arrives.","Test rollback across model, prompt, retrieval, and policy configuration—not just model weights."]},
+      "takeaways":[["Demo ≠ evidence","A demo samples success, not failure coverage."],["Canary is a boundary","It limits who pays for unknown production behavior."],["Rollback is part of design","Recovery must exist before the release needs it."]],
+      "next":{"title":"Next: decide whether the model itself should change","description":"Compare prompt/RAG baselines, adapters, quantized PEFT, and full fine-tuning against serving cost.","button":"Open Model Adaptation Lab","href":"/labs/model-adaptation-decision-lab/"}
+    },
+    "model-adaptation-decision-lab": {
+      "name": "Model Adaptation Decision Lab",
+      "seoTitle": "Model Adaptation Decision Lab — AhaFrame",
+      "description": "Choose the least complex model-adaptation strategy that closes a measured task gap with trustworthy data and viable serving economics.",
+      "level": "Advanced",
+      "layer": "Model Engineering",
+      "minutes": 18,
+      "hero": "Fine-tuning is not the next step after prompting. It is a system change that needs a measured reason.",
+      "quick": "Start with a strong prompt/RAG baseline, isolate the residual behavior gap, curate held-out data, then choose the least complex adaptation and serving strategy that closes it.",
+      "transferPrompt": "A stronger retrieval baseline closes 90% of the gap you planned to fine-tune for. Do you still train an adapter?",
+      "brief": {
+        "eyebrow": "MODEL DECISION",
+        "title": "Prove that training is the right intervention.",
+        "role": "You own a domain workflow with a repeatable classification and style gap.",
+        "body": "Prompting and retrieval improve factual grounding, but a persistent behavior gap remains. The team wants full fine-tuning before creating a held-out evaluation set or modeling adapter-serving cost.",
+        "objective": "Measure the non-training baseline, improve data quality, and choose the least complex adaptation that closes the verified task gap.",
+        "stakes": "Training can move failure from prompt logic into data, model lifecycle, and serving infrastructure."
+      },
+      "ui": {"workspace":"Adaptation decision console","policy":"Model adaptation","start":"Inspect task gap","run":"Evaluate adaptation","reset":"Reset baseline","evidence":"Evidence","budget":"Change budget","outcome":"Adaptation status","attempts":"Attempts","release":"Architecture decision","ship":"SHIP ADAPTATION","block":"BLOCK","inconclusive":"INCONCLUSIVE","complete":"Complete lab","waiting":"NOT EVALUATED"},
+      "evidenceLabels": {"brief":"Task brief","artifacts":"Dataset + deployment facts","signals":"Current implementation signals"},
+      "controls": {
+        "baseline":{"label":"Non-training baseline","intervention":"baseline","options":{"no-baseline":"No measured baseline","prompt-rag-benchmark":"Prompt/RAG benchmark","strong-prompt-rag":"Strong prompt/RAG baseline"}},
+        "dataset":{"label":"Training evidence","intervention":"dataset","options":{"raw-logs":"Raw logs","curated-heldout":"Curated + held-out eval","synthetic-curated":"Synthetic + curated + held-out"}},
+        "method":{"label":"Adaptation method","intervention":"method","options":{"prompt-rag-only":"Keep prompt/RAG","lora":"LoRA adapter","qlora":"QLoRA","full-finetune":"Full fine-tune"}},
+        "serving":{"label":"Serving model","intervention":"serving","options":{"dedicated-copy":"Dedicated model copy","adapter-serving":"Adapter-aware serving","multi-adapter-router":"Multi-adapter router"}}
+      },
+      "metrics": [
+        {"key":"residualTaskGapPercent","label":"Residual task gap","format":"percent"},
+        {"key":"adaptationEvidenceScore","label":"Adaptation evidence","format":"score"},
+        {"key":"dataQualityScore","label":"Data quality","format":"score"},
+        {"key":"servingComplexityScore","label":"Serving complexity","format":"score"},
+        {"key":"unitCostIndex","label":"Unit cost index","format":"score"}
+      ],
+      "debrief": {"eyebrow":"MODEL ENGINEERING","title":"Adapt only the failure you can measure.","rule":"The best adaptation is the least complex intervention that closes a held-out task gap under acceptable serving cost.","body":"PEFT methods such as LoRA reduce trainable parameters and adapter storage; quantized PEFT can lower training memory further; adapter-aware serving can reuse a base model across variants. None of those remove the need for a measured baseline, curated data, held-out evaluation, and deployment economics.","points":["Do not train before a strong non-training baseline exists.","Separate training data from held-out proof of improvement.","Treat serving and adapter lifecycle as part of the adaptation decision."]},
+      "takeaways":[["Training is not a reflex","Measure the residual behavior gap first."],["PEFT changes economics","Adapters reduce trainable state, not evaluation requirements."],["Serving decides viability","A good checkpoint can still be a bad production system."]],
+      "next":{"title":"Next: apply bounded automation to a whole business","description":"Use evidence loops, durable workflows, bounded automation, and risk gates to design a one-person AI operating system.","button":"Open Solo Business Build","href":"/build/solo-business-operating-system-build/"}
+    },
+    "solo-business-operating-system-build": {
+      "name": "Solo Business Operating System Build",
+      "seoTitle": "Solo Business Operating System Build — AhaFrame",
+      "description": "Design a one-person AI business around evidence loops, durable workflows, bounded automation, and human review boundaries.",
+      "level": "Advanced",
+      "layer": "AI for Business",
+      "minutes": 19,
+      "hero": "You automated 23 workflows. Now the exceptions and maintenance take longer than the manual work did.",
+      "quick": "AI leverage comes from choosing repeatable, reversible workflows and maintaining exception boundaries—not from automating every business function.",
+      "transferPrompt": "A workflow saves two hours per week but creates forty minutes of exception handling and one high-risk failure per month. Should it stay automated?",
+      "brief": {
+        "eyebrow": "OUTCOME BUILD",
+        "title": "Build leverage without becoming the automation janitor.",
+        "role": "You run a one-person AI software business across product, content, sales, support, and analytics.",
+        "body": "Twenty-three automations exist, but customer evidence is fragmented, fourteen workflows have no explicit owner or recovery path, and weekly exceptions dominate operations.",
+        "objective": "Create a business operating system that improves founder leverage while keeping customer signal, automation risk, support load, and maintenance bounded.",
+        "stakes": "An automation that cannot be maintained or safely escalated is operational debt, not leverage."
+      },
+      "ui": {"workspace":"Solo business control room","policy":"Operating system","start":"Inspect operations","run":"Evaluate operating system","reset":"Reset baseline","evidence":"Evidence","budget":"Change budget","outcome":"Operating status","attempts":"Attempts","release":"Operating decision","ship":"SHIP OPERATING SYSTEM","block":"BLOCK","inconclusive":"INCONCLUSIVE","complete":"Complete build","waiting":"NOT EVALUATED"},
+      "evidenceLabels": {"brief":"Business brief","artifacts":"Workflow inventory","signals":"Operating signals"},
+      "controls": {
+        "research":{"label":"Customer signal","intervention":"research","options":{"intuition-only":"Founder intuition only","evidence-loop":"Recurring evidence loop"}},
+        "workflow":{"label":"Workflow state","intervention":"workflow","options":{"chat-tabs":"Chat tabs + memory","durable-workflow":"Durable workflow state"}},
+        "automation":{"label":"Automation boundary","intervention":"automation","options":{"manual-everything":"Manual everything","bounded-automation":"Bounded automation","auto-everything":"Automate everything"}},
+        "review":{"label":"Human review","intervention":"review","options":{"no-gates":"No explicit gates","risk-gates":"Risk-based review gates","exception-queue":"Central exception queue"}}
+      },
+      "metrics": [
+        {"key":"customerEvidenceScore","label":"Customer evidence","format":"score"},
+        {"key":"automationFailureRiskPercent","label":"Automation failure risk","format":"percent"},
+        {"key":"supportLoadScore","label":"Founder support load","format":"score"},
+        {"key":"maintenanceHoursPerWeek","label":"Maintenance hours / week","format":"default"},
+        {"key":"founderLeverageScore","label":"Founder leverage","format":"score"}
+      ],
+      "debrief": {"eyebrow":"BUSINESS SYSTEM","title":"Automate the workflow, not the responsibility.","rule":"The best solo-business automation is bounded, observable, reversible where possible, and explicit about the human exception boundary.","body":"A one-person AI company still needs customer evidence, durable state, risk classification, exception handling, and maintenance budgets. These are the same engineering Concepts used in production Agents—applied to a business operating model.","points":["Validate customer problems before scaling automation around them.","Automate repeatable reversible work first.","Measure maintenance and exceptions as part of automation ROI."]},
+      "takeaways":[["AI leverage needs evidence","Customer signal should drive what gets automated."],["Automation has lifecycle cost","Maintenance belongs in the ROI equation."],["Human review is selective","Reserve attention for consequential and uncertain work."]],
+      "next":{"title":"Return to the Knowledge Map","description":"See how orchestration, production reliability, model engineering, and business automation connect back to shared Concepts.","button":"Explore Knowledge Map","href":"/learning/"}
+    }
+  }
+}
