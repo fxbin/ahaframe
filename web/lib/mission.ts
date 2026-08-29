@@ -84,6 +84,13 @@ const WAVE_2_SLUGS = new Set([
   "course-knowledge-product-build",
 ]);
 
+const WAVE_3_SLUGS = new Set([
+  "multi-agent-coordination-incident",
+  "production-release-gate-build",
+  "model-adaptation-decision-lab",
+  "solo-business-operating-system-build",
+]);
+
 export const WAVE_2_BUILD_SLUGS = [
   "write-book-with-ai-build",
   "knowledge-base-build",
@@ -97,6 +104,19 @@ export const WAVE_2_LAB_SLUGS = [
   "long-running-agent-recovery-mission",
 ] as const;
 
+export const WAVE_3_BUILD_SLUGS = [
+  "production-release-gate-build",
+  "solo-business-operating-system-build",
+] as const;
+
+export const WAVE_3_LAB_SLUGS = [
+  "multi-agent-coordination-incident",
+  "model-adaptation-decision-lab",
+] as const;
+
+export const OUTCOME_BUILD_SLUGS = [...WAVE_2_BUILD_SLUGS, ...WAVE_3_BUILD_SLUGS] as const;
+export const CURRENT_WAVE_LAB_SLUGS = [...WAVE_2_LAB_SLUGS, ...WAVE_3_LAB_SLUGS] as const;
+
 type MissionSlug = keyof typeof MISSION_DOMAINS;
 
 function isMissionSlug(slug: string): slug is MissionSlug {
@@ -104,14 +124,17 @@ function isMissionSlug(slug: string): slug is MissionSlug {
 }
 
 export function missionDomain(slug: string): string | null {
-  return isMissionSlug(slug) ? MISSION_DOMAINS[slug] : WAVE_2_SLUGS.has(slug) ? "content-wave-2" : null;
+  if (isMissionSlug(slug)) return MISSION_DOMAINS[slug];
+  if (WAVE_2_SLUGS.has(slug)) return "content-wave-2";
+  if (WAVE_3_SLUGS.has(slug)) return "content-wave-3";
+  return null;
 }
 
 export async function getMissionContent(locale: Locale, slug: string): Promise<MissionContent | null> {
   const domain = missionDomain(slug);
   if (!domain) return null;
   const source = await readFile(path.join(CONTENT_ROOT, `${domain}.${locale}.json`), "utf8");
-  if (domain === "content-wave-2") {
+  if (domain === "content-wave-2" || domain === "content-wave-3") {
     const parsed = JSON.parse(source) as { locale: Locale; missions: Record<string, MissionContent> };
     return parsed.missions[slug] ?? null;
   }
