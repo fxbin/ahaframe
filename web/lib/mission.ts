@@ -74,20 +74,47 @@ const MISSION_DOMAINS = {
   "data-analysis-verification-lab": "mission-data-analysis-verification",
 } as const;
 
-export type MissionSlug = keyof typeof MISSION_DOMAINS;
+const WAVE_2_SLUGS = new Set([
+  "structured-output-contract-lab",
+  "mcp-capability-boundary-mission",
+  "long-running-agent-recovery-mission",
+  "write-book-with-ai-build",
+  "knowledge-base-build",
+  "customer-support-build",
+  "course-knowledge-product-build",
+]);
+
+export const WAVE_2_BUILD_SLUGS = [
+  "write-book-with-ai-build",
+  "knowledge-base-build",
+  "customer-support-build",
+  "course-knowledge-product-build",
+] as const;
+
+export const WAVE_2_LAB_SLUGS = [
+  "structured-output-contract-lab",
+  "mcp-capability-boundary-mission",
+  "long-running-agent-recovery-mission",
+] as const;
+
+type MissionSlug = keyof typeof MISSION_DOMAINS;
 
 function isMissionSlug(slug: string): slug is MissionSlug {
   return Object.prototype.hasOwnProperty.call(MISSION_DOMAINS, slug);
 }
 
 export function missionDomain(slug: string): string | null {
-  return isMissionSlug(slug) ? MISSION_DOMAINS[slug] : null;
+  return isMissionSlug(slug) ? MISSION_DOMAINS[slug] : WAVE_2_SLUGS.has(slug) ? "content-wave-2" : null;
 }
 
 export async function getMissionContent(locale: Locale, slug: string): Promise<MissionContent | null> {
   const domain = missionDomain(slug);
   if (!domain) return null;
   const source = await readFile(path.join(CONTENT_ROOT, `${domain}.${locale}.json`), "utf8");
+  if (domain === "content-wave-2") {
+    const parsed = JSON.parse(source) as { locale: Locale; missions: Record<string, MissionContent> };
+    return parsed.missions[slug] ?? null;
+  }
   const parsed = JSON.parse(source) as { locale: Locale; mission: MissionContent };
   return parsed.mission;
 }
