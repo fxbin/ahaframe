@@ -1,0 +1,223 @@
+{
+  "locale": "en",
+  "missions": {
+    "structured-output-contract-lab": {
+      "name": "Structured Output Contract Lab",
+      "seoTitle": "Structured Output Contract Lab — AhaFrame",
+      "description": "Turn model-formatted JSON into a versioned, validated, bounded application contract.",
+      "level": "Intermediate",
+      "layer": "LLM Application Engineering",
+      "minutes": 14,
+      "hero": "The model returned valid-looking JSON. Production still broke because syntax was never the real contract.",
+      "quick": "Structured output becomes reliable only when shape, semantics, repair behavior, and partial-state rules form one machine-verifiable boundary.",
+      "transferPrompt": "A downstream workflow adds a new required invariant. Which part of the contract must change without breaking older consumers?",
+      "brief": {
+        "eyebrow": "CONTRACT FAILURE",
+        "title": "Valid JSON is not a valid business object.",
+        "role": "You own the boundary between an LLM extractor and an order workflow.",
+        "body": "An extraction endpoint parses successfully, but an empty items array violates a downstream invariant. Three blind retries increase latency without making the consumer safer.",
+        "objective": "Design a contract that rejects malformed and semantically invalid output before it crosses the application boundary.",
+        "stakes": "Weak contracts turn probabilistic output into deterministic downstream failures."
+      },
+      "ui": {"workspace":"Contract console","policy":"Output contract","start":"Inspect failure","run":"Evaluate contract","reset":"Reset baseline","evidence":"Evidence","budget":"Change budget","outcome":"Contract status","attempts":"Attempts","release":"Architecture decision","ship":"SHIP CONTRACT","block":"BLOCK","inconclusive":"INCONCLUSIVE","complete":"Complete lab","waiting":"NOT EVALUATED"},
+      "evidenceLabels": {"brief":"Failure brief","artifacts":"Payload + invariant","signals":"Runtime signals"},
+      "controls": {
+        "contract":{"label":"Contract definition","intervention":"contract","options":{"prompt-only":"Prompt-only formatting","json-schema":"JSON Schema","versioned-schema":"Versioned schema"}},
+        "validation":{"label":"Validation boundary","intervention":"validation","options":{"parse-only":"Parse only","schema":"Schema validation","schema-semantic":"Schema + semantic rules"}},
+        "repair":{"label":"Repair strategy","intervention":"repair","options":{"blind-retry":"Blind retry","validation-guided":"Validation-guided repair","bounded-repair":"Bounded repair"}},
+        "streaming":{"label":"Streaming semantics","intervention":"streaming","options":{"raw":"Raw partial JSON","buffered":"Buffer then validate","incremental":"Incremental structured state"}}
+      },
+      "metrics": [
+        {"key":"malformedOutputRiskPercent","label":"Malformed output risk","format":"percent"},
+        {"key":"semanticContractRiskPercent","label":"Semantic contract risk","format":"percent"},
+        {"key":"contractCoverageScore","label":"Contract coverage","format":"score"},
+        {"key":"retryAmplification","label":"Retry amplification","format":"default"},
+        {"key":"latencyMs","label":"Latency","format":"ms"}
+      ],
+      "debrief": {"eyebrow":"MENTAL MODEL","title":"A contract is more than output shape.","rule":"Parseability is evidence of syntax, not evidence of semantic validity.","body":"Reliable structured output combines an explicit schema, domain validation, bounded repair, and clear streaming semantics. The model proposes data; the application owns the contract.","points":["Version contracts instead of silently drifting them.","Validate domain invariants after structural validation.","Bound repair loops so failure cannot amplify indefinitely."]},
+      "takeaways":[["Shape ≠ semantics","JSON Schema cannot express every business invariant."],["Repair is policy","Retries need validation evidence and a stopping rule."],["Streaming is state","Partial output needs explicit consumer semantics."]],
+      "next":{"title":"Next: capability boundaries","description":"Apply the same contract thinking to tools and MCP capabilities.","button":"Open MCP Mission","href":"/labs/mcp-capability-boundary-mission/"}
+    },
+    "mcp-capability-boundary-mission": {
+      "name": "MCP Capability Boundary Mission",
+      "seoTitle": "MCP Capability Boundary Mission — AhaFrame",
+      "description": "Design least-privilege MCP capability exposure against the current protocol model.",
+      "level": "Advanced",
+      "layer": "Tools & MCP",
+      "minutes": 16,
+      "hero": "Your Agent can read an order, refund it, update CRM, and export every customer. One broad identity exposes all of it.",
+      "quick": "MCP capability discovery does not decide application authority; your runtime still owns authorization, least privilege, side-effect approval, and long-work boundaries.",
+      "transferPrompt": "A server adds a new mutating capability tomorrow. Should your Agent inherit it automatically?",
+      "brief": {"eyebrow":"CAPABILITY INCIDENT","title":"Discovery is not permission.","role":"You own the Agent gateway in front of an MCP server.","body":"A customer-support Agent needs a small subset of capabilities, but a shared identity can invoke every exposed mutation. The current protocol is stateless request/response; long-running work belongs behind an explicit extension boundary rather than an implicit session.","objective":"Expose only the capabilities, identity scope, and approval path the workload actually needs.","stakes":"A planning error should not become an unrestricted external side effect."},
+      "ui": {"workspace":"Capability console","policy":"MCP boundary","start":"Inspect capability surface","run":"Evaluate boundary","reset":"Reset baseline","evidence":"Evidence","budget":"Change budget","outcome":"Boundary status","attempts":"Attempts","release":"Architecture decision","ship":"SHIP BOUNDARY","block":"BLOCK","inconclusive":"INCONCLUSIVE","complete":"Complete mission","waiting":"NOT EVALUATED"},
+      "evidenceLabels": {"brief":"Protocol brief","artifacts":"Capability inventory","signals":"Boundary signals"},
+      "controls": {
+        "discovery":{"label":"Capability exposure","intervention":"discovery","options":{"implicit":"Implicit fixed surface","server-discover":"Server discovery + policy filter","gateway-allowlist":"Gateway allowlist"}},
+        "authorization":{"label":"Caller authority","intervention":"authorization","options":{"shared-token":"Shared broad token","scoped-identity":"Scoped identity","least-privilege":"Least privilege identity"}},
+        "sideEffects":{"label":"Consequential actions","intervention":"sideEffects","options":{"direct":"Execute directly","confirm":"Confirm consequential action","dry-run-approval":"Dry run + approval"}},
+        "longWork":{"label":"Long-running work","intervention":"longWork","options":{"blocking-core":"Block core request","tasks-extension":"Tasks extension boundary"}}
+      },
+      "metrics": [
+        {"key":"unauthorizedCapabilityRiskPercent","label":"Unauthorized capability risk","format":"percent"},
+        {"key":"blastRadiusScore","label":"Blast radius","format":"score"},
+        {"key":"auditCoverageScore","label":"Audit coverage","format":"score"},
+        {"key":"capabilityDriftPercent","label":"Capability drift","format":"percent"},
+        {"key":"operatorFrictionScore","label":"Operator friction","format":"score"}
+      ],
+      "debrief": {"eyebrow":"MENTAL MODEL","title":"Capability discovery and authorization are different layers.","rule":"A server can announce a capability; only your application should decide whether this Agent may use it.","body":"Current MCP architecture favors explicit capability discovery and stateless request/response. Secure Agent systems add scoped identity, least privilege, auditable side-effect policy, and an explicit boundary for long-running tasks.","points":["Never treat discovered capability as inherited permission.","Use workload-scoped authority instead of one broad shared identity.","Put consequential side effects behind risk-appropriate controls."]},
+      "takeaways":[["Discover ≠ authorize","Protocol surface is not application policy."],["Least privilege wins","Narrow identity reduces blast radius."],["Long work is explicit","Job lifecycle should not be smuggled into session assumptions."]],
+      "next":{"title":"Next: recovery","description":"Now make an Agent survive process loss, replay, and cancellation.","button":"Open Recovery Mission","href":"/labs/long-running-agent-recovery-mission/"}
+    },
+    "long-running-agent-recovery-mission": {
+      "name": "Long-Running Agent Recovery Mission",
+      "seoTitle": "Long-Running Agent Recovery Mission — AhaFrame",
+      "description": "Design durable state, idempotent replay, verified resume, and bounded cancellation for long-running Agents.",
+      "level": "Advanced",
+      "layer": "Agent Runtime",
+      "minutes": 17,
+      "hero": "The worker died at step 613. Restarting from zero repeats 147 external side effects.",
+      "quick": "Long-running Agents need durable workflow state and replay semantics; process memory and prompt history are not a recovery architecture.",
+      "transferPrompt": "A tool reports success, but your worker crashes before checkpointing it. What evidence can make resume safe?",
+      "brief": {"eyebrow":"RECOVERY INCIDENT","title":"Resume without replaying the world.","role":"You own a 2,000-document Agent workflow.","body":"The process disappears after hundreds of completed actions. No durable checkpoint exists, cancellation is ignored, and external tools are not transactional.","objective":"Recover from worker loss without losing state, duplicating side effects, or letting obsolete jobs run forever.","stakes":"Long-running autonomy without recovery semantics converts routine infrastructure failure into silent data corruption and spend."},
+      "ui": {"workspace":"Recovery console","policy":"Long-running runtime","start":"Replay failure","run":"Test recovery","reset":"Reset baseline","evidence":"Evidence","budget":"Change budget","outcome":"Recovery status","attempts":"Attempts","release":"Architecture decision","ship":"SHIP RECOVERY","block":"BLOCK","inconclusive":"INCONCLUSIVE","complete":"Complete mission","waiting":"NOT EVALUATED"},
+      "evidenceLabels": {"brief":"Job failure","artifacts":"Recovery artifacts","signals":"Runtime guarantees"},
+      "controls": {
+        "persistence":{"label":"Durable state","intervention":"persistence","options":{"memory-only":"Process memory only","checkpoint":"Checkpoint state","durable-events":"Durable events / step state"}},
+        "idempotency":{"label":"Replay boundary","intervention":"idempotency","options":{"none":"No idempotency","operation":"Operation idempotency","step":"Step idempotency"}},
+        "resume":{"label":"Resume strategy","intervention":"resume","options":{"restart":"Restart from zero","checkpoint":"Resume checkpoint","verified-step":"Verified-step resume"}},
+        "cancellation":{"label":"Cancellation","intervention":"cancellation","options":{"ignore":"Ignore cancellation","cooperative":"Cooperative cancellation","bounded":"Bounded cancellation"}}
+      },
+      "metrics": [
+        {"key":"stateLossRiskPercent","label":"State-loss risk","format":"percent"},
+        {"key":"duplicateWorkRiskPercent","label":"Duplicate-work risk","format":"percent"},
+        {"key":"recoveryScore","label":"Recovery quality","format":"score"},
+        {"key":"cancelLatencySeconds","label":"Cancel latency","format":"seconds"},
+        {"key":"costIndex","label":"Cost index","format":"score"}
+      ],
+      "debrief": {"eyebrow":"MENTAL MODEL","title":"Durability is a workflow property, not a model capability.","rule":"Resume is safe only when completed state and side effects can be independently reconstructed or verified.","body":"A production Agent needs durable execution records, idempotent side-effect boundaries, a resume policy, and bounded cancellation. These guarantees live in the runtime around the model.","points":["Persist enough state to reconstruct what actually completed.","Make replay safe at the same granularity you resume.","Cancellation must have a bounded operational meaning."]},
+      "takeaways":[["Memory ≠ durability","Prompt history cannot replace workflow state."],["Replay is a contract","Every resumed step needs a side-effect policy."],["Cancel is a guarantee","Obsolete work must stop predictably."]],
+      "next":{"title":"Apply the method to an outcome","description":"Use the same source, context, verification, and workflow ideas to produce a book-length artifact.","button":"Build a Book Workflow","href":"/build/write-book-with-ai-build/"}
+    },
+    "write-book-with-ai-build": {
+      "name": "Write a Book with AI",
+      "seoTitle": "Write a Book with AI — AhaFrame Build",
+      "description": "Build a source-backed AI writing system for a coherent ten-chapter manuscript.",
+      "level": "Intermediate",
+      "layer": "Create with AI",
+      "minutes": 18,
+      "hero": "Ten fluent chapters are easy. A ten-chapter argument that stays sourced, coherent, and reviewable is the real build.",
+      "quick": "AI-assisted long-form writing is a knowledge workflow: source authority, argument structure, scoped context, claim verification, and editorial review must work together.",
+      "transferPrompt": "One authoritative source changes after six chapters are drafted. Which claims and chapter briefs must be invalidated?",
+      "brief": {"eyebrow":"OUTCOME BUILD","title":"Design the manuscript system, not the magic prompt.","role":"You are producing an evidence-based ten-chapter book.","body":"Individual drafts read well, but terminology drifts, unsupported claims repeat, and only a fraction of claims trace back to sources.","objective":"Build a repeatable research-to-manuscript workflow with traceability and bounded revision cost.","stakes":"Publication quality depends on system-level consistency, not one-shot fluency."},
+      "ui": {"workspace":"Manuscript system","policy":"Book workflow","start":"Inspect draft system","run":"Evaluate manuscript system","reset":"Reset baseline","evidence":"Evidence","budget":"Change budget","outcome":"Build status","attempts":"Attempts","release":"Build decision","ship":"SHIP WORKFLOW","block":"BLOCK","inconclusive":"INCONCLUSIVE","complete":"Complete build","waiting":"NOT EVALUATED"},
+      "evidenceLabels": {"brief":"Publishing goal","artifacts":"Manuscript artifacts","signals":"Workflow signals"},
+      "controls": {
+        "research":{"label":"Research base","intervention":"research","options":{"chat-only":"Chat-only research","source-library":"Source library","authority-library":"Authority-tagged source library"}},
+        "outline":{"label":"Structure","intervention":"outline","options":{"chapter-list":"Chapter list","argument-map":"Argument map"}},
+        "context":{"label":"Chapter context","intervention":"context","options":{"full-manuscript":"Full manuscript context","chapter-briefs":"Scoped chapter briefs"}},
+        "verification":{"label":"Verification","intervention":"verification","options":{"polish-only":"Polish only","claim-check":"Claim + source check"}}
+      },
+      "metrics": [
+        {"key":"unsupportedClaimRiskPercent","label":"Unsupported claim risk","format":"percent"},
+        {"key":"consistencyDriftPercent","label":"Consistency drift","format":"percent"},
+        {"key":"sourceTraceabilityScore","label":"Source traceability","format":"score"},
+        {"key":"editorialConsistencyScore","label":"Editorial consistency","format":"score"},
+        {"key":"revisionHours","label":"Revision hours","format":"integer"}
+      ],
+      "debrief": {"eyebrow":"TRANSFER","title":"Long-form creation is controlled context plus evidence.","rule":"A larger context window does not replace source authority, argument dependencies, or factual verification.","body":"The useful unit is a chapter brief linked to an argument map and a source base. Verification should review claims separately from prose quality, so revisions have clear provenance.","points":["Separate research evidence from generated prose.","Give every chapter a job in the argument, not just a topic.","Invalidate dependent claims when authoritative sources change."]},
+      "takeaways":[["Sources are infrastructure","Research should survive across chapters."],["Context is scoped","Relevant chapter state beats manuscript dumping."],["Verification is separate","Fact checking is not copy editing."]],
+      "next":{"title":"Next: living knowledge","description":"Turn the same source and retrieval principles into a maintained AI knowledge base.","button":"Build a Knowledge Base","href":"/build/knowledge-base-build/"}
+    },
+    "knowledge-base-build": {
+      "name": "Build an AI Knowledge Base",
+      "seoTitle": "Build an AI Knowledge Base — AhaFrame Build",
+      "description": "Design an authority-aware, fresh, evaluated retrieval system instead of a document dump.",
+      "level": "Intermediate",
+      "layer": "Knowledge Systems",
+      "minutes": 18,
+      "hero": "Your corpus contains the right policy—and two stale versions that rank higher.",
+      "quick": "A useful knowledge base is a lifecycle: ingestion, authority, retrieval, freshness, and evaluation must agree over time.",
+      "transferPrompt": "A frequently retrieved document is superseded. How do you prove the old policy stopped influencing answers?",
+      "brief": {"eyebrow":"SYSTEM BUILD","title":"Make knowledge stay correct after launch.","role":"You own 4,800 product, policy, and support documents.","body":"Vector recall looks high, but source conflicts and stale policy copies produce wrong answers. Updates arrive days after the source of truth changes.","objective":"Design a retrieval lifecycle that favors authoritative evidence, refreshes quickly, and is regression-tested.","stakes":"Retrieval that works only in a demo becomes a stale-answer machine in production."},
+      "ui": {"workspace":"Knowledge system","policy":"Retrieval lifecycle","start":"Inspect corpus","run":"Evaluate knowledge system","reset":"Reset baseline","evidence":"Evidence","budget":"Change budget","outcome":"System status","attempts":"Attempts","release":"Build decision","ship":"SHIP SYSTEM","block":"BLOCK","inconclusive":"INCONCLUSIVE","complete":"Complete build","waiting":"NOT EVALUATED"},
+      "evidenceLabels": {"brief":"Corpus brief","artifacts":"Retrieval failures","signals":"Source signals"},
+      "controls": {
+        "ingestion":{"label":"Ingestion policy","intervention":"ingestion","options":{"dump-all":"Dump every document","authority-aware":"Authority-aware ingestion"}},
+        "retrieval":{"label":"Retrieval pipeline","intervention":"retrieval","options":{"vector-only":"Vector only","hybrid":"Hybrid retrieval","hybrid-rerank":"Hybrid + rerank"}},
+        "freshness":{"label":"Freshness","intervention":"freshness","options":{"batch-weekly":"Weekly batch","incremental-sync":"Incremental sync"}},
+        "evaluation":{"label":"Evaluation","intervention":"evaluation","options":{"spot-check":"Spot checks","failure-set":"Versioned failure set"}}
+      },
+      "metrics": [
+        {"key":"staleAnswerRiskPercent","label":"Stale-answer risk","format":"percent"},
+        {"key":"retrievalQualityScore","label":"Retrieval quality","format":"score"},
+        {"key":"authorityAlignmentScore","label":"Authority alignment","format":"score"},
+        {"key":"updateLatencyHours","label":"Update latency (h)","format":"integer"},
+        {"key":"evaluationCoverageScore","label":"Evaluation coverage","format":"score"}
+      ],
+      "debrief": {"eyebrow":"TRANSFER","title":"Knowledge is maintained, not merely embedded.","rule":"Similarity is one retrieval signal; authority, freshness, exact identifiers, and evaluation determine whether evidence is usable.","body":"A production knowledge base needs explicit source ownership, broad candidate recall, ranking policy, a fast update path, and a failure set that catches regressions.","points":["Attach authority and ownership before retrieval starts.","Evaluate the retrieval pipeline with known failure classes.","Treat stale evidence as an operational incident, not a prompt problem."]},
+      "takeaways":[["Corpus ≠ knowledge","A dump lacks authority and lifecycle."],["Recall ≠ correctness","Ranking policy decides what evidence wins."],["Freshness is observable","Updates need measurable latency and regression checks."]],
+      "next":{"title":"Next: support system","description":"Use knowledge, tools, autonomy, and escalation together in a customer-support build.","button":"Build AI Support","href":"/build/customer-support-build/"}
+    },
+    "customer-support-build": {
+      "name": "AI Customer Support Build",
+      "seoTitle": "AI Customer Support Build — AhaFrame",
+      "description": "Design a grounded, least-privilege support Agent with risk-based autonomy and escalation.",
+      "level": "Advanced",
+      "layer": "AI for Business",
+      "minutes": 18,
+      "hero": "A support Agent found an outdated exception policy and issued a real refund.",
+      "quick": "Support automation is not one chatbot: knowledge authority, tool scope, autonomy boundaries, escalation, and auditability must compose into one operating system.",
+      "transferPrompt": "Which support intents can become fully autonomous, and which should always preserve a human approval boundary?",
+      "brief": {"eyebrow":"BUSINESS BUILD","title":"Automate resolution without automating every risk.","role":"You own an 1,800-case-per-day support operation.","body":"The Agent handles policy questions and account mutations with the same broad tool surface. Human escalation is model-decided, and an outdated policy already caused a wrong refund.","objective":"Increase resolution while making consequential actions bounded, grounded, auditable, and escalatable.","stakes":"A conversational mistake is recoverable; an incorrect account mutation may not be."},
+      "ui": {"workspace":"Support operating system","policy":"Support architecture","start":"Inspect support incident","run":"Evaluate support system","reset":"Reset baseline","evidence":"Evidence","budget":"Change budget","outcome":"System status","attempts":"Attempts","release":"Build decision","ship":"SHIP SUPPORT","block":"BLOCK","inconclusive":"INCONCLUSIVE","complete":"Complete build","waiting":"NOT EVALUATED"},
+      "evidenceLabels": {"brief":"Support volume","artifacts":"Tool + policy surface","signals":"Risk signals"},
+      "controls": {
+        "grounding":{"label":"Answer grounding","intervention":"grounding","options":{"chat-memory":"Chat memory","authority-rag":"Authority-aware RAG"}},
+        "tools":{"label":"Tool surface","intervention":"tools","options":{"broad-tools":"Broad mutation tools","scoped-tools":"Intent-scoped tools"}},
+        "autonomy":{"label":"Autonomy boundary","intervention":"autonomy","options":{"auto-all":"Automate everything","approval-by-risk":"Approval by risk"}},
+        "escalation":{"label":"Escalation policy","intervention":"escalation","options":{"model-decides":"Model decides","confidence-policy":"Confidence + intent policy"}}
+      },
+      "metrics": [
+        {"key":"incorrectActionRiskPercent","label":"Incorrect action risk","format":"percent"},
+        {"key":"resolutionScore","label":"Resolution quality","format":"score"},
+        {"key":"escalationLoadScore","label":"Human queue load","format":"score"},
+        {"key":"auditCoverageScore","label":"Audit coverage","format":"score"},
+        {"key":"costIndex","label":"Cost index","format":"score"}
+      ],
+      "debrief": {"eyebrow":"TRANSFER","title":"Autonomy should follow risk, not novelty.","rule":"Ground answers in authority; scope tools by intent; require approval where side effects are consequential or ambiguous.","body":"Strong support systems separate read-only assistance, low-risk automation, consequential mutations, and uncertain exceptions. Escalation is an explicit policy, not the model admitting that it feels unsure.","points":["Use knowledge authority to ground policy decisions.","Expose the smallest tool surface that can complete the current intent.","Measure both automation quality and human queue load."]},
+      "takeaways":[["Answering ≠ acting","Tool access changes the risk class."],["Escalation is policy","Do not outsource the boundary to model self-confidence."],["Audit every mutation","Consequential actions need reconstructable evidence."]],
+      "next":{"title":"Next: knowledge products","description":"Apply AI to curriculum and media production without turning the result into generated filler.","button":"Build a Knowledge Product","href":"/build/course-knowledge-product-build/"}
+    },
+    "course-knowledge-product-build": {
+      "name": "Course / Knowledge Product Build",
+      "seoTitle": "Build a Course with AI — AhaFrame",
+      "description": "Design an AI-assisted course production system with objectives, concept reuse, editorial QA, media QA, and provenance.",
+      "level": "Advanced",
+      "layer": "Create with AI",
+      "minutes": 18,
+      "hero": "Generating 42 lessons quickly is not success if they repeat facts, drift in voice, and teach no transferable capability.",
+      "quick": "AI knowledge-product production needs learning objectives, a reusable concept graph, editorial verification, media QA, and source provenance—not a queue of lesson prompts.",
+      "transferPrompt": "A new lesson re-explains a concept that already exists elsewhere. Should you duplicate the explanation or attach a new practice experience to the canonical concept?",
+      "brief": {"eyebrow":"KNOWLEDGE PRODUCT BUILD","title":"Scale production without scaling filler.","role":"You are producing a bilingual AI engineering course with media assets.","body":"Eighteen fast-generated drafts repeat concepts, prerequisites drift, editorial voice changes, and source provenance is incomplete.","objective":"Build a production system where AI accelerates drafting but learning design and publication quality stay inspectable.","stakes":"Content volume can rise while educational value falls."},
+      "ui": {"workspace":"Knowledge product system","policy":"Content production architecture","start":"Inspect production pipeline","run":"Evaluate product system","reset":"Reset baseline","evidence":"Evidence","budget":"Change budget","outcome":"Product status","attempts":"Attempts","release":"Build decision","ship":"SHIP PRODUCT","block":"BLOCK","inconclusive":"INCONCLUSIVE","complete":"Complete build","waiting":"NOT EVALUATED"},
+      "evidenceLabels": {"brief":"Product goal","artifacts":"Draft inventory","signals":"Quality requirements"},
+      "controls": {
+        "objectives":{"label":"Learning objectives","intervention":"objectives","options":{"topic-list":"Topic list","measurable":"Measurable outcomes"}},
+        "curriculum":{"label":"Curriculum model","intervention":"curriculum","options":{"linear-prompts":"Linear lesson prompts","concept-graph":"Canonical concept graph"}},
+        "editorial":{"label":"Editorial review","intervention":"editorial","options":{"model-polish":"Model polish pass","rubric":"Human-readable review rubric"}},
+        "provenance":{"label":"Media + provenance","intervention":"provenance","options":{"untracked":"Untracked sources","qa-provenance":"QA + provenance gate"}}
+      },
+      "metrics": [
+        {"key":"objectiveCoverageScore","label":"Objective coverage","format":"score"},
+        {"key":"curriculumCoherenceScore","label":"Curriculum coherence","format":"score"},
+        {"key":"editorialDriftPercent","label":"Editorial drift","format":"percent"},
+        {"key":"mediaDefectPercent","label":"Media defects","format":"percent"},
+        {"key":"provenanceCoverageScore","label":"Provenance coverage","format":"score"},
+        {"key":"productionHours","label":"Production hours","format":"integer"}
+      ],
+      "debrief": {"eyebrow":"TRANSFER","title":"AI can scale drafting faster than it scales judgment.","rule":"Reuse canonical knowledge; generate practice around it; verify every artifact against explicit learning and publication criteria.","body":"A scalable knowledge-product pipeline begins with measurable outcomes and concept identity, then uses AI to draft variants, examples, media, and exercises. Editorial and provenance gates decide what is publishable.","points":["A topic list is not a learning objective.","Use one canonical concept across many paths instead of duplicating explanations.","Track provenance and media defects as publication constraints."]},
+      "takeaways":[["Path ≠ content","One concept can serve many outcomes."],["Rubrics preserve judgment","A second model pass is not independent QA."],["Provenance is product data","Publication needs traceable sources and assets."]],
+      "next":{"title":"Return to the Knowledge Map","description":"Connect these Builds back to the concepts and paths they practice.","button":"Explore Knowledge Map","href":"/learning/"}
+    }
+  }
+}
