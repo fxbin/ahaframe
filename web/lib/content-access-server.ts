@@ -9,9 +9,12 @@ const CONTENT_ROOT = (() => {
   return existsSync(fromRepositoryRoot) ? fromRepositoryRoot : path.resolve(process.cwd(), "..", "content");
 })();
 
-interface ProductionExperience {
+export interface ProductionExperience {
   id: string;
+  nodeType: "PLAYGROUND" | "LAB" | "MISSION" | "INCIDENT" | "BUILD";
   status: "EXISTING" | "SEEDED" | "PLANNED";
+  pathIds: string[];
+  conceptIds: string[];
   accessPolicyId: "access-open" | "access-free-choice" | "access-membership";
 }
 
@@ -47,9 +50,13 @@ async function loadManifest(): Promise<ProductionManifest> {
   return manifest;
 }
 
-export async function getPlannedContentAccessClassification(contentId: string): Promise<ContentAccessClassification | null> {
+export async function getProductionExperience(contentId: string): Promise<ProductionExperience | null> {
   const manifest = await loadManifest();
-  const experience = manifest.experiences.find((item) => item.id === contentId);
+  return manifest.experiences.find((item) => item.id === contentId) ?? null;
+}
+
+export async function getPlannedContentAccessClassification(contentId: string): Promise<ContentAccessClassification | null> {
+  const experience = await getProductionExperience(contentId);
   return experience ? CLASSIFICATION_BY_POLICY[experience.accessPolicyId] : null;
 }
 
