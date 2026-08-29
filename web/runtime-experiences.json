@@ -46,6 +46,21 @@
       "runtimeId": "prompt-injection-attack",
       "scripts": ["lab-engine.js", "prompt-injection-attack-scenario.js", "mission-engine.js", "prompt-injection-attack-mission.js"]
     },
+    "ai-code-review-mission": {
+      "kind": "mission",
+      "runtimeId": "ai-code-review-mission",
+      "scripts": ["lab-engine.js", "decision-experience-scenario.js", "content-wave-1-scenarios.js", "mission-engine.js", "content-wave-1-missions.js"]
+    },
+    "research-evidence-mission": {
+      "kind": "mission",
+      "runtimeId": "research-evidence-mission",
+      "scripts": ["lab-engine.js", "decision-experience-scenario.js", "content-wave-1-scenarios.js", "mission-engine.js", "content-wave-1-missions.js"]
+    },
+    "data-analysis-verification-lab": {
+      "kind": "mission",
+      "runtimeId": "data-analysis-verification-lab",
+      "scripts": ["lab-engine.js", "decision-experience-scenario.js", "content-wave-1-scenarios.js", "mission-engine.js", "content-wave-1-missions.js"]
+    },
     "reliable-support-agent": {
       "kind": "mission",
       "runtimeId": "production-support-launch",
