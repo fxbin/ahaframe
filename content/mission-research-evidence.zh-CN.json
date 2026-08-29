@@ -1,0 +1,83 @@
+{
+  "locale": "zh-CN",
+  "mission": {
+    "name": "Research Evidence Mission",
+    "seoTitle": "用 AI 做研究 — 证据验证 Mission | AhaFrame",
+    "description": "通过优化来源组合、交叉验证、Claim-Evidence 映射和时效性检查，把 AI 辅助研究草稿变成可验证的决策备忘录。",
+    "level": "应用 Mission",
+    "layer": "Research × Evidence",
+    "minutes": 16,
+    "hero": "这份研究稿读起来非常可信，但三个关键结论来源薄弱，一个已经过时，而且引用并没有说明哪条证据支持哪句话。先修复证据系统，再让别人据此做决策。",
+    "quick": "AI 研究真正可靠的条件是：关键结论能追溯到可检查证据，能被独立来源挑战，并且经过真实事件时间线的核验。",
+    "brief": {
+      "eyebrow": "MISSION · RESEARCH WITH AI",
+      "title": "表达很自信，也可能是一场证据事故。",
+      "role": "你正在为产品决策准备研究备忘录。",
+      "body": "一套 AI Research Workflow 已经生成了一份关于快速变化 AI 产品的完整报告。文字非常流畅，但几个关键判断只依赖搜索摘要和厂商材料，其中一条还混淆了发布日期与事件发生日期。",
+      "objective": "让这份备忘录可以被独立验证，同时避免把研究无限扩展成没有边界的资料搜集。",
+      "stakes": "过时或缺乏支持的结论，会把产品、预算或战略带向错误方向。"
+    },
+    "ui": {
+      "start": "开始调查",
+      "workspace": "证据工作台",
+      "evidence": "研究证据",
+      "policy": "研究策略",
+      "budget": "研究预算",
+      "run": "评估证据",
+      "reset": "重置研究",
+      "attempts": "研究尝试",
+      "noAttempts": "尚未评估任何证据策略。",
+      "release": "备忘录决策",
+      "ship": "USE MEMO",
+      "block": "BLOCK",
+      "inconclusive": "MORE RESEARCH",
+      "complete": "完成 Mission",
+      "outcome": "证据结果",
+      "waiting": "先检查草稿和来源，再修改证据策略。",
+      "compared": "比较首次 → 最新"
+    },
+    "evidenceLabels": {
+      "brief": "研究简报",
+      "artifacts": "草稿结论",
+      "signals": "来源信号",
+      "policy": "当前证据策略",
+      "audit": "证据诊断"
+    },
+    "controls": {
+      "source-mix": {"label": "来源组合", "options": {"search-snippets": "搜索摘要", "primary-plus-secondary": "一手来源 + 独立二手来源", "primary-first": "一手来源优先"}},
+      "triangulation": {"label": "交叉验证", "options": {"single-source": "单一来源", "two-source": "两个独立来源", "claim-specific": "重点验证高影响结论"}},
+      "claim-matrix": {"label": "Claim 跟踪", "options": {"notes-only": "自由笔记", "claim-evidence": "Claim → Evidence 矩阵", "claim-evidence-counter": "Claim → Evidence + 反证"}},
+      "freshness-check": {"label": "时效检查", "options": {"off": "不做显式检查", "date-filter": "检查发布日期", "event-date": "同时检查发布日期与事件日期"}}
+    },
+    "metrics": [
+      {"key": "unsupportedClaimRiskPercent", "label": "无支持结论风险", "format": "percent"},
+      {"key": "sourceDiversityScore", "label": "来源多样性", "format": "score"},
+      {"key": "verifiabilityScore", "label": "可验证性", "format": "score"},
+      {"key": "staleEvidenceRiskPercent", "label": "过时证据风险", "format": "percent"},
+      {"key": "researchMinutes", "label": "研究时间", "format": "integer"}
+    ],
+    "debrief": {
+      "eyebrow": "RESEARCH DEBRIEF",
+      "title": "最终输出不是研究本身，证据路径才是。",
+      "rule": "只有关键结论能够被追溯、挑战和更新，研究综合才真正有价值。",
+      "body": "AI 可以加速发现、提取、比较与写作，同时也让‘无证据的流畅综合’变得极其廉价。更持久的 Research Workflow 应该先拆问题，再有意识地选择来源权威，建立 Claim-Evidence 映射，对高影响结论进行独立挑战，区分页面发布日期与事件日期，最后才进行综合。",
+      "points": [
+        "搜索结果适合发现资料，不适合作为最终证据。",
+        "优先交叉验证那些会改变决策的结论，而不是平均验证每一句话。",
+        "在写结论之前先记录反证。",
+        "时效检查需要关注事件日期，而不只是页面时间戳。"
+      ]
+    },
+    "takeaways": [
+      ["Claim → Evidence", "一份研究备忘录应该明确暴露每个决策相关结论由什么证据支持。"],
+      ["权威与独立是两件事", "一手来源说明相关方怎么说，独立来源帮助验证它是否成立。"],
+      ["研究应该可更新", "结构化证据矩阵可以让新事实被局部吸收，而不必从头重写。"]
+    ],
+    "next": {
+      "title": "下一步：Data Analysis Verification Lab",
+      "description": "接下来验证一个数值结论：提取、计算和解释可能彼此独立地出错。",
+      "button": "进入数据分析 Lab",
+      "href": "/zh-cn/labs/data-analysis-verification-lab/"
+    }
+  }
+}
