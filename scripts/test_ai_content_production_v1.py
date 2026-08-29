@@ -33,7 +33,11 @@ def main():
     require(manifest["version"] == "1.0.0", "content production manifest version drifted")
     require(manifest["principles"]["knowledgeMapOpen"] is True, "Knowledge Map must remain open")
     require(manifest["principles"]["reuseCanonicalConcepts"] is True, "content production must reuse canonical concepts")
-    require(manifest["principles"]["billingActivation"] is False, "#146 must not activate Billing")
+    require(manifest["principles"]["billingActivation"] is False, "#146/#149 must not activate Billing")
+    require(
+        manifest["principles"]["freeChoiceActivation"] is False,
+        "#149 foundation must remain dormant until Content Readiness explicitly activates free-choice claiming",
+    )
     require("freeLimit" not in json.dumps(manifest), "free-choice quota belongs to entitlement, not content-production data")
 
     experiences = manifest["experiences"]
@@ -74,7 +78,7 @@ def main():
     print(
         "PASS AI content production v1: "
         f"{len(experiences)} experiences across {len(waves)} waves cover all {len(path_ids)} paths; "
-        f"access={access_counts}; Billing remains disabled."
+        f"access={access_counts}; Billing and free-choice claiming remain disabled."
     )
 
 
