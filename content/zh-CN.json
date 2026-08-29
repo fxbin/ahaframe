@@ -18,31 +18,20 @@
     "labs/ai-code-review-mission/",
     "labs/research-evidence-mission/",
     "labs/data-analysis-verification-lab/",
-    "build/reliable-support-agent/"
+    "labs/structured-output-contract-lab/",
+    "labs/mcp-capability-boundary-mission/",
+    "labs/long-running-agent-recovery-mission/",
+    "build/reliable-support-agent/",
+    "build/write-book-with-ai-build/",
+    "build/knowledge-base-build/",
+    "build/customer-support-build/",
+    "build/course-knowledge-product-build/"
   ],
   "brand": "AhaFrame",
   "ui": {
-    "nav": {
-      "lessons": "Campaign",
-      "roadmap": "知识地图",
-      "pricing": "定价",
-      "about": "关于",
-      "early_access": "加入内测",
-      "menu": "菜单"
-    },
-    "footer": {
-      "tagline": "面向 AI 工程的交互式可视化学习。",
-      "sitemap": "站点地图",
-      "about": "关于",
-      "early_access": "内测"
-    },
-    "language": {
-      "en": "English",
-      "zh-CN": "简体中文"
-    }
+    "nav": {"lessons":"Campaign","roadmap":"知识地图","pricing":"定价","about":"关于","early_access":"加入内测","menu":"菜单"},
+    "footer": {"tagline":"面向 AI 工程的交互式可视化学习。","sitemap":"站点地图","about":"关于","early_access":"内测"},
+    "language": {"en":"English","zh-CN":"简体中文"}
   },
-  "meta": {
-    "status": "m4-learning-surface-ready",
-    "note": "Every current English Validation Alpha learning route now has a zh-CN equivalent backed by the shared Engine/scenario implementation."
-  }
+  "meta": {"status":"m4-learning-surface-ready","note":"Every current English Validation Alpha learning route now has a zh-CN equivalent backed by the shared Engine/scenario implementation."}
 }
