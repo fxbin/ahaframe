@@ -29,12 +29,6 @@ function findRoute(routes: string[], contentId: string): string | null {
 
 export async function getCourseCatalog(locale: Locale): Promise<CourseCatalogItem[]> {
   const [knowledgeMap, localeSource] = await Promise.all([getKnowledgeMap(locale), getLocaleSource(locale)]);
-  const candidateContentIds = new Set<string>();
-  for (const path of knowledgeMap.paths) {
-    for (const milestone of path.milestones) {
-      for (const contentId of milestone.contentNodeIds) candidateContentIds.add(contentId);
-    }
-  }
 
   // Production Experiences are the authoritative shipped practice layer. The
   // canonical graph still owns course/path identity; this read model only joins
