@@ -4,6 +4,7 @@ import { ThirdPartyAnalytics } from "@/components/third-party-analytics";
 import { ValidationBootstrap } from "@/components/validation-bootstrap";
 import { indexingMetadata } from "@/lib/indexing";
 import "../globals.css";
+import "../editorial-learning.css";
 
 export const metadata: Metadata = {
   robots: indexingMetadata(),

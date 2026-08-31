@@ -12,6 +12,7 @@ import { indexingMetadata } from "@/lib/indexing";
 import { getLearningGraph } from "@/lib/learning-graph-server";
 import { organizationSchema } from "@/lib/schema";
 import "../../globals.css";
+import "../../editorial-learning.css";
 
 export const metadata: Metadata = {
   title: {

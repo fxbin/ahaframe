@@ -3,6 +3,22 @@
   "routePrefix": "zh-cn",
   "availableRoutes": [
     "",
+    "courses/",
+    "courses/ai-foundations/",
+    "courses/vibe-coding/",
+    "courses/llm-application-engineering/",
+    "courses/rag-knowledge-systems/",
+    "courses/agent-engineering/",
+    "courses/multi-agent-orchestration/",
+    "courses/production-ai-reliability/",
+    "courses/model-engineering/",
+    "courses/write-a-book-with-ai/",
+    "courses/build-ai-knowledge-base/",
+    "courses/research-with-ai/",
+    "courses/data-analysis-with-ai/",
+    "courses/course-knowledge-product-with-ai/",
+    "courses/solo-business-with-ai/",
+    "courses/ai-customer-support/",
     "learning/",
     "pricing/",
     "early-access/",
@@ -33,9 +49,9 @@
   ],
   "brand": "AhaFrame",
   "ui": {
-    "nav": {"lessons":"Campaign","roadmap":"知识地图","pricing":"定价","about":"关于","early_access":"加入内测","menu":"菜单"},
-    "footer": {"tagline":"面向 AI 工程的交互式可视化学习。","sitemap":"站点地图","about":"关于","early_access":"内测"},
+    "nav": {"lessons":"课程","roadmap":"知识地图","pricing":"定价","about":"关于","early_access":"加入内测","menu":"菜单"},
+    "footer": {"tagline":"清晰的 AI 课程，加上真正需要你做判断的互动练习。","sitemap":"站点地图","about":"关于","early_access":"内测"},
     "language": {"en":"English","zh-CN":"简体中文"}
   },
-  "meta": {"status":"m4-learning-surface-ready","note":"Every current English Validation Alpha learning route now has a zh-CN equivalent backed by the shared Engine/scenario implementation."}
+  "meta": {"status":"learning-ux-v1","note":"Courses are now the primary learner-facing entry while the Knowledge Map remains available for advanced exploration."}
 }

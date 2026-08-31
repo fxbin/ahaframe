@@ -7,28 +7,33 @@ const VIEWPORTS = [
 ] as const;
 
 for (const locale of ["en", "zh-cn"] as const) {
-  test(`${locale} homepage keeps editorial hierarchy without responsive overflow`, async ({ page }) => {
+  test(`${locale} homepage keeps the simplified editorial hierarchy without responsive overflow`, async ({ page }) => {
     for (const viewport of VIEWPORTS) {
       await page.setViewportSize(viewport);
       await page.goto(`/${locale}/`);
 
       await expect(page.locator("h1")).toHaveCount(1);
       await expect(page.locator("h1")).toBeVisible();
+      await expect(page.locator(".editorial-hero .editorial-primary-action")).toHaveCount(1);
       await expect(page.locator("#first-aha-title")).toBeVisible();
-      await expect(page.locator("#campaign")).toBeVisible();
-      await expect(page.locator("#roadmap")).toBeVisible();
+      await expect(page.locator("#campaign")).toHaveCount(0);
+      await expect(page.locator("#roadmap")).toHaveCount(0);
 
-      const layout = await page.evaluate(() => ({
-        scrollWidth: document.documentElement.scrollWidth,
-        clientWidth: document.documentElement.clientWidth,
-        heroTop: document.querySelector(".hero-section")?.getBoundingClientRect().top ?? -1,
-        campaignTop: document.querySelector("#campaign")?.getBoundingClientRect().top ?? -1,
-        roadmapTop: document.querySelector("#roadmap")?.getBoundingClientRect().top ?? -1,
-      }));
+      const layout = await page.evaluate(() => {
+        const hero = document.querySelector(".editorial-hero")?.getBoundingClientRect();
+        const firstAha = document.querySelector("#first-aha-title")?.getBoundingClientRect();
+        return {
+          scrollWidth: document.documentElement.scrollWidth,
+          clientWidth: document.documentElement.clientWidth,
+          heroTop: hero?.top ?? -1,
+          heroBottom: hero?.bottom ?? -1,
+          firstAhaTop: firstAha?.top ?? -1,
+        };
+      });
 
       expect(layout.scrollWidth, `${locale}/${viewport.name} introduced horizontal overflow`).toBeLessThanOrEqual(layout.clientWidth + 1);
-      expect(layout.heroTop).toBeLessThan(layout.campaignTop);
-      expect(layout.campaignTop).toBeLessThan(layout.roadmapTop);
+      expect(layout.heroTop).toBeGreaterThanOrEqual(0);
+      expect(layout.firstAhaTop).toBeGreaterThan(layout.heroBottom);
     }
   });
 }
@@ -69,17 +74,28 @@ test("bilingual homepage metadata preserves canonical and hreflang contract", as
   }
 });
 
-test("homepage keeps the First-Aha lightweight and avoids fabricated trust or mastery claims", async ({ page }) => {
+test("homepage keeps First-Aha below the fold and avoids fabricated trust or mastery claims", async ({ page }) => {
   await page.goto("/en/");
 
-  const hero = page.locator(".hero-section");
+  const hero = page.locator(".editorial-hero");
   await expect(hero.locator("img, video, iframe")).toHaveCount(0);
-  await expect(hero.getByText("The refund succeeded. Your agent just never knew.", { exact: true })).toBeVisible();
+  await expect(hero.locator(".editorial-primary-action")).toHaveCount(1);
+  await expect(hero.getByRole("link", { name: /Start Learning/i })).toHaveAttribute("href", "/en/courses/");
+
+  const firstAha = page.locator("#first-aha-title");
+  await expect(firstAha).toBeVisible();
+  await expect(page.getByText("The refund succeeded. Your agent just never knew.", { exact: true })).toBeVisible();
+  await expect(page.getByRole("link", { name: /Explore the Knowledge Map/i })).toHaveAttribute("href", "/en/learning/");
+
+  const verticalOrder = await page.evaluate(() => ({
+    heroBottom: document.querySelector(".editorial-hero")?.getBoundingClientRect().bottom ?? -1,
+    firstAhaTop: document.querySelector("#first-aha-title")?.getBoundingClientRect().top ?? -1,
+  }));
+  expect(verticalOrder.firstAhaTop).toBeGreaterThan(verticalOrder.heroBottom);
 
   const bodyText = await page.locator("body").innerText();
   expect(bodyText).not.toMatch(/10,000\+ users|trusted by \d+|★★★★★|mastered|completed course/i);
 
-  await expect(page.locator('[data-event="first_aha_incident_viewed"]')).toHaveCount(1);
-  await expect(page.locator('[data-event="first_aha_intervention_selected"]')).toHaveCount(3);
-  await expect(page.locator('[data-event="first_aha_cta_clicked"]')).toHaveCount(2);
+  // Interaction behavior is covered by homepage-first-aha.spec.ts and the keyboard test above.
+  // Analytics events are implementation signals, not DOM structure contracts.
 });
