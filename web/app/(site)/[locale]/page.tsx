@@ -3,8 +3,9 @@ import { notFound } from "next/navigation";
 import { CampaignHomePage } from "@/components/campaign-home-page";
 import { StructuredData } from "@/components/structured-data";
 import { getCampaignContract, getCampaignDiscovery } from "@/lib/campaign";
+import { getCourseCatalog } from "@/lib/course-catalog-server";
 import { localeFromSegment } from "@/lib/content";
-import { getLearningGraph } from "@/lib/learning-graph-server";
+import { getKnowledgeMap } from "@/lib/knowledge-map-server";
 import { pageMetadata } from "@/lib/metadata";
 import { campaignSchemas } from "@/lib/schema";
 
@@ -16,23 +17,27 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { locale: segment } = await params;
   const locale = localeFromSegment(segment);
   if (!locale) return {};
-  const content = await getCampaignDiscovery(locale);
-  return pageMetadata(locale, content.meta.title, content.meta.description);
+  const title = locale === "zh-CN" ? "AhaFrame — 看见 AI 如何工作" : "AhaFrame — Understand AI by seeing it work";
+  const description = locale === "zh-CN"
+    ? "通过清晰课程与真实互动练习理解、构建并使用 AI。"
+    : "Clear courses and real interactive practice for understanding, building, and using AI.";
+  return pageMetadata(locale, title, description);
 }
 
 export default async function LocaleHomePage({ params }: PageProps) {
   const { locale: segment } = await params;
   const locale = localeFromSegment(segment);
   if (!locale) notFound();
-  const [content, contract, learningGraph] = await Promise.all([
+  const [content, contract, knowledgeMap, catalog] = await Promise.all([
     getCampaignDiscovery(locale),
     getCampaignContract(),
-    getLearningGraph(locale),
+    getKnowledgeMap(locale),
+    getCourseCatalog(locale),
   ]);
   return (
     <>
       <StructuredData value={campaignSchemas(locale, content, contract)} />
-      <CampaignHomePage locale={locale} content={content} contract={contract} learningStages={learningGraph.stages} />
+      <CampaignHomePage locale={locale} content={content} knowledgeMap={knowledgeMap} catalog={catalog} />
     </>
   );
 }
