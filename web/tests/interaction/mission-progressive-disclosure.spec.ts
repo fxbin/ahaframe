@@ -35,8 +35,9 @@ test("Mission reveals evidence, review and release controls only when each phase
   await expect(workspace).toHaveAttribute("data-mission-phase", "DECIDE");
   await expect(workspace.locator('[data-mission-section="evidence"]')).toHaveCount(0);
   await expect(workspace.locator('[data-mission-section="interventions"]')).toHaveCount(0);
-  await expect(workspace.locator('[data-mission-section="release"]')).toBeVisible();
-  await expect(workspace.getByRole("button", { name: "SHIP", exact: true })).toBeVisible();
+  const release = workspace.locator('[data-mission-section="release"]');
+  await expect(release).toBeVisible();
+  await expect(release.getByRole("button")).toHaveCount(3);
 
   await workspace.getByRole("button", { name: /Reset/i }).click();
   await expect(workspace).toHaveAttribute("data-mission-phase", "BRIEF");
