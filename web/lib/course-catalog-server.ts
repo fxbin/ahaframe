@@ -9,7 +9,7 @@ const FEATURED_PATH_SLUGS = [
   "agent-engineering",
   "vibe-coding",
   "rag-knowledge-systems",
-  "write-book-ai",
+  "write-a-book-with-ai",
 ] as const;
 
 const PRODUCTION_IDS = [
