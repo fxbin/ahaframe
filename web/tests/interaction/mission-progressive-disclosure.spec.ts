@@ -1,7 +1,5 @@
 import { expect, test } from "@playwright/test";
 
-const section = (workspace: ReturnType<Parameters<typeof test>[1]> extends never ? never : never) => workspace;
-
 test("Mission reveals evidence, review and release controls only when each phase needs them", async ({ page }) => {
   await page.goto("/en/labs/mcp-capability-boundary-mission/");
 
