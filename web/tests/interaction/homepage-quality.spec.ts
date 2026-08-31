@@ -96,7 +96,6 @@ test("homepage keeps First-Aha below the fold and avoids fabricated trust or mas
   const bodyText = await page.locator("body").innerText();
   expect(bodyText).not.toMatch(/10,000\+ users|trusted by \d+|★★★★★|mastered|completed course/i);
 
-  await expect(page.locator('[data-event="first_aha_incident_viewed"]')).toHaveCount(1);
-  await expect(page.locator('[data-event="first_aha_intervention_selected"]')).toHaveCount(3);
-  await expect(page.locator('[data-event="first_aha_cta_clicked"]')).toHaveCount(2);
+  // Interaction behavior is covered by homepage-first-aha.spec.ts and the keyboard test above.
+  // Analytics events are implementation signals, not DOM structure contracts.
 });
