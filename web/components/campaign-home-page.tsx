@@ -82,8 +82,12 @@ export function CampaignHomePage({ locale, content, knowledgeMap, catalog }: Cam
     { title: labels.understand, copy: labels.understandCopy, symbol: "◯" },
     { title: labels.build, copy: labels.buildCopy, symbol: "◇" },
     { title: labels.use, copy: labels.useCopy, symbol: "□" },
-  ];
-  const domainCards = knowledgeMap.domains.slice(0, 3).map((domain, index) => ({ domain, ...domainCopy[index] }));
+  ] as const;
+  const domainCards = knowledgeMap.domains.slice(0, 3).map((domain, index) => {
+    const copy = domainCopy[index];
+    if (!copy) throw new Error(`Missing homepage copy for Knowledge Map domain ${domain.id}.`);
+    return { domain, ...copy };
+  });
 
   return (
     <main className="editorial-home">
