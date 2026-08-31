@@ -8,6 +8,7 @@ const CONTENT_ROOT = path.join(REPO_ROOT, "content");
 
 const REQUIRED_CORE_ROUTES = [
   "",
+  "courses/",
   "learning/",
   "pricing/",
   "early-access/",
@@ -26,6 +27,8 @@ const REQUIRED_CORE_ROUTES = [
 const REQUIRED_APP_FILES = [
   "app/(root)/page.tsx",
   "app/(site)/[locale]/page.tsx",
+  "app/(site)/[locale]/courses/page.tsx",
+  "app/(site)/[locale]/courses/[slug]/page.tsx",
   "app/(site)/[locale]/learning/page.tsx",
   "app/(site)/[locale]/pricing/page.tsx",
   "app/(site)/[locale]/early-access/page.tsx",
@@ -58,6 +61,8 @@ function assertRouteManifest(routes, locale) {
   for (const required of REQUIRED_CORE_ROUTES) {
     if (!routes.includes(required)) throw new Error(`${locale} lost required existing route ${required}.`);
   }
+  const courseRoutes = routes.filter((route) => route.startsWith("courses/") && route !== "courses/");
+  if (courseRoutes.length !== 15) throw new Error(`${locale} must publish exactly 15 canonical course detail routes; got ${courseRoutes.length}.`);
 }
 
 const contract = JSON.parse(await readFile(path.join(CONTENT_ROOT, "lab-reconciliation-v0.8.json"), "utf8"));
@@ -88,4 +93,4 @@ if (JSON.stringify(enRoutes) !== JSON.stringify(zhRoutes)) {
 
 for (const relativePath of REQUIRED_APP_FILES) await access(path.join(WEB_ROOT, relativePath));
 
-console.log(`Next.js public-route parity contract OK (${enRoutes.length} routes × 2 locales; stable routes preserved and locale manifests are exact peers).`);
+console.log(`Next.js public-route parity contract OK (${enRoutes.length} routes × 2 locales; Courses are primary, Knowledge Map remains available, stable routes preserved).`);
