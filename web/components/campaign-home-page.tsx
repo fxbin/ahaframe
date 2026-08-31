@@ -14,7 +14,7 @@ interface CampaignHomePageProps {
 
 function BotanicalBranch() {
   return (
-    <svg className="botanical-branch" viewBox="0 0 320 220" role="img" aria-label="">
+    <svg className="botanical-branch" viewBox="0 0 320 220" aria-hidden="true">
       <path d="M210 206C211 168 205 137 191 112C177 87 162 68 145 48" />
       <path d="M190 111C214 96 232 75 245 48" />
       <path d="M176 86C154 80 134 67 118 48" />
@@ -78,11 +78,12 @@ export function CampaignHomePage({ locale, content, knowledgeMap, catalog }: Cam
         map: "Explore the Knowledge Map",
       };
 
-  const domainCards = [
-    { domain: knowledgeMap.domains[0], title: labels.understand, copy: labels.understandCopy, symbol: "◯" },
-    { domain: knowledgeMap.domains[1], title: labels.build, copy: labels.buildCopy, symbol: "◇" },
-    { domain: knowledgeMap.domains[2], title: labels.use, copy: labels.useCopy, symbol: "□" },
-  ].filter((item) => Boolean(item.domain));
+  const domainCopy = [
+    { title: labels.understand, copy: labels.understandCopy, symbol: "◯" },
+    { title: labels.build, copy: labels.buildCopy, symbol: "◇" },
+    { title: labels.use, copy: labels.useCopy, symbol: "□" },
+  ];
+  const domainCards = knowledgeMap.domains.slice(0, 3).map((domain, index) => ({ domain, ...domainCopy[index] }));
 
   return (
     <main className="editorial-home">
