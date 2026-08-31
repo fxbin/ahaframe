@@ -1,10 +1,11 @@
-import { access, readFile } from "node:fs/promises";
+import { access, readFile, readdir } from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
 
 const WEB_ROOT = process.cwd();
 const REPO_ROOT = path.resolve(WEB_ROOT, "..");
 const CONTENT_ROOT = path.join(REPO_ROOT, "content");
+const INVENTORY_ROOT = path.join(CONTENT_ROOT, "ai-knowledge-inventory-v1.0");
 
 const REQUIRED_CORE_ROUTES = [
   "",
@@ -46,6 +47,15 @@ const FLAGSHIP_MISSIONS = [
   "mission-final-boss",
 ];
 
+const pathFiles = (await readdir(INVENTORY_ROOT)).filter((filename) => filename.startsWith("paths-") && filename.endsWith(".json")).sort();
+const canonicalCourseRoutes = [];
+for (const filename of pathFiles) {
+  const fragment = JSON.parse(await readFile(path.join(INVENTORY_ROOT, filename), "utf8"));
+  for (const learningPath of fragment.paths ?? []) canonicalCourseRoutes.push(`courses/${learningPath.slug}/`);
+}
+canonicalCourseRoutes.sort();
+if (canonicalCourseRoutes.length !== 15) throw new Error(`Knowledge Graph must expose 15 canonical Learning Paths; got ${canonicalCourseRoutes.length}.`);
+
 function assertRouteManifest(routes, locale) {
   if (!Array.isArray(routes) || routes.some((route) => typeof route !== "string")) {
     throw new Error(`${locale} availableRoutes must be a string array.`);
@@ -61,8 +71,10 @@ function assertRouteManifest(routes, locale) {
   for (const required of REQUIRED_CORE_ROUTES) {
     if (!routes.includes(required)) throw new Error(`${locale} lost required existing route ${required}.`);
   }
-  const courseRoutes = routes.filter((route) => route.startsWith("courses/") && route !== "courses/");
-  if (courseRoutes.length !== 15) throw new Error(`${locale} must publish exactly 15 canonical course detail routes; got ${courseRoutes.length}.`);
+  const courseRoutes = routes.filter((route) => route.startsWith("courses/") && route !== "courses/").sort();
+  if (JSON.stringify(courseRoutes) !== JSON.stringify(canonicalCourseRoutes)) {
+    throw new Error(`${locale} Course routes must exactly mirror canonical Knowledge Graph Path slugs.\nExpected: ${canonicalCourseRoutes.join(", ")}\nActual: ${courseRoutes.join(", ")}`);
+  }
 }
 
 const contract = JSON.parse(await readFile(path.join(CONTENT_ROOT, "lab-reconciliation-v0.8.json"), "utf8"));
@@ -93,4 +105,4 @@ if (JSON.stringify(enRoutes) !== JSON.stringify(zhRoutes)) {
 
 for (const relativePath of REQUIRED_APP_FILES) await access(path.join(WEB_ROOT, relativePath));
 
-console.log(`Next.js public-route parity contract OK (${enRoutes.length} routes × 2 locales; Courses are primary, Knowledge Map remains available, stable routes preserved).`);
+console.log(`Next.js public-route parity contract OK (${enRoutes.length} routes × 2 locales; 15 Course routes mirror canonical Path slugs; Knowledge Map and stable routes preserved).`);
