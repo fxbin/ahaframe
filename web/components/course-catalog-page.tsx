@@ -16,7 +16,6 @@ export function CourseCatalogPage({ locale, knowledgeMap, catalog }: CourseCatal
         kicker: "课程",
         title: "选一个目标，然后沿着清晰路径学习。",
         copy: "不用先理解整张知识地图。选择你现在最想解决的问题，按课程顺序学习，在关键节点进入真实 Practice。",
-        courses: "全部课程",
         sections: "个章节",
         practices: "个互动练习",
         open: "查看课程",
@@ -26,7 +25,6 @@ export function CourseCatalogPage({ locale, knowledgeMap, catalog }: CourseCatal
         kicker: "Courses",
         title: "Choose a goal. Follow a clear path.",
         copy: "You do not need to understand the whole knowledge map first. Pick what you want to accomplish, learn in order, and enter real practice when it matters.",
-        courses: "All courses",
         sections: "sections",
         practices: "interactive practices",
         open: "View course",
@@ -46,7 +44,7 @@ export function CourseCatalogPage({ locale, knowledgeMap, catalog }: CourseCatal
       <section className="py-14 sm:py-20">
         <div className="shell">
           {knowledgeMap.domains.map((domain) => {
-            const courses = catalog.filter((item) => item.path.domainIds.includes(domain.id));
+            const courses = catalog.filter((item) => item.path.domainIds[0] === domain.id);
             if (!courses.length) return null;
             return (
               <section key={domain.id} id={domain.slug} className="course-domain-section border-t border-[var(--border)] py-10 sm:py-14">
