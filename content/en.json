@@ -3,6 +3,22 @@
   "routePrefix": "en",
   "availableRoutes": [
     "",
+    "courses/",
+    "courses/ai-foundations/",
+    "courses/vibe-coding/",
+    "courses/llm-application-engineering/",
+    "courses/rag-knowledge-systems/",
+    "courses/agent-engineering/",
+    "courses/multi-agent-orchestration/",
+    "courses/production-ai-reliability/",
+    "courses/model-engineering/",
+    "courses/write-book-ai/",
+    "courses/build-knowledge-base/",
+    "courses/research-with-ai/",
+    "courses/data-analysis-ai/",
+    "courses/course-knowledge-product/",
+    "courses/solo-business-ai/",
+    "courses/ai-customer-support/",
     "learning/",
     "pricing/",
     "early-access/",
@@ -34,7 +50,7 @@
   "brand": "AhaFrame",
   "ui": {
     "nav": {
-      "lessons": "Campaign",
+      "lessons": "Courses",
       "roadmap": "Knowledge Map",
       "pricing": "Pricing",
       "about": "About",
@@ -42,7 +58,7 @@
       "menu": "Menu"
     },
     "footer": {
-      "tagline": "Interactive visual learning for AI engineering.",
+      "tagline": "Clear AI courses with real interactive practice.",
       "sitemap": "Sitemap",
       "about": "About",
       "early_access": "Early Access"
@@ -60,5 +76,5 @@
     "context-window": {"name":"Context Window Lab","category":"Context Engineering","level":"Beginner","minutes":8,"description":"Visualize how an LLM context window fills up and compare summarization, RAG, memory, and truncation strategies.","quick":"A context window is the model's finite working input budget; system instructions, conversation history, documents, and tool results all compete for that space."},
     "agent-loop": {"name":"Agent Loop Simulator","category":"Agents","level":"Intermediate","minutes":9,"description":"Step through an AI agent loop: understand the task, choose an action, call a tool, observe the result, recover from errors, and answer.","quick":"An AI agent repeatedly decides what to do next, acts through tools, observes the result, and uses that observation to decide whether to continue, retry, or answer."}
   },
-  "meta": {"updated":"2026-08-13"}
+  "meta": {"updated":"2026-08-31"}
 }
