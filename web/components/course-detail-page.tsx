@@ -12,6 +12,7 @@ export function CourseDetailPage({ locale, course }: CourseDetailPageProps) {
   const labels = locale === "zh-CN"
     ? {
         back: "返回全部课程",
+        kicker: "学习路径",
         outcome: "学习目标",
         deliverable: "最终产出",
         structure: "课程结构",
@@ -23,6 +24,7 @@ export function CourseDetailPage({ locale, course }: CourseDetailPageProps) {
       }
     : {
         back: "Back to all courses",
+        kicker: "Learning Path",
         outcome: "Learning goal",
         deliverable: "What you will build",
         structure: "Course structure",
@@ -40,7 +42,7 @@ export function CourseDetailPage({ locale, course }: CourseDetailPageProps) {
           <Link className="quiet-link text-sm" href={`/${segment}/courses/`}>← {labels.back}</Link>
           <div className="mt-10 grid gap-10 lg:grid-cols-[1fr_320px] lg:items-end">
             <div>
-              <p className="editorial-kicker">{course.path.difficulty}</p>
+              <p className="editorial-kicker">{labels.kicker}</p>
               <h1 className="editorial-display mt-5 text-5xl leading-[0.98] sm:text-6xl lg:text-[4.5rem]">{course.path.title}</h1>
               <p className="mt-7 max-w-2xl text-lg leading-8 text-[var(--muted)]">{course.path.description}</p>
             </div>
