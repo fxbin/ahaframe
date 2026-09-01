@@ -11,6 +11,12 @@ interface LabPageProps {
   experienceKey?: RuntimeExperienceKey;
 }
 
+const SPECIALIST_KEYS = new Set<RuntimeExperienceKey>(["context-compression", "agent-workflow-graph", "evaluation-failure"]);
+
+function isSpecialistExperience(experienceKey?: RuntimeExperienceKey): boolean {
+  return Boolean(experienceKey && SPECIALIST_KEYS.has(experienceKey));
+}
+
 function previewEntries(source: Record<string, unknown> | undefined): Array<[string, string]> {
   if (!source) return [];
   const entries: Array<[string, string]> = [];
@@ -33,7 +39,8 @@ function titleCase(key: string): string {
 }
 
 export function LabPage({ locale, lab, experienceKey }: LabPageProps) {
-  const controls = previewEntries(lab.interactive);
+  const specialist = isSpecialistExperience(experienceKey);
+  const controls = specialist ? [] : previewEntries(lab.interactive);
   const copy = commonUi(locale);
 
   return (
@@ -43,14 +50,21 @@ export function LabPage({ locale, lab, experienceKey }: LabPageProps) {
         <h1 className="mt-4 max-w-5xl text-5xl font-black leading-[0.98] tracking-[-0.055em] sm:text-6xl">{lab.name}</h1>
         <p className="mt-5 max-w-4xl text-lg leading-8 text-[var(--muted)]">{lab.hero}</p>
 
-        <div className="mt-10 grid gap-4 lg:grid-cols-[1.25fr_.75fr]">
-          <div className="rounded-[28px] border border-[var(--border)] bg-white p-6 sm:p-8">
-            <div><div className="text-xs font-bold uppercase tracking-[0.12em] text-[var(--primary)]">{copy.productionLab}</div><h2 className="mt-1 text-2xl font-black tracking-[-0.04em]">{lab.name}</h2></div>
-            {controls.length ? <div className="mt-6 grid gap-3 sm:grid-cols-2">{controls.map(([key, value]) => <div key={key} className="rounded-2xl bg-[var(--surface-soft)] p-4"><div className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--muted)]">{titleCase(key)}</div><div className="mt-2 text-sm leading-6">{value}</div></div>)}</div> : null}
-          </div>
+        {specialist ? (
+          <aside className="mt-10 max-w-4xl border-l-2 border-[var(--accent)] pl-5">
+            <div className="text-xs font-bold uppercase tracking-[0.12em] text-[var(--primary)]">{copy.inOneSentence}</div>
+            <p className="mt-3 text-xl font-semibold leading-8">{lab.quick}</p>
+          </aside>
+        ) : (
+          <div className="mt-10 grid gap-4 lg:grid-cols-[1.25fr_.75fr]">
+            <div className="rounded-[28px] border border-[var(--border)] bg-white p-6 sm:p-8">
+              <div><div className="text-xs font-bold uppercase tracking-[0.12em] text-[var(--primary)]">{copy.productionLab}</div><h2 className="mt-1 text-2xl font-black tracking-[-0.04em]">{lab.name}</h2></div>
+              {controls.length ? <div className="mt-6 grid gap-3 sm:grid-cols-2">{controls.map(([key, value]) => <div key={key} className="rounded-2xl bg-[var(--surface-soft)] p-4"><div className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--muted)]">{titleCase(key)}</div><div className="mt-2 text-sm leading-6">{value}</div></div>)}</div> : null}
+            </div>
 
-          <aside className="rounded-[28px] bg-[var(--text)] p-6 text-white sm:p-8"><div className="text-xs font-bold uppercase tracking-[0.12em] text-[var(--accent)]">{copy.inOneSentence}</div><p className="mt-4 text-xl font-semibold leading-8">{lab.quick}</p></aside>
-        </div>
+            <aside className="rounded-[28px] bg-[var(--text)] p-6 text-white sm:p-8"><div className="text-xs font-bold uppercase tracking-[0.12em] text-[var(--accent)]">{copy.inOneSentence}</div><p className="mt-4 text-xl font-semibold leading-8">{lab.quick}</p></aside>
+          </div>
+        )}
       </section>
 
       {experienceKey ? <section className="shell mt-16"><SpecialistRuntimeWorkspace locale={locale} experienceKey={experienceKey} /></section> : null}

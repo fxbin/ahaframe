@@ -13,6 +13,10 @@ interface SpecialistRuntimeWorkspaceProps {
 
 const SPECIALIST_KEYS = new Set<RuntimeExperienceKey>(["context-compression", "agent-workflow-graph", "evaluation-failure"]);
 
+export function isSpecialistExperience(experienceKey?: RuntimeExperienceKey): boolean {
+  return Boolean(experienceKey && SPECIALIST_KEYS.has(experienceKey));
+}
+
 function asRecord(value: unknown): RuntimeRecord {
   return value && typeof value === "object" && !Array.isArray(value) ? (value as RuntimeRecord) : {};
 }
@@ -26,7 +30,7 @@ function asString(value: unknown, fallback = "") {
 }
 
 export function SpecialistRuntimeWorkspace(props: SpecialistRuntimeWorkspaceProps) {
-  if (!SPECIALIST_KEYS.has(props.experienceKey)) return null;
+  if (!isSpecialistExperience(props.experienceKey)) return null;
   return <SpecialistRuntimeBody {...props} />;
 }
 
@@ -49,55 +53,145 @@ function SpecialistRuntimeBody({ locale, experienceKey }: SpecialistRuntimeWorks
   }
 
   if (runtime.status === "loading") {
-    return <div className="rounded-[24px] border border-[var(--border)] bg-white p-6 text-sm text-[var(--muted)]">{isZh ? "正在加载确定性 Lab Engine…" : "Loading deterministic Lab Engine…"}</div>;
+    return <div className="rounded-[24px] border border-[var(--border)] bg-white p-6 text-sm text-[var(--muted)]">{isZh ? "正在加载实验…" : "Loading lab…"}</div>;
   }
   if (runtime.status === "error" || !frame) {
-    return <div className="rounded-[24px] border border-[var(--border)] bg-white p-6 text-sm" role="alert">{isZh ? "运行时加载失败：" : "Runtime failed to load: "}{runtime.error}</div>;
+    return <div className="rounded-[24px] border border-[var(--border)] bg-white p-6 text-sm" role="alert">{isZh ? "实验加载失败：" : "Lab failed to load: "}{runtime.error}</div>;
   }
 
-  const titles: Record<string, string> = {
-    "context-compression": isZh ? "压缩策略控制台" : "Compression policy console",
-    "agent-workflow-graph": isZh ? "工作流图控制台" : "Workflow graph console",
-    "evaluation-failure": isZh ? "发布评估控制台" : "Release evaluation console",
-  };
+  const copy = specialistCopy(experienceKey, isZh);
+  const hasChanged = frame.historyLength > 0;
 
   return (
-    <div className="rounded-[26px] border border-[var(--border-strong)] bg-white p-6 sm:p-8">
-      <div className="flex flex-wrap items-start justify-between gap-4 border-b border-[var(--border)] pb-5">
-        <div>
-          <div className="eyebrow">Canonical Lab Engine</div>
-          <h2 className="mt-2 text-2xl font-black tracking-[-0.04em]">{titles[experienceKey]}</h2>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--muted)]">{isZh ? "React 只派发工程决策；状态、指标、failure type 和 diagnosis 都由现有确定性 scenario 重新计算。" : "React only dispatches engineering decisions; state, metrics, failure type, and diagnosis are recomputed by the existing deterministic scenario."}</p>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <button className="action-secondary" type="button" onClick={() => act(() => runtime.reset())}>{isZh ? "重置基线" : "Reset baseline"}</button>
-          {experienceKey === "context-compression" ? <button className="action-primary" type="button" onClick={() => act(() => runtime.dispatch("APPLY_BALANCED_PRESET"))}>{isZh ? "平衡预设" : "Balanced preset"}</button> : null}
-          {experienceKey === "agent-workflow-graph" ? <button className="action-primary" type="button" onClick={() => act(() => runtime.dispatch("APPLY_BALANCED_GRAPH"))}>{isZh ? "平衡架构" : "Balanced graph"}</button> : null}
-          {experienceKey === "evaluation-failure" ? <button className="action-primary" type="button" onClick={() => act(() => runtime.dispatch("APPLY_PRODUCTION_PRESET"))}>{isZh ? "生产评估预设" : "Production preset"}</button> : null}
-        </div>
+    <div className="rounded-[26px] border border-[var(--border-strong)] bg-white p-6 sm:p-8" data-specialist-lab={experienceKey} data-specialist-state={hasChanged ? "changed" : "baseline"}>
+      <div className="border-b border-[var(--border)] pb-6" data-lab-section="question">
+        <div className="eyebrow">{isZh ? "问题" : "Question"}</div>
+        <h2 className="mt-2 text-2xl font-black tracking-[-0.04em]">{copy.title}</h2>
+        <p className="mt-3 max-w-3xl text-base font-semibold leading-7">{copy.question}</p>
+        <p className="mt-2 max-w-3xl text-sm leading-6 text-[var(--muted)]">{copy.orientation}</p>
       </div>
 
-      <div className="mt-6 grid gap-8 lg:grid-cols-[.8fr_1.2fr]">
-        <div className="space-y-6">
+      <section className="mt-6" data-lab-section="change">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <div className="eyebrow">{isZh ? "改变" : "Change"}</div>
+            <h3 className="mt-2 text-xl font-black tracking-[-0.03em]">{copy.changeTitle}</h3>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--muted)]">{copy.changeHint}</p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <button className="action-secondary" type="button" onClick={() => act(() => runtime.reset())}>{isZh ? "重置基线" : "Reset baseline"}</button>
+            {experienceKey === "context-compression" ? <button className="action-primary" type="button" onClick={() => act(() => runtime.dispatch("APPLY_BALANCED_PRESET"))}>{isZh ? "平衡预设" : "Balanced preset"}</button> : null}
+            {experienceKey === "agent-workflow-graph" ? <button className="action-primary" type="button" onClick={() => act(() => runtime.dispatch("APPLY_BALANCED_GRAPH"))}>{isZh ? "平衡架构" : "Balanced graph"}</button> : null}
+            {experienceKey === "evaluation-failure" ? <button className="action-primary" type="button" onClick={() => act(() => runtime.dispatch("APPLY_PRODUCTION_PRESET"))}>{isZh ? "生产评估预设" : "Production preset"}</button> : null}
+          </div>
+        </div>
+
+        <div className="mt-6 grid gap-5 md:grid-cols-2">
           {experienceKey === "context-compression" ? <ContextControls isZh={isZh} state={state} act={act} dispatch={runtime.dispatch} /> : null}
           {experienceKey === "agent-workflow-graph" ? <GraphControls isZh={isZh} state={state} act={act} dispatch={runtime.dispatch} /> : null}
           {experienceKey === "evaluation-failure" ? <EvaluationControls isZh={isZh} state={state} act={act} dispatch={runtime.dispatch} /> : null}
-          {actionError ? <p className="text-sm font-medium" role="alert">{actionError}</p> : null}
         </div>
+        {hasChanged ? <div className="mt-4 text-xs text-[var(--muted)]">{frame.historyLength} {frame.historyLength === 1 ? (isZh ? "个已记录动作" : "recorded action") : (isZh ? "个已记录动作" : "recorded actions")}</div> : null}
+        {actionError ? <p className="mt-4 text-sm font-medium" role="alert">{actionError}</p> : null}
+      </section>
 
-        <div>
-          {experienceKey === "context-compression" ? <ContextMetrics isZh={isZh} metrics={metrics} /> : null}
-          {experienceKey === "agent-workflow-graph" ? <GraphMetrics isZh={isZh} metrics={metrics} /> : null}
-          {experienceKey === "evaluation-failure" ? <EvaluationMetrics isZh={isZh} metrics={metrics} derived={derived} /> : null}
-          <div className="mt-5 rounded-[20px] bg-[var(--surface-soft)] p-5">
+      {hasChanged ? <>
+        <section className="mt-8 border-t border-[var(--border)] pt-6" data-lab-section="observe">
+          <div className="eyebrow">{isZh ? "观察" : "Observe"}</div>
+          <h3 className="mt-2 text-xl font-black tracking-[-0.03em]">{copy.observeTitle}</h3>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--muted)]">{copy.observeHint}</p>
+          <div className="mt-5">
+            <EssentialMetrics experienceKey={experienceKey} isZh={isZh} metrics={metrics} />
+          </div>
+          <details className="mt-5 rounded-[18px] border border-[var(--border)] bg-[var(--bg)] p-4" data-lab-section="full-metrics">
+            <summary className="cursor-pointer text-sm font-bold">{isZh ? "查看全部指标" : "View all metrics"}</summary>
+            <div className="mt-4">
+              {experienceKey === "context-compression" ? <ContextMetrics isZh={isZh} metrics={metrics} /> : null}
+              {experienceKey === "agent-workflow-graph" ? <GraphMetrics isZh={isZh} metrics={metrics} /> : null}
+              {experienceKey === "evaluation-failure" ? <EvaluationMetrics isZh={isZh} metrics={metrics} derived={derived} /> : null}
+            </div>
+          </details>
+        </section>
+
+        <section className="mt-8 border-t border-[var(--border)] pt-6" data-lab-section="explain">
+          <div className="eyebrow">{isZh ? "解释" : "Explain"}</div>
+          <h3 className="mt-2 text-xl font-black tracking-[-0.03em]">{copy.explainTitle}</h3>
+          <div className="mt-4 rounded-[20px] bg-[var(--surface-soft)] p-5">
             <div className="text-xs font-bold uppercase tracking-[0.12em] text-[var(--primary)]">{asString(derived.failureType, "runtime-state")}</div>
             <p className="mt-2 text-sm leading-6 text-[var(--muted)]">{asString(derived.diagnosis)}</p>
           </div>
-          <div className="mt-4 text-xs text-[var(--muted)]">Engine {frame.version} · {frame.historyLength} {isZh ? "个已记录动作" : "recorded actions"}</div>
-        </div>
-      </div>
+          <details className="mt-3 text-xs text-[var(--muted)]">
+            <summary className="cursor-pointer font-semibold">{isZh ? "运行时详情" : "Runtime details"}</summary>
+            <div className="mt-2">Engine {frame.version} · {frame.historyLength} {isZh ? "个已记录动作" : frame.historyLength === 1 ? "recorded action" : "recorded actions"}</div>
+          </details>
+        </section>
+      </> : null}
     </div>
   );
+}
+
+function specialistCopy(experienceKey: RuntimeExperienceKey, isZh: boolean) {
+  if (experienceKey === "context-compression") {
+    return isZh ? {
+      title: "压缩策略控制台",
+      question: "Context 可以压缩到什么程度，才不会把关键事实和证据一起压没？",
+      orientation: "先改变一个策略，再观察质量、保留率与成本如何一起变化。不要先追求某一个单独指标。",
+      changeTitle: "调整 Context 策略",
+      changeHint: "可以只改一个变量，也可以使用平衡预设作为对照。每一次改变都由同一个确定性 scenario 重新计算。",
+      observeTitle: "发生了什么变化？",
+      observeHint: "先看三个最能解释 trade-off 的指标；需要诊断细节时再展开全部指标。",
+      explainTitle: "为什么会这样？",
+    } : {
+      title: "Compression policy console",
+      question: "How far can you compress context before critical facts and evidence stop surviving?",
+      orientation: "Change one policy, then observe quality, retention, and cost together. Do not optimize a single metric in isolation.",
+      changeTitle: "Change the context policy",
+      changeHint: "Adjust one variable or use the balanced preset as a comparison. Every change is recomputed by the same deterministic scenario.",
+      observeTitle: "What changed?",
+      observeHint: "Start with the three metrics that best expose the trade-off. Open the full metric set only when you need more evidence.",
+      explainTitle: "Why did it happen?",
+    };
+  }
+  if (experienceKey === "agent-workflow-graph") {
+    return isZh ? {
+      title: "工作流图控制台",
+      question: "什么时候增加 Agent 会提升可靠性，什么时候协调本身反而成为新的失败源？",
+      orientation: "改变拓扑、隔离、重试或 Join 策略，然后观察可靠性与协调成本是否真的改善。",
+      changeTitle: "改变工作流架构",
+      changeHint: "复杂度必须用结果证明自己。可以从一个变量开始，也可以用平衡架构做对照。",
+      observeTitle: "架构真的更好吗？",
+      observeHint: "先看可靠性、失败传播和协调开销，再决定是否需要展开全部指标。",
+      explainTitle: "系统为什么变好或变坏？",
+    } : {
+      title: "Workflow graph console",
+      question: "When does adding agents improve reliability—and when does coordination become the new failure mode?",
+      orientation: "Change topology, isolation, retry, or join policy, then check whether reliability improves enough to justify the coordination cost.",
+      changeTitle: "Change the workflow architecture",
+      changeHint: "Complexity has to earn its place. Change one variable or use the balanced graph as a comparison.",
+      observeTitle: "Is the architecture actually better?",
+      observeHint: "Start with reliability, failure propagation, and coordination overhead before opening the full metric set.",
+      explainTitle: "Why did the system improve or degrade?",
+    };
+  }
+  return isZh ? {
+    title: "发布评估控制台",
+    question: "一个模型在总分上变好，是否仍可能在真正影响生产风险的切片上变差？",
+    orientation: "改变数据集、阈值、Judge 与 Gate，再观察 aggregate improvement 是否经得住关键切片验证。",
+    changeTitle: "改变评估策略",
+    changeHint: "不要把单一总分当成发布结论。调整评估证据，或者用生产评估预设建立对照。",
+    observeTitle: "这个改进值得发布吗？",
+    observeHint: "先看总分变化、安全切片和回归数；完整指标与 Engine decision 保留在下方详情。",
+    explainTitle: "评估为什么给出这个结果？",
+  } : {
+    title: "Release evaluation console",
+    question: "Can a model improve on aggregate while getting worse on the slices that actually matter in production?",
+    orientation: "Change the dataset, threshold, judge, and gates, then test whether aggregate improvement survives critical-slice evidence.",
+    changeTitle: "Change the evaluation policy",
+    changeHint: "Do not treat one aggregate score as a release decision. Change the evidence or use the production preset as a comparison.",
+    observeTitle: "Is this improvement releasable?",
+    observeHint: "Start with aggregate delta, safety slice, and regressions. Full metrics and the engine decision remain available below.",
+    explainTitle: "Why did the evaluation reach this result?",
+  };
 }
 
 type Dispatch = (typeOrAction: string | RuntimeRecord, payload?: RuntimeRecord) => unknown;
@@ -134,6 +228,28 @@ function EvaluationControls({ isZh, state, act, dispatch }: { isZh: boolean; sta
     <SelectControl label={isZh ? "Judge 模式" : "Judge mode"} value={asString(state.judgeMode, "rubric")} options={{ deterministic: isZh ? "确定性检查" : "Deterministic", rubric: isZh ? "语义 Rubric" : "Semantic rubric", mixed: isZh ? "混合评估" : "Mixed" }} onChange={(value) => act(() => dispatch("SET_JUDGE_MODE", { value }))} />
     <ToggleControl label={isZh ? "成本 Gate" : "Cost gate"} checked={Boolean(state.costGate)} onChange={(value) => act(() => dispatch("SET_COST_GATE", { value }))} />
   </>;
+}
+
+function EssentialMetrics({ experienceKey, isZh, metrics }: { experienceKey: RuntimeExperienceKey; isZh: boolean; metrics: RuntimeRecord }) {
+  if (experienceKey === "context-compression") {
+    return <MetricGrid items={[
+      [isZh ? "任务质量" : "Task quality", asNumber(metrics.taskQuality).toFixed(1)],
+      [isZh ? "关键保留" : "Critical retention", `${asNumber(metrics.criticalRetentionPercent).toFixed(1)}%`],
+      [isZh ? "Token 节省" : "Token savings", `${asNumber(metrics.savingsPercent).toFixed(1)}%`],
+    ]} compact />;
+  }
+  if (experienceKey === "agent-workflow-graph") {
+    return <MetricGrid items={[
+      [isZh ? "可靠性" : "Reliability", `${asNumber(metrics.reliabilityPercent).toFixed(1)}%`],
+      [isZh ? "失败传播" : "Failure propagation", `${asNumber(metrics.failurePropagationPercent).toFixed(1)}%`],
+      [isZh ? "协调开销" : "Coordination", asNumber(metrics.coordinationOverhead).toFixed(1)],
+    ]} compact />;
+  }
+  return <MetricGrid items={[
+    [isZh ? "总分变化" : "Aggregate delta", asNumber(metrics.aggregateDelta).toFixed(1)],
+    [isZh ? "安全切片" : "Safety slice", asNumber(metrics.criticalSafetyScore).toFixed(1)],
+    [isZh ? "回归数" : "Regressions", asNumber(metrics.regressionCount).toFixed(0)],
+  ]} compact />;
 }
 
 function ContextMetrics({ isZh, metrics }: { isZh: boolean; metrics: RuntimeRecord }) {
@@ -187,6 +303,6 @@ function ToggleControl({ label, checked, onChange }: { label: string; checked: b
   return <label className="flex items-center justify-between gap-4 rounded-xl border border-[var(--border)] p-4 text-sm font-bold"><span>{label}</span><input className="h-5 w-5 accent-[var(--primary)]" type="checkbox" checked={checked} onChange={(event) => onChange(event.target.checked)} /></label>;
 }
 
-function MetricGrid({ items }: { items: Array<[string, string]> }) {
-  return <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">{items.map(([label, value]) => <div key={label} className="rounded-[18px] bg-[var(--surface-soft)] p-4"><div className="text-[11px] font-bold uppercase tracking-[0.08em] text-[var(--muted)]">{label}</div><div className="mt-2 text-lg font-black tracking-[-0.03em]">{value}</div></div>)}</div>;
+function MetricGrid({ items, compact = false }: { items: Array<[string, string]>; compact?: boolean }) {
+  return <div className={`grid gap-3 sm:grid-cols-2 ${compact ? "lg:grid-cols-3" : "lg:grid-cols-4"}`}>{items.map(([label, value]) => <div key={label} className="rounded-[18px] bg-[var(--surface-soft)] p-4"><div className="text-[11px] font-bold uppercase tracking-[0.08em] text-[var(--muted)]">{label}</div><div className="mt-2 text-lg font-black tracking-[-0.03em]">{value}</div></div>)}</div>;
 }

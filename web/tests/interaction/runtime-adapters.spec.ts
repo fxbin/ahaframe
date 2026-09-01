@@ -39,10 +39,10 @@ test.describe("AhaFrame deterministic interaction adapters", () => {
     await expect(compression).toHaveValue("72");
     await compression.fill("50");
     await expect(compression).toHaveValue("50");
-    await expect(page.getByText(/1 recorded action/)).toBeVisible();
+    await expect(page.getByText("1 recorded action", { exact: true })).toBeVisible();
 
     await page.getByRole("button", { name: "Balanced preset" }).click();
-    await expect(page.getByText(/2 recorded actions/)).toBeVisible();
+    await expect(page.getByText("2 recorded actions", { exact: true })).toBeVisible();
     await page.getByRole("button", { name: "Reset baseline" }).click();
     await expect(compression).toHaveValue("72");
   });
