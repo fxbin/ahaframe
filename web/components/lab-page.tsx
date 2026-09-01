@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { LearningContext } from "@/components/learning-context";
-import { isSpecialistExperience, SpecialistRuntimeWorkspace } from "@/components/runtime/specialist-runtime-workspace";
+import { SpecialistRuntimeWorkspace } from "@/components/runtime/specialist-runtime-workspace";
 import { localizedPath, type LabContent, type Locale } from "@/lib/content";
 import type { RuntimeExperienceKey } from "@/lib/runtime-manifest";
 import { commonUi } from "@/lib/ui-copy";
@@ -9,6 +9,12 @@ interface LabPageProps {
   locale: Locale;
   lab: LabContent;
   experienceKey?: RuntimeExperienceKey;
+}
+
+const SPECIALIST_KEYS = new Set<RuntimeExperienceKey>(["context-compression", "agent-workflow-graph", "evaluation-failure"]);
+
+function isSpecialistExperience(experienceKey?: RuntimeExperienceKey): boolean {
+  return Boolean(experienceKey && SPECIALIST_KEYS.has(experienceKey));
 }
 
 function previewEntries(source: Record<string, unknown> | undefined): Array<[string, string]> {
