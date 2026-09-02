@@ -24,6 +24,7 @@ interface LearningContextPanelProps {
   labels: LearningUxContent["page"];
   states: LearningUxContent["states"];
   knowledgeLabel?: string;
+  embedded?: boolean;
 }
 
 function subscribeProgress(callback: () => void) {
@@ -54,23 +55,35 @@ export function LearningContextPanel({
   labels,
   states,
   knowledgeLabel,
+  embedded = false,
 }: LearningContextPanelProps) {
   const rawProgress = useSyncExternalStore(subscribeProgress, progressSnapshot, serverProgressSnapshot);
   const progress = useMemo(() => parseLearningProgress(rawProgress), [rawProgress]);
   const state = effectiveLearningState({ id: contentId, reviewEligible }, progress);
+  const contextTitle = embedded ? (locale === "zh-CN" ? "学习连接" : "Learning context") : labels.debrief;
 
   function markTransferred() {
     setLearningState(contentId, "TRANSFERRED");
   }
 
   return (
-    <section className="shell mt-16 border-y border-[var(--border)] py-10" aria-labelledby={`learning-context-${contentId}`}>
+    <section
+      className={embedded ? "border-y border-[var(--border)] py-8" : "shell mt-16 border-y border-[var(--border)] py-10"}
+      aria-labelledby={`learning-context-${contentId}`}
+      data-learning-context={embedded ? "embedded" : "standalone"}
+    >
       <div className="grid gap-10 lg:grid-cols-[.8fr_1.2fr]">
         <div>
           <p className="eyebrow-label">LEARNING CONTEXT</p>
-          <h2 id={`learning-context-${contentId}`} className="mt-3 font-[family-name:var(--font-editorial)] text-3xl font-semibold tracking-[-0.04em]">
-            {labels.debrief}
-          </h2>
+          {embedded ? (
+            <h3 id={`learning-context-${contentId}`} className="mt-3 font-[family-name:var(--font-editorial)] text-2xl font-semibold tracking-[-0.04em]">
+              {contextTitle}
+            </h3>
+          ) : (
+            <h2 id={`learning-context-${contentId}`} className="mt-3 font-[family-name:var(--font-editorial)] text-3xl font-semibold tracking-[-0.04em]">
+              {contextTitle}
+            </h2>
+          )}
           <p className="mt-4 leading-7 text-[var(--muted)]">{debrief}</p>
           <div className="mt-5 inline-flex border border-[var(--border)] px-2.5 py-1 font-mono text-[11px] font-bold text-[var(--muted)]">
             {states[state]}
