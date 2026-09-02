@@ -41,7 +41,6 @@ export function CampaignHomePage({ locale, content, knowledgeMap, catalog }: Cam
         headline: "看见 AI 如何工作，才能真正理解它。",
         subheadline: "用清晰的课程理解 AI，用真实的 Practice 建立判断力。",
         start: "开始学习",
-        paths: "查看 15 条学习路径",
         choose: "你想学什么？",
         featured: "精选课程",
         viewAll: "查看全部课程",
@@ -61,7 +60,6 @@ export function CampaignHomePage({ locale, content, knowledgeMap, catalog }: Cam
         headline: "Understand AI by seeing it work.",
         subheadline: "Clear courses to build the mental model. Real practice to build judgment.",
         start: "Start Learning",
-        paths: "Explore 15 learning paths",
         choose: "What do you want to learn?",
         featured: "Featured Courses",
         viewAll: "View all courses",
@@ -96,14 +94,9 @@ export function CampaignHomePage({ locale, content, knowledgeMap, catalog }: Cam
           <div>
             <h1 className="editorial-display max-w-4xl text-5xl leading-[0.98] sm:text-6xl lg:text-[4.75rem]">{labels.headline}</h1>
             <p className="mt-7 max-w-xl text-lg leading-8 text-[var(--muted)] sm:text-xl">{labels.subheadline}</p>
-            <div className="mt-9 flex flex-wrap items-center gap-x-7 gap-y-4">
-              <Link className="editorial-primary-action" href={`/${segment}/courses/`}>
-                {labels.start} <span aria-hidden="true">→</span>
-              </Link>
-              <Link className="editorial-text-link" href={`/${segment}/courses/`}>
-                {labels.paths}
-              </Link>
-            </div>
+            <Link className="editorial-primary-action mt-9" href={`/${segment}/courses/`}>
+              {labels.start} <span aria-hidden="true">→</span>
+            </Link>
           </div>
           <div className="hero-botanical" aria-hidden="true">
             <BotanicalBranch />
