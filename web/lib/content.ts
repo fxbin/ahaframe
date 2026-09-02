@@ -56,6 +56,8 @@ export interface MarketingContent {
     headlineBefore: string;
     headlineAccent: string;
     intro: string;
+    statusLabel: string;
+    statusCopy: string;
     plans: Array<{
       name: string;
       badge: string;
@@ -67,11 +69,6 @@ export interface MarketingContent {
       href: string;
       event: string;
     }>;
-    compareTitle: string;
-    matrixHeaders: string[];
-    matrixRows: string[][];
-    sequenceTitle: string;
-    sequence: string[][];
     ctaTitle: string;
     ctaCopy: string;
     ctaButton: string;
