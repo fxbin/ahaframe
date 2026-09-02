@@ -8,9 +8,10 @@ import { LearningContextPanel } from "@/components/learning-context-panel";
 interface LearningContextProps {
   locale: Locale;
   contentId: string;
+  embedded?: boolean;
 }
 
-export async function LearningContext({ locale, contentId }: LearningContextProps) {
+export async function LearningContext({ locale, contentId, embedded = false }: LearningContextProps) {
   const [graph, ux] = await Promise.all([getLearningGraph(locale), getLearningUxContent(locale)]);
   const node = graph.contentNodes.find((item) => item.id === contentId);
   const details = ux.content[contentId];
@@ -38,6 +39,7 @@ export async function LearningContext({ locale, contentId }: LearningContextProp
         transfer={details.transfer}
         labels={ux.page}
         states={ux.states}
+        embedded={embedded}
       />
     );
   }
@@ -72,6 +74,7 @@ export async function LearningContext({ locale, contentId }: LearningContextProp
       labels={ux.page}
       states={ux.states}
       knowledgeLabel={locale === "zh-CN" ? "本次练习的 CONCEPT" : "CONCEPTS PRACTICED"}
+      embedded={embedded}
     />
   );
 }
