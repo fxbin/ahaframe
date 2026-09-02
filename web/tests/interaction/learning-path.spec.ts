@@ -1,9 +1,15 @@
 import { expect, test } from "@playwright/test";
 
-test("English Learning Path exposes 10 stages and graph-driven next action", async ({ page }) => {
+test("English Learning Path exposes 10 legacy stages on demand and keeps graph-driven next action", async ({ page }) => {
   await page.goto("/en/learning/");
 
   await expect(page.getByRole("heading", { level: 1 })).toContainText("complete AI Engineering path");
+
+  const advanced = page.getByTestId("advanced-learning-tools");
+  await expect(advanced).not.toHaveAttribute("open", "");
+  await expect(page.getByText("STAGE 00", { exact: true })).not.toBeVisible();
+  await advanced.locator("summary").first().click();
+
   await expect(page.getByText("STAGE 00", { exact: true })).toBeVisible();
   await expect(page.getByText("STAGE 09", { exact: true })).toBeVisible();
   await expect(page.getByRole("heading", { name: "AI Systems Mental Model" }).first()).toBeVisible();
@@ -49,14 +55,20 @@ test("Incident-first learner can inspect models, backfill, return and attempt tr
   expect(state["agent-reliability"].state).toBe("TRANSFERRED");
 });
 
-test("Chinese Learning Path preserves the same structure without fake mastery", async ({ page }) => {
+test("Chinese Learning Path preserves legacy structure on demand without fake mastery", async ({ page }) => {
   await page.goto("/zh-cn/learning/");
 
   await expect(page.getByRole("heading", { level: 1 })).toContainText("完整的 AI Engineering 路径");
+
+  const advanced = page.getByTestId("advanced-learning-tools");
+  await expect(advanced).not.toHaveAttribute("open", "");
+  await expect(page.getByText("STAGE 00", { exact: true })).not.toBeVisible();
+  await advanced.locator("summary").first().click();
+
   await expect(page.getByText("STAGE 00", { exact: true })).toBeVisible();
   await expect(page.getByText("STAGE 09", { exact: true })).toBeVisible();
 
-  const stageZero = page.locator("details").filter({ hasText: "AI 系统心智模型" }).first();
+  const stageZero = advanced.locator("details").filter({ hasText: "AI 系统心智模型" }).first();
   await stageZero.locator("summary").click();
   await expect(stageZero.getByText("概率性模型行为 vs 应用系统保证", { exact: true })).toBeVisible();
   await expect(page.getByText(/Mastered|已掌握/i)).toHaveCount(0);
