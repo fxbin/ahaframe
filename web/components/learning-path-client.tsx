@@ -59,6 +59,19 @@ export function LearningPathClient({ graph, knowledgeMap, ux }: LearningPathClie
     for (const node of graph.contentNodes) map.get(node.stageId)?.push(node);
     return map;
   }, [graph]);
+  const advanced = graph.locale === "zh-CN"
+    ? {
+        kicker: "高级学习工具",
+        title: "查看旧版 Guided Path 与浏览器学习进度",
+        copy: "只有当你需要按旧版 10 个 Stage 查看 Experience、复习状态或 Legacy Model Index 时再展开。",
+        legacy: "Legacy Model Index · V0.9",
+      }
+    : {
+        kicker: "Advanced learning tools",
+        title: "Open the legacy Guided Path and browser progress",
+        copy: "Expand this only when you need the older 10-stage Experience progression, review state, or Legacy Model Index.",
+        legacy: "LEGACY MODEL INDEX · V0.9",
+      };
 
   function reset() {
     if (!window.confirm(ux.page.resetConfirm)) return;
@@ -104,110 +117,121 @@ export function LearningPathClient({ graph, knowledgeMap, ux }: LearningPathClie
 
       <KnowledgeMapOverview map={knowledgeMap} />
 
-      <section className="py-16 sm:py-20" data-testid="guided-path-v09-compat">
+      <section className="py-10 sm:py-12">
         <div className="shell">
-          <div className="flex flex-col gap-6 border-b border-[var(--border)] pb-8 sm:flex-row sm:items-end sm:justify-between">
-            <div className="max-w-3xl">
-              <p className="eyebrow-label">GUIDED PATH · CURRENT EXPERIENCES</p>
-              <h2 className="section-title">{ux.page.pathTitle}</h2>
-              <p className="section-copy">{ux.page.pathCopy}</p>
-            </div>
-            <p className="max-w-sm text-xs leading-5 text-[var(--muted)]">{ux.page.anonymousNote}</p>
-          </div>
+          <details className="border-y border-[var(--border)]" data-testid="advanced-learning-tools">
+            <summary className="grid cursor-pointer list-none gap-4 py-7 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--primary)] sm:grid-cols-[1fr_auto] sm:items-end">
+              <span>
+                <span className="technical-label">{advanced.kicker}</span>
+                <span className="mt-2 block font-[family-name:var(--font-editorial)] text-2xl font-semibold tracking-[-0.035em]">{advanced.title}</span>
+                <span className="mt-2 block max-w-3xl text-sm leading-6 text-[var(--muted)]">{advanced.copy}</span>
+              </span>
+              <span className="font-mono text-xs text-[var(--muted)]" aria-hidden="true">＋</span>
+            </summary>
 
-          {due.length ? (
-            <div className="mt-8 border border-[var(--warning)] p-5">
-              <p className="technical-label">{ux.states.REVIEW_DUE}</p>
-              <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2">
-                {due.map((node) => (
-                  <Link key={node.id} href={localizeLearningRoute(node.route, graph.locale)} className="text-link" data-event="learning_review_returned" data-content-id={node.id}>
-                    {node.title} <span aria-hidden="true">→</span>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          ) : null}
-
-          <ol className="mt-10 border-t border-[var(--border)]">
-            {graph.stages.map((stage) => {
-              const stageNodes = nodesByStage.get(stage.id) ?? [];
-              return (
-                <li key={stage.id} id={stage.slug} className="grid gap-5 border-b border-[var(--border)] py-8 lg:grid-cols-[92px_.8fr_1.2fr] lg:gap-8">
-                  <div className="font-mono text-sm font-bold text-[var(--primary)]">STAGE {String(stage.order).padStart(2, "0")}</div>
-                  <div>
-                    <h3 className="font-[family-name:var(--font-editorial)] text-2xl font-semibold tracking-[-0.035em]">{stage.title}</h3>
-                    <p className="mt-2 text-sm leading-6 text-[var(--muted)]">{stage.description}</p>
+            <div className="border-t border-[var(--border)] pb-10 pt-8">
+              <div data-testid="guided-path-v09-compat">
+                <div className="flex flex-col gap-6 pb-8 sm:flex-row sm:items-end sm:justify-between">
+                  <div className="max-w-3xl">
+                    <p className="eyebrow-label">GUIDED PATH · CURRENT EXPERIENCES</p>
+                    <h2 className="section-title">{ux.page.pathTitle}</h2>
+                    <p className="section-copy">{ux.page.pathCopy}</p>
                   </div>
-                  <div>
-                    {stageNodes.length ? (
-                      <div className="divide-y divide-[var(--border)] border-y border-[var(--border)]">
-                        {stageNodes.map((node) => {
-                          const state = effectiveLearningState(node, progress);
-                          return (
-                            <Link
-                              key={node.id}
-                              href={localizeLearningRoute(node.route, graph.locale)}
-                              className="group flex items-start justify-between gap-5 py-3.5"
-                              data-event="learning_path_continued"
-                              data-content-id={node.id}
-                            >
-                              <span>
-                                <span className="block text-sm font-bold">{node.title}</span>
-                                <span className="mt-1 block text-xs leading-5 text-[var(--muted)]">{node.format} · {node.effortBand}</span>
-                              </span>
-                              <span className={`shrink-0 border px-2 py-1 font-mono text-[10px] font-bold ${stateClass(state)}`}>{ux.states[state]}</span>
-                            </Link>
-                          );
-                        })}
-                      </div>
-                    ) : (
-                      <p className="border-y border-[var(--border)] py-4 text-xs leading-5 text-[var(--muted)]">{ux.page.models}: {stage.modelIds.length}</p>
-                    )}
+                  <p className="max-w-sm text-xs leading-5 text-[var(--muted)]">{ux.page.anonymousNote}</p>
+                </div>
+
+                {due.length ? (
+                  <div className="mb-8 border border-[var(--warning)] p-5">
+                    <p className="technical-label">{ux.states.REVIEW_DUE}</p>
+                    <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2">
+                      {due.map((node) => (
+                        <Link key={node.id} href={localizeLearningRoute(node.route, graph.locale)} className="text-link" data-event="learning_review_returned" data-content-id={node.id}>
+                          {node.title} <span aria-hidden="true">→</span>
+                        </Link>
+                      ))}
+                    </div>
                   </div>
-                </li>
-              );
-            })}
-          </ol>
-        </div>
-      </section>
+                ) : null}
 
-      <section className="border-y border-[var(--border)] bg-white py-16 sm:py-20">
-        <div className="shell">
-          <div className="max-w-3xl">
-            <p className="eyebrow-label">LEGACY MODEL INDEX · V0.9</p>
-            <h2 className="section-title">{ux.page.mapTitle}</h2>
-            <p className="section-copy">{ux.page.mapCopy}</p>
-          </div>
-
-          <div className="mt-10 grid gap-x-10 border-t border-[var(--border)] lg:grid-cols-2">
-            {graph.stages.map((stage) => (
-              <details key={stage.id} className="group border-b border-[var(--border)] py-5">
-                <summary className="flex cursor-pointer list-none items-start justify-between gap-5 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--primary)]">
-                  <span>
-                    <span className="font-mono text-[11px] font-bold text-[var(--primary)]">{String(stage.order).padStart(2, "0")}</span>
-                    <span className="ml-3 font-bold">{stage.title}</span>
-                  </span>
-                  <span className="font-mono text-xs text-[var(--muted)]">{stage.modelIds.length}</span>
-                </summary>
-                <ul className="mt-4 space-y-2 pl-8">
-                  {stage.modelIds.map((modelId) => {
-                    const model = modelsById.get(modelId);
-                    if (!model) return null;
+                <ol className="border-t border-[var(--border)]">
+                  {graph.stages.map((stage) => {
+                    const stageNodes = nodesByStage.get(stage.id) ?? [];
                     return (
-                      <li key={model.id} className="flex gap-3 text-sm leading-6">
-                        <span className="font-mono text-[10px] text-[var(--muted)]">{model.id}</span>
-                        <span>{model.title}</span>
+                      <li key={stage.id} id={stage.slug} className="grid gap-5 border-b border-[var(--border)] py-7 lg:grid-cols-[92px_.8fr_1.2fr] lg:gap-8">
+                        <div className="font-mono text-sm font-bold text-[var(--primary)]">STAGE {String(stage.order).padStart(2, "0")}</div>
+                        <div>
+                          <h3 className="font-[family-name:var(--font-editorial)] text-2xl font-semibold tracking-[-0.035em]">{stage.title}</h3>
+                          <p className="mt-2 text-sm leading-6 text-[var(--muted)]">{stage.description}</p>
+                        </div>
+                        <div>
+                          {stageNodes.length ? (
+                            <div className="divide-y divide-[var(--border)] border-y border-[var(--border)]">
+                              {stageNodes.map((node) => {
+                                const state = effectiveLearningState(node, progress);
+                                return (
+                                  <Link
+                                    key={node.id}
+                                    href={localizeLearningRoute(node.route, graph.locale)}
+                                    className="group flex items-start justify-between gap-5 py-3.5"
+                                    data-event="learning_path_continued"
+                                    data-content-id={node.id}
+                                  >
+                                    <span>
+                                      <span className="block text-sm font-bold">{node.title}</span>
+                                      <span className="mt-1 block text-xs leading-5 text-[var(--muted)]">{node.format} · {node.effortBand}</span>
+                                    </span>
+                                    <span className={`shrink-0 border px-2 py-1 font-mono text-[10px] font-bold ${stateClass(state)}`}>{ux.states[state]}</span>
+                                  </Link>
+                                );
+                              })}
+                            </div>
+                          ) : (
+                            <p className="border-y border-[var(--border)] py-4 text-xs leading-5 text-[var(--muted)]">{ux.page.models}: {stage.modelIds.length}</p>
+                          )}
+                        </div>
                       </li>
                     );
                   })}
-                </ul>
-              </details>
-            ))}
-          </div>
+                </ol>
+              </div>
 
-          <div className="mt-10 flex justify-end">
-            <button type="button" className="text-link" onClick={reset}>{ux.page.reset}</button>
-          </div>
+              <div className="mt-12 border-t border-[var(--border)] pt-8">
+                <p className="eyebrow-label">{advanced.legacy}</p>
+                <h2 className="section-title">{ux.page.mapTitle}</h2>
+                <p className="section-copy">{ux.page.mapCopy}</p>
+
+                <div className="mt-8 grid gap-x-10 border-t border-[var(--border)] lg:grid-cols-2">
+                  {graph.stages.map((stage) => (
+                    <details key={stage.id} className="group border-b border-[var(--border)] py-5">
+                      <summary className="flex cursor-pointer list-none items-start justify-between gap-5 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--primary)]">
+                        <span>
+                          <span className="font-mono text-[11px] font-bold text-[var(--primary)]">{String(stage.order).padStart(2, "0")}</span>
+                          <span className="ml-3 font-bold">{stage.title}</span>
+                        </span>
+                        <span className="font-mono text-xs text-[var(--muted)]">{stage.modelIds.length}</span>
+                      </summary>
+                      <ul className="mt-4 space-y-2 pl-8">
+                        {stage.modelIds.map((modelId) => {
+                          const model = modelsById.get(modelId);
+                          if (!model) return null;
+                          return (
+                            <li key={model.id} className="flex gap-3 text-sm leading-6">
+                              <span className="font-mono text-[10px] text-[var(--muted)]">{model.id}</span>
+                              <span>{model.title}</span>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </details>
+                  ))}
+                </div>
+
+                <div className="mt-8 flex justify-end">
+                  <button type="button" className="text-link" onClick={reset}>{ux.page.reset}</button>
+                </div>
+              </div>
+            </div>
+          </details>
         </div>
       </section>
     </div>
