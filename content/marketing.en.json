@@ -1,24 +1,50 @@
 {
   "locale": "en",
   "pricing": {
-    "title": "AhaFrame Pricing — Interactive AI engineering labs",
-    "description": "Explore AhaFrame pricing hypotheses for free AI engineering mental models, a one-time foundations track, and a future production-lab membership.",
-    "kicker": "Pricing validation",
-    "headlineBefore": "Learn the concepts free. Pay for",
-    "headlineAccent": "engineering capability",
-    "intro": "AhaFrame is testing a paid layer around flagship production incidents, a cross-layer Final Boss, interactive foundations, and evaluation. No payment is collected in this MVP.",
+    "title": "AhaFrame Pricing — Clear AI courses with real practice",
+    "description": "See what is free now and what a future AhaFrame membership may unlock after content validation.",
+    "kicker": "Pricing",
+    "headlineBefore": "Learn now. Decide later if the deeper practice is",
+    "headlineAccent": "worth paying for",
+    "intro": "AhaFrame is still validating content quality and learning value. Billing is intentionally not open yet.",
+    "statusLabel": "Billing status",
+    "statusCopy": "Not open yet. We will only turn on paid access after the content-readiness gate is satisfied; no payment can be made on this page today.",
     "plans": [
-      {"name":"Free","badge":"","description":"Build the mental models before paying for anything.","price":"$0","suffix":"/ forever","items":["Core interactive mental models","Foundational simulations","Public concept guides","Local progress tracking","Rotating production-lab previews"],"cta":"Try Evaluation Failure Lab","href":"/en/labs/evaluation-failure/","event":""},
-      {"name":"AI Engineer Foundations","badge":"Recommended hypothesis","description":"A focused path from understanding to production intuition.","price":"$39","suffix":"/ one-time concept","items":["3 flagship production incidents","1 cross-layer Final Boss","Interactive Foundations + specialist labs","Evaluation and release-decision challenges","Lifetime access as the Foundations track expands"],"cta":"I’d consider $39 once","href":"/en/early-access/?intent=foundations-39","event":"pricing_foundations_click"},
-      {"name":"Production Labs","badge":"Future hypothesis","description":"A separate subscription for continuously growing advanced production incidents and workflows.","price":"$12","suffix":"/ month concept","items":["Advanced production incident simulations","Continuously growing Mission library","Advanced compare / replay workflows","Saved experiments when accounts launch","Live-model credits only when enabled"],"cta":"I’d consider $12/month","href":"/en/early-access/?intent=production-labs-12","event":"pricing_pro_click"}
+      {
+        "name": "Free now",
+        "badge": "Available",
+        "description": "Use the public learning system before making any purchase decision.",
+        "price": "$0",
+        "suffix": "/ now",
+        "items": [
+          "Courses and the full Knowledge Map",
+          "Public guides as they are published",
+          "Selected interactive practice",
+          "Local learning progress"
+        ],
+        "cta": "Start learning",
+        "href": "/en/courses/",
+        "event": ""
+      },
+      {
+        "name": "Membership later",
+        "badge": "Planned after validation",
+        "description": "A paid layer for learners who want the complete interactive practice library.",
+        "price": "Not open",
+        "suffix": "price will be validated later",
+        "items": [
+          "Full standard Lab / Mission / Build library",
+          "Growing production practice",
+          "New interactive releases",
+          "Account-backed progress when identity is needed"
+        ],
+        "cta": "Tell me when membership opens",
+        "href": "/en/early-access/?intent=membership",
+        "event": "paid_intent_clicked"
+      }
     ],
-    "compareTitle": "What are you paying for?",
-    "matrixHeaders": ["Capability","Free","Foundations","Production Labs"],
-    "matrixRows": [["Mental models + concept guides","✓","✓","✓"],["Flagship incidents + Final Boss","Preview","✓","Separate purchase"],["Interactive Foundations + specialist labs","Selected","✓","Separate purchase"],["Growing production incident library","Preview","—","✓"],["Advanced compare / replay workflows","—","—","✓"]],
-    "sequenceTitle": "Development sequence",
-    "sequence": [["RAG Failure Lab","Break retrieval, tune it, compare it.","Available"],["Agent Reliability Lab","Retries, limits, validation, safety, cost.","Available"],["Evaluation Failure Lab","Dataset coverage, regressions, vetoes, evidence, release gates.","New"],["Context Compression Lab","Token savings, retained evidence, retrieval, memory trade-offs.","Next"],["Optional accounts","Only when Save / Purchase / Live Mode needs identity.","Later"]],
-    "ctaTitle": "Help validate the paid layer.",
-    "ctaCopy": "Choose the offer you would realistically consider. This records intent only; no charge is made.",
+    "ctaTitle": "Help decide when AhaFrame is ready to charge.",
+    "ctaCopy": "Use the free product first. If the deeper practice feels worth paying for, join Early Access and we will use that signal in the content-readiness review.",
     "ctaButton": "Join Early Access →"
   },
   "earlyAccess": {
