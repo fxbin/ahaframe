@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { GuideProgressControl } from "@/components/guide-progress-control";
 import type { Locale } from "@/lib/content";
 import { localizedPath, segmentForLocale } from "@/lib/content";
 import type { GuidePageData } from "@/lib/guides";
@@ -53,10 +54,17 @@ function practiceHref(locale: Locale, guideSlug: string, href: string, pathSlug?
   return `${localizedPath(href, locale)}?${params.toString()}`;
 }
 
+function practiceContentId(href: string): string | null {
+  const route = href.split("?")[0];
+  const parts = route.split("/").filter(Boolean);
+  return parts.length ? parts[parts.length - 1] : null;
+}
+
 export function GuidePage({ locale, data }: { locale: Locale; data: GuidePageData }) {
   const labels = copy(locale);
   const segment = segmentForLocale(locale);
   const { guide, concept, relatedConcepts, pathMemberships, activePath } = data;
+  const practiceId = guide.practice ? practiceContentId(guide.practice.href) : null;
 
   return (
     <main>
@@ -150,6 +158,8 @@ export function GuidePage({ locale, data }: { locale: Locale; data: GuidePageDat
                 ))}
               </ol>
             </section>
+
+            <GuideProgressControl locale={locale} conceptId={concept.id} practiceId={practiceId} />
 
             {pathMemberships.length ? (
               <section className="border-b border-[var(--border)] py-10" data-guide-path-memberships>
