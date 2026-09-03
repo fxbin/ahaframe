@@ -17,6 +17,9 @@ export function CourseDetailPage({ locale, course }: CourseDetailPageProps) {
         deliverable: "最终产出",
         structure: "课程结构",
         topics: "个主题",
+        guide: "Guide",
+        conceptOnly: "Concept · Guide 正在扩展",
+        minutes: "分钟",
         practice: "Practice",
         practiceCopy: "在关键节点进入真实场景，而不是只读完内容。",
         open: "开始练习",
@@ -29,6 +32,9 @@ export function CourseDetailPage({ locale, course }: CourseDetailPageProps) {
         deliverable: "What you will build",
         structure: "Course structure",
         topics: "topics",
+        guide: "Guide",
+        conceptOnly: "Concept · Guide expanding",
+        minutes: "min",
         practice: "Practice",
         practiceCopy: "Enter real scenarios at the moments where reading is not enough.",
         open: "Open practice",
@@ -66,11 +72,43 @@ export function CourseDetailPage({ locale, course }: CourseDetailPageProps) {
             <section>
               <h2 className="font-[family-name:var(--font-editorial)] text-3xl font-semibold tracking-[-0.04em]">{labels.structure}</h2>
               <div className="mt-8 divide-y divide-[var(--border)] border-y border-[var(--border)]">
-                {course.path.milestones.map((milestone, index) => (
-                  <article key={milestone.id} className="grid gap-3 py-6 sm:grid-cols-[44px_1fr_auto] sm:items-center">
+                {course.milestones.map((milestone, index) => (
+                  <article key={milestone.id} className="grid gap-4 py-7 sm:grid-cols-[44px_1fr]">
                     <span className="course-number">{String(index + 1).padStart(2, "0")}</span>
-                    <h3 className="font-[family-name:var(--font-editorial)] text-xl font-semibold tracking-[-0.03em]">{milestone.title}</h3>
-                    <span className="text-xs text-[var(--muted)]">{milestone.conceptIds.length} {labels.topics}</span>
+                    <div>
+                      <div className="flex flex-wrap items-baseline justify-between gap-3">
+                        <h3 className="font-[family-name:var(--font-editorial)] text-xl font-semibold tracking-[-0.03em]">{milestone.title}</h3>
+                        <span className="text-xs text-[var(--muted)]">{milestone.concepts.length} {labels.topics}</span>
+                      </div>
+                      <ol className="mt-5 divide-y divide-[var(--border)] border-t border-[var(--border)]">
+                        {milestone.concepts.map((concept) => (
+                          <li key={concept.id} data-course-concept-id={concept.id} className="py-3.5">
+                            {concept.guide ? (
+                              <Link
+                                className="group flex items-start justify-between gap-5"
+                                data-course-guide-concept-id={concept.id}
+                                href={`/${segment}/guides/${concept.guide.slug}/?path=${encodeURIComponent(course.path.slug)}`}
+                              >
+                                <span>
+                                  <span className="block font-medium leading-6 group-hover:underline">{concept.guide.title}</span>
+                                  {concept.guide.title !== concept.title ? (
+                                    <span className="mt-0.5 block text-xs leading-5 text-[var(--muted)]">{concept.title}</span>
+                                  ) : null}
+                                </span>
+                                <span className="shrink-0 text-right text-[10px] uppercase tracking-[0.12em] text-[var(--muted)]">
+                                  {labels.guide}<br />{concept.guide.readingMinutes} {labels.minutes}
+                                </span>
+                              </Link>
+                            ) : (
+                              <div className="flex items-start justify-between gap-5">
+                                <span className="leading-6 text-[var(--muted)]">{concept.title}</span>
+                                <span className="shrink-0 text-right text-[10px] uppercase tracking-[0.12em] text-[var(--muted)]">{labels.conceptOnly}</span>
+                              </div>
+                            )}
+                          </li>
+                        ))}
+                      </ol>
+                    </div>
                   </article>
                 ))}
               </div>
