@@ -41,7 +41,7 @@ test("Course-context Guide to Mission preserves Path and can continue to the nex
     "/en/guides/human-review-boundary/?path=agent-engineering",
   );
   await next.click();
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Human review boundary");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Human review boundaries");
   await expect(page.locator('[data-guide-active-path="agent-engineering"]')).toBeVisible();
 });
 
