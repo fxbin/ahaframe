@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import type { Locale } from "@/lib/content";
-import { segmentForLocale } from "@/lib/content";
 import type { GuideDirectoryData } from "@/lib/guides-directory";
 
 interface GuideDirectoryPageProps {
@@ -12,7 +11,7 @@ interface GuideDirectoryPageProps {
 }
 
 export function GuideDirectoryPage({ locale, data }: GuideDirectoryPageProps) {
-  const segment = segmentForLocale(locale);
+  const segment = locale === "zh-CN" ? "zh-cn" : "en";
   const [query, setQuery] = useState("");
   const [domain, setDomain] = useState("");
   const [branch, setBranch] = useState("");
