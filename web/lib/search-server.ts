@@ -30,7 +30,7 @@ async function practiceCopy(locale: Locale, contentId: string): Promise<{ title:
     return {
       title: lab.name,
       summary: lab.description,
-      body: [lab.quick, lab.hero, ...(lab.takeaways ?? []).flatMap((item) => [item.label, item.value])].filter(Boolean).join(" "),
+      body: [lab.quick, lab.hero, ...(lab.takeaways ?? []).flatMap(([label, value]) => [label, value])].filter(Boolean).join(" "),
     };
   }
 
