@@ -1,0 +1,98 @@
+{
+  "version": "1.0.0",
+  "locale": "zh-CN",
+  "wave": "core-20",
+  "bundle": "core-02",
+  "guides": [
+    {
+      "slug": "structured-output-contract",
+      "conceptId": "concept-structured-output-contract",
+      "title": "Structured Output 是应用契约",
+      "summary": "JSON 结构只有在应用同时验证语法与下游业务语义时，才真正成为可依赖的边界。",
+      "readingMinutes": 6,
+      "access": "OPEN",
+      "mentalModel": "Structured Output 把自由文本生成变成 Boundary Contract，但在无效值与语义上不可能的组合被拒绝之前，这个 Contract 仍然是不完整的。",
+      "whyItMatters": "JSON 能成功 Parse，不等于得到了有效的业务对象。生产系统需要在生成结果进入数据库、Tool 或用户可见操作之前，捕获缺失字段、错误 Enum、不可能组合以及 Schema Version Drift。",
+      "sections": [
+        {"id":"mechanism","title":"从格式升级为 Contract","body":"强边界至少包含两层：Structural Validation 检查类型与 Required Field，Semantic Validation 检查领域规则。再加上版本管理与 Bounded Repair，失败就会成为显式证据，而不是被静默转换成看起来正常的数据。"},
+        {"id":"example","title":"例子：JSON 合法，但订单不可能成立","body":"模型返回了合法 JSON，其中 quantity 是 -3，Shipping Method 也不允许用于当前目的地。Parser 会接受它；Schema 可以捕获负数；Semantic Validation 则负责发现目的地规则冲突。不同验证层保护的是不同 Invariant。"}
+      ],
+      "failureModes": ["把“合法 JSON”直接等同于有效应用数据。","Validation 失败后盲目重复同一个 Prompt。","Schema 变化时没有显式 Version Handling。"],
+      "heuristics": ["把结构校验与业务语义校验分开。","将精确 Validation Error 反馈给有限次数的 Repair。","只有通过 Contract Boundary 后，才允许结果触发下游 Side Effect。"],
+      "takeaways": ["结构化能够减少歧义，但不能消除语义错误。","Validation Error 是能够指导 Repair 的证据。","Contract 应该存在于应用边界，而不只是写在 Prompt 中。"],
+      "practice": {"title":"在 Structured Output Lab 中设计有边界的 Contract","href":"/labs/structured-output-contract-lab/"}
+    },
+    {
+      "slug": "finite-context-budget",
+      "conceptId": "concept-finite-context-budget",
+      "title": "有限 Context 预算",
+      "summary": "Context Engineering 本质上是资源分配：决定哪条指令、证据、Memory 与 Tool State 值得占据下一份预算。",
+      "readingMinutes": 6,
+      "access": "OPEN",
+      "mentalModel": "每一条 Context 都在消耗稀缺容量。真正的问题不是“它放不放得下”，而是“它是否值得占据模型当前决策的 Working Set”。",
+      "whyItMatters": "大 Context Window 很容易掩盖差的选择策略。当所有东西都被保留时，过期事实、重复指令与冗长 Tool Trace 会增加成本，也会削弱关键证据的信号。明确 Budget 能迫使系统表达优先级。",
+      "sections": [
+        {"id":"mechanism","title":"按照信息角色分配预算","body":"可以把 Context 分成 Invariant Instruction、Current Task State、Authoritative Evidence、Working Memory 与 Transient Trace 等类别。每一类都拥有自己的 Retention、Refresh 与 Compression Policy，而不是对所有内容使用同一种 Truncation。"},
+        {"id":"example","title":"例子：必须保住 Release Veto","body":"一个 Release Agent 拿到四十页测试日志和一个尚未解决的安全 Veto。盲目 Summarization 可能因为 Veto 只出现一次而把它删掉。Budget Policy 则会把 Veto 归为不可压缩约束，只压缩重复日志。"}
+      ],
+      "failureModes": ["对所有内容使用 FIFO 截断。","把大部分 Window 花在冗长 Tool Output 上。","对关键约束与普通背景使用同一种 Compression Policy。"],
+      "heuristics": ["为 Invariant 与未解决 Blocker 预留 Protected Budget。","按 Source Category 记录 Token Cost。","把重复 Observation 压缩成 State，而不是不断累积成 Prose History。"],
+      "takeaways": ["Context Window 是容量，Context Budget 才是策略。","预算应该反映决策重要性，而不是信息到达顺序。","Protected Information Class 可以避免关键证据被静默丢失。"],
+      "practice": {"title":"在 Context Compression Lab 中比较不同 Retention Policy","href":"/labs/context-compression/"}
+    },
+    {
+      "slug": "context-management",
+      "conceptId": "concept-context-management",
+      "title": "Context Management",
+      "summary": "Context Management 会随着任务变化不断决定哪些内容需要加载、刷新、压缩或移除。",
+      "readingMinutes": 7,
+      "access": "OPEN",
+      "mentalModel": "好的 Context 是根据当前决策从 State 与 Evidence 中 Just-in-time 组装出来的，而不是一份永远增长的 Conversation Transcript。",
+      "whyItMatters": "长期任务一直在变化：事实会过期、目标会被重新定义、Tool 会产生新状态，而中间推理的价值会下降。没有明确 Context Lifecycle，Prompt 最终就会变成当前证据与历史残留物的混合物。",
+      "sections": [
+        {"id":"mechanism","title":"建立 Context Lifecycle","body":"在每一个有意义的步骤之前，应用先明确下一步要做的 Decision，再加载最小必要 State 与 Evidence，保留 Durable Constraint，并压缩或删除 Transient Material。Retrieval 与 Memory 是这个 Lifecycle 的输入机制，而不是两个互相独立的魔法功能。"},
+        {"id":"example","title":"例子：Repository Editing Agent","body":"与其每次重新发送整个 Repository 与全部 Chat History，Editing Agent 只加载当前 Task Spec、准备修改的文件、相关 Test 与最新 Tool Result。修改完成并验证后，它持久化关键 Decision，再丢弃原始 Command Output。"}
+      ],
+      "failureModes": ["把 Conversation History 等同于 Application State。","即使静态前缀与下一步无关，也反复加载。","底层 Source 已经变化，却没有让旧 Context 失效。"],
+      "heuristics": ["围绕下一次 Decision 构造 Context，而不是围绕整个 Project。","明确分离 Durable State、Retrievable Knowledge 与 Transient Observation。","记录每个项目为什么被保留，让 Compression Policy 可审计。"],
+      "takeaways": ["Context Management 是持续 Lifecycle，而不是一次 Prompt Optimization。","重要 State 需要在 Prompt 之外存活。","Retrieval、Memory 与 Summarization 都是更大 Selection Policy 里的机制。"],
+      "practice": {"title":"在 Context Compression Lab 中压力测试信息保留","href":"/labs/context-compression/"}
+    },
+    {
+      "slug": "hybrid-retrieval",
+      "conceptId": "concept-hybrid-retrieval",
+      "title": "Dense、Sparse 与 Hybrid Retrieval",
+      "summary": "不同 Retrieval Signal 能捕获不同证据；Hybrid Retrieval 将语义相似与精确词项信号结合起来。",
+      "readingMinutes": 6,
+      "access": "OPEN",
+      "mentalModel": "Dense Retrieval 擅长寻找意义相近内容，Sparse Retrieval 擅长精确术语；可靠系统可以先同时扩大 Recall，再选择最终 Evidence。",
+      "whyItMatters": "纯 Vector Retrieval 容易漏掉 ID、Error Code、人名和精确条款；纯 Keyword Search 又可能漏掉 Paraphrase。Hybrid Retrieval 用多个 Signal 改善 Recall，再把更丰富的 Selection 交给后续 Ranking Stage。",
+      "sections": [
+        {"id":"mechanism","title":"先 Recall，再 Selection","body":"Dense Retrieval 找语义相似 Passage，Sparse Retrieval 奖励词项重叠。Hybrid Stage 合并 Candidate，必要时再通过 Reranking 使用更丰富的 Query-Document Interaction 对它们评分。最终系统是一条 Pipeline，而不是一个万能 Similarity Score。"},
+        {"id":"example","title":"例子：同时按 Error Code 与语义查 Incident","body":"用户询问“Agent Resume 时的 E_CONN_17”。Sparse Search 能精准找到这个 Error Code，Dense Search 则找到使用不同措辞描述 Resume Failure 的文档。Hybrid Retrieval 会保留两类 Candidate，随后交给 Reranker 决定最终 Evidence。"}
+      ],
+      "failureModes": ["把 Embedding Similarity 当作所有 Query 的唯一检索信号。","没有 Calibration 或 Evaluation 就直接混合 Dense 与 Sparse Score。","只看最终 Answer Quality，从而隐藏 Retrieval 本身的问题。"],
+      "heuristics": ["先独立评测 Retrieval Recall，再评测 Generation。","保留 Exact Identifier 与 Structured Filter 能力。","Candidate 很多但最终 Context 必须很小时使用 Reranking。"],
+      "takeaways": ["不存在一个 Retrieval Signal 能统治所有 Query。","Hybrid Retrieval 首先是一种 Recall Strategy。","Retriever 没找到的证据，Generator 无法凭空恢复。"],
+      "practice": {"title":"在 RAG Failure Lab 中破坏并修复 Retrieval Pipeline","href":"/labs/rag-failure/"}
+    },
+    {
+      "slug": "source-authority",
+      "conceptId": "concept-source-authority",
+      "title": "Freshness、Authority 与来源优先级",
+      "summary": "最相似的 Passage 并不一定是系统最应该信任的来源。",
+      "readingMinutes": 6,
+      "access": "OPEN",
+      "mentalModel": "Evidence Selection 需要 Trust Policy：Relevance 回答“是否相关”，Authority 与 Freshness 回答“这个来源是否应该支配决策”。",
+      "whyItMatters": "Knowledge System 中经常同时存在重复内容、旧政策与从更强 Primary Source 派生出来的摘要。如果 Retrieval 只按照 Semantic Similarity 排序，过期 FAQ 完全可能压过当前 Operating Procedure，并产出非常自信但错误的答案。",
+      "sections": [
+        {"id":"mechanism","title":"把 Authority 加入 Relevance","body":"尽可能记录 Source Type、Owner、Effective Date、Version 与 Supersession。Retrieval 可以把这些信号作为 Filter 或 Ranking Feature，而最终答案保留 Provenance，让 Operator 能知道究竟是哪一份 Source 支配了 Claim。"},
+        {"id":"example","title":"例子：政策上个月刚改过","body":"旧 FAQ 写着可以 30 天退款，当前 Policy 已经改成 14 天。旧 FAQ 因为语言更像用户表达而获得更高 Vector Similarity。Authority Policy 会把当前 Policy 标记成 Controlling Source，并过滤或显著降低 Legacy FAQ 的优先级。"}
+      ],
+      "failureModes": ["只按 Similarity 排序而忽略 Effective Date。","让 Derived Summary 排在 Primary Policy 之前。","知识已过期却没有 Retire 或标记 Superseded。"],
+      "heuristics": ["把 Authority 与 Freshness 建模成 First-class Metadata。","涉及 Action 或 Compliance 的 Claim 优先使用 Primary Source。","在 Evaluation 与 Debugging 中暴露 Provenance。"],
+      "takeaways": ["Similarity 与 Trust 回答的是不同问题。","Knowledge Quality 取决于 Lifecycle 与 Authority，而不只是 Embedding。","Retrieval Pipeline 应该能解释为什么某个 Source 排在另一个 Source 前面。"],
+      "practice": {"title":"在 RAG Incident 中检查旧 Source 如何造成错误","href":"/labs/rag-failure/"}
+    }
+  ]
+}
