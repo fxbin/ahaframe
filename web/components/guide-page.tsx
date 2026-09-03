@@ -18,6 +18,12 @@ function copy(locale: Locale) {
         practice: "Apply the concept",
         map: "Back to Knowledge Map",
         guide: "Guide",
+        usedIn: "Used in",
+        usedInCopy: "This Concept is reused across these canonical learning paths.",
+        continue: "Continue learning",
+        previous: "Previous Guide",
+        next: "Next Guide",
+        course: "Course",
       }
     : {
         kicker: "核心 GUIDE",
@@ -32,36 +38,55 @@ function copy(locale: Locale) {
         practice: "把知识用起来",
         map: "返回知识地图",
         guide: "Guide",
+        usedIn: "用于这些学习路径",
+        usedInCopy: "这个 Concept 会在多个 canonical 学习路径中复用。",
+        continue: "继续学习",
+        previous: "上一篇 Guide",
+        next: "下一篇 Guide",
+        course: "课程",
       };
 }
 
 export function GuidePage({ locale, data }: { locale: Locale; data: GuidePageData }) {
   const labels = copy(locale);
   const segment = segmentForLocale(locale);
-  const { guide, concept, relatedConcepts } = data;
+  const { guide, concept, relatedConcepts, pathMemberships, activePath } = data;
 
   return (
     <main>
       <article>
         <header className="border-b border-[var(--border)] py-14 sm:py-20">
-          <div className="shell grid gap-10 lg:grid-cols-[1.1fr_.9fr] lg:items-end">
-            <div className="max-w-4xl">
-              <p className="eyebrow-label">{labels.kicker}</p>
-              <div className="mt-4 flex flex-wrap gap-x-3 gap-y-2 font-mono text-[10px] uppercase tracking-[0.08em] text-[var(--muted)]">
-                <span>{concept.kind}</span>
-                <span aria-hidden="true">·</span>
-                <span>{concept.difficulty}</span>
-                <span aria-hidden="true">·</span>
-                <span>{guide.readingMinutes} {labels.minutes}</span>
+          <div className="shell">
+            {activePath ? (
+              <nav
+                aria-label={labels.course}
+                className="mb-8 flex flex-wrap items-center gap-2 text-sm text-[var(--muted)]"
+                data-guide-active-path={activePath.slug}
+              >
+                <Link className="quiet-link" href={`/${segment}/courses/${activePath.slug}/`}>{activePath.title}</Link>
+                <span aria-hidden="true">→</span>
+                <span>{activePath.milestoneTitle}</span>
+              </nav>
+            ) : null}
+            <div className="grid gap-10 lg:grid-cols-[1.1fr_.9fr] lg:items-end">
+              <div className="max-w-4xl">
+                <p className="eyebrow-label">{labels.kicker}</p>
+                <div className="mt-4 flex flex-wrap gap-x-3 gap-y-2 font-mono text-[10px] uppercase tracking-[0.08em] text-[var(--muted)]">
+                  <span>{concept.kind}</span>
+                  <span aria-hidden="true">·</span>
+                  <span>{concept.difficulty}</span>
+                  <span aria-hidden="true">·</span>
+                  <span>{guide.readingMinutes} {labels.minutes}</span>
+                </div>
+                <h1 className="mt-5 max-w-4xl font-[family-name:var(--font-editorial)] text-5xl font-semibold leading-[0.98] tracking-[-0.05em] sm:text-6xl">
+                  {guide.title}
+                </h1>
+                <p className="mt-6 max-w-3xl text-lg leading-8 text-[var(--muted)]">{guide.summary}</p>
               </div>
-              <h1 className="mt-5 max-w-4xl font-[family-name:var(--font-editorial)] text-5xl font-semibold leading-[0.98] tracking-[-0.05em] sm:text-6xl">
-                {guide.title}
-              </h1>
-              <p className="mt-6 max-w-3xl text-lg leading-8 text-[var(--muted)]">{guide.summary}</p>
-            </div>
-            <div className="border-y border-[var(--border)] py-5 lg:border-y-0 lg:border-l lg:py-2 lg:pl-8">
-              <p className="technical-label">{labels.mentalModel}</p>
-              <p className="mt-3 font-[family-name:var(--font-editorial)] text-2xl leading-9 tracking-[-0.025em]">{guide.mentalModel}</p>
+              <div className="border-y border-[var(--border)] py-5 lg:border-y-0 lg:border-l lg:py-2 lg:pl-8">
+                <p className="technical-label">{labels.mentalModel}</p>
+                <p className="mt-3 font-[family-name:var(--font-editorial)] text-2xl leading-9 tracking-[-0.025em]">{guide.mentalModel}</p>
+              </div>
             </div>
           </div>
         </header>
@@ -119,6 +144,61 @@ export function GuidePage({ locale, data }: { locale: Locale; data: GuidePageDat
                 ))}
               </ol>
             </section>
+
+            {pathMemberships.length ? (
+              <section className="border-b border-[var(--border)] py-10" data-guide-path-memberships>
+                <p className="technical-label">{labels.usedIn}</p>
+                <p className="mt-2 max-w-3xl text-sm leading-6 text-[var(--muted)]">{labels.usedInCopy}</p>
+                <div className="mt-6 grid gap-x-8 border-t border-[var(--border)] sm:grid-cols-2">
+                  {pathMemberships.map((membership) => (
+                    <Link
+                      key={membership.id}
+                      href={`/${segment}/courses/${membership.slug}/`}
+                      data-guide-path-membership={membership.slug}
+                      className="flex items-start justify-between gap-4 border-b border-[var(--border)] py-4 transition hover:text-[var(--primary)]"
+                    >
+                      <span>
+                        <span className="block text-sm font-bold">{membership.title}</span>
+                        <span className="mt-1 block text-xs text-[var(--muted)]">{membership.milestoneTitle}</span>
+                      </span>
+                      <span className="font-mono text-[9px] text-[var(--primary)]">{labels.course} →</span>
+                    </Link>
+                  ))}
+                </div>
+              </section>
+            ) : null}
+
+            {activePath && (activePath.previous || activePath.next) ? (
+              <section className="border-b border-[var(--border)] py-10" data-guide-sequence={activePath.slug}>
+                <p className="technical-label">{labels.continue}</p>
+                <div className="mt-6 grid gap-4 sm:grid-cols-2">
+                  <div>
+                    {activePath.previous ? (
+                      <Link
+                        className="group block border border-[var(--border)] p-5 transition hover:border-[var(--primary)]"
+                        href={`/${segment}/guides/${activePath.previous.slug}/?path=${encodeURIComponent(activePath.slug)}`}
+                        data-guide-previous={activePath.previous.conceptId}
+                      >
+                        <span className="technical-label">← {labels.previous}</span>
+                        <strong className="mt-3 block font-[family-name:var(--font-editorial)] text-xl tracking-[-0.03em] group-hover:text-[var(--primary)]">{activePath.previous.title}</strong>
+                      </Link>
+                    ) : null}
+                  </div>
+                  <div>
+                    {activePath.next ? (
+                      <Link
+                        className="group block border border-[var(--border)] p-5 sm:text-right transition hover:border-[var(--primary)]"
+                        href={`/${segment}/guides/${activePath.next.slug}/?path=${encodeURIComponent(activePath.slug)}`}
+                        data-guide-next={activePath.next.conceptId}
+                      >
+                        <span className="technical-label">{labels.next} →</span>
+                        <strong className="mt-3 block font-[family-name:var(--font-editorial)] text-xl tracking-[-0.03em] group-hover:text-[var(--primary)]">{activePath.next.title}</strong>
+                      </Link>
+                    ) : null}
+                  </div>
+                </div>
+              </section>
+            ) : null}
 
             {relatedConcepts.length ? (
               <section className="border-b border-[var(--border)] py-10">
