@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
 import type { Locale } from "@/lib/content";
 import { SEARCH_TYPE_ORDER, searchDocuments, type SearchDocument, type SearchDocumentType } from "@/lib/search";
 
@@ -42,9 +42,13 @@ export function GlobalSearch({ locale, documents }: GlobalSearchProps) {
   const [query, setQuery] = useState("");
   const [activeIndex, setActiveIndex] = useState(0);
   const results = useMemo(() => searchDocuments(documents, query), [documents, query]);
+  const orderedResults = useMemo(
+    () => SEARCH_TYPE_ORDER.flatMap((type) => results.filter((result) => result.type === type)),
+    [results],
+  );
 
   useEffect(() => {
-    function onShortcut(event: KeyboardEvent) {
+    function onShortcut(event: globalThis.KeyboardEvent) {
       if ((event.metaKey || event.ctrlKey) && event.key.toLocaleLowerCase() === "k") {
         event.preventDefault();
         setOpen(true);
@@ -69,22 +73,22 @@ export function GlobalSearch({ locale, documents }: GlobalSearchProps) {
     window.requestAnimationFrame(() => triggerRef.current?.focus());
   }
 
-  function onInputKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
+  function onInputKeyDown(event: ReactKeyboardEvent<HTMLInputElement>) {
     if (event.key === "Escape") {
       event.preventDefault();
       close();
       return;
     }
-    if (!results.length) return;
+    if (!orderedResults.length) return;
     if (event.key === "ArrowDown") {
       event.preventDefault();
-      setActiveIndex((value) => (value + 1) % results.length);
+      setActiveIndex((value) => (value + 1) % orderedResults.length);
     } else if (event.key === "ArrowUp") {
       event.preventDefault();
-      setActiveIndex((value) => (value - 1 + results.length) % results.length);
+      setActiveIndex((value) => (value - 1 + orderedResults.length) % orderedResults.length);
     } else if (event.key === "Enter") {
       event.preventDefault();
-      window.location.assign(results[Math.min(activeIndex, results.length - 1)].route);
+      window.location.assign(orderedResults[Math.min(activeIndex, orderedResults.length - 1)].route);
     }
   }
 
@@ -117,7 +121,7 @@ export function GlobalSearch({ locale, documents }: GlobalSearchProps) {
                 onKeyDown={onInputKeyDown}
                 placeholder={copy.placeholder}
                 aria-label={copy.dialog}
-                aria-activedescendant={results.length ? `search-result-${activeIndex}` : undefined}
+                aria-activedescendant={orderedResults.length ? `search-result-${activeIndex}` : undefined}
                 autoComplete="off"
               />
               <button type="button" className="quiet-link text-xs" onClick={close} aria-label={copy.close}>Esc</button>
@@ -126,7 +130,7 @@ export function GlobalSearch({ locale, documents }: GlobalSearchProps) {
             <div className="max-h-[68vh] overflow-y-auto p-3" data-global-search-results data-search-document-count={documents.length}>
               {!query.trim() ? (
                 <p className="px-3 py-8 text-sm leading-6 text-[var(--muted)]">{copy.hint}</p>
-              ) : !results.length ? (
+              ) : !orderedResults.length ? (
                 <p className="px-3 py-8 text-sm leading-6 text-[var(--muted)]" data-global-search-empty>{copy.empty}</p>
               ) : (
                 SEARCH_TYPE_ORDER.map((type) => {
