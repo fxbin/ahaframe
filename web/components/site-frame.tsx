@@ -24,8 +24,8 @@ export async function SiteFrame({ locale, source, children }: SiteFrameProps) {
             {source.brand}
           </Link>
 
-          <div className="flex items-center gap-2 sm:gap-4 lg:gap-6">
-            <nav className="site-header__nav flex items-center gap-4 text-sm sm:gap-6 lg:gap-7" aria-label="Primary navigation">
+          <div className="flex items-center gap-1.5 sm:gap-4 lg:gap-6">
+            <nav className="site-header__nav flex items-center gap-3 text-sm sm:gap-6 lg:gap-7" aria-label="Primary navigation">
               <Link className="transition hover:text-[var(--text)]" href={`/${segment}/courses/`}>
                 {source.ui.nav.lessons}
               </Link>
