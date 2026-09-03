@@ -61,6 +61,10 @@ runs:
         node scripts/test_content_wave_3.js
         python3 scripts/test_content_wave_3_contract.py
 
+    - name: Test Core Guide content v1
+      shell: bash
+      run: python3 scripts/test_core_guides_v1.py
+
     - name: Test Integrated Build
       shell: bash
       run: node scripts/test_integrated_build.js
