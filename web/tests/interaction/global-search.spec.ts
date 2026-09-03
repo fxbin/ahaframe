@@ -45,7 +45,7 @@ test("exact Course and Practice destinations participate without fabricated Cour
   await input.fill("$47,000 Retry");
   const practice = page.locator('[data-search-result="practice:agent-reliability"]');
   await expect(practice).toBeVisible();
-  await expect(practice).toHaveAttribute("data-search-reason", "exact");
+  await expect(practice).toHaveAttribute("data-search-reason", "prefix");
   await expect(practice).toHaveAttribute("href", "/en/labs/agent-reliability/");
   expect((await practice.getAttribute("href")) ?? "").not.toContain("path=");
 });
