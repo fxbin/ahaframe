@@ -24,6 +24,7 @@ export function GuideDirectoryPage({ locale, data }: GuideDirectoryPageProps) {
         kicker: "GUIDES",
         title: "60 个可复用的 AI 心智模型。",
         copy: "Guide 用来快速理解一个 Concept；Course 用来告诉你下一步学什么。你可以直接浏览，也可以按知识域、主题、课程和难度筛选。",
+        filtersRegion: "Guide 筛选条件",
         filter: "筛选 Guide",
         search: "在当前目录中过滤标题或摘要",
         allDomains: "全部知识域",
@@ -48,6 +49,7 @@ export function GuideDirectoryPage({ locale, data }: GuideDirectoryPageProps) {
         kicker: "GUIDES",
         title: "60 reusable mental models for AI.",
         copy: "Use a Guide when you need to understand one Concept now; use a Course when you want an ordered next step. Browse directly or filter by domain, topic, course, and difficulty.",
+        filtersRegion: "Guide filters",
         filter: "Filter Guides",
         search: "Filter this directory by title or summary",
         allDomains: "All domains",
@@ -112,7 +114,7 @@ export function GuideDirectoryPage({ locale, data }: GuideDirectoryPageProps) {
         </div>
       </section>
 
-      <section className="border-b border-[var(--border)] py-8" aria-label={labels.filter}>
+      <section className="border-b border-[var(--border)] py-8" aria-label={labels.filtersRegion}>
         <div className="shell">
           <div className="grid gap-3 lg:grid-cols-[1.4fr_repeat(4,minmax(0,1fr))]">
             <label className="grid gap-2 text-xs font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">
