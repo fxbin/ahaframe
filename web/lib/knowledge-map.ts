@@ -27,6 +27,7 @@ export interface KnowledgeMapConcept {
   maturity: string;
   versionSensitive: boolean;
   legacyIds: string[];
+  guideSlug: string | null;
 }
 
 export interface KnowledgeMapMilestone {
