@@ -9,7 +9,7 @@ test("English Core Guide renders the full reading contract and localized practic
   await expect(page.getByText("Common failure modes", { exact: true })).toBeVisible();
   await expect(page.getByText("Engineering heuristics", { exact: true })).toBeVisible();
   await expect(page.getByText("Takeaways", { exact: true })).toBeVisible();
-  await expect(page.getByRole("link", { name: /Stress-test context retention/ })).toHaveAttribute("href", "/en/labs/context-compression/");
+  await expect(page.getByRole("link", { name: /Stress-test context retention/ })).toHaveAttribute("href", "/en/labs/context-compression/?guide=context-management");
 });
 
 test("Chinese Core Guide preserves the same content structure and localizes navigation", async ({ page }) => {
@@ -21,27 +21,27 @@ test("Chinese Core Guide preserves the same content structure and localizes navi
   await expect(page.getByText("常见失败模式", { exact: true })).toBeVisible();
   await expect(page.getByText("工程启发", { exact: true })).toBeVisible();
   await expect(page.getByText("关键结论", { exact: true })).toBeVisible();
-  await expect(page.getByRole("link", { name: /压力测试信息保留/ })).toHaveAttribute("href", "/zh-cn/labs/context-compression/");
+  await expect(page.getByRole("link", { name: /压力测试信息保留/ })).toHaveAttribute("href", "/zh-cn/labs/context-compression/?guide=context-management");
 });
 
 test("Core-40 publishes the new evaluation Guide in both locales", async ({ page }) => {
   await page.goto("/en/guides/evaluation-evidence/");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Evaluation environments and verifier design");
-  await expect(page.getByRole("link", { name: /Design evidence and vetoes/ })).toHaveAttribute("href", "/en/labs/evaluation-failure/");
+  await expect(page.getByRole("link", { name: /Design evidence and vetoes/ })).toHaveAttribute("href", "/en/labs/evaluation-failure/?guide=evaluation-evidence");
 
   await page.goto("/zh-cn/guides/evaluation-evidence/");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Evaluation Environment 与 Verifier Design");
-  await expect(page.getByRole("link", { name: /设计 Evidence 与 Veto/ })).toHaveAttribute("href", "/zh-cn/labs/evaluation-failure/");
+  await expect(page.getByRole("link", { name: /设计 Evidence 与 Veto/ })).toHaveAttribute("href", "/zh-cn/labs/evaluation-failure/?guide=evaluation-evidence");
 });
 
 test("Core-60 publishes a newly added Guide in both locales", async ({ page }) => {
   await page.goto("/en/guides/traceability/");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Traceability from input to outcome");
-  await expect(page.getByRole("link", { name: /Diagnose evidence paths/ })).toHaveAttribute("href", "/en/labs/evaluation-failure/");
+  await expect(page.getByRole("link", { name: /Diagnose evidence paths/ })).toHaveAttribute("href", "/en/labs/evaluation-failure/?guide=traceability");
 
   await page.goto("/zh-cn/guides/traceability/");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("从 Input 到 Outcome 的 Traceability");
-  await expect(page.getByRole("link", { name: /诊断 Evidence Path/ })).toHaveAttribute("href", "/zh-cn/labs/evaluation-failure/");
+  await expect(page.getByRole("link", { name: /诊断 Evidence Path/ })).toHaveAttribute("href", "/zh-cn/labs/evaluation-failure/?guide=traceability");
 });
 
 test("direct Guide visits show canonical Path memberships without inventing a linear sequence", async ({ page }) => {
