@@ -13,6 +13,7 @@ const CORE_GUIDE_COUNT = 60;
 const REQUIRED_CORE_ROUTES = [
   "",
   "courses/",
+  "guides/",
   "learning/",
   "pricing/",
   "early-access/",
@@ -33,6 +34,7 @@ const REQUIRED_APP_FILES = [
   "app/(site)/[locale]/page.tsx",
   "app/(site)/[locale]/courses/page.tsx",
   "app/(site)/[locale]/courses/[slug]/page.tsx",
+  "app/(site)/[locale]/guides/page.tsx",
   "app/(site)/[locale]/guides/[slug]/page.tsx",
   "app/(site)/[locale]/learning/page.tsx",
   "app/(site)/[locale]/pricing/page.tsx",
@@ -115,7 +117,7 @@ function assertRouteManifest(routes, locale) {
   if (JSON.stringify(courseRoutes) !== JSON.stringify(canonicalCourseRoutes)) {
     throw new Error(`${locale} Course routes must exactly mirror canonical Knowledge Graph Path slugs.\nExpected: ${canonicalCourseRoutes.join(", ")}\nActual: ${courseRoutes.join(", ")}`);
   }
-  const guideRoutes = routes.filter((route) => route.startsWith("guides/")).sort();
+  const guideRoutes = routes.filter((route) => route.startsWith("guides/") && route !== "guides/").sort();
   if (JSON.stringify(guideRoutes) !== JSON.stringify(canonicalGuideRoutes)) {
     throw new Error(`${locale} Guide routes must exactly mirror the Core Guide publication bundles.\nExpected: ${canonicalGuideRoutes.join(", ")}\nActual: ${guideRoutes.join(", ")}`);
   }
@@ -149,4 +151,4 @@ if (JSON.stringify(enRoutes) !== JSON.stringify(zhRoutes)) {
 
 for (const relativePath of REQUIRED_APP_FILES) await access(path.join(WEB_ROOT, relativePath));
 
-console.log(`Next.js public-route parity contract OK (${enRoutes.length} routes × 2 locales; 15 Course routes + 60 Core Guide routes mirror canonical content; Knowledge Map and stable routes preserved).`);
+console.log(`Next.js public-route parity contract OK (${enRoutes.length} routes × 2 locales; 15 Course routes + Guides directory + 60 Core Guide routes mirror canonical content; Knowledge Map and stable routes preserved).`);
