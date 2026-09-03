@@ -1,9 +1,10 @@
 import type { Locale } from "@/lib/content";
 import { getFoundationContent, getLabContent, getLocaleSource } from "@/lib/content";
-import type { KnowledgeMapPath } from "@/lib/knowledge-map";
+import type { KnowledgeMapConcept, KnowledgeMapMilestone, KnowledgeMapPath } from "@/lib/knowledge-map";
 import { getKnowledgeMap } from "@/lib/knowledge-map-server";
 import { getProductionExperience } from "@/lib/content-access-server";
 import { getMissionContent } from "@/lib/mission";
+import { getCoreGuides } from "@/lib/guides-server";
 
 const FEATURED_PATH_SLUGS = [
   "agent-engineering",
@@ -40,8 +41,29 @@ export interface CoursePractice {
   description: string;
 }
 
+export interface CourseGuideProjection {
+  slug: string;
+  title: string;
+  readingMinutes: number;
+}
+
+export interface CourseConceptProjection {
+  id: string;
+  title: string;
+  difficulty: string;
+  guide: CourseGuideProjection | null;
+}
+
+export interface CourseMilestoneProjection {
+  id: string;
+  title: string;
+  required: boolean;
+  concepts: CourseConceptProjection[];
+}
+
 export interface CourseCatalogItem {
   path: KnowledgeMapPath;
+  milestones: CourseMilestoneProjection[];
   practices: CoursePractice[];
 }
 
@@ -64,8 +86,34 @@ async function resolvePracticeCopy(locale: Locale, contentId: string): Promise<{
   return { title: contentId, description: "" };
 }
 
+function projectMilestone(
+  milestone: KnowledgeMapMilestone,
+  conceptById: Map<string, KnowledgeMapConcept>,
+  guideByConceptId: Map<string, CourseGuideProjection>,
+): CourseMilestoneProjection {
+  return {
+    id: milestone.id,
+    title: milestone.title,
+    required: milestone.required,
+    concepts: milestone.conceptIds.map((conceptId) => {
+      const concept = conceptById.get(conceptId);
+      if (!concept) throw new Error(`Course milestone points to unknown Concept: ${milestone.id} -> ${conceptId}`);
+      return {
+        id: concept.id,
+        title: concept.title,
+        difficulty: concept.difficulty,
+        guide: guideByConceptId.get(concept.id) ?? null,
+      };
+    }),
+  };
+}
+
 export async function getCourseCatalog(locale: Locale): Promise<CourseCatalogItem[]> {
-  const [knowledgeMap, localeSource] = await Promise.all([getKnowledgeMap(locale), getLocaleSource(locale)]);
+  const [knowledgeMap, localeSource, guides] = await Promise.all([
+    getKnowledgeMap(locale),
+    getLocaleSource(locale),
+    getCoreGuides(locale),
+  ]);
   const production = (
     await Promise.all(PRODUCTION_IDS.map((contentId) => getProductionExperience(contentId)))
   ).filter((item): item is NonNullable<typeof item> => Boolean(item && item.status === "EXISTING"));
@@ -74,6 +122,13 @@ export async function getCourseCatalog(locale: Locale): Promise<CourseCatalogIte
     await Promise.all(
       production.map(async (experience) => [experience.id, await resolvePracticeCopy(locale, experience.id)] as const),
     ),
+  );
+  const conceptById = new Map(knowledgeMap.concepts.map((concept) => [concept.id, concept]));
+  const guideByConceptId = new Map(
+    guides.map((guide) => [
+      guide.conceptId,
+      { slug: guide.slug, title: guide.title, readingMinutes: guide.readingMinutes } satisfies CourseGuideProjection,
+    ]),
   );
 
   return knowledgeMap.paths.map((path) => {
@@ -90,8 +145,9 @@ export async function getCourseCatalog(locale: Locale): Promise<CourseCatalogIte
         };
       })
       .filter((practice) => Boolean(practice.route));
+    const milestones = path.milestones.map((milestone) => projectMilestone(milestone, conceptById, guideByConceptId));
 
-    return { path, practices };
+    return { path, milestones, practices };
   });
 }
 
