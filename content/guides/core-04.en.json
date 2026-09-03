@@ -1,0 +1,98 @@
+{
+  "version": "1.0.0",
+  "locale": "en",
+  "wave": "core-20",
+  "bundle": "core-04",
+  "guides": [
+    {
+      "slug": "idempotency-boundary",
+      "conceptId": "concept-idempotency-boundary",
+      "title": "Idempotency boundary",
+      "summary": "Repeated attempts should represent the same business intent instead of silently creating a new side effect each time.",
+      "readingMinutes": 6,
+      "access": "OPEN",
+      "mentalModel": "A stable operation identity distinguishes a retry of the same intent from a genuinely new intent.",
+      "whyItMatters": "Networks retry, workers restart and agents re-plan. Without an idempotency boundary, the same user intent can create duplicate orders, messages, charges or refunds. The protection has to live at the side-effect boundary rather than in optimistic model reasoning.",
+      "sections": [
+        {"id":"mechanism","title":"Give business intent a stable identity","body":"The caller assigns an idempotency key or operation ID when one side-effecting intent is created. The receiver records the result for that identity and returns the same outcome for repeated attempts. That identity must survive network retries, process restarts and agent re-planning."},
+        {"id":"example","title":"Example: one click, two HTTP attempts","body":"A user clicks Buy once. The first request times out, so the client retries. If both attempts carry the same order-intent ID, the server can return the original order instead of creating a second one."}
+      ],
+      "failureModes": ["Creating a new idempotency key for every retry.","Scoping the key only to an HTTP attempt rather than the business intent.","Using compensation as a substitute for preventing avoidable duplicates."],
+      "heuristics": ["Place the identity at the business side-effect boundary.","Persist the operation identity wherever retries can originate.","Test timeout, restart and partial-success paths explicitly."],
+      "takeaways": ["Identity should be stable before retry timing is considered.","One intent should have one operation identity.","Idempotency and reconciliation work together for ambiguous outcomes."],
+      "practice": {"title":"Repair the duplicate-side-effect incident","href":"/labs/agent-reliability/"}
+    },
+    {
+      "slug": "observability-as-diagnosis",
+      "conceptId": "concept-observability-diagnosis",
+      "title": "Observability as a diagnosis interface",
+      "summary": "Logs and traces are valuable when they let an operator reconstruct why an AI outcome happened across model, retrieval, tool and runtime layers.",
+      "readingMinutes": 6,
+      "access": "OPEN",
+      "mentalModel": "Observability should expose a causal execution path: what entered each boundary, what evidence was selected, what decision was made and what the environment returned.",
+      "whyItMatters": "AI failures are easy to misattribute. A wrong answer may come from missing retrieval, stale source authority, a malformed tool response, an application-state bug or model behavior. Without cross-layer evidence, teams default to changing prompts even when the prompt is not the failing component.",
+      "sections": [
+        {"id":"mechanism","title":"Trace decisions across boundaries","body":"Capture stable request and operation IDs, relevant inputs, retrieval candidates and selected evidence, tool calls, validation outcomes and release decisions. The trace should make state transitions inspectable without requiring operators to reconstruct the workflow from unrelated timestamped logs."},
+        {"id":"example","title":"Example: the wrong customer credit","body":"A support agent grants the wrong credit. The final answer looks like a reasoning error, but the trace shows that retrieval loaded the policy for a different customer plan. The fix belongs in retrieval filtering and identity propagation, not in a longer system prompt."}
+      ],
+      "failureModes": ["Recording only the final prompt and response.","Collecting huge logs without correlation identifiers.","Building dashboards that show errors but not which system layer produced them."],
+      "heuristics": ["Log inputs and outputs at important system boundaries.","Use stable IDs to connect model, retrieval, tool and runtime events.","Design traces around the questions an operator needs to answer during diagnosis."],
+      "takeaways": ["Useful observability enables attribution.","State transitions matter more than isolated timestamps.","Good evidence prevents prompt tuning from becoming the default fix for every failure."],
+      "practice": {"title":"Use evidence and vetoes in Evaluation Failure Lab","href":"/labs/evaluation-failure/"}
+    },
+    {
+      "slug": "source-triangulation",
+      "conceptId": "concept-source-triangulation",
+      "title": "Triangulate independent sources",
+      "summary": "Confidence should increase when independent evidence paths converge, not when many links repeat the same upstream claim.",
+      "readingMinutes": 6,
+      "access": "OPEN",
+      "mentalModel": "Count independent evidence paths, not citation count. Five pages copying one original source are still one underlying piece of evidence.",
+      "whyItMatters": "AI-assisted research can produce a long bibliography that looks rigorous while remaining epistemically thin. Syndicated articles, derivative summaries and repeated press coverage may all inherit the same unverified claim. Triangulation asks whether the evidence has genuinely independent origins.",
+      "sections": [
+        {"id":"mechanism","title":"Track evidence lineage","body":"Identify primary sources and group documents that share the same upstream evidence. For consequential claims, seek a different evidence path such as an official record, independent measurement, separate dataset or expert analysis. Preserve disagreement when independent sources do not converge."},
+        {"id":"example","title":"Example: five articles, one statistic","body":"Five news stories say that 70% of teams adopted AI, but each article quotes the same company blog. That is one data point repeated five times. An independent survey with a different sample would add a second evidence path; another rewrite of the blog would not."}
+      ],
+      "failureModes": ["Treating syndicated coverage as independent confirmation.","Using search-result count as a proxy for confidence.","Smoothing over disagreement to produce a cleaner narrative."],
+      "heuristics": ["Track the original source behind every consequential claim.","Seek at least one independent evidence path for high-impact conclusions.","Preserve conflicts and uncertainty in the synthesis."],
+      "takeaways": ["Citation quantity is not evidence diversity.","Independence is about source lineage.","A strong synthesis can explicitly say that credible evidence conflicts."],
+      "practice": {"title":"Build an evidence-backed research decision","href":"/labs/research-evidence-mission/"}
+    },
+    {
+      "slug": "long-form-consistency",
+      "conceptId": "concept-long-form-consistency",
+      "title": "Long-form consistency",
+      "summary": "Coherent long documents externalize claims, terminology, voice and decisions instead of relying on one giant prompt to remember everything.",
+      "readingMinutes": 7,
+      "access": "OPEN",
+      "mentalModel": "Long-form generation is a state-management problem: argument maps, source-backed claims, terminology and chapter contracts provide durable editorial memory.",
+      "whyItMatters": "A model can produce a strong paragraph while a 20,000-word manuscript slowly contradicts itself. Definitions drift, evidence is reused incorrectly and the voice changes because local generation does not automatically preserve global project state.",
+      "sections": [
+        {"id":"mechanism","title":"Externalize the manuscript state","body":"Maintain an argument outline, source-backed claim list, glossary, editorial constraints and chapter briefs. Each drafting step receives the relevant subset, and review compares local text against those shared artifacts rather than trusting the model to remember the entire manuscript."},
+        {"id":"example","title":"Example: one concept changes meaning","body":"Chapter 2 defines verification as independent evidence checking, but Chapter 8 casually uses verification to mean 'ask the model again'. A glossary and claim ledger expose the semantic drift during review before the inconsistency becomes embedded across the book."}
+      ],
+      "failureModes": ["Sending the whole manuscript with 'stay consistent' as the main control.","Using summaries as the only record of exact claims and terminology.","Running style edits without rechecking factual and conceptual consistency."],
+      "heuristics": ["Maintain a glossary and claim ledger outside the generated prose.","Give each chapter an explicit brief and dependency on the global argument.","Review cross-chapter terminology, repetition and contradiction separately from local style."],
+      "takeaways": ["Local fluency does not guarantee global coherence.","Editorial artifacts act as durable memory for the writing system.","Long-form verification should compare text against shared project state."],
+      "practice": {"title":"Design the writing system in Write a Book with AI","href":"/build/write-book-with-ai-build/"}
+    },
+    {
+      "slug": "automation-boundary",
+      "conceptId": "concept-workflow-automation-boundary",
+      "title": "Choose the automation boundary",
+      "summary": "Automate stable, observable work and keep humans where ambiguity, accountability or exception cost remains high.",
+      "readingMinutes": 6,
+      "access": "OPEN",
+      "mentalModel": "A task is a good automation candidate when its inputs and success criteria are clear enough to verify automatically and its failures are recoverable.",
+      "whyItMatters": "AI makes it easy to automate a process before understanding it. When hidden judgment, policy exceptions or responsibility boundaries are buried inside a model call, short-term leverage becomes long-term maintenance and operational risk.",
+      "sections": [
+        {"id":"mechanism","title":"Find the stable boundary","body":"Decompose the workflow and score each stage by input stability, reversibility, verification cost and exception frequency. Automate stages with clear postconditions first. Keep high-impact or ambiguous decisions behind explicit policy and human accountability until evidence supports a wider boundary."},
+        {"id":"example","title":"Example: support in a solo business","body":"A solo founder can automate ticket classification, knowledge retrieval and first-draft replies early. Refunds, account access and unusual policy conflicts remain human decisions. Over time, measured exception rates can justify moving specific low-risk actions across the automation boundary."}
+      ],
+      "failureModes": ["Automating the entire workflow because one happy-path demo worked.","Ignoring exception handling, ownership and maintenance cost.","Adding human review everywhere without defining what the human must decide."],
+      "heuristics": ["Automate tasks with clear machine-checkable postconditions first.","Keep irreversible or high-impact actions behind stronger policy boundaries.","Track exception rate and maintenance burden as automation metrics."],
+      "takeaways": ["Leverage comes from stable boundaries, not maximum autonomy.","Verification cost helps determine what can be safely delegated.","Every automation needs an owner, exception path and maintenance policy."],
+      "practice": {"title":"Design a solo-business operating system","href":"/build/solo-business-operating-system-build/"}
+    }
+  ]
+}
