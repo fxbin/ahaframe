@@ -1,0 +1,98 @@
+{
+  "version": "1.0.0",
+  "locale": "zh-CN",
+  "wave": "core-20",
+  "bundle": "core-01",
+  "guides": [
+    {
+      "slug": "probabilistic-model-behavior",
+      "conceptId": "concept-probabilistic-behavior",
+      "title": "概率性模型行为",
+      "summary": "把模型输出理解为一组可能续写的概率分布，而不是从问题到唯一答案的确定性查表。",
+      "readingMinutes": 6,
+      "access": "OPEN",
+      "mentalModel": "LLM 不是检索一个保证正确的答案，而是在 Context 与采样策略的约束下，持续从多个可能的 Next Token 中进行选择。",
+      "whyItMatters": "如果把概率生成器当成确定性软件组件，就会把正常的输出变化误判为 Bug，也会把模型的自信表达误当成正确性。可靠的 AI 系统需要把模型不确定性与应用层真正提供的保证分开：Schema、Validator、Tool、业务规则与人工复核负责建立可执行的边界。",
+      "sections": [
+        {"id":"mechanism","title":"这种行为如何产生","body":"在每一个生成步骤中，模型都会为多个可能的 Next Token 计算分数。Prompt、此前 Token 与模型参数共同塑造这个分布，随后 Decoding 决定选择哪一个续写。Context 或采样条件发生很小的变化，就可能让后续路径分叉，因此同一个任务的两次合理运行也可能得到不同表述。"},
+        {"id":"example","title":"例子：同一个客服问题问两次","body":"连续两次让模型总结退款政策，措辞可能不同，但只要关键事实一致，这种变化本身并不是问题。如果某一次突然编造了一个例外条款，真正的问题也不是“表述不稳定”，而是系统没有为事实性主张提供 Grounding 与 Verification。"}
+      ],
+      "failureModes": ["把一次成功输出当作模型行为稳定的证明。","把低 Temperature 当作事实正确性的保证。","让模型的自信程度替代外部证据或 Runtime 检查。"],
+      "heuristics": ["当输出变化会影响结果时，用多次代表性运行进行评测。","把必须成立的硬约束放到 Schema、Validator、Tool 与业务规则中。","衡量任务是否真正成功以及失败模式，而不是模型说得有多自信。"],
+      "takeaways": ["概率性不等于随机，而是结果存在一个分布。","当失败代价较高时，应用保证必须由模型之外的系统机制提供。","只要明确哪些条件必须保持不变，允许一定输出变化并没有问题。"],
+      "practice": {"title":"在 Token Playground 中观察 Next Token 概率变化","href":"/lessons/token-playground/"}
+    },
+    {
+      "slug": "model-claim-vs-runtime-fact",
+      "conceptId": "concept-model-vs-runtime-fact",
+      "title": "模型声称 vs Runtime 事实",
+      "summary": "模型可以描述它认为发生了什么，但只有 Runtime 与外部系统能够确认真实发生了什么。",
+      "readingMinutes": 6,
+      "access": "OPEN",
+      "mentalModel": "模型文本只是 Observation 或 Hypothesis；Runtime State、Tool Response、数据库记录与真实 Side Effect 才属于证据层。",
+      "whyItMatters": "很多生产事故都从“把模型说的话升级成系统事实”开始。Agent 可能声称付款失败、文件已经保存或工具执行完成，即便 Runtime 只有模糊甚至相反的证据。系统必须明确区分 Narrated State 与 Verified State。",
+      "sections": [
+        {"id":"mechanism","title":"两个事实层","body":"模型看到的世界是序列化后的视图：Prompt、Tool Output 与历史消息。真正的 Runtime 则拥有执行状态，并且可以读取持久化记录。当 Tool Timeout 或只返回部分信息时，模型可以形成推断，但这个推断不能在没有验证的情况下成为 Source of Truth。"},
+        {"id":"example","title":"例子：一次 Timeout 的退款请求","body":"退款请求发生 Timeout。模型说“退款失败了”，于是重新发起请求。几分钟后，两次请求都结算成功，造成重复退款。正确的系统应先把 Timeout 视为 Unknown，再根据支付平台的权威状态完成 Reconciliation，之后才能决定是否 Retry。"}
+      ],
+      "failureModes": ["把 Assistant 的叙述直接保存成权威 Workflow State。","把缺失 Tool Output 理解成 Side Effect 没有发生。","让生成式摘要覆盖更强的 Source of Truth 数据。"],
+      "heuristics": ["把执行事实与会话文本分开持久化。","把模糊结果明确建模为 UNKNOWN 或 PENDING。","使用权威外部标识符对 Side Effect 做 Reconciliation。"],
+      "takeaways": ["模型可以解释状态，但不应该天然拥有状态。","Unknown 是一个合法而且常常更安全的 Runtime Outcome。","权威事实应该流入模型，而不是由模型凭空生成。"],
+      "practice": {"title":"在 Evaluation Failure Lab 中检查证据","href":"/labs/evaluation-failure/"}
+    },
+    {
+      "slug": "tokenization",
+      "conceptId": "concept-tokenization",
+      "title": "Tokenization",
+      "summary": "模型处理的是 Token 序列，而不是人眼看到的字符或单词，因此成本、限制和行为都会受到文本切分方式影响。",
+      "readingMinutes": 5,
+      "access": "OPEN",
+      "mentalModel": "文本进入模型之前会被转换成 Token ID；模型在这个序列上计算，而 Context Limit 也是按 Token 而不是按页数或字符数衡量。",
+      "whyItMatters": "Tokenization 会影响 Context Budget、Latency、价格，某些情况下也会影响模型行为。代码、不常见的人名、多语言文本与空白符，即使视觉长度相近，也可能占用完全不同数量的 Token。",
+      "sections": [
+        {"id":"mechanism","title":"从文本到模型输入","body":"Tokenizer 会把常见文本片段映射成整数 ID。高频片段通常可以用更少的 Token 表示，而少见字符串可能被拆成多个碎片。这些 Token ID 构成模型实际处理的序列；生成阶段产生新的 Token ID，再被 Decode 回文本。"},
+        {"id":"example","title":"例子：字符数相近，成本却不同","body":"一个短标识符、一段 JSON 和一句中文可能拥有相近的字符数，却产生不同的 Token 数量。如果系统只按字符预算，就可能意外截断关键指令，或者在接入模型时超过 Provider 的 Context Limit。"}
+      ],
+      "failureModes": ["只根据单词数或字符数估算 Context 容量。","忽略日志、代码和序列化 Tool Result 的高 Token 消耗。","假设 Token Boundary 与真正的语义概念边界一致。"],
+      "heuristics": ["当限制重要时，使用目标模型对应的 Tokenizer 实际测量。","分别为指令、检索证据、Tool Output 与生成结果预留预算。","在删除高价值证据之前，先裁剪低价值序列化数据。"],
+      "takeaways": ["字符是 UI 层概念，Token 才是模型输入的计量单位。","Token 数量取决于内容类型，并不与视觉长度成固定比例。","Tokenization 应用于预算与容量管理，而不应被误用成语义检索策略。"],
+      "practice": {"title":"在 Token Playground 中查看 Token 边界","href":"/lessons/token-playground/"}
+    },
+    {
+      "slug": "context-window",
+      "conceptId": "concept-context-window",
+      "title": "Context Window",
+      "summary": "Context Window 是有限的工作输入预算，System Instruction、Conversation、Retrieved Evidence 与 Tool Result 都在竞争这块空间。",
+      "readingMinutes": 6,
+      "access": "OPEN",
+      "mentalModel": "Context 是模型当前的工作空间，而不是无限 Memory；每增加一个 Token，都在占用有限容量与注意力。",
+      "whyItMatters": "更大的 Context Window 并不会消除 Context Engineering。过长的历史会掩埋关键约束，旧信息可能和当前证据冲突，冗长 Tool Trace 也可能挤掉下一步决策真正需要的信息。",
+      "sections": [
+        {"id":"mechanism","title":"哪些信息在竞争 Window","body":"System Instruction、User Message、Example、Retrieved Document、Memory Snippet 与 Tool Output 都占用同一个有限输入空间。随着 Workspace 增长，应用必须决定哪些内容保留、压缩、重新检索或直接丢弃。"},
+        {"id":"example","title":"例子：执行了 80 次 Tool Call 的 Agent","body":"Agent 把每一次 Tool Result 都永久留在 Conversation 中。到最后一步时，最初的验收条件与最新权威状态被大量低价值日志包围。解决方式并不是简单换一个更大模型，而是建立保留决策和证据、压缩临时 Trace 的 Context Policy。"}
+      ],
+      "failureModes": ["把更多 Context 等同于更好的 Context。","长期保留过期或互相冲突的证据。","把 Chat History 当成 Durable Workflow State。"],
+      "heuristics": ["按照信息角色与重要性分配 Context Budget。","优先保留当前权威证据，而不是旧的冗长 Trace。","压缩时明确保护约束、决策与尚未解决的问题。"],
+      "takeaways": ["Context 是有限工作空间。","相关性与 Authority 比原始信息量更重要。","Durable State 与 Context 是不同的系统职责。"],
+      "practice": {"title":"观察 Context Window 如何被填满与重组","href":"/lessons/context-window/"}
+    },
+    {
+      "slug": "relevance-over-volume",
+      "conceptId": "concept-context-relevance",
+      "title": "相关性优先于信息量",
+      "summary": "当低价值材料开始与真正关键的证据竞争时，加入更多输入反而可能降低决策质量。",
+      "readingMinutes": 5,
+      "access": "OPEN",
+      "mentalModel": "Context Quality 本质上是选择问题：只放入能够保留当前决策所需证据与约束的最小充分信息集。",
+      "whyItMatters": "团队经常在模型犯错后不断追加更多文档、更多示例和更多历史，这会同时增加噪音、冲突与成本。更可靠的系统会根据当前任务相关性、来源 Authority 与 Freshness 对信息排序，而不是把 Context 当作 Dump。",
+      "sections": [
+        {"id":"mechanism","title":"生成之前先做选择","body":"应用需要从多个来源组装 Context。每一个候选项都同时具有“对当前决策的价值”和“占用 Token/Attention 的成本”。因此 Retrieval、Filtering 与 Summarization 本身就是推理质量的一部分，而不仅仅是基础设施优化。"},
+        {"id":"example","title":"例子：五十份文档中的政策答案","body":"客服助手同时得到四十份旧 FAQ 和一份当前政策。当前政策包含真正答案，但大量旧文本制造了冲突。按照 Authority 与生效日期进行筛选后，Context 更小，答案反而更可靠。"}
+      ],
+      "failureModes": ["把每一个 Retrieval Result 都直接塞进 Prompt。","只优化 Semantic Similarity，而不考虑 Source Authority。","保留与当前决策没有关系的大量背景信息。"],
+      "heuristics": ["把 Relevance、Authority 与 Freshness 放在一起排序。","为不同 Evidence Class 设置独立上限，而不是只有一个总 Token Limit。","记录哪些信息被排除，让 Retrieval 错误仍然可诊断。"],
+      "takeaways": ["高质量 Context 是经过筛选的，而不是不断堆积的。","只要保留了正确证据，更小的 Context 完全可能更好。","Context Selection 属于应用正确性的一部分。"],
+      "practice": {"title":"在 Context Compression Lab 中观察压缩权衡","href":"/labs/context-compression/"}
+    }
+  ]
+}
