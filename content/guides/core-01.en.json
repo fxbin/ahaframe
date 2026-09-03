@@ -1,0 +1,98 @@
+{
+  "version": "1.0.0",
+  "locale": "en",
+  "wave": "core-20",
+  "bundle": "core-01",
+  "guides": [
+    {
+      "slug": "probabilistic-model-behavior",
+      "conceptId": "concept-probabilistic-behavior",
+      "title": "Probabilistic model behavior",
+      "summary": "Treat model output as a distribution of plausible continuations, not a deterministic lookup from question to answer.",
+      "readingMinutes": 6,
+      "access": "OPEN",
+      "mentalModel": "An LLM does not retrieve one guaranteed answer; it repeatedly chooses among plausible next tokens under the constraints of its context and sampling policy.",
+      "whyItMatters": "If you expect deterministic software guarantees from a probabilistic generator, you will misread variation as a bug and confidence as correctness. Good AI systems separate model uncertainty from the guarantees enforced by application code, validation, tools and human review.",
+      "sections": [
+        {"id":"mechanism","title":"How the behavior emerges","body":"At each generation step the model scores many possible next tokens. The prompt, prior tokens and model weights shape that distribution; decoding then chooses a continuation. Small changes in context or sampling can change the path, so two valid runs may diverge even when the underlying task is identical."},
+        {"id":"example","title":"Example: the same support question twice","body":"Ask for a refund-policy summary twice and the wording may differ while the underlying facts remain compatible. If one run invents an exception, the problem is not that the wording changed; it is that the system lacked grounding and verification for a factual claim."}
+      ],
+      "failureModes": ["Treating one good output as proof of stable behavior.","Using low temperature as if it guaranteed factual correctness.","Letting model confidence replace evidence or runtime checks."],
+      "heuristics": ["Design evaluations over multiple representative runs when variability matters.","Move hard guarantees into schemas, validators, tools and business rules.","Measure task success and failure modes, not verbal confidence."],
+      "takeaways": ["Probabilistic does not mean random; it means outcomes have a distribution.","Application guarantees must be enforced outside the model when failure is costly.","Variation is acceptable when the contract defines what must remain invariant."],
+      "practice": {"title":"See next-token probability change in Token Playground","href":"/lessons/token-playground/"}
+    },
+    {
+      "slug": "model-claim-vs-runtime-fact",
+      "conceptId": "concept-model-vs-runtime-fact",
+      "title": "Model claim vs runtime fact",
+      "summary": "A model can describe what it thinks happened; only the runtime and external systems can establish what actually happened.",
+      "readingMinutes": 6,
+      "access": "OPEN",
+      "mentalModel": "Model text is an observation or hypothesis. Runtime state, tool responses, databases and external side effects are the evidence layer.",
+      "whyItMatters": "Many production failures begin when a model statement is promoted into system truth. An agent may say a payment failed, a file was saved or a tool completed even when the runtime has ambiguous or contradictory evidence. The system must distinguish narrated state from verified state.",
+      "sections": [
+        {"id":"mechanism","title":"Two truth layers","body":"The model sees a serialized view of the world: prompts, tool outputs and prior messages. The runtime owns execution state and can inspect durable records. When a tool times out or returns partial information, the model may infer a result, but that inference must not silently become the source of truth."},
+        {"id":"example","title":"Example: a timed-out refund","body":"A refund request times out. The model says 'the refund failed' and retries. Minutes later both requests settle, creating a duplicate refund. The correct system first treats the timeout as unknown, then reconciles against the payment provider before deciding whether to retry."}
+      ],
+      "failureModes": ["Storing assistant narration as authoritative workflow state.","Assuming missing tool output means the side effect did not occur.","Letting generated summaries overwrite stronger source-of-truth data."],
+      "heuristics": ["Persist execution facts separately from conversational text.","Represent ambiguous outcomes explicitly as UNKNOWN or PENDING.","Reconcile side effects using authoritative external identifiers."],
+      "takeaways": ["A model can explain state without owning state.","Unknown is a valid runtime outcome and often safer than guessed success or failure.","Authoritative facts should flow into the model, not be invented by it."],
+      "practice": {"title":"Inspect evidence in Evaluation Failure Lab","href":"/labs/evaluation-failure/"}
+    },
+    {
+      "slug": "tokenization",
+      "conceptId": "concept-tokenization",
+      "title": "Tokenization",
+      "summary": "Models process token sequences, not human-visible characters or words, so cost, limits and behavior depend on how text is segmented.",
+      "readingMinutes": 5,
+      "access": "OPEN",
+      "mentalModel": "Before generation, text is converted into token IDs. The model reasons over that sequence, and context limits are measured in tokens rather than pages or characters.",
+      "whyItMatters": "Tokenization affects context budget, latency, price and sometimes behavior. Code, uncommon names, multilingual text and whitespace can consume very different numbers of tokens even when they look similar in length to a person.",
+      "sections": [
+        {"id":"mechanism","title":"From text to model input","body":"A tokenizer maps recurring text fragments to integer IDs. Common fragments may be represented compactly while unusual strings split into many pieces. Those IDs become the sequence processed by the model; generation produces token IDs that are decoded back into text."},
+        {"id":"example","title":"Example: equal characters, unequal cost","body":"A short identifier, a JSON blob and a Chinese sentence can have similar character counts but different token counts. A system that budgets by characters may unexpectedly truncate instructions or exceed a provider context limit."}
+      ],
+      "failureModes": ["Estimating context capacity only from word or character counts.","Ignoring token-heavy logs, code and serialized tool results.","Assuming token boundaries align with semantic concepts."],
+      "heuristics": ["Measure tokens with the tokenizer used by the target model when limits matter.","Budget separately for instructions, retrieved evidence, tool output and generation.","Trim low-value serialized data before removing high-value evidence."],
+      "takeaways": ["Characters are a UI concept; tokens are the model's input accounting unit.","Token count is workload-dependent, not proportional to visible length.","Tokenization should inform budgets, not become a semantic retrieval strategy."],
+      "practice": {"title":"Inspect token boundaries in Token Playground","href":"/lessons/token-playground/"}
+    },
+    {
+      "slug": "context-window",
+      "conceptId": "concept-context-window",
+      "title": "Context window",
+      "summary": "The context window is a finite working-input budget shared by instructions, conversation, retrieved evidence and tool results.",
+      "readingMinutes": 6,
+      "access": "OPEN",
+      "mentalModel": "Context is the model's current workspace, not an infinite memory. Every additional token competes for limited attention and capacity.",
+      "whyItMatters": "A larger context window does not remove the need for context engineering. Long histories can bury constraints, stale information can conflict with current evidence, and tool traces can crowd out the information needed for the next decision.",
+      "sections": [
+        {"id":"mechanism","title":"What competes for the window","body":"System instructions, user messages, examples, retrieved documents, memory snippets and tool outputs all occupy the same finite input. As the workspace grows, the application must decide what to preserve, compress, retrieve again or discard."},
+        {"id":"example","title":"Example: an agent after 80 tool calls","body":"An agent keeps every tool result in the conversation. By the final step, the original acceptance criteria and recent authoritative state are surrounded by thousands of low-value log tokens. The fix is not simply a bigger model; it is a policy that retains decisions and evidence while compacting transient traces."}
+      ],
+      "failureModes": ["Treating more context as automatically better context.","Keeping stale or contradictory evidence indefinitely.","Using chat history as a substitute for durable workflow state."],
+      "heuristics": ["Allocate the context budget by role and importance.","Prefer current authoritative evidence over old verbose traces.","Compact with explicit retention rules for constraints, decisions and unresolved questions."],
+      "takeaways": ["Context is a finite workspace.","Relevance and authority matter more than raw volume.","Durable state and context are different system responsibilities."],
+      "practice": {"title":"Fill and reshape a context window","href":"/lessons/context-window/"}
+    },
+    {
+      "slug": "relevance-over-volume",
+      "conceptId": "concept-context-relevance",
+      "title": "Relevance over raw volume",
+      "summary": "More input can reduce decision quality when low-value material competes with the evidence that actually matters.",
+      "readingMinutes": 5,
+      "access": "OPEN",
+      "mentalModel": "Context quality is a selection problem: include the smallest set of information that preserves the evidence and constraints required for the next decision.",
+      "whyItMatters": "Teams often react to model mistakes by adding more documents, more examples and more history. That can increase noise, contradiction and cost. Strong systems rank information by task relevance, authority and recency instead of treating context as a dump.",
+      "sections": [
+        {"id":"mechanism","title":"Selection before generation","body":"The application assembles context from multiple sources. Each candidate item has a value for the current decision and a cost in tokens and attention. Retrieval, filtering and summarization are therefore part of reasoning quality, not merely infrastructure optimizations."},
+        {"id":"example","title":"Example: policy answer with fifty documents","body":"A support assistant receives forty old FAQ pages and one current policy. The current policy contains the answer, but its signal is diluted by contradictory legacy text. Filtering by authority and effective date produces a smaller context and a more reliable answer."}
+      ],
+      "failureModes": ["Appending every retrieved result to the prompt.","Optimizing only semantic similarity while ignoring authority.","Keeping background information that is unrelated to the current decision."],
+      "heuristics": ["Rank context by relevance, authority and freshness together.","Set explicit caps per evidence class instead of one global token limit.","Log what was excluded so retrieval mistakes remain diagnosable."],
+      "takeaways": ["Useful context is curated, not accumulated.","Smaller can be better when it preserves the right evidence.","Context selection is part of application correctness."],
+      "practice": {"title":"See context compression trade-offs","href":"/labs/context-compression/"}
+    }
+  ]
+}
