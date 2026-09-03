@@ -44,6 +44,52 @@ test("Core-60 publishes a newly added Guide in both locales", async ({ page }) =
   await expect(page.getByRole("link", { name: /诊断 Evidence Path/ })).toHaveAttribute("href", "/zh-cn/labs/evaluation-failure/");
 });
 
+test("direct Guide visits show canonical Path memberships without inventing a linear sequence", async ({ page }) => {
+  await page.goto("/en/guides/model-capability-envelope/");
+
+  await expect(page.locator('[data-guide-path-membership="ai-foundations"]')).toBeVisible();
+  await expect(page.locator('[data-guide-path-membership="llm-application-engineering"]')).toBeVisible();
+  await expect(page.locator("[data-guide-active-path]")).toHaveCount(0);
+  await expect(page.locator("[data-guide-sequence]")).toHaveCount(0);
+});
+
+test("one reused Guide resolves different previous and next neighbors in different Course contexts", async ({ page }) => {
+  await page.goto("/en/guides/model-capability-envelope/?path=ai-foundations");
+  await expect(page.locator('[data-guide-active-path="ai-foundations"]')).toBeVisible();
+  await expect(page.locator('[data-guide-previous="concept-context-window"]')).toHaveAttribute(
+    "href",
+    "/en/guides/context-window/?path=ai-foundations",
+  );
+  await expect(page.locator('[data-guide-next="concept-latency-throughput-basics"]')).toHaveAttribute(
+    "href",
+    "/en/guides/latency-throughput-basics/?path=ai-foundations",
+  );
+
+  await page.goto("/en/guides/model-capability-envelope/?path=llm-application-engineering");
+  await expect(page.locator('[data-guide-active-path="llm-application-engineering"]')).toBeVisible();
+  await expect(page.locator('[data-guide-previous="concept-probabilistic-behavior"]')).toHaveAttribute(
+    "href",
+    "/en/guides/probabilistic-model-behavior/?path=llm-application-engineering",
+  );
+  await expect(page.locator('[data-guide-next="concept-finite-context-budget"]')).toHaveAttribute(
+    "href",
+    "/en/guides/finite-context-budget/?path=llm-application-engineering",
+  );
+});
+
+test("invalid Path context is ignored and Chinese Path context localizes correctly", async ({ page }) => {
+  await page.goto("/en/guides/model-capability-envelope/?path=agent-engineering");
+  await expect(page.locator("[data-guide-active-path]")).toHaveCount(0);
+  await expect(page.locator("[data-guide-sequence]")).toHaveCount(0);
+
+  await page.goto("/zh-cn/guides/model-capability-envelope/?path=ai-foundations");
+  const context = page.locator('[data-guide-active-path="ai-foundations"]');
+  await expect(context).toContainText("AI 基础");
+  await expect(context).toContainText("模型、Token 与 Context");
+  await expect(page.getByText("用于这些学习路径", { exact: true })).toBeVisible();
+  await expect(page.getByText("继续学习", { exact: true })).toBeVisible();
+});
+
 test("Knowledge Map links only Concepts with published Guides", async ({ page }) => {
   await page.goto("/en/learning/");
 
