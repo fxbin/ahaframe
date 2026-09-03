@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 import json
+import subprocess
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -113,9 +115,11 @@ def main():
     require(manifest["principles"]["billingActivation"] is False, "Core Guides must not activate Billing")
     require(manifest["principles"]["freeChoiceActivation"] is False, "Core Guides must not activate free-choice claiming")
 
+    subprocess.run([sys.executable, str(ROOT / "scripts" / "guide_coverage.py"), "--check"], cwd=ROOT, check=True)
+
     print(
         "PASS Core Guide v1 publication: 40 canonical Concepts now have substantial OPEN Guides in exact EN/zh-CN parity; "
-        "version-sensitive Concepts retain canonical sourceRefs, all Guide routes and practice targets are public, "
+        "version-sensitive Concepts retain canonical sourceRefs, coverage-plan invariants pass, all Guide routes and practice targets are public, "
         "relations remain Knowledge-Graph-derived, and monetization gates stay disabled."
     )
 
