@@ -55,6 +55,11 @@ export async function getProductionExperience(contentId: string): Promise<Produc
   return manifest.experiences.find((item) => item.id === contentId) ?? null;
 }
 
+export async function getProductionExperiences(): Promise<ProductionExperience[]> {
+  const manifest = await loadManifest();
+  return manifest.experiences.filter((item) => item.status === "EXISTING");
+}
+
 export async function getPlannedContentAccessClassification(contentId: string): Promise<ContentAccessClassification | null> {
   const experience = await getProductionExperience(contentId);
   return experience ? CLASSIFICATION_BY_POLICY[experience.accessPolicyId] : null;
