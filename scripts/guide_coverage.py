@@ -143,10 +143,17 @@ def main() -> int:
         errors.append(f"Path-Concept membership drift: {sum(reuse.values())}")
     if len(baseline) != 20 or len(core40) != 40 or len(core60) != 60:
         errors.append("Coverage plan must contain cumulative 20 / 40 / 60 unique Concepts")
-    if actual != baseline:
+
+    expected_actual_by_count = {20: baseline, 40: core40, 60: core60}
+    expected_actual = expected_actual_by_count.get(len(actual))
+    if expected_actual is None:
+        errors.append(f"Published Guide count must match a planned stage (20/40/60), got {len(actual)}")
+    elif actual != expected_actual:
         errors.append(
-            f"Actual Guide bindings differ from the core-20 baseline: actual={len(actual)} baseline={len(baseline)}"
+            f"Actual Guide bindings differ from the planned core-{len(actual)} stage: "
+            f"missing={sorted(expected_actual - actual)} unexpected={sorted(actual - expected_actual)}"
         )
+
     unknown = core60 - set(reuse)
     if unknown:
         errors.append(f"Unknown planned Concepts: {sorted(unknown)}")
@@ -167,6 +174,7 @@ def main() -> int:
             "pathCount": len(paths),
             "pathConceptMembershipCount": sum(reuse.values()),
         },
+        "publishedGuideCount": len(actual),
         "stages": stages,
         "theoreticalMembershipMaximum": {"core-40": max40, "core-60": max60},
         "errors": errors,
@@ -176,6 +184,7 @@ def main() -> int:
         print(json.dumps(output, ensure_ascii=False, indent=2))
     else:
         print("Guide Coverage: 145 Concepts × 15 Paths")
+        print(f"Published Guide stage: {len(actual)} Guides")
         print()
         for name in ("core-20", "core-40", "core-60"):
             metric = stages[name]

@@ -17,6 +17,8 @@ const CONTENT_ROOT = (() => {
 })();
 const INVENTORY_ROOT = path.join(CONTENT_ROOT, "ai-knowledge-inventory-v1.0");
 const GUIDE_ROOT = path.join(CONTENT_ROOT, "guides");
+const CORE_GUIDE_BUNDLE_COUNT = 8;
+const CORE_GUIDE_COUNT = 40;
 
 interface DomainSource {
   id: string;
@@ -116,14 +118,24 @@ async function loadInventory(): Promise<{ branches: BranchSource[]; concepts: Co
   return { branches, concepts, paths };
 }
 
+function expectedGuideWave(filename: string): "core-20" | "core-40" {
+  const match = filename.match(/^core-(\d{2})\./);
+  if (!match) throw new Error(`Invalid Core Guide filename: ${filename}`);
+  return Number(match[1]) <= 4 ? "core-20" : "core-40";
+}
+
 async function loadGuideIndex(locale: Locale): Promise<Map<string, string>> {
   const filenames = (await readdir(GUIDE_ROOT))
     .filter((filename) => /^core-\d{2}\.(en|zh-CN)\.json$/.test(filename) && filename.endsWith(`.${locale}.json`))
     .sort();
+  if (filenames.length !== CORE_GUIDE_BUNDLE_COUNT) {
+    throw new Error(`Knowledge Map expected ${CORE_GUIDE_BUNDLE_COUNT} Core Guide bundles for ${locale}; got ${filenames.length}.`);
+  }
+
   const index = new Map<string, string>();
   for (const filename of filenames) {
     const bundle = JSON.parse(await readFile(path.join(GUIDE_ROOT, filename), "utf8")) as GuideIndexBundle;
-    if (bundle.version !== "1.0.0" || bundle.wave !== "core-20" || bundle.locale !== locale) {
+    if (bundle.version !== "1.0.0" || bundle.wave !== expectedGuideWave(filename) || bundle.locale !== locale) {
       throw new Error(`Knowledge Map Guide index contract mismatch: ${filename}`);
     }
     for (const guide of bundle.guides) {
@@ -131,7 +143,7 @@ async function loadGuideIndex(locale: Locale): Promise<Map<string, string>> {
       index.set(guide.conceptId, guide.slug);
     }
   }
-  if (index.size !== 20) throw new Error(`Knowledge Map expected 20 published Core Guides; got ${index.size}.`);
+  if (index.size !== CORE_GUIDE_COUNT) throw new Error(`Knowledge Map expected ${CORE_GUIDE_COUNT} published Core Guides; got ${index.size}.`);
   return index;
 }
 

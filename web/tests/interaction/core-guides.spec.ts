@@ -24,6 +24,16 @@ test("Chinese Core Guide preserves the same content structure and localizes navi
   await expect(page.getByRole("link", { name: /压力测试信息保留/ })).toHaveAttribute("href", "/zh-cn/labs/context-compression/");
 });
 
+test("Core-40 publishes the new evaluation Guide in both locales", async ({ page }) => {
+  await page.goto("/en/guides/evaluation-evidence/");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Evaluation environments and verifier design");
+  await expect(page.getByRole("link", { name: /Design evidence and vetoes/ })).toHaveAttribute("href", "/en/labs/evaluation-failure/");
+
+  await page.goto("/zh-cn/guides/evaluation-evidence/");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Evaluation Environment 与 Verifier Design");
+  await expect(page.getByRole("link", { name: /设计 Evidence 与 Veto/ })).toHaveAttribute("href", "/zh-cn/labs/evaluation-failure/");
+});
+
 test("Knowledge Map links only Concepts with published Guides", async ({ page }) => {
   await page.goto("/en/learning/");
 
@@ -42,4 +52,21 @@ test("Knowledge Map links only Concepts with published Guides", async ({ page })
 
   await expect(context.getByText("Prompt caching and stable prefixes", { exact: true })).toBeVisible();
   await expect(context.locator('[data-guide-concept-id="concept-prompt-caching"]')).toHaveCount(0);
+});
+
+test("Knowledge Map projects a newly published core-40 Concept to its Guide", async ({ page }) => {
+  await page.goto("/en/learning/");
+
+  const build = page.getByTestId("knowledge-domain-build-ai");
+  await build.locator(":scope > summary").click();
+
+  const production = build.locator('details[data-branch-id="branch-production-ai"]');
+  await production.locator(":scope > summary").click();
+
+  const evaluation = production.locator('details[data-branch-id="branch-eval-reliability"]');
+  await evaluation.locator(":scope > summary").click();
+
+  const published = evaluation.locator('[data-guide-concept-id="concept-evaluation-evidence"]');
+  await expect(published).toBeVisible();
+  await expect(published).toHaveAttribute("href", "/en/guides/evaluation-evidence/");
 });

@@ -2,12 +2,16 @@
 from __future__ import annotations
 
 import json
+import subprocess
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 CONTENT = ROOT / "content"
 GUIDES = CONTENT / "guides"
 INVENTORY = CONTENT / "ai-knowledge-inventory-v1.0"
+GUIDE_COUNT = 40
+BUNDLE_COUNT = 8
 
 
 def load(path: Path):
@@ -30,15 +34,19 @@ def load_concepts():
     return concepts
 
 
+def expected_wave(bundle_number: int) -> str:
+    return "core-20" if bundle_number <= 4 else "core-40"
+
+
 def load_guides(locale: str):
     paths = sorted(GUIDES.glob(f"core-*.{locale}.json"))
-    require(len(paths) == 4, f"{locale} must have exactly four Core Guide bundles, got {len(paths)}")
+    require(len(paths) == BUNDLE_COUNT, f"{locale} must have exactly {BUNDLE_COUNT} Core Guide bundles, got {len(paths)}")
     guides = []
     for expected_number, path in enumerate(paths, start=1):
         bundle = load(path)
         require(bundle.get("version") == "1.0.0", f"Guide version drifted: {path.name}")
         require(bundle.get("locale") == locale, f"Guide locale drifted: {path.name}")
-        require(bundle.get("wave") == "core-20", f"Guide wave drifted: {path.name}")
+        require(bundle.get("wave") == expected_wave(expected_number), f"Guide wave drifted: {path.name}")
         require(bundle.get("bundle") == f"core-{expected_number:02d}", f"Guide bundle order drifted: {path.name}")
         require(len(bundle.get("guides", [])) == 5, f"Each Core Guide bundle must contain five Guides: {path.name}")
         guides.extend(bundle["guides"])
@@ -64,8 +72,9 @@ def main():
     en_routes = load(CONTENT / "en.json")["availableRoutes"]
     zh_routes = load(CONTENT / "zh-CN.json")["availableRoutes"]
     manifest = load(CONTENT / "ai-content-production-v1.0.json")
+    coverage_plan = load(GUIDES / "coverage-plan-v1.0.json")
 
-    require(len(en) == 20 and len(zh) == 20, "Core Guide Wave 1 must contain exactly 20 Guides per locale")
+    require(len(en) == GUIDE_COUNT and len(zh) == GUIDE_COUNT, f"Core Guide publication must contain exactly {GUIDE_COUNT} Guides per locale")
     require([item["slug"] for item in en] == [item["slug"] for item in zh], "EN/zh-CN Guide slug order drifted")
     require([item["conceptId"] for item in en] == [item["conceptId"] for item in zh], "EN/zh-CN Guide Concept binding drifted")
     require([item["readingMinutes"] for item in en] == [item["readingMinutes"] for item in zh], "EN/zh-CN Guide reading-time parity drifted")
@@ -73,18 +82,23 @@ def main():
 
     slugs = [item["slug"] for item in en]
     concept_ids = [item["conceptId"] for item in en]
-    require(len(set(slugs)) == 20, "Core Guide slugs must be unique")
-    require(len(set(concept_ids)) == 20, "Each Core Guide must bind exactly one unique canonical Concept")
+    require(len(set(slugs)) == GUIDE_COUNT, "Core Guide slugs must be unique")
+    require(len(set(concept_ids)) == GUIDE_COUNT, "Each Core Guide must bind exactly one unique canonical Concept")
+
+    planned_core40 = set(coverage_plan["baselineConceptIds"]) | set(coverage_plan["core40Additions"])
+    require(set(concept_ids) == planned_core40, "Published Guide Concept bindings must exactly match the frozen core-40 coverage plan")
 
     public_guide_routes = sorted(route for route in en_routes if route.startswith("guides/"))
     expected_routes = sorted(f"guides/{slug}/" for slug in slugs)
-    require(public_guide_routes == expected_routes, "Public Guide routes must exactly mirror the 20 Guide slugs")
+    require(public_guide_routes == expected_routes, f"Public Guide routes must exactly mirror the {GUIDE_COUNT} Guide slugs")
 
     for en_guide, zh_guide in zip(en, zh, strict=True):
         slug = en_guide["slug"]
         concept_id = en_guide["conceptId"]
         require(concept_id in concepts, f"Guide points to unknown canonical Concept: {slug} -> {concept_id}")
-        require(concepts[concept_id].get("versionSensitive") is False, f"Core-20 intentionally avoids unreviewed version-sensitive Guide content: {concept_id}")
+        concept = concepts[concept_id]
+        if concept.get("versionSensitive") is True:
+            require(bool(concept.get("sourceRefs")), f"Version-sensitive Guide Concept must retain canonical sourceRefs: {concept_id}")
         require(en_guide.get("access") == "OPEN" and zh_guide.get("access") == "OPEN", f"Core Guide must remain OPEN: {slug}")
         require([item["id"] for item in en_guide.get("sections", [])] == ["mechanism", "example"], f"English Guide section contract drifted: {slug}")
         require([item["id"] for item in zh_guide.get("sections", [])] == ["mechanism", "example"], f"Chinese Guide section contract drifted: {slug}")
@@ -101,9 +115,12 @@ def main():
     require(manifest["principles"]["billingActivation"] is False, "Core Guides must not activate Billing")
     require(manifest["principles"]["freeChoiceActivation"] is False, "Core Guides must not activate free-choice claiming")
 
+    subprocess.run([sys.executable, str(ROOT / "scripts" / "guide_coverage.py"), "--check"], cwd=ROOT, check=True)
+
     print(
-        "PASS Core Guide v1 publication: 20 canonical Concepts now have substantial OPEN Guides in exact EN/zh-CN parity; "
-        "all Guide routes and practice targets are public, relations remain Knowledge-Graph-derived, and monetization gates stay disabled."
+        "PASS Core Guide v1 publication: 40 canonical Concepts now have substantial OPEN Guides in exact EN/zh-CN parity; "
+        "version-sensitive Concepts retain canonical sourceRefs, coverage-plan invariants pass, all Guide routes and practice targets are public, "
+        "relations remain Knowledge-Graph-derived, and monetization gates stay disabled."
     )
 
 

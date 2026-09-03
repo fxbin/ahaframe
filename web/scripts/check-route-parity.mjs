@@ -7,6 +7,8 @@ const REPO_ROOT = path.resolve(WEB_ROOT, "..");
 const CONTENT_ROOT = path.join(REPO_ROOT, "content");
 const INVENTORY_ROOT = path.join(CONTENT_ROOT, "ai-knowledge-inventory-v1.0");
 const GUIDE_ROOT = path.join(CONTENT_ROOT, "guides");
+const CORE_GUIDE_BUNDLE_COUNT = 8;
+const CORE_GUIDE_COUNT = 40;
 
 const REQUIRED_CORE_ROUTES = [
   "",
@@ -58,20 +60,30 @@ for (const filename of pathFiles) {
 canonicalCourseRoutes.sort();
 if (canonicalCourseRoutes.length !== 15) throw new Error(`Knowledge Graph must expose 15 canonical Learning Paths; got ${canonicalCourseRoutes.length}.`);
 
+function expectedGuideWave(filename) {
+  const match = filename.match(/^core-(\d{2})\./);
+  if (!match) throw new Error(`Invalid Core Guide filename: ${filename}`);
+  return Number(match[1]) <= 4 ? "core-20" : "core-40";
+}
+
 async function guideRoutesForLocale(locale) {
   const files = (await readdir(GUIDE_ROOT))
     .filter((filename) => /^core-\d{2}\.(en|zh-CN)\.json$/.test(filename) && filename.endsWith(`.${locale}.json`))
     .sort();
-  if (files.length !== 4) throw new Error(`${locale} must contain exactly four Core Guide bundles; got ${files.length}.`);
+  if (files.length !== CORE_GUIDE_BUNDLE_COUNT) {
+    throw new Error(`${locale} must contain exactly ${CORE_GUIDE_BUNDLE_COUNT} Core Guide bundles; got ${files.length}.`);
+  }
   const routes = [];
   for (const filename of files) {
     const bundle = JSON.parse(await readFile(path.join(GUIDE_ROOT, filename), "utf8"));
-    if (bundle.version !== "1.0.0" || bundle.wave !== "core-20" || bundle.locale !== locale) {
+    if (bundle.version !== "1.0.0" || bundle.wave !== expectedGuideWave(filename) || bundle.locale !== locale) {
       throw new Error(`Guide bundle contract mismatch: ${filename}`);
     }
     for (const guide of bundle.guides ?? []) routes.push(`guides/${guide.slug}/`);
   }
-  if (routes.length !== 20 || new Set(routes).size !== 20) throw new Error(`${locale} must expose exactly 20 unique Core Guide routes.`);
+  if (routes.length !== CORE_GUIDE_COUNT || new Set(routes).size !== CORE_GUIDE_COUNT) {
+    throw new Error(`${locale} must expose exactly ${CORE_GUIDE_COUNT} unique Core Guide routes.`);
+  }
   return routes.sort();
 }
 
@@ -134,4 +146,4 @@ if (JSON.stringify(enRoutes) !== JSON.stringify(zhRoutes)) {
 
 for (const relativePath of REQUIRED_APP_FILES) await access(path.join(WEB_ROOT, relativePath));
 
-console.log(`Next.js public-route parity contract OK (${enRoutes.length} routes × 2 locales; 15 Course routes + 20 Core Guide routes mirror canonical content; Knowledge Map and stable routes preserved).`);
+console.log(`Next.js public-route parity contract OK (${enRoutes.length} routes × 2 locales; 15 Course routes + 40 Core Guide routes mirror canonical content; Knowledge Map and stable routes preserved).`);

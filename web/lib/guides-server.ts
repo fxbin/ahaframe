@@ -11,6 +11,8 @@ const CONTENT_ROOT = (() => {
 })();
 const GUIDE_ROOT = path.join(CONTENT_ROOT, "guides");
 const INVENTORY_ROOT = path.join(CONTENT_ROOT, "ai-knowledge-inventory-v1.0");
+const CORE_GUIDE_BUNDLE_COUNT = 8;
+const CORE_GUIDE_COUNT = 40;
 
 interface EdgeSource {
   id: string;
@@ -24,21 +26,31 @@ interface RelationshipFragment {
   edges?: EdgeSource[];
 }
 
+function expectedWave(filename: string): "core-20" | "core-40" {
+  const match = filename.match(/^core-(\d{2})\./);
+  if (!match) throw new Error(`Invalid Core Guide filename: ${filename}`);
+  return Number(match[1]) <= 4 ? "core-20" : "core-40";
+}
+
 export async function getCoreGuides(locale: Locale): Promise<CoreGuide[]> {
   const filenames = (await readdir(GUIDE_ROOT))
     .filter((filename) => /^core-\d{2}\.(en|zh-CN)\.json$/.test(filename) && filename.endsWith(`.${locale}.json`))
     .sort();
-  if (filenames.length !== 4) throw new Error(`Core Guide bundle count mismatch for ${locale}: ${filenames.length}`);
+  if (filenames.length !== CORE_GUIDE_BUNDLE_COUNT) {
+    throw new Error(`Core Guide bundle count mismatch for ${locale}: ${filenames.length}`);
+  }
 
   const guides: CoreGuide[] = [];
   for (const filename of filenames) {
     const bundle = JSON.parse(await readFile(path.join(GUIDE_ROOT, filename), "utf8")) as CoreGuideBundle;
-    if (bundle.version !== "1.0.0" || bundle.wave !== "core-20") throw new Error(`Core Guide bundle version mismatch: ${filename}`);
+    if (bundle.version !== "1.0.0" || bundle.wave !== expectedWave(filename)) {
+      throw new Error(`Core Guide bundle version/wave mismatch: ${filename}`);
+    }
     if (bundle.locale !== locale) throw new Error(`Core Guide locale mismatch: expected ${locale}, got ${bundle.locale}`);
     guides.push(...bundle.guides);
   }
 
-  if (guides.length !== 20) throw new Error(`Core Guide count mismatch for ${locale}: ${guides.length}`);
+  if (guides.length !== CORE_GUIDE_COUNT) throw new Error(`Core Guide count mismatch for ${locale}: ${guides.length}`);
   if (new Set(guides.map((guide) => guide.slug)).size !== guides.length) throw new Error(`Duplicate Core Guide slug in ${locale}.`);
   if (new Set(guides.map((guide) => guide.conceptId)).size !== guides.length) throw new Error(`Duplicate Core Guide Concept binding in ${locale}.`);
   return guides;
