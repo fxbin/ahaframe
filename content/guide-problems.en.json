@@ -1,0 +1,54 @@
+{
+  "version": "1.0.0",
+  "locale": "en",
+  "problems": [
+    {
+      "id": "problem-rag-wrong-source",
+      "problem": "My RAG retrieves the wrong document",
+      "explanation": "The right source exists, but retrieval keeps selecting weaker, stale, or irrelevant evidence.",
+      "guideConceptIds": ["concept-hybrid-retrieval", "concept-source-authority", "concept-retrieval-evaluation"],
+      "practiceId": "rag-failure",
+      "pathId": "path-rag-knowledge-systems"
+    },
+    {
+      "id": "problem-retry-after-timeout",
+      "problem": "My agent repeats an action after timeout",
+      "explanation": "A missing response is being treated as confirmed failure, so retries can duplicate irreversible side effects.",
+      "guideConceptIds": ["concept-timeout-ambiguity", "concept-idempotency-boundary", "concept-verification-loop"],
+      "practiceId": "agent-reliability",
+      "pathId": "path-production-ai-reliability"
+    },
+    {
+      "id": "problem-agent-too-much-permission",
+      "problem": "My agent has too much permission",
+      "explanation": "The model can reach tools or side effects that should be constrained, reviewed, or denied by runtime policy.",
+      "guideConceptIds": ["concept-least-privilege", "concept-trust-boundary", "concept-human-review-boundary"],
+      "practiceId": "mcp-capability-boundary-mission",
+      "pathId": "path-agent-engineering"
+    },
+    {
+      "id": "problem-model-upgrade-regression",
+      "problem": "My model upgrade looks better overall but breaks important cases",
+      "explanation": "Average quality improved, but a critical slice or workflow regressed and the release decision is now ambiguous.",
+      "guideConceptIds": ["concept-evaluation-evidence", "concept-confidence-variance", "concept-slices-regression"],
+      "practiceId": "evaluation-failure",
+      "pathId": "path-production-ai-reliability"
+    },
+    {
+      "id": "problem-long-running-agent-state",
+      "problem": "My long-running agent loses state or cannot recover safely",
+      "explanation": "Temporary context, durable state, checkpoints, and expiry are blurred together, making resume behavior unsafe.",
+      "guideConceptIds": ["concept-working-durable-memory", "concept-memory-lifecycle", "concept-memory-expiry"],
+      "practiceId": "long-running-agent-recovery-mission",
+      "pathId": "path-agent-engineering"
+    },
+    {
+      "id": "problem-multi-agent-complexity",
+      "problem": "My multi-agent system adds complexity without reliability",
+      "explanation": "Delegation and parallelism added coordination cost, but did not make responsibility, verification, or outcomes clearer.",
+      "guideConceptIds": ["concept-workflow-decomposition", "concept-parallel-agent-work", "concept-topology-tradeoffs"],
+      "practiceId": "multi-agent-coordination-incident",
+      "pathId": "path-multi-agent-orchestration"
+    }
+  ]
+}
