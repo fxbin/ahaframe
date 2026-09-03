@@ -2,7 +2,16 @@ import { existsSync } from "node:fs";
 import { readFile, readdir } from "node:fs/promises";
 import path from "node:path";
 import type { Locale } from "@/lib/content";
-import type { CoreGuide, CoreGuideBundle, CoreGuideWave, GuidePageData, GuideRelatedConcept } from "@/lib/guides";
+import type {
+  CoreGuide,
+  CoreGuideBundle,
+  CoreGuideWave,
+  GuideActivePathContext,
+  GuidePageData,
+  GuidePathMembership,
+  GuideRelatedConcept,
+  GuideSequenceNeighbor,
+} from "@/lib/guides";
 import { getKnowledgeMap } from "@/lib/knowledge-map-server";
 
 const CONTENT_ROOT = (() => {
@@ -77,7 +86,73 @@ async function loadRelationshipEdges(): Promise<EdgeSource[]> {
   return edges;
 }
 
-export async function getGuidePageData(locale: Locale, slug: string): Promise<GuidePageData | null> {
+function pathMembershipsForConcept(
+  conceptId: string,
+  paths: Awaited<ReturnType<typeof getKnowledgeMap>>["paths"],
+): GuidePathMembership[] {
+  const memberships: GuidePathMembership[] = [];
+  for (const learningPath of paths) {
+    const milestone = learningPath.milestones.find((item) => item.conceptIds.includes(conceptId));
+    if (!milestone) continue;
+    memberships.push({
+      id: learningPath.id,
+      slug: learningPath.slug,
+      title: learningPath.title,
+      milestoneId: milestone.id,
+      milestoneTitle: milestone.title,
+    });
+  }
+  return memberships;
+}
+
+function publishedPathSequence(pathConceptIds: string[], guideByConcept: Map<string, CoreGuide>): CoreGuide[] {
+  const seen = new Set<string>();
+  const sequence: CoreGuide[] = [];
+  for (const conceptId of pathConceptIds) {
+    if (seen.has(conceptId)) continue;
+    seen.add(conceptId);
+    const published = guideByConcept.get(conceptId);
+    if (published) sequence.push(published);
+  }
+  return sequence;
+}
+
+function neighbor(guide: CoreGuide | undefined): GuideSequenceNeighbor | null {
+  return guide ? { conceptId: guide.conceptId, slug: guide.slug, title: guide.title } : null;
+}
+
+function activePathContext(
+  guide: CoreGuide,
+  requestedPathSlug: string | null | undefined,
+  memberships: GuidePathMembership[],
+  paths: Awaited<ReturnType<typeof getKnowledgeMap>>["paths"],
+  guideByConcept: Map<string, CoreGuide>,
+): GuideActivePathContext | null {
+  if (!requestedPathSlug) return null;
+  const membership = memberships.find((item) => item.slug === requestedPathSlug);
+  if (!membership) return null;
+  const learningPath = paths.find((item) => item.id === membership.id);
+  if (!learningPath) return null;
+
+  const sequence = publishedPathSequence(
+    learningPath.milestones.flatMap((milestone) => milestone.conceptIds),
+    guideByConcept,
+  );
+  const index = sequence.findIndex((item) => item.conceptId === guide.conceptId);
+  if (index < 0) return null;
+
+  return {
+    ...membership,
+    previous: neighbor(sequence[index - 1]),
+    next: neighbor(sequence[index + 1]),
+  };
+}
+
+export async function getGuidePageData(
+  locale: Locale,
+  slug: string,
+  requestedPathSlug?: string | null,
+): Promise<GuidePageData | null> {
   const [guides, map, edges] = await Promise.all([getCoreGuides(locale), getKnowledgeMap(locale), loadRelationshipEdges()]);
   const guide = guides.find((item) => item.slug === slug);
   if (!guide) return null;
@@ -86,7 +161,7 @@ export async function getGuidePageData(locale: Locale, slug: string): Promise<Gu
   const concept = conceptById.get(guide.conceptId);
   if (!concept) throw new Error(`Guide points to unknown Concept: ${guide.slug} -> ${guide.conceptId}`);
 
-  const guideByConcept = new Map(guides.map((item) => [item.conceptId, item.slug]));
+  const guideByConcept = new Map(guides.map((item) => [item.conceptId, item]));
   const related: GuideRelatedConcept[] = [];
   const seen = new Set<string>();
   for (const edge of edges) {
@@ -101,15 +176,18 @@ export async function getGuidePageData(locale: Locale, slug: string): Promise<Gu
       id: other.id,
       title: other.title,
       relationship: edge.type,
-      guideSlug: guideByConcept.get(other.id) ?? null,
+      guideSlug: guideByConcept.get(other.id)?.slug ?? null,
     });
   }
 
   related.sort((a, b) => Number(Boolean(b.guideSlug)) - Number(Boolean(a.guideSlug)) || a.title.localeCompare(b.title));
+  const pathMemberships = pathMembershipsForConcept(guide.conceptId, map.paths);
 
   return {
     guide,
     concept: { id: concept.id, title: concept.title, kind: concept.kind, difficulty: concept.difficulty },
     relatedConcepts: related.slice(0, 8),
+    pathMemberships,
+    activePath: activePathContext(guide, requestedPathSlug, pathMemberships, map.paths, guideByConcept),
   };
 }
