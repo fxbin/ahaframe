@@ -96,9 +96,10 @@ def main():
     )
     require(set(concept_ids) == planned_core60, "Published Guide Concept bindings must exactly match the frozen core-60 coverage plan")
 
-    public_guide_routes = sorted(route for route in en_routes if route.startswith("guides/"))
+    require("guides/" in en_routes, "Guide Directory must remain a public canonical route")
+    public_guide_routes = sorted(route for route in en_routes if route.startswith("guides/") and route != "guides/")
     expected_routes = sorted(f"guides/{slug}/" for slug in slugs)
-    require(public_guide_routes == expected_routes, f"Public Guide routes must exactly mirror the {GUIDE_COUNT} Guide slugs")
+    require(public_guide_routes == expected_routes, f"Public Guide detail routes must exactly mirror the {GUIDE_COUNT} Guide slugs")
 
     for en_guide, zh_guide in zip(en, zh, strict=True):
         slug = en_guide["slug"]
@@ -127,7 +128,7 @@ def main():
 
     print(
         "PASS Core Guide v1 publication: 60 canonical Concepts now have substantial OPEN Guides in exact EN/zh-CN parity; "
-        "version-sensitive Concepts retain canonical sourceRefs, coverage-plan invariants pass, all Guide routes and practice targets are public, "
+        "version-sensitive Concepts retain canonical sourceRefs, coverage-plan invariants pass, the Guide Directory and all Guide detail routes/practice targets are public, "
         "relations remain Knowledge-Graph-derived, and monetization gates stay disabled."
     )
 
