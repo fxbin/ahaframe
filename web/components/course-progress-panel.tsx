@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useGuideProductProgress } from "@/hooks/use-guide-product-progress";
-import { localizedPath, segmentForLocale, type Locale } from "@/lib/content";
+import type { Locale } from "@/lib/content";
 import { guideEvidenceState, practiceCompleted } from "@/lib/learning-progress";
 
 interface CourseProgressGuide {
@@ -25,13 +25,23 @@ interface CourseProgressPanelProps {
   practices: CourseProgressPractice[];
 }
 
+function segmentFor(locale: Locale) {
+  return locale === "zh-CN" ? "zh-cn" : "en";
+}
+
+function localizedPracticeRoute(route: string, locale: Locale) {
+  const segment = segmentFor(locale);
+  const normalized = route.replace(/^\/+/, "");
+  return `/${segment}/${normalized}`;
+}
+
 export function CourseProgressPanel({ locale, pathId, pathSlug, guides, practices }: CourseProgressPanelProps) {
   const progress = useGuideProductProgress();
   const readGuides = guides.filter((guide) => guideEvidenceState(progress, guide.conceptId) === "READ");
   const practiced = practices.filter((practice) => practiceCompleted(progress, practice.id));
   const firstUnread = guides.find((guide) => guideEvidenceState(progress, guide.conceptId) !== "READ") ?? null;
   const firstUnpracticed = practices.find((practice) => !practiceCompleted(progress, practice.id)) ?? null;
-  const segment = segmentForLocale(locale);
+  const segment = segmentFor(locale);
   const copy = locale === "zh-CN"
     ? {
         label: "本地学习记录",
@@ -59,7 +69,7 @@ export function CourseProgressPanel({ locale, pathId, pathSlug, guides, practice
     : firstUnpracticed
       ? {
           title: firstUnpracticed.title,
-          href: localizedPath(`/${firstUnpracticed.route}`, locale),
+          href: localizedPracticeRoute(firstUnpracticed.route, locale),
           kind: "practice",
         }
       : null;
