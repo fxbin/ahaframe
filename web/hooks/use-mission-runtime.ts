@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { markPracticeCompleted, setLearningState } from "@/lib/learning-progress";
 import { loadRuntimeScripts, type MissionRuntime, type MissionSnapshot, type RuntimeRecord } from "@/lib/runtime-client";
 import { runtimeExperience, type RuntimeExperienceKey } from "@/lib/runtime-manifest";
 import type { RuntimeStatus } from "@/hooks/use-lab-runtime";
@@ -84,7 +85,12 @@ export function useMissionRuntime(experienceKey: RuntimeExperienceKey) {
     }, [refresh, requireRuntime]),
     readyToDecide: useCallback(() => commitSnapshot(requireRuntime().readyToDecide()), [commitSnapshot, requireRuntime]),
     submitReleaseDecision: useCallback((decision: string) => commitSnapshot(requireRuntime().submitReleaseDecision(decision)), [commitSnapshot, requireRuntime]),
-    complete: useCallback(() => commitSnapshot(requireRuntime().complete()), [commitSnapshot, requireRuntime]),
+    complete: useCallback(() => {
+      const snapshot = commitSnapshot(requireRuntime().complete());
+      setLearningState(experienceKey, "PRACTICED");
+      markPracticeCompleted(experienceKey);
+      return snapshot;
+    }, [commitSnapshot, experienceKey, requireRuntime]),
     reset: useCallback(() => commitSnapshot(requireRuntime().reset()), [commitSnapshot, requireRuntime]),
     listAttempts: useCallback(() => requireRuntime().listAttempts(), [requireRuntime]),
   };
