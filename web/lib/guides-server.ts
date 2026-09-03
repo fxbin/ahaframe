@@ -2,7 +2,7 @@ import { existsSync } from "node:fs";
 import { readFile, readdir } from "node:fs/promises";
 import path from "node:path";
 import type { Locale } from "@/lib/content";
-import type { CoreGuide, CoreGuideBundle, GuidePageData, GuideRelatedConcept } from "@/lib/guides";
+import type { CoreGuide, CoreGuideBundle, CoreGuideWave, GuidePageData, GuideRelatedConcept } from "@/lib/guides";
 import { getKnowledgeMap } from "@/lib/knowledge-map-server";
 
 const CONTENT_ROOT = (() => {
@@ -11,8 +11,8 @@ const CONTENT_ROOT = (() => {
 })();
 const GUIDE_ROOT = path.join(CONTENT_ROOT, "guides");
 const INVENTORY_ROOT = path.join(CONTENT_ROOT, "ai-knowledge-inventory-v1.0");
-const CORE_GUIDE_BUNDLE_COUNT = 8;
-const CORE_GUIDE_COUNT = 40;
+const CORE_GUIDE_BUNDLE_COUNT = 12;
+const CORE_GUIDE_COUNT = 60;
 
 interface EdgeSource {
   id: string;
@@ -26,10 +26,13 @@ interface RelationshipFragment {
   edges?: EdgeSource[];
 }
 
-function expectedWave(filename: string): "core-20" | "core-40" {
+function expectedWave(filename: string): CoreGuideWave {
   const match = filename.match(/^core-(\d{2})\./);
   if (!match) throw new Error(`Invalid Core Guide filename: ${filename}`);
-  return Number(match[1]) <= 4 ? "core-20" : "core-40";
+  const number = Number(match[1]);
+  if (number <= 4) return "core-20";
+  if (number <= 8) return "core-40";
+  return "core-60";
 }
 
 export async function getCoreGuides(locale: Locale): Promise<CoreGuide[]> {

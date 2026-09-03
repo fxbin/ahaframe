@@ -10,8 +10,8 @@ ROOT = Path(__file__).resolve().parents[1]
 CONTENT = ROOT / "content"
 GUIDES = CONTENT / "guides"
 INVENTORY = CONTENT / "ai-knowledge-inventory-v1.0"
-GUIDE_COUNT = 40
-BUNDLE_COUNT = 8
+GUIDE_COUNT = 60
+BUNDLE_COUNT = 12
 
 
 def load(path: Path):
@@ -35,7 +35,11 @@ def load_concepts():
 
 
 def expected_wave(bundle_number: int) -> str:
-    return "core-20" if bundle_number <= 4 else "core-40"
+    if bundle_number <= 4:
+        return "core-20"
+    if bundle_number <= 8:
+        return "core-40"
+    return "core-60"
 
 
 def load_guides(locale: str):
@@ -85,8 +89,12 @@ def main():
     require(len(set(slugs)) == GUIDE_COUNT, "Core Guide slugs must be unique")
     require(len(set(concept_ids)) == GUIDE_COUNT, "Each Core Guide must bind exactly one unique canonical Concept")
 
-    planned_core40 = set(coverage_plan["baselineConceptIds"]) | set(coverage_plan["core40Additions"])
-    require(set(concept_ids) == planned_core40, "Published Guide Concept bindings must exactly match the frozen core-40 coverage plan")
+    planned_core60 = (
+        set(coverage_plan["baselineConceptIds"])
+        | set(coverage_plan["core40Additions"])
+        | set(coverage_plan["core60Additions"])
+    )
+    require(set(concept_ids) == planned_core60, "Published Guide Concept bindings must exactly match the frozen core-60 coverage plan")
 
     public_guide_routes = sorted(route for route in en_routes if route.startswith("guides/"))
     expected_routes = sorted(f"guides/{slug}/" for slug in slugs)
@@ -118,7 +126,7 @@ def main():
     subprocess.run([sys.executable, str(ROOT / "scripts" / "guide_coverage.py"), "--check"], cwd=ROOT, check=True)
 
     print(
-        "PASS Core Guide v1 publication: 40 canonical Concepts now have substantial OPEN Guides in exact EN/zh-CN parity; "
+        "PASS Core Guide v1 publication: 60 canonical Concepts now have substantial OPEN Guides in exact EN/zh-CN parity; "
         "version-sensitive Concepts retain canonical sourceRefs, coverage-plan invariants pass, all Guide routes and practice targets are public, "
         "relations remain Knowledge-Graph-derived, and monetization gates stay disabled."
     )
