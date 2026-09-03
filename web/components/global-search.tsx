@@ -51,6 +51,7 @@ export function GlobalSearch({ locale, documents }: GlobalSearchProps) {
     function onShortcut(event: globalThis.KeyboardEvent) {
       if ((event.metaKey || event.ctrlKey) && event.key.toLocaleLowerCase() === "k") {
         event.preventDefault();
+        setActiveIndex(0);
         setOpen(true);
       }
     }
@@ -60,16 +61,14 @@ export function GlobalSearch({ locale, documents }: GlobalSearchProps) {
 
   useEffect(() => {
     if (!open) return;
-    setActiveIndex(0);
     const frame = window.requestAnimationFrame(() => inputRef.current?.focus());
     return () => window.cancelAnimationFrame(frame);
   }, [open]);
 
-  useEffect(() => setActiveIndex(0), [query]);
-
   function close() {
     setOpen(false);
     setQuery("");
+    setActiveIndex(0);
     window.requestAnimationFrame(() => triggerRef.current?.focus());
   }
 
@@ -100,7 +99,10 @@ export function GlobalSearch({ locale, documents }: GlobalSearchProps) {
         ref={triggerRef}
         type="button"
         className="inline-flex min-h-9 items-center gap-2 border border-[var(--border)] px-2.5 text-xs font-semibold text-[var(--muted)] transition hover:border-[var(--text)] hover:text-[var(--text)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)] sm:px-3"
-        onClick={() => setOpen(true)}
+        onClick={() => {
+          setActiveIndex(0);
+          setOpen(true);
+        }}
         aria-haspopup="dialog"
         data-global-search-trigger
       >
@@ -117,7 +119,10 @@ export function GlobalSearch({ locale, documents }: GlobalSearchProps) {
                 ref={inputRef}
                 className="min-h-10 flex-1 bg-transparent text-base outline-none placeholder:text-[var(--muted)]"
                 value={query}
-                onChange={(event) => setQuery(event.target.value)}
+                onChange={(event) => {
+                  setQuery(event.target.value);
+                  setActiveIndex(0);
+                }}
                 onKeyDown={onInputKeyDown}
                 placeholder={copy.placeholder}
                 aria-label={copy.dialog}
