@@ -98,16 +98,18 @@ export function GlobalSearch({ locale, documents }: GlobalSearchProps) {
       <button
         ref={triggerRef}
         type="button"
-        className="inline-flex min-h-9 items-center gap-2 border border-[var(--border)] px-2.5 text-xs font-semibold text-[var(--muted)] transition hover:border-[var(--text)] hover:text-[var(--text)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)] sm:px-3"
+        className="inline-flex min-h-9 min-w-9 items-center justify-center gap-2 border border-[var(--border)] px-2 text-xs font-semibold text-[var(--muted)] transition hover:border-[var(--text)] hover:text-[var(--text)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)] sm:px-3"
         onClick={() => {
           setActiveIndex(0);
           setOpen(true);
         }}
+        aria-label={copy.trigger}
         aria-haspopup="dialog"
         data-global-search-trigger
       >
-        <span>{copy.trigger}</span>
-        <kbd className="hidden font-mono text-[10px] font-normal sm:inline">{copy.shortcut}</kbd>
+        <span aria-hidden="true">⌕</span>
+        <span className="hidden sm:inline">{copy.trigger}</span>
+        <kbd className="hidden font-mono text-[10px] font-normal lg:inline">{copy.shortcut}</kbd>
       </button>
 
       {open ? (
