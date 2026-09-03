@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense, type ReactNode } from "react";
 import { notFound } from "next/navigation";
+import { GuidePracticeReturnBar } from "@/components/guide-practice-return-bar";
 import { LearningProgressTracker } from "@/components/learning-progress-tracker";
 import { LearningReturnBar } from "@/components/learning-return-bar";
 import { StructuredData } from "@/components/structured-data";
@@ -8,6 +9,7 @@ import { ThirdPartyAnalytics } from "@/components/third-party-analytics";
 import { SiteFrame } from "@/components/site-frame";
 import { ValidationBootstrap } from "@/components/validation-bootstrap";
 import { getLocaleSource, localeFromSegment, SUPPORTED_SEGMENTS } from "@/lib/content";
+import { getGuidePracticeReturnTargets } from "@/lib/guides-server";
 import { indexingMetadata } from "@/lib/indexing";
 import { getLearningGraph } from "@/lib/learning-graph-server";
 import { organizationSchema } from "@/lib/schema";
@@ -38,7 +40,11 @@ export default async function LocaleRootLayout({
   const locale = localeFromSegment(segment);
   if (!locale) notFound();
 
-  const [source, graph] = await Promise.all([getLocaleSource(locale), getLearningGraph(locale)]);
+  const [source, graph, guidePracticeTargets] = await Promise.all([
+    getLocaleSource(locale),
+    getLearningGraph(locale),
+    getGuidePracticeReturnTargets(locale),
+  ]);
   const progressNodes = graph.contentNodes.map(({ id, route }) => ({ id, route }));
   const returnNodes = graph.contentNodes.map(({ id, title, route }) => ({ id, title, route }));
 
@@ -51,6 +57,9 @@ export default async function LocaleRootLayout({
         <SiteFrame locale={locale} source={source}>
           <Suspense fallback={null}>
             <LearningReturnBar locale={locale} nodes={returnNodes} />
+          </Suspense>
+          <Suspense fallback={null}>
+            <GuidePracticeReturnBar locale={locale} targets={guidePracticeTargets} />
           </Suspense>
           {children}
         </SiteFrame>

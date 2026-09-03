@@ -47,6 +47,12 @@ function copy(locale: Locale) {
       };
 }
 
+function practiceHref(locale: Locale, guideSlug: string, href: string, pathSlug?: string | null) {
+  const params = new URLSearchParams({ guide: guideSlug });
+  if (pathSlug) params.set("path", pathSlug);
+  return `${localizedPath(href, locale)}?${params.toString()}`;
+}
+
 export function GuidePage({ locale, data }: { locale: Locale; data: GuidePageData }) {
   const labels = copy(locale);
   const segment = segmentForLocale(locale);
@@ -233,7 +239,11 @@ export function GuidePage({ locale, data }: { locale: Locale; data: GuidePageDat
               <div>
                 <p className="technical-label">{labels.practice}</p>
                 {guide.practice ? (
-                  <Link className="editorial-primary-action mt-4" href={localizedPath(guide.practice.href, locale)}>
+                  <Link
+                    className="editorial-primary-action mt-4"
+                    href={practiceHref(locale, guide.slug, guide.practice.href, activePath?.slug)}
+                    data-guide-practice-link={guide.slug}
+                  >
                     {guide.practice.title} <span aria-hidden="true">→</span>
                   </Link>
                 ) : null}

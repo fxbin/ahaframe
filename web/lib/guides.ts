@@ -63,6 +63,18 @@ export interface GuideActivePathContext extends GuidePathMembership {
   next: GuideSequenceNeighbor | null;
 }
 
+export interface GuidePracticePathContext {
+  slug: string;
+  title: string;
+  next: GuideSequenceNeighbor | null;
+}
+
+export interface GuidePracticeReturnTarget {
+  slug: string;
+  title: string;
+  paths: GuidePracticePathContext[];
+}
+
 export interface GuidePageData {
   guide: CoreGuide;
   concept: {
