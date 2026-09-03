@@ -19,6 +19,26 @@
     "courses/course-knowledge-product-with-ai/",
     "courses/solo-business-with-ai/",
     "courses/ai-customer-support/",
+    "guides/probabilistic-model-behavior/",
+    "guides/model-claim-vs-runtime-fact/",
+    "guides/tokenization/",
+    "guides/context-window/",
+    "guides/relevance-over-volume/",
+    "guides/structured-output-contract/",
+    "guides/finite-context-budget/",
+    "guides/context-management/",
+    "guides/hybrid-retrieval/",
+    "guides/source-authority/",
+    "guides/working-vs-durable-memory/",
+    "guides/agent-loop/",
+    "guides/bounded-autonomy/",
+    "guides/workflow-decomposition/",
+    "guides/timeout-ambiguity/",
+    "guides/idempotency-boundary/",
+    "guides/observability-as-diagnosis/",
+    "guides/source-triangulation/",
+    "guides/long-form-consistency/",
+    "guides/automation-boundary/",
     "learning/",
     "pricing/",
     "early-access/",
@@ -53,5 +73,5 @@
     "footer": {"tagline":"清晰的 AI 课程，加上真正需要你做判断的互动练习。","sitemap":"站点地图","about":"关于","early_access":"内测"},
     "language": {"en":"English","zh-CN":"简体中文"}
   },
-  "meta": {"status":"learning-ux-v1","note":"Courses are now the primary learner-facing entry while the Knowledge Map remains available for advanced exploration."}
+  "meta": {"status":"learning-ux-v1","note":"Courses are now the primary learner-facing entry while the Knowledge Map remains available for advanced exploration.","updated":"2026-09-03"}
 }

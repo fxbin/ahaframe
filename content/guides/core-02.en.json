@@ -1,0 +1,98 @@
+{
+  "version": "1.0.0",
+  "locale": "en",
+  "wave": "core-20",
+  "bundle": "core-02",
+  "guides": [
+    {
+      "slug": "structured-output-contract",
+      "conceptId": "concept-structured-output-contract",
+      "title": "Structured output is an application contract",
+      "summary": "A JSON shape is useful only when the application validates both syntax and the meaning required by downstream code.",
+      "readingMinutes": 6,
+      "access": "OPEN",
+      "mentalModel": "Structured output turns free-form generation into a boundary contract, but the contract is incomplete until invalid and semantically impossible values are rejected.",
+      "whyItMatters": "Parsing JSON successfully is not the same as receiving a valid business object. Production systems need a boundary that catches missing fields, wrong enums, impossible combinations and version drift before generated data reaches databases, tools or user-visible actions.",
+      "sections": [
+        {"id":"mechanism","title":"From format to contract","body":"A strong boundary has at least two layers: structural validation checks types and required fields, while semantic validation checks domain rules. Versioning and bounded repair then make failures explicit instead of silently coercing bad output."},
+        {"id":"example","title":"Example: a valid but impossible order","body":"The model returns valid JSON with quantity -3 and a shipping method that is forbidden for the destination. A parser accepts it; a schema may catch the negative number; semantic validation catches the destination rule. Each layer protects a different invariant."}
+      ],
+      "failureModes": ["Treating 'valid JSON' as equivalent to valid application data.","Retrying the same prompt blindly after validation fails.","Changing schemas without explicit version handling."],
+      "heuristics": ["Validate structure and business semantics separately.","Feed precise validation errors into a bounded repair attempt.","Keep downstream side effects behind the validated contract boundary."],
+      "takeaways": ["Structure reduces ambiguity but does not eliminate semantic failure.","Validation errors are evidence that should guide repair.","Contracts belong at the application boundary, not only in the prompt."],
+      "practice": {"title":"Design a bounded contract in Structured Output Lab","href":"/labs/structured-output-contract-lab/"}
+    },
+    {
+      "slug": "finite-context-budget",
+      "conceptId": "concept-finite-context-budget",
+      "title": "Finite context budget",
+      "summary": "Context engineering is allocation: decide which instructions, evidence, memory and tool state deserve the next token of budget.",
+      "readingMinutes": 6,
+      "access": "OPEN",
+      "mentalModel": "Every context item spends scarce capacity. The correct question is not 'Can it fit?' but 'Is it worth occupying the model's working set for this decision?'",
+      "whyItMatters": "Large windows can hide poor selection policies. When everything is retained, stale facts, repeated instructions and verbose tool traces increase cost and can weaken the signal of critical evidence. A budget forces the system to express priorities.",
+      "sections": [
+        {"id":"mechanism","title":"Budget by information role","body":"Divide context into categories such as invariant instructions, current task state, authoritative evidence, working memory and transient traces. Give each category a policy for retention, refresh and compression instead of applying one generic truncation rule."},
+        {"id":"example","title":"Example: preserving the release veto","body":"A release agent has 40 pages of test logs plus one unresolved safety veto. Blind summarization drops the veto because it appears once. A budget policy classifies vetoes as non-compressible constraints while reducing repetitive logs."}
+      ],
+      "failureModes": ["Using first-in/first-out truncation for all content.","Spending most of the window on verbose tool output.","Compressing critical constraints with the same policy as background detail."],
+      "heuristics": ["Reserve protected budget for invariants and unresolved blockers.","Track token cost by source category.","Compress repeated observations into state, not prose history."],
+      "takeaways": ["A context window is capacity; a context budget is policy.","The budget should reflect decision importance, not arrival order.","Protected information classes prevent silent loss of critical evidence."],
+      "practice": {"title":"Compare retention policies in Context Compression Lab","href":"/labs/context-compression/"}
+    },
+    {
+      "slug": "context-management",
+      "conceptId": "concept-context-management",
+      "title": "Context management",
+      "summary": "Context management continuously decides what to load, refresh, compact and remove as a task evolves.",
+      "readingMinutes": 7,
+      "access": "OPEN",
+      "mentalModel": "Good context is assembled just-in-time from state and evidence; it is not a transcript that grows forever.",
+      "whyItMatters": "Long-running work changes. Facts become stale, goals are refined, tools return new state and intermediate reasoning loses value. Without an explicit context lifecycle, the prompt becomes a mixture of current evidence and historical residue.",
+      "sections": [
+        {"id":"mechanism","title":"A context lifecycle","body":"Before each meaningful step, the application identifies the decision to make, loads the minimum relevant state and evidence, preserves durable constraints, and compacts or discards transient material. Retrieval and memory are inputs to this lifecycle rather than separate magic features."},
+        {"id":"example","title":"Example: repository editing agent","body":"Instead of resending the entire repository and chat history, an editing agent loads the current task spec, the files it will modify, relevant tests and the latest tool results. After a successful change it persists the decision and drops raw command output."}
+      ],
+      "failureModes": ["Equating conversation history with application state.","Reloading large static prefixes even when they do not affect the next step.","Failing to invalidate context after the underlying source changes."],
+      "heuristics": ["Build context around the next decision, not the whole project.","Separate durable state, retrievable knowledge and transient observations.","Record why an item was retained so compaction policies can be audited."],
+      "takeaways": ["Context management is a lifecycle, not a one-time prompt optimization.","State should survive outside the prompt when it matters after compaction.","Retrieval, memory and summarization are selection mechanisms inside one larger policy."],
+      "practice": {"title":"Stress-test context retention","href":"/labs/context-compression/"}
+    },
+    {
+      "slug": "hybrid-retrieval",
+      "conceptId": "concept-hybrid-retrieval",
+      "title": "Dense, sparse and hybrid retrieval",
+      "summary": "Different retrieval signals catch different evidence; hybrid retrieval combines semantic similarity with exact lexical evidence.",
+      "readingMinutes": 6,
+      "access": "OPEN",
+      "mentalModel": "Semantic vectors are good at meaning, lexical search is good at exact terms, and a robust retrieval system can use both before ranking the final evidence set.",
+      "whyItMatters": "Vector-only retrieval often misses IDs, error codes, names and exact clauses. Keyword-only search can miss paraphrases. Hybrid retrieval improves recall by combining signals, then lets a later stage prioritize the evidence most useful for the current question.",
+      "sections": [
+        {"id":"mechanism","title":"Recall first, selection second","body":"Dense retrieval finds semantically similar passages; sparse retrieval rewards overlapping terms. A hybrid stage merges candidates, and optional reranking scores them with richer query-document interaction. The result is a pipeline rather than one universal similarity number."},
+        {"id":"example","title":"Example: find an incident by error code and meaning","body":"A user asks about 'E_CONN_17 when the agent resumes'. Sparse search finds the exact error code, while dense search finds documentation about resume failures that uses different wording. Hybrid retrieval keeps both candidate classes available for reranking."}
+      ],
+      "failureModes": ["Treating embedding similarity as sufficient for every query.","Merging dense and sparse scores without calibration or evaluation.","Optimizing retrieval only by answer quality, hiding retrieval-specific failures."],
+      "heuristics": ["Evaluate retrieval recall before evaluating generation.","Keep exact identifiers and structured filters available.","Use reranking when the candidate set is broad but final context must stay small."],
+      "takeaways": ["No single retrieval signal dominates every query type.","Hybrid retrieval is primarily a recall strategy.","Generation cannot recover evidence the retriever never surfaced."],
+      "practice": {"title":"Break and repair a RAG pipeline","href":"/labs/rag-failure/"}
+    },
+    {
+      "slug": "source-authority",
+      "conceptId": "concept-source-authority",
+      "title": "Freshness, authority and source priority",
+      "summary": "The most similar passage is not necessarily the source the system should trust.",
+      "readingMinutes": 6,
+      "access": "OPEN",
+      "mentalModel": "Evidence selection needs a trust policy: relevance answers 'is this about the task?', while authority and freshness answer 'should this source govern the decision?'",
+      "whyItMatters": "Knowledge systems often contain duplicates, old policies and summaries derived from stronger primary sources. If retrieval ranks only by semantic similarity, a stale FAQ can outrank the current operating procedure and produce a confidently wrong answer.",
+      "sections": [
+        {"id":"mechanism","title":"Add authority to relevance","body":"Represent source type, owner, effective date, version and supersession when possible. Retrieval can use these signals as filters or ranking features, and the final answer can retain provenance so operators can see which source governed the claim."},
+        {"id":"example","title":"Example: policy changed last month","body":"An old FAQ says refunds are allowed for 30 days; the current policy says 14. The old page has more user-like language and wins vector similarity. An authority policy marks the current policy as controlling and either filters or heavily down-ranks the legacy FAQ."}
+      ],
+      "failureModes": ["Ranking by similarity while ignoring effective date.","Letting derived summaries outrank primary policy documents.","Failing to retire or mark superseded knowledge."],
+      "heuristics": ["Encode authority and freshness as first-class metadata.","Prefer primary sources when claims affect actions or compliance.","Expose provenance in evaluation and debugging."],
+      "takeaways": ["Similarity answers a different question from trust.","Knowledge quality depends on lifecycle and authority, not only embeddings.","A retrieval pipeline should be able to explain why one source outranked another."],
+      "practice": {"title":"Inspect stale-source failure in the RAG incident","href":"/labs/rag-failure/"}
+    }
+  ]
+}

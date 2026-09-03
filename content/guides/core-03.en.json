@@ -1,0 +1,98 @@
+{
+  "version": "1.0.0",
+  "locale": "en",
+  "wave": "core-20",
+  "bundle": "core-03",
+  "guides": [
+    {
+      "slug": "working-vs-durable-memory",
+      "conceptId": "concept-working-durable-memory",
+      "title": "Working memory vs durable memory",
+      "summary": "Keep temporary reasoning context separate from durable state that must survive compaction, retries and new sessions.",
+      "readingMinutes": 6,
+      "access": "OPEN",
+      "mentalModel": "Working memory helps with the current step; durable memory is application state with an explicit write, read, update and expiry policy.",
+      "whyItMatters": "Calling every retained piece of text 'memory' hides different engineering responsibilities. A scratch note can be disposable, while a user preference, workflow checkpoint or verified external identifier may need to survive restarts and remain correct after the current prompt is gone.",
+      "sections": [
+        {"id":"mechanism","title":"Two lifecycles, not one storage bucket","body":"Working memory stays close to the current task and can be summarized or dropped when its local purpose is complete. Durable memory lives outside the prompt, is selected back into context when relevant, and needs policies for ownership, validity, privacy, update and deletion."},
+        {"id":"example","title":"Example: resume after a crash","body":"An agent writes 'step 4 looks complete' into chat and then crashes. That sentence is not proof that the side effect committed. A durable checkpoint records the operation identifier, verified external result and remaining verification work so the workflow can resume without guessing from prose history."}
+      ],
+      "failureModes": ["Persisting raw model reasoning as trusted long-term memory.","Treating chat history as a recovery checkpoint.","Never expiring preferences or facts after their source changes."],
+      "heuristics": ["Define which facts deserve durable storage before adding a memory database.","Store provenance and update time with durable facts.","Re-retrieve durable memory for the current task instead of replaying all history."],
+      "takeaways": ["Working memory serves the current decision; durable memory survives across decisions.","Persistence needs a lifecycle policy, not only a storage layer.","Durable memory should be verifiable and invalidatable."],
+      "practice": {"title":"Compare checkpoint and durable-event recovery","href":"/labs/long-running-agent-recovery-mission/"}
+    },
+    {
+      "slug": "agent-loop",
+      "conceptId": "concept-agent-loop",
+      "title": "Act → observe → verify loop",
+      "summary": "An agent is a control loop that chooses an action, observes the environment and verifies whether the task state actually improved.",
+      "readingMinutes": 6,
+      "access": "OPEN",
+      "mentalModel": "Every action should produce evidence for the next decision. Without observation and verification, an agent becomes a sequence of increasingly confident guesses.",
+      "whyItMatters": "Tool access alone does not make a reliable agent. The useful capability comes from closing the loop between intent, action and evidence so the system can detect failed assumptions, recover from errors and stop when the goal is genuinely satisfied.",
+      "sections": [
+        {"id":"mechanism","title":"The control-loop structure","body":"Start from the current goal and verified state. The model selects an action; a tool or environment executes it; the runtime captures the observation; a verifier checks the expected state transition. The next decision is then continue, retry, escalate or stop."},
+        {"id":"example","title":"Example: a coding agent edits one function","body":"The agent edits a function, then inspects the diff and runs targeted tests. If a test fails, that observation changes the next action. If all required checks pass, the verifier can establish the postcondition instead of trusting the model's statement that the change is done."}
+      ],
+      "failureModes": ["Treating a successful tool call as proof the task succeeded.","Skipping observation and planning the next action from stale state.","Running without explicit termination or escalation conditions."],
+      "heuristics": ["Define expected postconditions before high-impact actions.","Prefer structured observations that can be checked independently.","Make stop, retry and escalation explicit runtime decisions."],
+      "takeaways": ["Agency is a loop, not a long prompt.","Actions need observations and verification to become reliable progress.","Termination is part of agent architecture, not cleanup logic."],
+      "practice": {"title":"Step through the Agent Loop Simulator","href":"/lessons/agent-loop/"}
+    },
+    {
+      "slug": "bounded-autonomy",
+      "conceptId": "concept-bounded-autonomy",
+      "title": "Bounded autonomy",
+      "summary": "Give an agent enough freedom to complete useful work, but place hard boundaries around cost, time, permissions and irreversible effects.",
+      "readingMinutes": 6,
+      "access": "OPEN",
+      "mentalModel": "Autonomy is an action budget: the agent can operate inside a defined envelope and must stop, ask, verify or escalate when it reaches a boundary.",
+      "whyItMatters": "Unbounded loops can spend indefinitely, repeat side effects and drift away from the user's intent. Over-constrained agents are little more than fixed workflows. The engineering goal is to match autonomy to the reversibility and impact of each action class.",
+      "sections": [
+        {"id":"mechanism","title":"Build the autonomy envelope","body":"Boundaries can include maximum steps, tool allowlists, spending caps, timeouts, approval requirements and confidence-based escalation. Low-risk reversible actions may be automatic, while high-impact or ambiguous actions require stronger evidence or a human decision."},
+        {"id":"example","title":"Example: a support agent","body":"The agent may search the knowledge base, draft a reply and issue a small predefined credit automatically. A large refund requires approval, while conflicting policy evidence forces escalation. The same agent therefore has different autonomy levels for different actions."}
+      ],
+      "failureModes": ["Assigning one autonomy level to every tool and action.","Allowing retries to bypass approval or spending boundaries.","Adding vague 'human in the loop' steps without explicit escalation criteria."],
+      "heuristics": ["Classify actions by reversibility and impact.","Set finite step, time and cost budgets.","Treat escalation as a normal success path, not an agent failure."],
+      "takeaways": ["More autonomy is not the same as more capability.","Boundaries should scale with action risk.","A reliable agent knows when not to continue."],
+      "practice": {"title":"Explore workflow boundaries in Agent Workflow Graph Lab","href":"/labs/agent-workflow-graph/"}
+    },
+    {
+      "slug": "workflow-decomposition",
+      "conceptId": "concept-workflow-decomposition",
+      "title": "Workflow decomposition",
+      "summary": "Break a complex goal into stages with explicit inputs, outputs and verification before adding more agent intelligence.",
+      "readingMinutes": 7,
+      "access": "OPEN",
+      "mentalModel": "A useful stage has one clear responsibility, a bounded contract and a handoff another stage can inspect without sharing the entire scratchpad.",
+      "whyItMatters": "Large prompts mix research, planning, execution, checking and publishing into one opaque step. Decomposition makes failures attributable, retries targeted and deterministic components easier to substitute for model reasoning where they are better suited.",
+      "sections": [
+        {"id":"mechanism","title":"Decompose by responsibility","body":"Identify transformations such as gather evidence, decide, act, verify and package. Give each stage explicit state and postconditions. Introduce parallelism only when work is genuinely independent or when independent verification provides more value than the coordination cost."},
+        {"id":"example","title":"Example: source-backed article production","body":"A robust workflow separates source collection, claim extraction, outline design, drafting and independent verification. The draft receives a claim-and-source artifact rather than every research scratch note, so a factual defect can be traced to a specific stage."}
+      ],
+      "failureModes": ["Creating many agent personas without distinct responsibility boundaries.","Sharing one growing scratchpad across every stage.","Retrying the entire workflow when only one stage failed."],
+      "heuristics": ["Name stages after artifacts or decisions, not personas.","Keep handoffs small and inspectable.","Prefer a simple sequential topology until concurrency produces measurable value."],
+      "takeaways": ["Decomposition improves observability before it improves sophistication.","A stage earns its existence when it localizes responsibility.","Complex topology must earn its coordination cost."],
+      "practice": {"title":"Compare simple and coordinated agent designs","href":"/labs/multi-agent-coordination-incident/"}
+    },
+    {
+      "slug": "timeout-ambiguity",
+      "conceptId": "concept-timeout-ambiguity",
+      "title": "Timeout ambiguity",
+      "summary": "A timeout proves that a timely response was not observed; it does not prove that the remote operation failed.",
+      "readingMinutes": 6,
+      "access": "OPEN",
+      "mentalModel": "A timeout is a communication observation, not a conclusion about the remote side effect.",
+      "whyItMatters": "Distributed systems can lose responses after successful work, continue processing after the caller gives up, or fail before reaching the server. If an agent collapses all of those cases into FAILED, a seemingly reasonable retry can duplicate money movement, messages or other irreversible effects.",
+      "sections": [
+        {"id":"mechanism","title":"Three states behind one timeout","body":"The request may have failed before execution, succeeded while the response was lost, or still be running. Safe handling therefore needs stable operation identity, idempotency when supported, and a reconciliation path that can query authoritative remote state before a new side effect is issued."},
+        {"id":"example","title":"Example: the duplicate refund","body":"A refund call times out. The agent labels it failed and retries with a new operation identity. Both calls eventually settle, refunding twice. Modeling the first result as UNKNOWN and reconciling by the original operation ID prevents the second side effect."}
+      ],
+      "failureModes": ["Mapping every timeout directly to FAILED.","Generating a new operation identity on each retry.","Reporting definitive failure before reconciliation is possible."],
+      "heuristics": ["Represent ambiguous outcomes explicitly as UNKNOWN or PENDING.","Keep the same idempotency key across retries of one intent.","Provide an authoritative reconciliation path for costly side effects."],
+      "takeaways": ["Missing response is not confirmed remote failure.","Retries become safer when one intent has one stable identity.","Unknown is a legitimate runtime state and should be modeled explicitly."],
+      "practice": {"title":"Experience the $47,000 Retry incident","href":"/labs/agent-reliability/"}
+    }
+  ]
+}

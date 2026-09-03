@@ -6,10 +6,11 @@ function copy(locale: KnowledgeMap["locale"]) {
     ? {
         kicker: "AI KNOWLEDGE MAP · V1.0",
         title: "Explore AI as a connected knowledge map.",
-        intro: "Open a domain only when you want to inspect the underlying concepts. If you want a clear learning order, Courses is the simpler entry point.",
+        intro: "Open a domain only when you want to inspect the underlying concepts. Published Core Guides are linked directly from their Concept. If you want a clear learning order, Courses is the simpler entry point.",
         branches: "branches",
         concepts: "concepts",
         shared: "shared",
+        guide: "Guide",
         coursesKicker: "Prefer a clear path?",
         coursesTitle: "Use Courses for goal-oriented learning.",
         coursesCopy: "The same canonical knowledge is projected into 15 simpler learning paths, without duplicating the graph here.",
@@ -18,10 +19,11 @@ function copy(locale: KnowledgeMap["locale"]) {
     : {
         kicker: "AI 知识地图 · V1.0",
         title: "把 AI 当作一张相互连接的知识地图来探索。",
-        intro: "只有当你想查看底层知识关系时，再展开某个领域。如果你更需要清晰的学习顺序，课程页会更简单。",
+        intro: "只有当你想查看底层知识关系时，再展开某个领域。已经发布 Core Guide 的 Concept 可以直接进入阅读；如果你更需要清晰学习顺序，课程页会更简单。",
         branches: "个分支",
         concepts: "个知识点",
         shared: "跨路径复用",
+        guide: "Guide",
         coursesKicker: "更想按顺序学？",
         coursesTitle: "用课程页选择目标导向的学习路径。",
         coursesCopy: "同一套 canonical knowledge 会投影成 15 条更简单的学习路径，这里不再重复展开第二套课程结构。",
@@ -64,15 +66,34 @@ export function KnowledgeMapOverview({ map }: KnowledgeMapOverviewProps) {
           <span className="shrink-0 font-mono text-[10px] text-[var(--muted)]">{concepts.length}</span>
         </summary>
         <div className="mt-4 space-y-1 pl-3 sm:pl-5">
-          {concepts.map((concept) => (
-            <div key={concept.id} className="flex items-start justify-between gap-4 border-l border-[var(--border)] py-2 pl-4 text-sm">
-              <span>
-                <span className="font-medium">{concept.title}</span>
-                <span className="ml-2 font-mono text-[9px] uppercase text-[var(--muted)]">{concept.kind}</span>
-              </span>
-              {concept.branchIds.length > 1 ? <span className="shrink-0 font-mono text-[9px] text-[var(--primary)]">{labels.shared}</span> : null}
-            </div>
-          ))}
+          {concepts.map((concept) => {
+            const body = (
+              <>
+                <span>
+                  <span className="font-medium">{concept.title}</span>
+                  <span className="ml-2 font-mono text-[9px] uppercase text-[var(--muted)]">{concept.kind}</span>
+                </span>
+                <span className="flex shrink-0 items-center gap-2 font-mono text-[9px]">
+                  {concept.branchIds.length > 1 ? <span className="text-[var(--muted)]">{labels.shared}</span> : null}
+                  {concept.guideSlug ? <span className="text-[var(--primary)]">{labels.guide} →</span> : null}
+                </span>
+              </>
+            );
+            return concept.guideSlug ? (
+              <Link
+                key={concept.id}
+                href={`/${segment}/guides/${concept.guideSlug}/`}
+                className="flex items-start justify-between gap-4 border-l border-[var(--primary)] py-2 pl-4 text-sm transition hover:text-[var(--primary)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]"
+                data-guide-concept-id={concept.id}
+              >
+                {body}
+              </Link>
+            ) : (
+              <div key={concept.id} className="flex items-start justify-between gap-4 border-l border-[var(--border)] py-2 pl-4 text-sm">
+                {body}
+              </div>
+            );
+          })}
           {children.map((child) => <Branch key={child.id} branch={child} depth={depth + 1} />)}
         </div>
       </details>
