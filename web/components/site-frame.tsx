@@ -26,6 +26,9 @@ export function SiteFrame({ locale, source, children }: SiteFrameProps) {
               <Link className="transition hover:text-[var(--text)]" href={`/${segment}/courses/`}>
                 {source.ui.nav.lessons}
               </Link>
+              <Link className="transition hover:text-[var(--text)]" href={`/${segment}/guides/`}>
+                {source.ui.nav.guides}
+              </Link>
               <Link className="hidden transition hover:text-[var(--text)] md:inline" href={`/${segment}/learning/`}>
                 {source.ui.nav.roadmap}
               </Link>
@@ -48,6 +51,7 @@ export function SiteFrame({ locale, source, children }: SiteFrameProps) {
           </div>
           <div className="flex flex-wrap gap-x-5 gap-y-2">
             <Link href={`/${segment}/courses/`}>{source.ui.nav.lessons}</Link>
+            <Link href={`/${segment}/guides/`}>{source.ui.nav.guides}</Link>
             <Link href={`/${segment}/learning/`}>{source.ui.nav.roadmap}</Link>
             <Link href={`/${segment}/pricing/`}>{source.ui.nav.pricing}</Link>
             <Link href={`/${segment}/early-access/`}>{source.ui.footer.early_access}</Link>

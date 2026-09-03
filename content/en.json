@@ -19,6 +19,7 @@
     "courses/course-knowledge-product-with-ai/",
     "courses/solo-business-with-ai/",
     "courses/ai-customer-support/",
+    "guides/",
     "guides/probabilistic-model-behavior/",
     "guides/model-claim-vs-runtime-fact/",
     "guides/tokenization/",
@@ -111,6 +112,7 @@
   "ui": {
     "nav": {
       "lessons": "Courses",
+      "guides": "Guides",
       "roadmap": "Knowledge Map",
       "pricing": "Pricing",
       "about": "About",
