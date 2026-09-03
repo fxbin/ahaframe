@@ -6,6 +6,7 @@ const WEB_ROOT = process.cwd();
 const REPO_ROOT = path.resolve(WEB_ROOT, "..");
 const CONTENT_ROOT = path.join(REPO_ROOT, "content");
 const INVENTORY_ROOT = path.join(CONTENT_ROOT, "ai-knowledge-inventory-v1.0");
+const GUIDE_ROOT = path.join(CONTENT_ROOT, "guides");
 
 const REQUIRED_CORE_ROUTES = [
   "",
@@ -30,6 +31,7 @@ const REQUIRED_APP_FILES = [
   "app/(site)/[locale]/page.tsx",
   "app/(site)/[locale]/courses/page.tsx",
   "app/(site)/[locale]/courses/[slug]/page.tsx",
+  "app/(site)/[locale]/guides/[slug]/page.tsx",
   "app/(site)/[locale]/learning/page.tsx",
   "app/(site)/[locale]/pricing/page.tsx",
   "app/(site)/[locale]/early-access/page.tsx",
@@ -56,6 +58,29 @@ for (const filename of pathFiles) {
 canonicalCourseRoutes.sort();
 if (canonicalCourseRoutes.length !== 15) throw new Error(`Knowledge Graph must expose 15 canonical Learning Paths; got ${canonicalCourseRoutes.length}.`);
 
+async function guideRoutesForLocale(locale) {
+  const files = (await readdir(GUIDE_ROOT))
+    .filter((filename) => /^core-\d{2}\.(en|zh-CN)\.json$/.test(filename) && filename.endsWith(`.${locale}.json`))
+    .sort();
+  if (files.length !== 4) throw new Error(`${locale} must contain exactly four Core Guide bundles; got ${files.length}.`);
+  const routes = [];
+  for (const filename of files) {
+    const bundle = JSON.parse(await readFile(path.join(GUIDE_ROOT, filename), "utf8"));
+    if (bundle.version !== "1.0.0" || bundle.wave !== "core-20" || bundle.locale !== locale) {
+      throw new Error(`Guide bundle contract mismatch: ${filename}`);
+    }
+    for (const guide of bundle.guides ?? []) routes.push(`guides/${guide.slug}/`);
+  }
+  if (routes.length !== 20 || new Set(routes).size !== 20) throw new Error(`${locale} must expose exactly 20 unique Core Guide routes.`);
+  return routes.sort();
+}
+
+const canonicalGuideRoutes = await guideRoutesForLocale("en");
+const zhGuideRoutes = await guideRoutesForLocale("zh-CN");
+if (JSON.stringify(canonicalGuideRoutes) !== JSON.stringify(zhGuideRoutes)) {
+  throw new Error(`EN/zh-CN Core Guide slug parity drifted.\nEN: ${canonicalGuideRoutes.join(", ")}\nZH: ${zhGuideRoutes.join(", ")}`);
+}
+
 function assertRouteManifest(routes, locale) {
   if (!Array.isArray(routes) || routes.some((route) => typeof route !== "string")) {
     throw new Error(`${locale} availableRoutes must be a string array.`);
@@ -74,6 +99,10 @@ function assertRouteManifest(routes, locale) {
   const courseRoutes = routes.filter((route) => route.startsWith("courses/") && route !== "courses/").sort();
   if (JSON.stringify(courseRoutes) !== JSON.stringify(canonicalCourseRoutes)) {
     throw new Error(`${locale} Course routes must exactly mirror canonical Knowledge Graph Path slugs.\nExpected: ${canonicalCourseRoutes.join(", ")}\nActual: ${courseRoutes.join(", ")}`);
+  }
+  const guideRoutes = routes.filter((route) => route.startsWith("guides/")).sort();
+  if (JSON.stringify(guideRoutes) !== JSON.stringify(canonicalGuideRoutes)) {
+    throw new Error(`${locale} Guide routes must exactly mirror the Core Guide publication bundles.\nExpected: ${canonicalGuideRoutes.join(", ")}\nActual: ${guideRoutes.join(", ")}`);
   }
 }
 
@@ -105,4 +134,4 @@ if (JSON.stringify(enRoutes) !== JSON.stringify(zhRoutes)) {
 
 for (const relativePath of REQUIRED_APP_FILES) await access(path.join(WEB_ROOT, relativePath));
 
-console.log(`Next.js public-route parity contract OK (${enRoutes.length} routes × 2 locales; 15 Course routes mirror canonical Path slugs; Knowledge Map and stable routes preserved).`);
+console.log(`Next.js public-route parity contract OK (${enRoutes.length} routes × 2 locales; 15 Course routes + 20 Core Guide routes mirror canonical content; Knowledge Map and stable routes preserved).`);
