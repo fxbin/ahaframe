@@ -9,6 +9,7 @@ import type {
   GuideActivePathContext,
   GuidePageData,
   GuidePathMembership,
+  GuidePracticeReturnTarget,
   GuideRelatedConcept,
   GuideSequenceNeighbor,
 } from "@/lib/guides";
@@ -146,6 +147,26 @@ function activePathContext(
     previous: neighbor(sequence[index - 1]),
     next: neighbor(sequence[index + 1]),
   };
+}
+
+export async function getGuidePracticeReturnTargets(locale: Locale): Promise<GuidePracticeReturnTarget[]> {
+  const [guides, map] = await Promise.all([getCoreGuides(locale), getKnowledgeMap(locale)]);
+  const guideByConcept = new Map(guides.map((item) => [item.conceptId, item]));
+
+  return guides
+    .filter((guide) => Boolean(guide.practice))
+    .map((guide) => {
+      const memberships = pathMembershipsForConcept(guide.conceptId, map.paths);
+      return {
+        slug: guide.slug,
+        title: guide.title,
+        paths: memberships.map((membership) => {
+          const context = activePathContext(guide, membership.slug, memberships, map.paths, guideByConcept);
+          if (!context) throw new Error(`Guide practice context failed to resolve: ${guide.slug} -> ${membership.slug}`);
+          return { slug: membership.slug, title: membership.title, next: context.next };
+        }),
+      };
+    });
 }
 
 export async function getGuidePageData(
