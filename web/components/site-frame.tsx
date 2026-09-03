@@ -1,6 +1,8 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { segmentForLocale, type Locale, type LocaleSource } from "@/lib/content";
+import { getSearchDocuments } from "@/lib/search-server";
+import { GlobalSearch } from "./global-search";
 import { LocaleSwitch } from "./locale-switch";
 
 interface SiteFrameProps {
@@ -9,9 +11,10 @@ interface SiteFrameProps {
   children: ReactNode;
 }
 
-export function SiteFrame({ locale, source, children }: SiteFrameProps) {
+export async function SiteFrame({ locale, source, children }: SiteFrameProps) {
   const segment = segmentForLocale(locale);
   const home = `/${segment}/`;
+  const searchDocuments = await getSearchDocuments(locale);
 
   return (
     <>
@@ -21,8 +24,8 @@ export function SiteFrame({ locale, source, children }: SiteFrameProps) {
             {source.brand}
           </Link>
 
-          <div className="flex items-center gap-4 sm:gap-6">
-            <nav className="site-header__nav flex items-center gap-5 text-sm sm:gap-7" aria-label="Primary navigation">
+          <div className="flex items-center gap-2 sm:gap-4 lg:gap-6">
+            <nav className="site-header__nav flex items-center gap-4 text-sm sm:gap-6 lg:gap-7" aria-label="Primary navigation">
               <Link className="transition hover:text-[var(--text)]" href={`/${segment}/courses/`}>
                 {source.ui.nav.lessons}
               </Link>
@@ -36,6 +39,7 @@ export function SiteFrame({ locale, source, children }: SiteFrameProps) {
                 {source.ui.nav.pricing}
               </Link>
             </nav>
+            <GlobalSearch locale={locale} documents={searchDocuments} />
             <LocaleSwitch locale={locale} labels={source.ui.language} />
           </div>
         </div>
