@@ -4,6 +4,7 @@ import { GuideDirectoryPage } from "@/components/guide-directory-page";
 import { StructuredData } from "@/components/structured-data";
 import { localeFromSegment } from "@/lib/content";
 import { getGuideDirectory } from "@/lib/guides-directory-server";
+import { getGuideProblemDiscovery } from "@/lib/guide-problems-server";
 import { pageMetadata } from "@/lib/metadata";
 import { webPageSchema } from "@/lib/schema";
 
@@ -27,7 +28,10 @@ export default async function GuidesRoute({ params }: PageProps) {
   const locale = localeFromSegment(segment);
   if (!locale) notFound();
 
-  const data = await getGuideDirectory(locale);
+  const [data, problemDiscovery] = await Promise.all([
+    getGuideDirectory(locale),
+    getGuideProblemDiscovery(locale),
+  ]);
   const title = locale === "zh-CN" ? "60 个可复用的 AI 心智模型" : "60 reusable mental models for AI";
   const description = locale === "zh-CN"
     ? "直接浏览 Guide，或按 canonical Knowledge Graph 结构筛选。"
@@ -36,7 +40,7 @@ export default async function GuidesRoute({ params }: PageProps) {
   return (
     <>
       <StructuredData value={webPageSchema(locale, "guides/", title, description)} />
-      <GuideDirectoryPage locale={locale} data={data} />
+      <GuideDirectoryPage locale={locale} data={data} problemDiscovery={problemDiscovery} />
     </>
   );
 }
