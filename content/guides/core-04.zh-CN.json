@@ -1,0 +1,98 @@
+{
+  "version": "1.0.0",
+  "locale": "zh-CN",
+  "wave": "core-20",
+  "bundle": "core-04",
+  "guides": [
+    {
+      "slug": "idempotency-boundary",
+      "conceptId": "concept-idempotency-boundary",
+      "title": "Idempotency Boundary",
+      "summary": "重复 Attempt 应该代表同一个 Business Intent，而不是每一次都悄悄创建新的 Side Effect。",
+      "readingMinutes": 6,
+      "access": "OPEN",
+      "mentalModel": "Stable Operation Identity 用来区分“同一个 Intent 的 Retry”和“一个真正全新的 Intent”。",
+      "whyItMatters": "网络会 Retry、Worker 会 Restart、Agent 会 Re-plan。缺少 Idempotency Boundary 时，同一个用户 Intent 可能制造重复 Order、Message、Charge 或 Refund。这个保护必须位于真正的 Side-effect Boundary，而不能依赖模型乐观地判断“应该没发生”。",
+      "sections": [
+        {"id":"mechanism","title":"给 Business Intent 一个稳定 Identity","body":"当一个需要 Side Effect 的 Intent 被创建时，Caller 就分配 Idempotency Key 或 Operation ID。Receiver 为这个 Identity 记录 Result，并在重复 Attempt 时返回同一个 Outcome。这个 Identity 必须跨越 Network Retry、Process Restart 与 Agent Re-planning。"},
+        {"id":"example","title":"例子：一次点击，两次 HTTP Attempt","body":"用户只点击了一次 Buy，但第一次 Request Timeout，于是 Client Retry。如果两次 Attempt 都携带同一个 Order-intent ID，Server 就可以返回原来的 Order，而不是创建第二个订单。"}
+      ],
+      "failureModes": ["每次 Retry 都创建新的 Idempotency Key。","Key 只绑定一次 HTTP Attempt，而不是 Business Intent。","把 Compensation 当作避免重复 Side Effect 的替代方案。"],
+      "heuristics": ["把 Stable Identity 放在真正的 Business Side-effect Boundary。","任何可能发起 Retry 的地方都要持久化 Operation Identity。","显式测试 Timeout、Restart 与 Partial Success 路径。"],
+      "takeaways": ["在考虑 Retry Timing 之前，Identity 就应该稳定。","一个 Intent 应该只有一个 Operation Identity。","面对 Ambiguous Outcome，Idempotency 与 Reconciliation 需要一起工作。"],
+      "practice": {"title":"修复 Duplicate Side Effect 事故","href":"/labs/agent-reliability/"}
+    },
+    {
+      "slug": "observability-as-diagnosis",
+      "conceptId": "concept-observability-diagnosis",
+      "title": "Observability 是诊断界面",
+      "summary": "只有当 Log 与 Trace 能帮助 Operator 重建 Model、Retrieval、Tool 与 Runtime 之间的因果路径时，它们才真正有价值。",
+      "readingMinutes": 6,
+      "access": "OPEN",
+      "mentalModel": "Observability 应该暴露 Causal Execution Path：每个 Boundary 进入了什么、选择了什么证据、做了什么 Decision、Environment 又返回了什么。",
+      "whyItMatters": "AI Failure 很容易被错误归因。Wrong Answer 可能来自 Retrieval 漏证据、Source Authority 过期、Tool Response 异常、Application State Bug，也可能真的来自 Model Behavior。缺少跨层 Evidence 时，团队往往默认去改 Prompt，即使 Prompt 根本不是失败组件。",
+      "sections": [
+        {"id":"mechanism","title":"跨 Boundary Trace Decision","body":"记录稳定的 Request 与 Operation ID、关键 Input、Retrieval Candidate 与最终选择的 Evidence、Tool Call、Validation Outcome 与 Release Decision。Trace 应该让 State Transition 可检查，而不是要求 Operator 从大量互不关联的 Timestamp Log 中手工重建 Workflow。"},
+        {"id":"example","title":"例子：发错了 Customer Credit","body":"Support Agent 给用户发错 Credit。最终 Answer 看起来像 Reasoning Error，但 Trace 显示 Retrieval 实际加载了另一个 Customer Plan 的 Policy。真正修复点是 Retrieval Filtering 与 Identity Propagation，而不是把 System Prompt 写得更长。"}
+      ],
+      "failureModes": ["只记录最终 Prompt 与 Response。","收集大量 Log，却没有 Correlation Identifier。","Dashboard 只能显示 Error，却看不出是哪个 System Layer 产生的。"],
+      "heuristics": ["在重要 System Boundary 记录 Input 与 Output。","使用 Stable ID 串联 Model、Retrieval、Tool 与 Runtime Event。","围绕 Operator 在 Diagnosis 时真正需要回答的问题设计 Trace。"],
+      "takeaways": ["有用的 Observability 必须支持 Attribution。","State Transition 比孤立 Timestamp 更重要。","高质量 Evidence 能防止 Prompt Tuning 变成所有失败的默认修复方式。"],
+      "practice": {"title":"在 Evaluation Failure Lab 中使用 Evidence 与 Veto","href":"/labs/evaluation-failure/"}
+    },
+    {
+      "slug": "source-triangulation",
+      "conceptId": "concept-source-triangulation",
+      "title": "交叉验证独立来源",
+      "summary": "当真正独立的 Evidence Path 相互收敛时，Confidence 才应该上升；很多链接重复同一个上游 Claim 并不构成独立验证。",
+      "readingMinutes": 6,
+      "access": "OPEN",
+      "mentalModel": "计算 Independent Evidence Path，而不是 Citation 数量。五个页面复制同一个 Original Source，本质上仍然只有一份底层证据。",
+      "whyItMatters": "AI 辅助 Research 很容易生成一长串看起来很严谨的 Bibliography，但 Epistemic Depth 仍然很薄。Syndicated Article、Derived Summary 与重复媒体报道可能全部继承同一个未经验证的 Claim。Triangulation 关注的是 Evidence 是否真的拥有独立来源。",
+      "sections": [
+        {"id":"mechanism","title":"追踪 Evidence Lineage","body":"先识别 Primary Source，再把共享同一 Upstream Evidence 的文档归为一组。对于高影响 Claim，需要寻找不同 Evidence Path，例如 Official Record、Independent Measurement、独立 Dataset 或 Expert Analysis。如果独立来源没有收敛，则保留分歧，而不是强行统一答案。"},
+        {"id":"example","title":"例子：五篇文章，一个统计数字","body":"五篇 News 都写着“70% 的团队已经采用 AI”，但它们全部引用同一家公司 Blog。这只是同一个 Data Point 被重复五次。一个拥有不同 Sample 的独立 Survey 才构成第二条 Evidence Path；另一篇改写 Blog 的文章则不算。"}
+      ],
+      "failureModes": ["把 Syndicated Coverage 当作 Independent Confirmation。","用 Search Result 数量代替 Confidence。","为了让 Narrative 更整洁而抹平真实分歧。"],
+      "heuristics": ["为每个重要 Claim 追踪最初 Source。","高影响结论至少寻找一条独立 Evidence Path。","在 Synthesis 中保留 Conflict 与 Uncertainty。"],
+      "takeaways": ["Citation 数量不等于 Evidence Diversity。","Independence 取决于 Source Lineage。","强 Synthesis 完全可以明确说明可信证据彼此冲突。"],
+      "practice": {"title":"构建有 Evidence 支撑的 Research Decision","href":"/labs/research-evidence-mission/"}
+    },
+    {
+      "slug": "long-form-consistency",
+      "conceptId": "concept-long-form-consistency",
+      "title": "长内容一致性",
+      "summary": "真正连贯的长内容会把 Claim、Terminology、Voice 与 Decision 外部化，而不是依赖一条超长 Prompt 记住所有事情。",
+      "readingMinutes": 7,
+      "access": "OPEN",
+      "mentalModel": "Long-form Generation 是 State-management Problem：Argument Map、Source-backed Claim、Terminology 与 Chapter Contract 共同构成 Durable Editorial Memory。",
+      "whyItMatters": "模型可以写出非常好的一个 Paragraph，但 20,000 字 Manuscript 仍然会慢慢自相矛盾。Definition 漂移、Evidence 被错误复用、Voice 改变，原因在于 Local Generation 并不会自动维护整个 Project 的 Global State。",
+      "sections": [
+        {"id":"mechanism","title":"把 Manuscript State 外部化","body":"维护 Argument Outline、Source-backed Claim List、Glossary、Editorial Constraint 与 Chapter Brief。每一次 Drafting 只接收当前相关的子集，而 Review 则把 Local Text 与这些 Shared Artifact 对照，而不是期待模型自己记住整本 Manuscript。"},
+        {"id":"example","title":"例子：同一个概念在不同章节变了含义","body":"第 2 章把 Verification 定义为 Independent Evidence Checking，第 8 章却把 Verification 写成“再问模型一次”。Glossary 与 Claim Ledger 能在 Review 阶段暴露这种 Semantic Drift，避免矛盾继续扩散到整本书。"}
+      ],
+      "failureModes": ["把整本 Manuscript 塞进 Prompt，再只写一句“保持一致”。","只用 Summary 保存 Exact Claim 与 Terminology。","做 Style Editing 时不重新检查事实与概念一致性。"],
+      "heuristics": ["在 Generated Prose 之外维护 Glossary 与 Claim Ledger。","每个 Chapter 都有明确 Brief，并说明它与 Global Argument 的依赖。","把跨章节 Terminology、Repetition 与 Contradiction 作为独立 Review 任务。"],
+      "takeaways": ["Local Fluency 不保证 Global Coherence。","Editorial Artifact 可以作为 Writing System 的 Durable Memory。","Long-form Verification 应把文本与 Shared Project State 进行比较。"],
+      "practice": {"title":"在 Write a Book with AI 中设计写作系统","href":"/build/write-book-with-ai-build/"}
+    },
+    {
+      "slug": "automation-boundary",
+      "conceptId": "concept-workflow-automation-boundary",
+      "title": "选择正确的 Automation Boundary",
+      "summary": "优先自动化稳定、可观察、可验证的工作，把高歧义、高责任或高异常成本的判断继续留给人。",
+      "readingMinutes": 6,
+      "access": "OPEN",
+      "mentalModel": "当 Task 的 Input 与 Success Criteria 足够清晰，可以自动 Verification，并且 Failure 可恢复时，它才是好的 Automation Candidate。",
+      "whyItMatters": "AI 让团队很容易在真正理解 Process 之前就开始自动化。如果 Hidden Judgment、Policy Exception 或 Responsibility Boundary 全部被塞进一个 Model Call，短期看起来获得了 Leverage，长期却会变成 Maintenance 与 Operational Risk。",
+      "sections": [
+        {"id":"mechanism","title":"寻找稳定 Boundary","body":"先 Decompose Workflow，再按 Input Stability、Reversibility、Verification Cost 与 Exception Frequency 评估每一个 Stage。优先自动化拥有 Clear Postcondition 的部分；高影响或高歧义 Decision 继续放在 Explicit Policy 与 Human Accountability 后面，直到 Evidence 足以支持扩张 Boundary。"},
+        {"id":"example","title":"例子：一人公司的 Customer Support","body":"Solo Founder 可以较早自动化 Ticket Classification、Knowledge Retrieval 与 First-draft Reply。Refund、Account Access 与异常 Policy Conflict 继续由人工决策。随着 Exception Rate 被持续测量，某些低风险 Action 才可以逐步移动到 Automation Boundary 另一侧。"}
+      ],
+      "failureModes": ["Happy Path Demo 成功一次，就自动化整条 Workflow。","忽略 Exception Handling、Ownership 与 Maintenance Cost。","所有地方都加 Human Review，却没有定义人到底需要判断什么。"],
+      "heuristics": ["优先自动化拥有 Machine-checkable Postcondition 的 Task。","不可逆或高影响 Action 放在更强 Policy Boundary 后面。","把 Exception Rate 与 Maintenance Burden 当作 Automation Metric。"],
+      "takeaways": ["真正的 Leverage 来自稳定 Boundary，而不是最大化 Autonomy。","Verification Cost 能帮助判断哪些工作可以安全 Delegation。","每一条 Automation 都需要 Owner、Exception Path 与 Maintenance Policy。"],
+      "practice": {"title":"设计 Solo-business Operating System","href":"/build/solo-business-operating-system-build/"}
+    }
+  ]
+}
