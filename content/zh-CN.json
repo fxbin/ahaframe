@@ -19,6 +19,7 @@
     "courses/course-knowledge-product-with-ai/",
     "courses/solo-business-with-ai/",
     "courses/ai-customer-support/",
+    "guides/",
     "guides/probabilistic-model-behavior/",
     "guides/model-claim-vs-runtime-fact/",
     "guides/tokenization/",
@@ -109,7 +110,7 @@
   ],
   "brand": "AhaFrame",
   "ui": {
-    "nav": {"lessons":"课程","roadmap":"知识地图","pricing":"定价","about":"关于","early_access":"加入内测","menu":"菜单"},
+    "nav": {"lessons":"课程","guides":"Guides","roadmap":"知识地图","pricing":"定价","about":"关于","early_access":"加入内测","menu":"菜单"},
     "footer": {"tagline":"清晰的 AI 课程，加上真正需要你做判断的互动练习。","sitemap":"站点地图","about":"关于","early_access":"内测"},
     "language": {"en":"English","zh-CN":"简体中文"}
   },
