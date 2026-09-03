@@ -44,6 +44,25 @@ export interface GuideRelatedConcept {
   guideSlug: string | null;
 }
 
+export interface GuidePathMembership {
+  id: string;
+  slug: string;
+  title: string;
+  milestoneId: string;
+  milestoneTitle: string;
+}
+
+export interface GuideSequenceNeighbor {
+  conceptId: string;
+  slug: string;
+  title: string;
+}
+
+export interface GuideActivePathContext extends GuidePathMembership {
+  previous: GuideSequenceNeighbor | null;
+  next: GuideSequenceNeighbor | null;
+}
+
 export interface GuidePageData {
   guide: CoreGuide;
   concept: {
@@ -53,4 +72,6 @@ export interface GuidePageData {
     difficulty: string;
   };
   relatedConcepts: GuideRelatedConcept[];
+  pathMemberships: GuidePathMembership[];
+  activePath: GuideActivePathContext | null;
 }
