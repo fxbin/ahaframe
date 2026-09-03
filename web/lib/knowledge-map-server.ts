@@ -16,6 +16,7 @@ const CONTENT_ROOT = (() => {
   return existsSync(fromRepositoryRoot) ? fromRepositoryRoot : path.resolve(process.cwd(), "..", "content");
 })();
 const INVENTORY_ROOT = path.join(CONTENT_ROOT, "ai-knowledge-inventory-v1.0");
+const GUIDE_ROOT = path.join(CONTENT_ROOT, "guides");
 
 interface DomainSource {
   id: string;
@@ -87,6 +88,13 @@ interface InventoryFragment {
   paths?: PathSource[];
 }
 
+interface GuideIndexBundle {
+  version: string;
+  locale: Locale;
+  wave: string;
+  guides: Array<{ slug: string; conceptId: string }>;
+}
+
 async function loadJson<T>(filename: string): Promise<T> {
   return JSON.parse(await readFile(path.join(CONTENT_ROOT, filename), "utf8")) as T;
 }
@@ -108,11 +116,31 @@ async function loadInventory(): Promise<{ branches: BranchSource[]; concepts: Co
   return { branches, concepts, paths };
 }
 
+async function loadGuideIndex(locale: Locale): Promise<Map<string, string>> {
+  const filenames = (await readdir(GUIDE_ROOT))
+    .filter((filename) => /^core-\d{2}\.(en|zh-CN)\.json$/.test(filename) && filename.endsWith(`.${locale}.json`))
+    .sort();
+  const index = new Map<string, string>();
+  for (const filename of filenames) {
+    const bundle = JSON.parse(await readFile(path.join(GUIDE_ROOT, filename), "utf8")) as GuideIndexBundle;
+    if (bundle.version !== "1.0.0" || bundle.wave !== "core-20" || bundle.locale !== locale) {
+      throw new Error(`Knowledge Map Guide index contract mismatch: ${filename}`);
+    }
+    for (const guide of bundle.guides) {
+      if (index.has(guide.conceptId)) throw new Error(`Duplicate Guide Concept binding: ${guide.conceptId}`);
+      index.set(guide.conceptId, guide.slug);
+    }
+  }
+  if (index.size !== 20) throw new Error(`Knowledge Map expected 20 published Core Guides; got ${index.size}.`);
+  return index;
+}
+
 export async function getKnowledgeMap(locale: Locale): Promise<KnowledgeMap> {
-  const [seed, presentation, inventory] = await Promise.all([
+  const [seed, presentation, inventory, guideIndex] = await Promise.all([
     loadJson<{ schemaVersion: string; domains: DomainSource[] }>("ai-knowledge-graph-v1.0.json"),
     loadJson<{ locale: Locale; domains: Record<string, DomainPresentation> }>(`ai-knowledge-graph-v1.0.${locale}.json`),
     loadInventory(),
+    loadGuideIndex(locale),
   ]);
   if (seed.schemaVersion !== "1.0.0") throw new Error("Knowledge Map schema version mismatch.");
   if (presentation.locale !== locale) throw new Error(`Knowledge Map locale mismatch for ${locale}.`);
@@ -146,6 +174,7 @@ export async function getKnowledgeMap(locale: Locale): Promise<KnowledgeMap> {
     maturity: concept.maturity,
     versionSensitive: concept.versionSensitive,
     legacyIds: concept.legacyIds,
+    guideSlug: guideIndex.get(concept.id) ?? null,
   }));
 
   const paths: KnowledgeMapPath[] = inventory.paths.map((item) => ({
