@@ -2,15 +2,18 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { GuideProblemDiscovery } from "@/components/guide-problem-discovery";
 import type { Locale } from "@/lib/content";
 import type { GuideDirectoryData } from "@/lib/guides-directory";
+import type { GuideProblemDiscoveryData } from "@/lib/guide-problems";
 
 interface GuideDirectoryPageProps {
   locale: Locale;
   data: GuideDirectoryData;
+  problemDiscovery: GuideProblemDiscoveryData;
 }
 
-export function GuideDirectoryPage({ locale, data }: GuideDirectoryPageProps) {
+export function GuideDirectoryPage({ locale, data, problemDiscovery }: GuideDirectoryPageProps) {
   const segment = locale === "zh-CN" ? "zh-cn" : "en";
   const [query, setQuery] = useState("");
   const [domain, setDomain] = useState("");
@@ -113,6 +116,8 @@ export function GuideDirectoryPage({ locale, data }: GuideDirectoryPageProps) {
           </div>
         </div>
       </section>
+
+      <GuideProblemDiscovery locale={locale} data={problemDiscovery} />
 
       <section className="border-b border-[var(--border)] py-8" aria-label={labels.filtersRegion}>
         <div className="shell">
