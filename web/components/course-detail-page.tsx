@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CourseProgressPanel } from "@/components/course-progress-panel";
 import { localizedPath, segmentForLocale, type Locale } from "@/lib/content";
 import type { CourseCatalogItem } from "@/lib/course-catalog-server";
 
@@ -41,6 +42,20 @@ export function CourseDetailPage({ locale, course }: CourseDetailPageProps) {
         noPractice: "Interactive practice for this path is being expanded.",
       };
 
+  const seenGuideConcepts = new Set<string>();
+  const progressGuides = course.milestones.flatMap((milestone) => milestone.concepts)
+    .filter((concept) => {
+      if (!concept.guide || seenGuideConcepts.has(concept.id)) return false;
+      seenGuideConcepts.add(concept.id);
+      return true;
+    })
+    .map((concept) => ({
+      conceptId: concept.id,
+      slug: concept.guide!.slug,
+      title: concept.guide!.title,
+    }));
+  const progressPractices = course.practices.map((practice) => ({ id: practice.id, title: practice.title, route: practice.route }));
+
   return (
     <main className="course-detail-page">
       <section className="border-b border-[var(--border)] py-10 sm:py-16">
@@ -65,6 +80,14 @@ export function CourseDetailPage({ locale, course }: CourseDetailPageProps) {
           </div>
         </div>
       </section>
+
+      <CourseProgressPanel
+        locale={locale}
+        pathId={course.path.id}
+        pathSlug={course.path.slug}
+        guides={progressGuides}
+        practices={progressPractices}
+      />
 
       <section className="py-14 sm:py-20">
         <div className="shell max-w-5xl">
