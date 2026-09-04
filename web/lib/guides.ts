@@ -1,7 +1,7 @@
 import type { Locale } from "@/lib/content";
 
 export type GuideAccess = "OPEN";
-export type CoreGuideWave = "core-20" | "core-40" | "core-60";
+export type CoreGuideWave = "core-20" | "core-40" | "core-60" | "core-80";
 
 export interface GuidePracticeLink {
   title: string;
