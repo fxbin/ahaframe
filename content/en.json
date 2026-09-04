@@ -80,6 +80,26 @@
     "guides/open-closed-model-tradeoff/",
     "guides/memory-expiry/",
     "guides/customer-support-copilot/",
+    "guides/next-token-generation/",
+    "guides/sampling-controls/",
+    "guides/embeddings-semantic-space/",
+    "guides/hallucination/",
+    "guides/context-vs-memory/",
+    "guides/checkpoint-resume/",
+    "guides/async-long-running/",
+    "guides/reversible-actions/",
+    "guides/context-compaction/",
+    "guides/streaming-backpressure/",
+    "guides/retry-amplification/",
+    "guides/prompt-injection-defense/",
+    "guides/online-monitoring/",
+    "guides/rollout-fallback/",
+    "guides/reranking/",
+    "guides/learning-objective-design/",
+    "guides/coordination-overhead/",
+    "guides/test-first-ai/",
+    "guides/fact-check-revision/",
+    "guides/data-analysis-verification/",
     "learning/",
     "pricing/",
     "early-access/",
@@ -138,5 +158,5 @@
     "context-window": {"name":"Context Window Lab","category":"Context Engineering","level":"Beginner","minutes":8,"description":"Visualize how an LLM context window fills up and compare summarization, RAG, memory, and truncation strategies.","quick":"A context window is the model's finite working input budget; system instructions, conversation history, documents, and tool results all compete for that space."},
     "agent-loop": {"name":"Agent Loop Simulator","category":"Agents","level":"Intermediate","minutes":9,"description":"Step through an AI agent loop: understand the task, choose an action, call a tool, observe the result, recover from errors, and answer.","quick":"An AI agent repeatedly decides what to do next, acts through tools, observes the result, and uses that observation to decide whether to continue, retry, or answer."}
   },
-  "meta": {"updated":"2026-09-03"}
+  "meta": {"updated":"2026-09-04"}
 }
