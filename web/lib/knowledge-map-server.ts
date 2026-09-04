@@ -17,8 +17,8 @@ const CONTENT_ROOT = (() => {
 })();
 const INVENTORY_ROOT = path.join(CONTENT_ROOT, "ai-knowledge-inventory-v1.0");
 const GUIDE_ROOT = path.join(CONTENT_ROOT, "guides");
-const CORE_GUIDE_BUNDLE_COUNT = 12;
-const CORE_GUIDE_COUNT = 60;
+const CORE_GUIDE_BUNDLE_COUNT = 16;
+const CORE_GUIDE_COUNT = 80;
 
 interface DomainSource {
   id: string;
@@ -118,13 +118,15 @@ async function loadInventory(): Promise<{ branches: BranchSource[]; concepts: Co
   return { branches, concepts, paths };
 }
 
-function expectedGuideWave(filename: string): "core-20" | "core-40" | "core-60" {
+function expectedGuideWave(filename: string): "core-20" | "core-40" | "core-60" | "core-80" {
   const match = filename.match(/^core-(\d{2})\./);
   if (!match) throw new Error(`Invalid Core Guide filename: ${filename}`);
   const number = Number(match[1]);
   if (number <= 4) return "core-20";
   if (number <= 8) return "core-40";
-  return "core-60";
+  if (number <= 12) return "core-60";
+  if (number <= 16) return "core-80";
+  throw new Error(`Unsupported Core Guide bundle number: ${filename}`);
 }
 
 async function loadGuideIndex(locale: Locale): Promise<Map<string, string>> {

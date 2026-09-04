@@ -10,8 +10,8 @@ ROOT = Path(__file__).resolve().parents[1]
 CONTENT = ROOT / "content"
 GUIDES = CONTENT / "guides"
 INVENTORY = CONTENT / "ai-knowledge-inventory-v1.0"
-GUIDE_COUNT = 60
-BUNDLE_COUNT = 12
+GUIDE_COUNT = 80
+BUNDLE_COUNT = 16
 
 
 def load(path: Path):
@@ -39,7 +39,11 @@ def expected_wave(bundle_number: int) -> str:
         return "core-20"
     if bundle_number <= 8:
         return "core-40"
-    return "core-60"
+    if bundle_number <= 12:
+        return "core-60"
+    if bundle_number <= 16:
+        return "core-80"
+    raise AssertionError(f"unsupported Core Guide bundle number: {bundle_number}")
 
 
 def load_guides(locale: str):
@@ -89,12 +93,13 @@ def main():
     require(len(set(slugs)) == GUIDE_COUNT, "Core Guide slugs must be unique")
     require(len(set(concept_ids)) == GUIDE_COUNT, "Each Core Guide must bind exactly one unique canonical Concept")
 
-    planned_core60 = (
+    planned_core80 = (
         set(coverage_plan["baselineConceptIds"])
         | set(coverage_plan["core40Additions"])
         | set(coverage_plan["core60Additions"])
+        | set(coverage_plan["core80Additions"])
     )
-    require(set(concept_ids) == planned_core60, "Published Guide Concept bindings must exactly match the frozen core-60 coverage plan")
+    require(set(concept_ids) == planned_core80, "Published Guide Concept bindings must exactly match the frozen core-80 coverage plan")
 
     require("guides/" in en_routes, "Guide Directory must remain a public canonical route")
     public_guide_routes = sorted(route for route in en_routes if route.startswith("guides/") and route != "guides/")
@@ -127,7 +132,7 @@ def main():
     subprocess.run([sys.executable, str(ROOT / "scripts" / "guide_coverage.py"), "--check"], cwd=ROOT, check=True)
 
     print(
-        "PASS Core Guide v1 publication: 60 canonical Concepts now have substantial OPEN Guides in exact EN/zh-CN parity; "
+        "PASS Core Guide v1 publication: 80 canonical Concepts now have substantial OPEN Guides in exact EN/zh-CN parity; "
         "version-sensitive Concepts retain canonical sourceRefs, coverage-plan invariants pass, the Guide Directory and all Guide detail routes/practice targets are public, "
         "relations remain Knowledge-Graph-derived, and monetization gates stay disabled."
     )

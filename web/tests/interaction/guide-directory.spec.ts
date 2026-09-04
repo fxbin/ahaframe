@@ -1,17 +1,17 @@
 import { expect, test } from "@playwright/test";
 
-test("English Guides directory exposes exactly 60 published Guides from canonical domains", async ({ page }) => {
+test("English Guides directory exposes exactly 80 published Guides from canonical domains", async ({ page }) => {
   await page.goto("/en/guides/");
 
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("60 reusable mental models for AI.");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("80 reusable mental models for AI.");
   const items = page.locator("[data-guide-directory-item]");
-  await expect(items).toHaveCount(60);
+  await expect(items).toHaveCount(80);
   await expect(page.locator('[data-guide-directory-domain="domain-understand-ai"]')).toBeVisible();
   await expect(page.locator('[data-guide-directory-domain="domain-build-ai"]')).toBeVisible();
   await expect(page.locator('[data-guide-directory-domain="domain-use-ai"]')).toBeVisible();
 
   const slugs = await items.evaluateAll((nodes) => nodes.map((node) => node.getAttribute("data-guide-directory-item")));
-  expect(new Set(slugs).size).toBe(60);
+  expect(new Set(slugs).size).toBe(80);
   for (const item of await items.all()) {
     await expect(item).toHaveAttribute("href", /^\/en\/guides\/[a-z0-9-]+\/$/);
   }
@@ -26,7 +26,7 @@ test("directory filters stay deterministic and reset without crawlable filter UR
   await expect(page).toHaveURL(/\/en\/guides\/$/);
 
   await page.getByRole("button", { name: "Reset filters" }).click();
-  await expect(page.locator("[data-guide-directory-item]")).toHaveCount(60);
+  await expect(page.locator("[data-guide-directory-item]")).toHaveCount(80);
 
   await page.getByLabel("All courses").selectOption({ label: "AI Customer Support" });
   await expect(page.locator("[data-guide-directory-item]")).toHaveCount(10);
@@ -43,15 +43,15 @@ test("directory has an explicit zero-result state and can recover to all Guides"
   await page.getByLabel("Filter Guides").fill("this-guide-does-not-exist-xyz");
   await expect(page.locator("[data-guide-directory-empty]")).toBeVisible();
   await expect(page.locator("[data-guide-directory-item]")).toHaveCount(0);
-  await page.getByRole("button", { name: "Clear filters and view all 60" }).click();
-  await expect(page.locator("[data-guide-directory-item]")).toHaveCount(60);
+  await page.getByRole("button", { name: "Clear filters and view all 80" }).click();
+  await expect(page.locator("[data-guide-directory-item]")).toHaveCount(80);
 });
 
-test("Chinese Guides directory preserves 60-guide parity and localized navigation", async ({ page }) => {
+test("Chinese Guides directory preserves 80-guide parity and localized navigation", async ({ page }) => {
   await page.goto("/zh-cn/guides/");
 
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("60 个可复用的 AI 心智模型。");
-  await expect(page.locator("[data-guide-directory-item]")).toHaveCount(60);
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("80 个可复用的 AI 心智模型。");
+  await expect(page.locator("[data-guide-directory-item]")).toHaveCount(80);
   await expect(page.getByRole("link", { name: "Guides", exact: true }).first()).toHaveAttribute("href", "/zh-cn/guides/");
 
   await page.getByLabel("筛选 Guide").fill("Timeout");

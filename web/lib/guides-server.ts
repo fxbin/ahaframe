@@ -21,8 +21,8 @@ const CONTENT_ROOT = (() => {
 })();
 const GUIDE_ROOT = path.join(CONTENT_ROOT, "guides");
 const INVENTORY_ROOT = path.join(CONTENT_ROOT, "ai-knowledge-inventory-v1.0");
-const CORE_GUIDE_BUNDLE_COUNT = 12;
-const CORE_GUIDE_COUNT = 60;
+const CORE_GUIDE_BUNDLE_COUNT = 16;
+const CORE_GUIDE_COUNT = 80;
 
 interface EdgeSource {
   id: string;
@@ -42,7 +42,9 @@ function expectedWave(filename: string): CoreGuideWave {
   const number = Number(match[1]);
   if (number <= 4) return "core-20";
   if (number <= 8) return "core-40";
-  return "core-60";
+  if (number <= 12) return "core-60";
+  if (number <= 16) return "core-80";
+  throw new Error(`Unsupported Core Guide bundle number: ${filename}`);
 }
 
 export async function getCoreGuides(locale: Locale): Promise<CoreGuide[]> {

@@ -71,7 +71,7 @@ test("Course progress counts only explicit Read evidence and continues to the fi
   await expect(panel.locator("[data-course-guides-read]")).toContainText(/^1 \/ [1-9]/);
   await expect(panel.locator('[data-course-continue="guide"]')).toHaveAttribute(
     "href",
-    "/en/guides/idempotency-boundary/?path=production-ai-reliability",
+    "/en/guides/retry-amplification/?path=production-ai-reliability",
   );
 });
 

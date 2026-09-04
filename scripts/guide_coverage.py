@@ -125,13 +125,16 @@ def main() -> int:
     baseline = set(plan["baselineConceptIds"])
     core40 = baseline | set(plan["core40Additions"])
     core60 = core40 | set(plan["core60Additions"])
+    core80 = core60 | set(plan["core80Additions"])
     actual = load_actual_guide_ids()
 
-    stages = {
-        "core-20": stage_metrics(baseline, paths, reuse),
-        "core-40": stage_metrics(core40, paths, reuse),
-        "core-60": stage_metrics(core60, paths, reuse),
+    stage_sets = {
+        "core-20": baseline,
+        "core-40": core40,
+        "core-60": core60,
+        "core-80": core80,
     }
+    stages = {name: stage_metrics(selected, paths, reuse) for name, selected in stage_sets.items()}
 
     errors: list[str] = []
     expected_matrix = plan["matrix"]
@@ -141,32 +144,38 @@ def main() -> int:
         errors.append(f"Path count drift: {len(paths)}")
     if sum(reuse.values()) != expected_matrix["pathConceptMembershipCount"]:
         errors.append(f"Path-Concept membership drift: {sum(reuse.values())}")
-    if len(baseline) != 20 or len(core40) != 40 or len(core60) != 60:
-        errors.append("Coverage plan must contain cumulative 20 / 40 / 60 unique Concepts")
 
-    expected_actual_by_count = {20: baseline, 40: core40, 60: core60}
+    expected_counts = {20, 40, 60, 80}
+    if {len(selected) for selected in stage_sets.values()} != expected_counts:
+        errors.append("Coverage plan must contain cumulative 20 / 40 / 60 / 80 unique Concepts")
+
+    expected_actual_by_count = {len(selected): selected for selected in stage_sets.values()}
     expected_actual = expected_actual_by_count.get(len(actual))
     if expected_actual is None:
-        errors.append(f"Published Guide count must match a planned stage (20/40/60), got {len(actual)}")
+        errors.append(f"Published Guide count must match a planned stage (20/40/60/80), got {len(actual)}")
     elif actual != expected_actual:
         errors.append(
             f"Actual Guide bindings differ from the planned core-{len(actual)} stage: "
             f"missing={sorted(expected_actual - actual)} unexpected={sorted(actual - expected_actual)}"
         )
 
-    unknown = core60 - set(reuse)
+    unknown = core80 - set(reuse)
     if unknown:
         errors.append(f"Unknown planned Concepts: {sorted(unknown)}")
 
-    core40_floor = float(plan["policy"]["core40MinimumPathCoverage"])
-    core60_floor = float(plan["policy"]["core60MinimumPathCoverage"])
-    if stages["core-40"]["minimumPathCoverage"] + 1e-12 < core40_floor:
-        errors.append("core-40 minimum Path coverage fell below plan floor")
-    if stages["core-60"]["minimumPathCoverage"] + 1e-12 < core60_floor:
-        errors.append("core-60 minimum Path coverage fell below plan floor")
+    floors = {
+        "core-40": float(plan["policy"]["core40MinimumPathCoverage"]),
+        "core-60": float(plan["policy"]["core60MinimumPathCoverage"]),
+        "core-80": float(plan["policy"]["core80MinimumPathCoverage"]),
+    }
+    for stage_name, floor in floors.items():
+        if stages[stage_name]["minimumPathCoverage"] + 1e-12 < floor:
+            errors.append(f"{stage_name} minimum Path coverage fell below plan floor")
 
-    max40 = theoretical_membership_max(baseline, 40, reuse)
-    max60 = theoretical_membership_max(baseline, 60, reuse)
+    theoretical = {
+        name: theoretical_membership_max(baseline, len(stage_sets[name]), reuse)
+        for name in ("core-40", "core-60", "core-80")
+    }
 
     output = {
         "matrix": {
@@ -176,7 +185,7 @@ def main() -> int:
         },
         "publishedGuideCount": len(actual),
         "stages": stages,
-        "theoreticalMembershipMaximum": {"core-40": max40, "core-60": max60},
+        "theoreticalMembershipMaximum": theoretical,
         "errors": errors,
     }
 
@@ -186,9 +195,9 @@ def main() -> int:
         print("Guide Coverage: 145 Concepts × 15 Paths")
         print(f"Published Guide stage: {len(actual)} Guides")
         print()
-        for name in ("core-20", "core-40", "core-60"):
+        for name in stage_sets:
             metric = stages[name]
-            maximum = None if name == "core-20" else output["theoreticalMembershipMaximum"][name]
+            maximum = theoretical.get(name)
             efficiency = ""
             if maximum:
                 efficiency = f" | reuse efficiency {metric['membershipCovered']}/{maximum} ({pct(metric['membershipCovered'] / maximum)})"
@@ -198,22 +207,20 @@ def main() -> int:
                 f"Path reach {metric['pathReach']}/15 | floor {pct(metric['minimumPathCoverage'])}{efficiency}"
             )
         print()
-        print("| Path | Concepts | core-20 | core-40 | core-60 |")
-        print("| --- | ---: | ---: | ---: | ---: |")
+        stage_names = list(stage_sets)
+        print("| Path | Concepts | " + " | ".join(stage_names) + " |")
+        print("| --- | ---: | " + " | ".join("---:" for _ in stage_names) + " |")
         by_stage = {
             name: {row["id"]: row for row in metric["perPath"]}
             for name, metric in stages.items()
         }
         for path_id, path in paths.items():
-            row20 = by_stage["core-20"][path_id]
-            row40 = by_stage["core-40"][path_id]
-            row60 = by_stage["core-60"][path_id]
-            print(
-                f"| {path['title']} | {row20['total']} | "
-                f"{row20['covered']}/{row20['total']} ({pct(row20['ratio'])}) | "
-                f"{row40['covered']}/{row40['total']} ({pct(row40['ratio'])}) | "
-                f"{row60['covered']}/{row60['total']} ({pct(row60['ratio'])}) |"
-            )
+            first = by_stage[stage_names[0]][path_id]
+            cells = []
+            for stage_name in stage_names:
+                row = by_stage[stage_name][path_id]
+                cells.append(f"{row['covered']}/{row['total']} ({pct(row['ratio'])})")
+            print(f"| {path['title']} | {first['total']} | " + " | ".join(cells) + " |")
 
     if errors:
         for error in errors:

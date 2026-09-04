@@ -7,9 +7,10 @@
     "duplicateConceptReferencesWithinPath": "deduplicated"
   },
   "policy": {
-    "priority": "Close low-coverage Path gaps first, then maximize covered Path-Concept memberships using Concept reuse across Paths.",
+    "priority": "Close low-coverage Path gaps first, then maximize covered Path-Concept memberships using Concept reuse across Paths; after core-60, weigh search value, Practice adjacency and pedagogical distinctiveness because cross-Path reuse is nearly exhausted.",
     "core40MinimumPathCoverage": 0.30,
-    "core60MinimumPathCoverage": 0.45
+    "core60MinimumPathCoverage": 0.45,
+    "core80MinimumPathCoverage": 0.60
   },
   "baselineConceptIds": [
     "concept-probabilistic-behavior",
@@ -76,5 +77,27 @@
     "concept-open-closed-model-tradeoff",
     "concept-memory-expiry",
     "concept-customer-support-copilot"
+  ],
+  "core80Additions": [
+    "concept-next-token-generation",
+    "concept-sampling-controls",
+    "concept-embeddings-semantic-space",
+    "concept-hallucination",
+    "concept-context-vs-memory",
+    "concept-checkpoint-resume",
+    "concept-async-long-running",
+    "concept-reversible-actions",
+    "concept-retry-amplification",
+    "concept-prompt-injection-defense",
+    "concept-online-monitoring",
+    "concept-rollout-fallback",
+    "concept-context-compaction",
+    "concept-streaming-backpressure",
+    "concept-learning-objective-design",
+    "concept-coordination-overhead",
+    "concept-reranking",
+    "concept-test-first-ai",
+    "concept-fact-check-revision",
+    "concept-data-analysis-verification"
   ]
 }

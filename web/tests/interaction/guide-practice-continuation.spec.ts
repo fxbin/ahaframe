@@ -35,13 +35,13 @@ test("Course-context Guide to Mission preserves Path and can continue to the nex
     "href",
     "/en/guides/least-privilege/?path=agent-engineering",
   );
-  const next = bar.locator('[data-guide-practice-next="concept-human-review-boundary"]');
+  const next = bar.locator('[data-guide-practice-next="concept-reversible-actions"]');
   await expect(next).toHaveAttribute(
     "href",
-    "/en/guides/human-review-boundary/?path=agent-engineering",
+    "/en/guides/reversible-actions/?path=agent-engineering",
   );
   await next.click();
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Human review boundaries");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Reversible actions");
   await expect(page.locator('[data-guide-active-path="agent-engineering"]')).toBeVisible();
 });
 
