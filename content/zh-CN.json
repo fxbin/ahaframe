@@ -80,6 +80,26 @@
     "guides/open-closed-model-tradeoff/",
     "guides/memory-expiry/",
     "guides/customer-support-copilot/",
+    "guides/next-token-generation/",
+    "guides/sampling-controls/",
+    "guides/embeddings-semantic-space/",
+    "guides/hallucination/",
+    "guides/context-vs-memory/",
+    "guides/checkpoint-resume/",
+    "guides/async-long-running/",
+    "guides/reversible-actions/",
+    "guides/context-compaction/",
+    "guides/streaming-backpressure/",
+    "guides/retry-amplification/",
+    "guides/prompt-injection-defense/",
+    "guides/online-monitoring/",
+    "guides/rollout-fallback/",
+    "guides/reranking/",
+    "guides/learning-objective-design/",
+    "guides/coordination-overhead/",
+    "guides/test-first-ai/",
+    "guides/fact-check-revision/",
+    "guides/data-analysis-verification/",
     "learning/",
     "pricing/",
     "early-access/",
@@ -114,5 +134,5 @@
     "footer": {"tagline":"清晰的 AI 课程，加上真正需要你做判断的互动练习。","sitemap":"站点地图","about":"关于","early_access":"内测"},
     "language": {"en":"English","zh-CN":"简体中文"}
   },
-  "meta": {"status":"learning-ux-v1","note":"Courses are now the primary learner-facing entry while the Knowledge Map remains available for advanced exploration.","updated":"2026-09-03"}
+  "meta": {"status":"learning-ux-v1","note":"Courses are now the primary learner-facing entry while the Knowledge Map remains available for advanced exploration.","updated":"2026-09-04"}
 }
