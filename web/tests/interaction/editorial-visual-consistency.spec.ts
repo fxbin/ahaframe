@@ -3,10 +3,6 @@ import { expect, test } from "@playwright/test";
 const RED = "rgb(214, 59, 50)";
 const LEGACY_GREEN = "#1f6654";
 
-async function cssColor(locator: ReturnType<Parameters<typeof test>[0] extends never ? never : never>) {
-  return locator;
-}
-
 test.describe("editorial visual consistency", () => {
   test("Pricing and global search use the editorial red accent", async ({ page }) => {
     await page.goto("/en/pricing/");
