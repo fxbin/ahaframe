@@ -7,8 +7,8 @@ const REPO_ROOT = path.resolve(WEB_ROOT, "..");
 const CONTENT_ROOT = path.join(REPO_ROOT, "content");
 const INVENTORY_ROOT = path.join(CONTENT_ROOT, "ai-knowledge-inventory-v1.0");
 const GUIDE_ROOT = path.join(CONTENT_ROOT, "guides");
-const CORE_GUIDE_BUNDLE_COUNT = 12;
-const CORE_GUIDE_COUNT = 60;
+const CORE_GUIDE_BUNDLE_COUNT = 16;
+const CORE_GUIDE_COUNT = 80;
 
 const REQUIRED_CORE_ROUTES = [
   "",
@@ -68,7 +68,9 @@ function expectedGuideWave(filename) {
   const number = Number(match[1]);
   if (number <= 4) return "core-20";
   if (number <= 8) return "core-40";
-  return "core-60";
+  if (number <= 12) return "core-60";
+  if (number <= 16) return "core-80";
+  throw new Error(`Unsupported Core Guide bundle number: ${filename}`);
 }
 
 async function guideRoutesForLocale(locale) {
@@ -151,4 +153,4 @@ if (JSON.stringify(enRoutes) !== JSON.stringify(zhRoutes)) {
 
 for (const relativePath of REQUIRED_APP_FILES) await access(path.join(WEB_ROOT, relativePath));
 
-console.log(`Next.js public-route parity contract OK (${enRoutes.length} routes × 2 locales; 15 Course routes + Guides directory + 60 Core Guide routes mirror canonical content; Knowledge Map and stable routes preserved).`);
+console.log(`Next.js public-route parity contract OK (${enRoutes.length} routes × 2 locales; 15 Course routes + Guides directory + ${CORE_GUIDE_COUNT} Core Guide routes mirror canonical content; Knowledge Map and stable routes preserved).`);
