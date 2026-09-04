@@ -24,21 +24,21 @@ export function GuideDirectoryPage({ locale, data, problemDiscovery }: GuideDire
 
   const labels = locale === "zh-CN"
     ? {
-        kicker: "GUIDES", title: "60 个可复用的 AI 心智模型。",
+        kicker: "GUIDES", title: `${data.count} 个可复用的 AI 心智模型。`,
         copy: "Guide 用来快速理解一个 Concept；Course 用来告诉你下一步学什么。你可以直接浏览，也可以按知识域、主题、课程和难度筛选。",
         filtersRegion: "Guide 筛选条件", filter: "筛选 Guide", search: "在当前目录中过滤标题或摘要", allDomains: "全部知识域",
         allBranches: "全部主题", allCourses: "全部课程", allDifficulty: "全部难度", practiceOnly: "仅显示带 Practice 的 Guide",
         reset: "重置筛选", showing: "当前显示", of: "篇，共", guides: "篇 Guide", min: "分钟", usedIn: "用于", courses: "个课程",
-        practice: "含 Practice", open: "阅读 Guide", empty: "没有 Guide 符合当前筛选条件。", emptyAction: "清除筛选，查看全部 60 篇",
+        practice: "含 Practice", open: "阅读 Guide", empty: "没有 Guide 符合当前筛选条件。", emptyAction: `清除筛选，查看全部 ${data.count} 篇`,
         coursesLink: "想系统学习？查看 Courses →",
       }
     : {
-        kicker: "GUIDES", title: "60 reusable mental models for AI.",
+        kicker: "GUIDES", title: `${data.count} reusable mental models for AI.`,
         copy: "Use a Guide when you need to understand one Concept now; use a Course when you want an ordered next step. Browse directly or filter by domain, topic, course, and difficulty.",
         filtersRegion: "Guide filters", filter: "Filter Guides", search: "Filter this directory by title or summary", allDomains: "All domains",
         allBranches: "All topics", allCourses: "All courses", allDifficulty: "All difficulties", practiceOnly: "Only Guides with Practice",
         reset: "Reset filters", showing: "Showing", of: "of", guides: "Guides", min: "min", usedIn: "Used in", courses: "courses",
-        practice: "Practice available", open: "Read Guide", empty: "No Guides match the current filters.", emptyAction: "Clear filters and view all 60",
+        practice: "Practice available", open: "Read Guide", empty: "No Guides match the current filters.", emptyAction: `Clear filters and view all ${data.count}`,
         coursesLink: "Want an ordered path? View Courses →",
       };
 
