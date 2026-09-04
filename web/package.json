@@ -12,7 +12,7 @@
     "check:runtime": "node scripts/check-runtime-assets.mjs",
     "check:experiences": "node scripts/check-runtime-experiences.mjs",
     "check:browser-secrets": "node scripts/check-browser-secrets.mjs",
-    "prelint": "npm run write:build-mode",
+    "prelint": "npm run write:build-mode && python3 ../scripts/test_editorial_visual_consistency.py",
     "lint": "eslint .",
     "pretypecheck": "npm run write:build-mode",
     "typecheck": "tsc --noEmit",
