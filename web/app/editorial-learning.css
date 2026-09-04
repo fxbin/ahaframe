@@ -15,6 +15,14 @@
   color: var(--editorial-ink);
 }
 
+/* Legacy Lab/Mission workspaces still consume --primary for controls and accents.
+   Scope that token to the editorial brand only inside migrated Experience pages;
+   semantic --success/--warning/--danger tokens remain untouched. */
+.editorial-experience-page {
+  --primary: var(--brand-accent);
+  --primary-soft: var(--brand-accent-soft);
+}
+
 .site-header {
   background: color-mix(in srgb, var(--bg) 98%, transparent);
   backdrop-filter: blur(12px);
