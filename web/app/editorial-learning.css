@@ -1,13 +1,26 @@
 :root {
-  --editorial-accent: #d63b32;
+  --editorial-accent: var(--brand-accent);
+  --editorial-accent-soft: var(--brand-accent-soft);
   --editorial-ink: #171717;
   --editorial-paper: #fbfaf6;
 }
 
 .editorial-home,
 .course-catalog-page,
-.course-detail-page {
+.course-detail-page,
+.editorial-experience-page,
+.editorial-marketing-page,
+.editorial-learning-page,
+.editorial-guide-page {
   color: var(--editorial-ink);
+}
+
+/* Legacy Lab/Mission workspaces still consume --primary for controls and accents.
+   Scope that token to the editorial brand only inside migrated Experience pages;
+   semantic --success/--warning/--danger tokens remain untouched. */
+.editorial-experience-page {
+  --primary: var(--brand-accent);
+  --primary-soft: var(--brand-accent-soft);
 }
 
 .site-header {

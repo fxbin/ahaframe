@@ -25,12 +25,12 @@ export function LearningReturnBar({ locale, nodes }: LearningReturnBarProps) {
   const prefix = locale === "zh-CN" ? "你正在补充前置内容。完成后返回" : "You are backfilling a prerequisite. Return to";
 
   return (
-    <div className="border-b border-[var(--border)] bg-[var(--primary-soft)]">
-      <div className="shell flex flex-wrap items-center justify-between gap-3 py-3 text-sm">
+    <div className="border-b border-[var(--border)] bg-[var(--surface)]">
+      <div className="shell flex flex-wrap items-center justify-between gap-3 border-l-2 border-[var(--brand-accent)] py-3 pl-4 text-sm">
         <span className="text-[var(--muted)]">{prefix} <strong className="text-[var(--text)]">{target.title}</strong></span>
         <Link
           href={`/${segment}${target.route}`}
-          className="text-link"
+          className="editorial-text-link"
           data-event="learning_prerequisite_backfill_completed"
           data-content-id={target.id}
         >

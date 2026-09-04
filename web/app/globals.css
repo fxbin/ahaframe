@@ -9,7 +9,9 @@
   --muted: #66706b;
   --primary: #1f6654;
   --primary-soft: #e8f0ec;
-  --accent: #a8c8bc;
+  --brand-accent: #d63b32;
+  --brand-accent-soft: #f6e9e7;
+  --accent: #e3aaa5;
   --border: #dfdfd7;
   --border-strong: #c9cbc2;
   --danger: #b34a3c;
@@ -58,7 +60,7 @@ textarea {
 }
 
 ::selection {
-  background: rgba(31, 102, 84, 0.15);
+  background: rgba(214, 59, 50, 0.16);
 }
 
 .shell {
@@ -76,7 +78,7 @@ textarea {
 .technical-label,
 .eyebrow-label,
 .eyebrow {
-  color: var(--primary);
+  color: var(--brand-accent);
   font-family: var(--font-mono);
   font-size: 0.7rem;
   font-weight: 700;
@@ -118,8 +120,8 @@ textarea {
 }
 
 .primary-action:hover {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--brand-accent);
+  border-color: var(--brand-accent);
   transform: translateY(-1px);
 }
 
@@ -127,7 +129,7 @@ textarea {
 .text-link:focus-visible,
 button:focus-visible,
 a:focus-visible {
-  outline: 2px solid var(--primary);
+  outline: 2px solid var(--brand-accent);
   outline-offset: 3px;
 }
 
@@ -145,8 +147,8 @@ a:focus-visible {
 }
 
 .text-link:hover {
-  color: var(--primary);
-  text-decoration-color: var(--primary);
+  color: var(--brand-accent);
+  text-decoration-color: var(--brand-accent);
 }
 
 .editorial-rule {
@@ -193,7 +195,7 @@ a:focus-visible {
   position: absolute;
   inset: 0 0 auto;
   height: 2px;
-  background: var(--primary);
+  background: var(--brand-accent);
   content: "";
 }
 

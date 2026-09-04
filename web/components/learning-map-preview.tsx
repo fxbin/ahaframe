@@ -22,11 +22,11 @@ export function LearningMapPreview({ locale, stages, kicker, title, copy }: Lear
   }
 
   return (
-    <section id="roadmap" className="border-y border-[var(--border)] bg-[var(--surface)] py-20 sm:py-24" aria-labelledby="learning-map-preview-title">
+    <section id="roadmap" className="editorial-learning-page border-y border-[var(--border)] bg-[var(--surface)] py-20 sm:py-24" aria-labelledby="learning-map-preview-title">
       <div className="shell">
         <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
           <div className="max-w-3xl">
-            <p className="eyebrow-label">{kicker}</p>
+            <p className="editorial-kicker">{kicker}</p>
             <h2 id="learning-map-preview-title" className="section-title">{title}</h2>
             <p className="section-copy">{copy}</p>
           </div>
@@ -38,11 +38,11 @@ export function LearningMapPreview({ locale, stages, kicker, title, copy }: Lear
             <li key={stage.id} className="min-w-0 border-r border-b border-[var(--border)]">
               <Link
                 href={`${learningHref}#${stage.slug}`}
-                className="group flex h-full min-h-40 flex-col p-5 transition hover:bg-[var(--surface-soft)] focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[var(--primary)] sm:p-6"
+                className="group flex h-full min-h-40 flex-col p-5 transition hover:bg-[var(--surface-soft)] focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[var(--brand-accent)] sm:p-6"
                 data-stage-id={stage.id}
               >
                 <span className="flex items-center justify-between gap-3 font-mono text-[10px] font-bold uppercase tracking-[0.08em] text-[var(--muted)]">
-                  <span>{labels.stage} {String(stage.order).padStart(2, "0")}</span>
+                  <span className="group-hover:text-[var(--brand-accent)]">{labels.stage} {String(stage.order).padStart(2, "0")}</span>
                   <span aria-hidden="true" className="text-[var(--border-strong)] transition-transform group-hover:translate-x-1">→</span>
                 </span>
                 <strong className="mt-4 block text-sm leading-5 tracking-[-0.015em]">{stage.title}</strong>
@@ -53,7 +53,7 @@ export function LearningMapPreview({ locale, stages, kicker, title, copy }: Lear
         </ol>
 
         <div className="mt-8 flex justify-end">
-          <Link className="text-link" href={learningHref} data-event="homepage_learning_map_opened">
+          <Link className="editorial-text-link" href={learningHref} data-event="homepage_learning_map_opened">
             {labels.cta} <span aria-hidden="true">→</span>
           </Link>
         </div>
