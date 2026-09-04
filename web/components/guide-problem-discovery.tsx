@@ -41,7 +41,7 @@ export function GuideProblemDiscovery({ locale, data }: GuideProblemDiscoveryPro
         <div className="mt-8 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
           {data.bundles.map((bundle) => (
             <details key={bundle.id} className="group border border-[var(--border)] bg-[var(--background)]" data-guide-problem={bundle.id}>
-              <summary className="cursor-pointer list-none p-5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]">
+              <summary className="cursor-pointer list-none p-5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--brand-accent)]">
                 <span className="flex items-start justify-between gap-4">
                   <span>
                     <strong className="block font-[family-name:var(--font-editorial)] text-xl font-semibold tracking-[-0.035em]">{bundle.problem}</strong>
@@ -57,7 +57,7 @@ export function GuideProblemDiscovery({ locale, data }: GuideProblemDiscoveryPro
                   {bundle.guides.map((guide, index) => (
                     <li key={guide.conceptId}>
                       <Link
-                        className="flex items-center justify-between gap-3 py-3 text-sm font-semibold transition hover:text-[var(--primary)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]"
+                        className="flex items-center justify-between gap-3 py-3 text-sm font-semibold transition hover:text-[var(--brand-accent)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--brand-accent)]"
                         href={`/${segment}/guides/${guide.slug}/`}
                         data-guide-problem-guide={guide.conceptId}
                       >
