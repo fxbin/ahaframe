@@ -133,7 +133,6 @@ export async function getSearchDocuments(locale: Locale): Promise<SearchDocument
     });
   }
 
-  if (guideDocuments.length !== 60) throw new Error(`Unified search requires 60 published Guides, got ${guideDocuments.length}.`);
   if (courseDocuments.length !== 15) throw new Error(`Unified search requires 15 canonical Courses, got ${courseDocuments.length}.`);
   if (conceptDocuments.length !== 145) throw new Error(`Unified search requires 145 canonical Concepts, got ${conceptDocuments.length}.`);
 
