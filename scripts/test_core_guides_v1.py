@@ -130,10 +130,11 @@ def main():
     require(manifest["principles"]["freeChoiceActivation"] is False, "Core Guides must not activate free-choice claiming")
 
     subprocess.run([sys.executable, str(ROOT / "scripts" / "guide_coverage.py"), "--check"], cwd=ROOT, check=True)
+    subprocess.run([sys.executable, str(ROOT / "scripts" / "practice_density.py"), "--check"], cwd=ROOT, check=True)
 
     print(
         "PASS Core Guide v1 publication: 80 canonical Concepts now have substantial OPEN Guides in exact EN/zh-CN parity; "
-        "version-sensitive Concepts retain canonical sourceRefs, coverage-plan invariants pass, the Guide Directory and all Guide detail routes/practice targets are public, "
+        "version-sensitive Concepts retain canonical sourceRefs, coverage-plan and Practice-density invariants pass, the Guide Directory and all Guide detail routes/practice targets are public, "
         "relations remain Knowledge-Graph-derived, and monetization gates stay disabled."
     )
 
