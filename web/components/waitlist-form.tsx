@@ -59,10 +59,10 @@ export function WaitlistForm({
 
   if (status === "success") {
     return (
-      <div className="rounded-2xl bg-[var(--surface-soft)] p-5" role="status">
-        <div className="font-bold">{successTitle}</div>
+      <div className="border-y border-[var(--border)] bg-[var(--surface)] py-5" role="status">
+        <div className="font-semibold">{successTitle}</div>
         <div className="mt-1 text-sm leading-6 text-[var(--muted)]">{successCopy}</div>
-        <Link className="mt-3 inline-flex text-sm font-bold text-[var(--primary)]" href={`/${segment}/#campaign`}>
+        <Link className="editorial-text-link mt-4" href={`/${segment}/#campaign`}>
           {successLink}
         </Link>
       </div>
@@ -71,7 +71,7 @@ export function WaitlistForm({
 
   return (
     <form onSubmit={submit}>
-      <label className="text-sm font-bold" htmlFor="early-access-email">{emailLabel}</label>
+      <label className="text-sm font-semibold" htmlFor="early-access-email">{emailLabel}</label>
       <input
         id="early-access-email"
         name="email"
@@ -81,10 +81,10 @@ export function WaitlistForm({
         value={email}
         onChange={(event) => setEmail(event.target.value)}
         placeholder={placeholder}
-        className="mt-2 w-full rounded-2xl border border-[var(--border)] bg-[var(--bg)] px-4 py-3 outline-none focus:border-[var(--primary)]"
+        className="mt-2 w-full border border-[var(--border)] bg-[var(--surface)] px-4 py-3 outline-none transition focus:border-[var(--brand-accent)]"
       />
       <button
-        className="mt-3 w-full rounded-full bg-[var(--text)] px-5 py-3 text-sm font-bold text-white disabled:cursor-wait disabled:opacity-60"
+        className="mt-3 w-full border border-[var(--editorial-ink)] bg-[var(--editorial-ink)] px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90 disabled:cursor-wait disabled:opacity-60"
         type="submit"
         disabled={status === "submitting"}
       >
@@ -92,7 +92,7 @@ export function WaitlistForm({
       </button>
       <p className="mt-4 text-xs leading-5 text-[var(--muted)]">{trustNote}</p>
       {status === "error" ? (
-        <p className="mt-3 text-sm font-medium" role="alert">
+        <p className="mt-3 text-sm font-medium text-[var(--danger)]" role="alert">
           {isZh ? "提交失败，请稍后重试。" : "Submission failed. Please try again."}
         </p>
       ) : null}
