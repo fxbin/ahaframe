@@ -22,7 +22,7 @@
     "samePathExplicitPracticeMemberships": 71,
     "core80SamePathExplicitPracticeMemberships": 17,
     "evidencePracticeCount": 21,
-    "evidencePathMemberships": 24
+    "evidencePathMemberships": 25
   },
   "augmentations": [
     {
@@ -33,15 +33,15 @@
     },
     {
       "experienceId": "rag-failure",
-      "addConceptIds": ["concept-hybrid-retrieval", "concept-reranking"],
+      "addConceptIds": ["concept-hybrid-retrieval", "concept-reranking", "concept-evidence-granularity"],
       "evidenceSources": ["src/assets/lab-scenarios.js", "src/assets/broken-rag-pipeline-scenario.js"],
-      "rationale": "The RAG runtime exposes vector versus hybrid retrieval and an explicit reranker toggle whose state changes precision, latency, cost and release evidence."
+      "rationale": "The RAG runtime exposes chunk size and overlap, vector versus hybrid retrieval, and an explicit reranker toggle; these controls change evidence granularity, precision, recall, latency, cost and release evidence."
     },
     {
       "experienceId": "agent-reliability",
-      "addConceptIds": ["concept-retry-amplification"],
+      "addConceptIds": ["concept-retry-amplification", "concept-compensation-recovery"],
       "evidenceSources": ["src/assets/47000-retry-scenario.js", "src/assets/47000-retry-mission.js"],
-      "rationale": "The $47,000 Retry incident makes timeout ambiguity plus repeated retry of an irreversible refund the central failure mechanism and compares bounded retry/idempotency policies."
+      "rationale": "The $47,000 Retry incident makes timeout ambiguity plus repeated retry of an irreversible refund the central failure mechanism and explicitly compares retry, idempotency and compensation/recovery traps."
     },
     {
       "experienceId": "production-release-gate-build",
@@ -62,18 +62,35 @@
     {
       "experienceId": "instruction-conflict",
       "nodeType": "MISSION",
-      "pathIds": ["path-production-ai-reliability"],
-      "conceptIds": ["concept-trust-boundary", "concept-prompt-injection-defense", "concept-runtime-enforcement"],
+      "pathIds": ["path-ai-foundations", "path-production-ai-reliability"],
+      "conceptIds": [
+        "concept-instruction-authority",
+        "concept-instruction-conflict",
+        "concept-prompt-context-runtime-boundary",
+        "concept-prompt-specificity",
+        "concept-trust-boundary",
+        "concept-prompt-injection-defense",
+        "concept-runtime-enforcement"
+      ],
       "evidenceSources": ["src/assets/instruction-conflict-scenario.js", "src/assets/prompt-injection-attack-scenario.js", "src/assets/prompt-injection-attack-mission.js"],
-      "rationale": "The public Instruction Conflict route runs the Prompt Injection Attack mission, where provenance/trust policy, scoped tools, approval, runtime gates, filters and validators determine whether untrusted instructions reach capability paths."
+      "rationale": "Instruction Conflict directly varies source authority, system specificity, retrieved context behavior and output constraints; the public route then runs the Prompt Injection Attack mission, where provenance, scoped tools, approval and runtime gates determine whether untrusted instructions reach capability paths."
     },
     {
       "experienceId": "agent-workflow-graph",
       "nodeType": "LAB",
       "pathIds": ["path-multi-agent-orchestration"],
-      "conceptIds": ["concept-workflow-decomposition", "concept-parallel-agent-work", "concept-topology-tradeoffs", "concept-coordination-overhead"],
+      "conceptIds": [
+        "concept-agent-loop",
+        "concept-loop-vs-graph",
+        "concept-delegation-state",
+        "concept-workflow-decomposition",
+        "concept-parallel-agent-work",
+        "concept-independent-verification",
+        "concept-topology-tradeoffs",
+        "concept-coordination-overhead"
+      ],
       "evidenceSources": ["src/assets/agent-workflow-graph-scenario.js"],
-      "rationale": "The learner changes topology, agent count, parallelism, state isolation, retry scope and join strategy and observes coordination overhead, failure propagation, duplicate work, latency, cost and reliability."
+      "rationale": "The learner compares loop versus graph topology, changes delegation topology, agent count, parallelism, state isolation, retry scope and join verification, and observes coordination overhead, failure propagation, duplicate work, latency, cost and reliability."
     },
     {
       "experienceId": "evaluation-failure",
