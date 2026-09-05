@@ -1,0 +1,247 @@
+{
+  "version": "1.0.0",
+  "status": "CANDIDATE_SET_FROZEN",
+  "dependsOn": {
+    "publishedStage": "core-80",
+    "practiceReconciliation": "practice-evidence-reconciliation-v1.0.json"
+  },
+  "policy": {
+    "guideBudget": 20,
+    "stage1": "Maximize the minimum canonical Path Guide coverage with exactly 20 additional Guides. Remaining post-Core-80 Concepts must have at most one Path membership; otherwise this quota model must be recomputed.",
+    "stage2": "Within each mathematically required Path quota, rank by reconciled Practice proximity, likely direct-search/retrieval value, pedagogical distinctiveness, and continuity of the Course learning arc.",
+    "practiceEvidenceIsDerived": true,
+    "searchAndDistinctivenessAreEditorialJudgments": true,
+    "doNotPublishFromThisFile": true,
+    "billingActivation": false,
+    "freeChoiceActivation": false
+  },
+  "expectedProjection": {
+    "guideConceptCount": 100,
+    "guideConceptCoverage": 0.6896551724137931,
+    "pathConceptMembershipCount": 163,
+    "pathConceptMembershipCoverage": 0.7836538461538461,
+    "minimumPathCoverage": 0.7272727272727273,
+    "selectedConceptMembershipGain": 20,
+    "practiceProximalSelections": 14
+  },
+  "pathQuotas": {
+    "path-ai-foundations": 6,
+    "path-vibe-coding": 1,
+    "path-llm-application-engineering": 2,
+    "path-rag-knowledge-systems": 2,
+    "path-agent-engineering": 3,
+    "path-multi-agent-orchestration": 1,
+    "path-production-ai-reliability": 2,
+    "path-model-engineering": 1,
+    "path-course-knowledge-product": 1,
+    "path-solo-business-ai": 1
+  },
+  "selected": [
+    {
+      "conceptId": "concept-attention-budget",
+      "pathId": "path-ai-foundations",
+      "searchValue": 3,
+      "distinctiveness": 3,
+      "practiceProximityExpected": false,
+      "reason": "A durable explanation for why finite attention still matters even with large context windows; it bridges context-window mechanics to relevance and context engineering and has high direct lookup value."
+    },
+    {
+      "conceptId": "concept-instruction-authority",
+      "pathId": "path-ai-foundations",
+      "searchValue": 2,
+      "distinctiveness": 3,
+      "practiceProximityExpected": true,
+      "reason": "Instruction Conflict directly exercises source-aware authority. A Guide closes the conceptual gap between prompt wording and system/developer/context/user precedence."
+    },
+    {
+      "conceptId": "concept-instruction-conflict",
+      "pathId": "path-ai-foundations",
+      "searchValue": 2,
+      "distinctiveness": 3,
+      "practiceProximityExpected": true,
+      "reason": "The existing Practice makes conflicting instruction sources observable; this is a distinct failure model learners need before security and agent-control topics."
+    },
+    {
+      "conceptId": "concept-prompt-context-runtime-boundary",
+      "pathId": "path-ai-foundations",
+      "searchValue": 3,
+      "distinctiveness": 3,
+      "practiceProximityExpected": true,
+      "reason": "AhaFrame repeatedly depends on separating model persuasion, supplied context and runtime enforcement. The existing Instruction Conflict experience already demonstrates this boundary."
+    },
+    {
+      "conceptId": "concept-reasoning-budget",
+      "pathId": "path-ai-foundations",
+      "searchValue": 3,
+      "distinctiveness": 3,
+      "practiceProximityExpected": false,
+      "reason": "Reasoning effort is an engineering budget with quality, latency and cost consequences; it is more actionable than a generic explanation of opaque reasoning."
+    },
+    {
+      "conceptId": "concept-capability-vs-guarantee",
+      "pathId": "path-ai-foundations",
+      "searchValue": 3,
+      "distinctiveness": 3,
+      "practiceProximityExpected": false,
+      "reason": "This is a foundational production mental model: a model being capable of a behavior is not a reliability guarantee. It transfers across every later engineering Course."
+    },
+    {
+      "conceptId": "concept-ai-code-review",
+      "pathId": "path-vibe-coding",
+      "searchValue": 3,
+      "distinctiveness": 3,
+      "practiceProximityExpected": true,
+      "reason": "The shipped AI Code Review Mission already turns generated code into an evidence-backed merge decision; the Guide completes the Course's generate-test-review arc."
+    },
+    {
+      "conceptId": "concept-conversation-state",
+      "pathId": "path-llm-application-engineering",
+      "searchValue": 3,
+      "distinctiveness": 2,
+      "practiceProximityExpected": false,
+      "reason": "Conversation state is an application responsibility that is routinely confused with model memory or raw context. It is a prerequisite for robust multi-turn product architecture."
+    },
+    {
+      "conceptId": "concept-model-routing-fallback",
+      "pathId": "path-llm-application-engineering",
+      "searchValue": 3,
+      "distinctiveness": 3,
+      "practiceProximityExpected": false,
+      "reason": "Routing and fallback connect model selection to production resilience and cost. The topic has strong direct retrieval value and extends the Course beyond single-model demos."
+    },
+    {
+      "conceptId": "concept-evidence-granularity",
+      "pathId": "path-rag-knowledge-systems",
+      "searchValue": 2,
+      "distinctiveness": 3,
+      "practiceProximityExpected": true,
+      "reason": "Broken RAG Pipeline already exposes chunk size and overlap as decision variables. The Guide gives learners the mental model behind those controls rather than treating chunking as a magic constant."
+    },
+    {
+      "conceptId": "concept-memory-authority-conflict",
+      "pathId": "path-rag-knowledge-systems",
+      "searchValue": 2,
+      "distinctiveness": 3,
+      "practiceProximityExpected": false,
+      "reason": "After retrieval authority and memory lifecycle are already covered, the next discontinuity is what happens when durable memory conflicts with fresher or more authoritative evidence."
+    },
+    {
+      "conceptId": "concept-mcp-boundaries",
+      "pathId": "path-agent-engineering",
+      "searchValue": 3,
+      "distinctiveness": 3,
+      "practiceProximityExpected": true,
+      "reason": "The existing MCP Capability Boundary Mission already teaches the boundary explicitly. A Guide gives a searchable conceptual entry before the learner manipulates capabilities."
+    },
+    {
+      "conceptId": "concept-mcp-capability-negotiation",
+      "pathId": "path-agent-engineering",
+      "searchValue": 3,
+      "distinctiveness": 3,
+      "practiceProximityExpected": true,
+      "reason": "Capability negotiation is exercised by the MCP Mission and is more specific and decision-changing than a generic MCP overview."
+    },
+    {
+      "conceptId": "concept-interrupt-cancel",
+      "pathId": "path-agent-engineering",
+      "searchValue": 2,
+      "distinctiveness": 3,
+      "practiceProximityExpected": true,
+      "reason": "Long-Running Agent Recovery already requires interruption/cancellation boundaries. This Guide completes the runtime-control arc alongside checkpoint/resume and async work."
+    },
+    {
+      "conceptId": "concept-loop-vs-graph",
+      "pathId": "path-multi-agent-orchestration",
+      "searchValue": 3,
+      "distinctiveness": 3,
+      "practiceProximityExpected": true,
+      "reason": "Agent Workflow Graph directly compares topology choices, and loop-versus-graph is the highest-leverage decision boundary before delegation complexity is introduced."
+    },
+    {
+      "conceptId": "concept-runtime-enforcement",
+      "pathId": "path-production-ai-reliability",
+      "searchValue": 3,
+      "distinctiveness": 3,
+      "practiceProximityExpected": true,
+      "reason": "Prompt Injection Attack proves that model persuasion is insufficient without runtime gates, scoped tools and approval. This is a core production-security mental model."
+    },
+    {
+      "conceptId": "concept-ship-block-inconclusive",
+      "pathId": "path-production-ai-reliability",
+      "searchValue": 2,
+      "distinctiveness": 3,
+      "practiceProximityExpected": true,
+      "reason": "Evaluation Failure already produces SHIP/BLOCK/INCONCLUSIVE consequences. The Guide makes evidence synthesis and veto logic explicit before release decisions."
+    },
+    {
+      "conceptId": "concept-adapter-finetuning",
+      "pathId": "path-model-engineering",
+      "searchValue": 3,
+      "distinctiveness": 3,
+      "practiceProximityExpected": true,
+      "reason": "Model Adaptation Decision already compares LoRA/QLoRA/full fine-tuning. Adapter fine-tuning has high lookup value while remaining tied to a measured adaptation decision rather than training for its own sake."
+    },
+    {
+      "conceptId": "concept-curriculum-decomposition",
+      "pathId": "path-course-knowledge-product",
+      "searchValue": 2,
+      "distinctiveness": 3,
+      "practiceProximityExpected": true,
+      "reason": "The Course / Knowledge Product Build already requires curriculum decomposition. It is the missing bridge between learning objectives and generated lesson/media assets."
+    },
+    {
+      "conceptId": "concept-automation-maintenance",
+      "pathId": "path-solo-business-ai",
+      "searchValue": 2,
+      "distinctiveness": 3,
+      "practiceProximityExpected": true,
+      "reason": "The Solo Business Build explicitly exposes maintenance burden. This Guide prevents the common automation trap where nominal leverage creates a larger exception and upkeep surface."
+    }
+  ],
+  "deferredRationale": {
+    "path-ai-foundations": {
+      "conceptIds": ["concept-sequence-ordering", "concept-multimodal-representation", "concept-modality-grounding", "concept-examples-shape-behavior", "concept-prompt-specificity", "concept-planning-as-search", "concept-reasoning-opacity", "concept-distribution-shift", "concept-bias-fairness", "concept-human-accountability"],
+      "reason": "Core-100 uses the six AI Foundations slots on higher-transfer boundaries, direct lookup topics and three Concepts already backed by Instruction Conflict. The deferred set remains valid but is either narrower, overlaps an already selected mental model, or can be handled as concise canonical explanation before a long Guide is warranted."
+    },
+    "path-vibe-coding": {
+      "conceptIds": ["concept-repository-context", "concept-plan-before-code", "concept-dependency-migration-verification"],
+      "reason": "AI Code Review wins the single slot because it is already backed by a shipped Mission and completes the evidence-based review loop; the others are useful workflow subtopics but have weaker current Practice adjacency."
+    },
+    "path-llm-application-engineering": {
+      "conceptIds": ["concept-context-structure-cache", "concept-prompt-caching", "concept-api-rate-limit-resilience"],
+      "reason": "Conversation state and model routing/fallback cover more fundamental application architecture. Cache and rate-limit mechanics remain important but are narrower operational optimizations for a later wave or concise treatment."
+    },
+    "path-rag-knowledge-systems": {
+      "conceptIds": ["concept-metadata-retrieval", "concept-user-domain-memory", "concept-knowledge-graph-structure", "concept-hybrid-structured-unstructured-search"],
+      "reason": "Evidence granularity has exact RAG Practice adjacency; memory authority conflict closes the more consequential lifecycle gap. The deferred topics are narrower retrieval/memory variants or architecture extensions."
+    },
+    "path-agent-engineering": {
+      "conceptIds": ["concept-mcp-tasks-elicitation", "concept-planning-vs-direct", "concept-environment-observation", "concept-action-grounding", "concept-sandbox-permissions"],
+      "reason": "The three selected Concepts are all exercised by existing MCP or long-running-agent Missions and close concrete capability/runtime control gaps. Deferred items either lack equivalent current Practice evidence or are more specialized."
+    },
+    "path-multi-agent-orchestration": {
+      "conceptIds": ["concept-delegation-state", "concept-independent-verification"],
+      "reason": "All three remaining Concepts have Practice proximity, but loop-vs-graph is the upstream architectural decision that determines whether delegation and independent verification complexity should exist at all."
+    },
+    "path-production-ai-reliability": {
+      "conceptIds": ["concept-compensation-recovery", "concept-outcome-trajectory-evaluation", "concept-release-economics", "concept-failure-attribution", "concept-cross-layer-architecture", "concept-queue-backpressure"],
+      "reason": "Runtime enforcement and SHIP/BLOCK/INCONCLUSIVE are high-transfer boundaries already backed by strong Practices. Compensation and release economics also have evidence, but are narrower; the remaining topics either require broader cross-layer treatment or stronger dedicated Practice before long-form expansion."
+    },
+    "path-model-engineering": {
+      "conceptIds": ["concept-finetune-dataset-design", "concept-inference-serving"],
+      "reason": "All are legitimate model-engineering topics, but adapter fine-tuning combines strong search demand with an existing LoRA/QLoRA decision Practice. Dataset design and serving remain natural follow-ons."
+    },
+    "path-course-knowledge-product": {
+      "conceptIds": ["concept-media-quality-review", "concept-knowledge-product-publishing"],
+      "reason": "Curriculum decomposition is upstream of both media review and publishing and is already exercised by the Build, so it creates the largest learning-continuity gain for the single slot."
+    },
+    "path-solo-business-ai": {
+      "conceptIds": ["concept-customer-problem-research", "concept-content-marketing-system"],
+      "reason": "Automation maintenance is the most AhaFrame-specific engineering lesson and is explicitly surfaced by the existing Solo Business Build. Customer research and content marketing remain valuable but are broader business topics that can defer without breaking the AI operating-system arc."
+    },
+    "alreadyAboveCore100Floor": {
+      "pathIds": ["path-write-book-ai", "path-build-knowledge-base", "path-research-with-ai", "path-data-analysis-ai", "path-ai-customer-support"],
+      "reason": "These Paths already exceed the mathematically achievable Core-100 minimum floor at Core-80, so allocating scarce Core-100 slots here would reduce the global minimum Path coverage below the optimum."
+    }
+  }
+}
