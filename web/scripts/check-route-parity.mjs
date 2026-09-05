@@ -7,51 +7,27 @@ const REPO_ROOT = path.resolve(WEB_ROOT, "..");
 const CONTENT_ROOT = path.join(REPO_ROOT, "content");
 const INVENTORY_ROOT = path.join(CONTENT_ROOT, "ai-knowledge-inventory-v1.0");
 const GUIDE_ROOT = path.join(CONTENT_ROOT, "guides");
-const CORE_GUIDE_BUNDLE_COUNT = 16;
-const CORE_GUIDE_COUNT = 80;
+const CORE_GUIDE_BUNDLE_COUNT = 20;
+const CORE_GUIDE_COUNT = 100;
 
 const REQUIRED_CORE_ROUTES = [
-  "",
-  "courses/",
-  "guides/",
-  "learning/",
-  "pricing/",
-  "early-access/",
-  "lessons/token-playground/",
-  "lessons/context-window/",
-  "lessons/agent-loop/",
-  "labs/instruction-conflict/",
-  "labs/rag-failure/",
-  "labs/context-compression/",
-  "labs/agent-reliability/",
-  "labs/agent-workflow-graph/",
-  "labs/evaluation-failure/",
-  "build/reliable-support-agent/",
+  "", "courses/", "guides/", "learning/", "pricing/", "early-access/",
+  "lessons/token-playground/", "lessons/context-window/", "lessons/agent-loop/",
+  "labs/instruction-conflict/", "labs/rag-failure/", "labs/context-compression/", "labs/agent-reliability/",
+  "labs/agent-workflow-graph/", "labs/evaluation-failure/", "build/reliable-support-agent/",
 ];
 
 const REQUIRED_APP_FILES = [
-  "app/(root)/page.tsx",
-  "app/(site)/[locale]/page.tsx",
-  "app/(site)/[locale]/courses/page.tsx",
-  "app/(site)/[locale]/courses/[slug]/page.tsx",
-  "app/(site)/[locale]/guides/page.tsx",
-  "app/(site)/[locale]/guides/[slug]/page.tsx",
-  "app/(site)/[locale]/learning/page.tsx",
-  "app/(site)/[locale]/pricing/page.tsx",
-  "app/(site)/[locale]/early-access/page.tsx",
-  "app/(site)/[locale]/lessons/[slug]/page.tsx",
-  "app/(site)/[locale]/labs/[slug]/page.tsx",
-  "app/(site)/[locale]/build/[slug]/page.tsx",
-  "app/(site)/[locale]/build/reliable-support-agent/page.tsx",
+  "app/(root)/page.tsx", "app/(site)/[locale]/page.tsx", "app/(site)/[locale]/courses/page.tsx",
+  "app/(site)/[locale]/courses/[slug]/page.tsx", "app/(site)/[locale]/guides/page.tsx",
+  "app/(site)/[locale]/guides/[slug]/page.tsx", "app/(site)/[locale]/learning/page.tsx",
+  "app/(site)/[locale]/pricing/page.tsx", "app/(site)/[locale]/early-access/page.tsx",
+  "app/(site)/[locale]/lessons/[slug]/page.tsx", "app/(site)/[locale]/labs/[slug]/page.tsx",
+  "app/(site)/[locale]/build/[slug]/page.tsx", "app/(site)/[locale]/build/reliable-support-agent/page.tsx",
   "app/api/waitlist/route.ts",
 ];
 
-const FLAGSHIP_MISSIONS = [
-  "mission-broken-rag",
-  "mission-47000-retry",
-  "mission-prompt-injection",
-  "mission-final-boss",
-];
+const FLAGSHIP_MISSIONS = ["mission-broken-rag", "mission-47000-retry", "mission-prompt-injection", "mission-final-boss"];
 
 const pathFiles = (await readdir(INVENTORY_ROOT)).filter((filename) => filename.startsWith("paths-") && filename.endsWith(".json")).sort();
 const canonicalCourseRoutes = [];
@@ -70,6 +46,7 @@ function expectedGuideWave(filename) {
   if (number <= 8) return "core-40";
   if (number <= 12) return "core-60";
   if (number <= 16) return "core-80";
+  if (number <= 20) return "core-100";
   throw new Error(`Unsupported Core Guide bundle number: ${filename}`);
 }
 
@@ -101,28 +78,16 @@ if (JSON.stringify(canonicalGuideRoutes) !== JSON.stringify(zhGuideRoutes)) {
 }
 
 function assertRouteManifest(routes, locale) {
-  if (!Array.isArray(routes) || routes.some((route) => typeof route !== "string")) {
-    throw new Error(`${locale} availableRoutes must be a string array.`);
-  }
-  if (new Set(routes).size !== routes.length) {
-    throw new Error(`${locale} availableRoutes contains duplicates.`);
-  }
+  if (!Array.isArray(routes) || routes.some((route) => typeof route !== "string")) throw new Error(`${locale} availableRoutes must be a string array.`);
+  if (new Set(routes).size !== routes.length) throw new Error(`${locale} availableRoutes contains duplicates.`);
   for (const route of routes) {
-    if (route && (!route.endsWith("/") || route.startsWith("/") || route.includes("//"))) {
-      throw new Error(`${locale} contains a non-canonical public route: ${route}`);
-    }
+    if (route && (!route.endsWith("/") || route.startsWith("/") || route.includes("//"))) throw new Error(`${locale} contains a non-canonical public route: ${route}`);
   }
-  for (const required of REQUIRED_CORE_ROUTES) {
-    if (!routes.includes(required)) throw new Error(`${locale} lost required existing route ${required}.`);
-  }
+  for (const required of REQUIRED_CORE_ROUTES) if (!routes.includes(required)) throw new Error(`${locale} lost required existing route ${required}.`);
   const courseRoutes = routes.filter((route) => route.startsWith("courses/") && route !== "courses/").sort();
-  if (JSON.stringify(courseRoutes) !== JSON.stringify(canonicalCourseRoutes)) {
-    throw new Error(`${locale} Course routes must exactly mirror canonical Knowledge Graph Path slugs.\nExpected: ${canonicalCourseRoutes.join(", ")}\nActual: ${courseRoutes.join(", ")}`);
-  }
+  if (JSON.stringify(courseRoutes) !== JSON.stringify(canonicalCourseRoutes)) throw new Error(`${locale} Course routes must exactly mirror canonical Knowledge Graph Path slugs.`);
   const guideRoutes = routes.filter((route) => route.startsWith("guides/") && route !== "guides/").sort();
-  if (JSON.stringify(guideRoutes) !== JSON.stringify(canonicalGuideRoutes)) {
-    throw new Error(`${locale} Guide routes must exactly mirror the Core Guide publication bundles.\nExpected: ${canonicalGuideRoutes.join(", ")}\nActual: ${guideRoutes.join(", ")}`);
-  }
+  if (JSON.stringify(guideRoutes) !== JSON.stringify(canonicalGuideRoutes)) throw new Error(`${locale} Guide routes must exactly mirror the Core Guide publication bundles.`);
 }
 
 const contract = JSON.parse(await readFile(path.join(CONTENT_ROOT, "lab-reconciliation-v0.8.json"), "utf8"));
@@ -134,23 +99,14 @@ for (const locale of ["en", "zh-CN"]) {
   const source = JSON.parse(await readFile(path.join(CONTENT_ROOT, `${locale}.json`), "utf8"));
   assertRouteManifest(source.availableRoutes, locale);
   localeSources[locale] = source;
-
   const campaign = JSON.parse(await readFile(path.join(CONTENT_ROOT, `campaign-discovery.${locale}.json`), "utf8"));
-  for (const experience of contract.experiences) {
-    if (!campaign.knowledge?.experiences?.[experience.id]) throw new Error(`${locale} Knowledge Map is missing ${experience.id}.`);
-  }
-  for (const id of contract.primaryCampaign) {
-    if (!campaign.campaign?.cards?.[id]) throw new Error(`${locale} Campaign is missing primary card ${id}.`);
-  }
+  for (const experience of contract.experiences) if (!campaign.knowledge?.experiences?.[experience.id]) throw new Error(`${locale} Knowledge Map is missing ${experience.id}.`);
+  for (const id of contract.primaryCampaign) if (!campaign.campaign?.cards?.[id]) throw new Error(`${locale} Campaign is missing primary card ${id}.`);
   for (const mission of FLAGSHIP_MISSIONS) await access(path.join(CONTENT_ROOT, `${mission}.${locale}.json`));
 }
 
 const enRoutes = localeSources.en.availableRoutes;
 const zhRoutes = localeSources["zh-CN"].availableRoutes;
-if (JSON.stringify(enRoutes) !== JSON.stringify(zhRoutes)) {
-  throw new Error(`EN/zh-CN public route parity drifted.\nEN: ${JSON.stringify(enRoutes)}\nZH: ${JSON.stringify(zhRoutes)}`);
-}
-
+if (JSON.stringify(enRoutes) !== JSON.stringify(zhRoutes)) throw new Error(`EN/zh-CN public route parity drifted.`);
 for (const relativePath of REQUIRED_APP_FILES) await access(path.join(WEB_ROOT, relativePath));
-
 console.log(`Next.js public-route parity contract OK (${enRoutes.length} routes × 2 locales; 15 Course routes + Guides directory + ${CORE_GUIDE_COUNT} Core Guide routes mirror canonical content; Knowledge Map and stable routes preserved).`);
