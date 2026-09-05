@@ -1,11 +1,5 @@
 #!/usr/bin/env python3
-"""Compute Guide coverage over the 145 Concept × 15 Path matrix.
-
-The matrix is binary at Path level: if a Concept is referenced by multiple
-milestones in the same Path it still contributes one covered Path-Concept
-membership. This keeps the metric aligned with reusable Concepts projected
-into goal-oriented Paths.
-"""
+"""Compute Guide coverage over the 145 Concept × 15 Path matrix."""
 
 from __future__ import annotations
 
@@ -32,10 +26,7 @@ def load_paths() -> dict[str, dict[str, object]]:
                 for milestone in path.get("milestones", [])
                 for concept_id in milestone.get("conceptIds", [])
             }
-            paths[path["id"]] = {
-                "title": path.get("en", path["id"]),
-                "conceptIds": concept_ids,
-            }
+            paths[path["id"]] = {"title": path.get("en", path["id"]), "conceptIds": concept_ids}
     return paths
 
 
@@ -63,26 +54,13 @@ def build_reuse(paths: dict[str, dict[str, object]]) -> Counter[str]:
     return reuse
 
 
-def stage_metrics(
-    selected: set[str],
-    paths: dict[str, dict[str, object]],
-    reuse: Counter[str],
-) -> dict[str, object]:
+def stage_metrics(selected: set[str], paths: dict[str, dict[str, object]], reuse: Counter[str]) -> dict[str, object]:
     per_path = []
     for path_id, path in paths.items():
         concept_ids: set[str] = path["conceptIds"]  # type: ignore[assignment]
         covered = len(concept_ids & selected)
         total = len(concept_ids)
-        per_path.append(
-            {
-                "id": path_id,
-                "title": path["title"],
-                "covered": covered,
-                "total": total,
-                "ratio": covered / total,
-            }
-        )
-
+        per_path.append({"id": path_id, "title": path["title"], "covered": covered, "total": total, "ratio": covered / total})
     membership_covered = sum(reuse[concept_id] for concept_id in selected)
     membership_total = sum(reuse.values())
     return {
@@ -97,13 +75,8 @@ def stage_metrics(
     }
 
 
-def theoretical_membership_max(
-    baseline: set[str], target_count: int, reuse: Counter[str]
-) -> int:
-    remaining = sorted(
-        (reuse[concept_id] for concept_id in reuse if concept_id not in baseline),
-        reverse=True,
-    )
+def theoretical_membership_max(baseline: set[str], target_count: int, reuse: Counter[str]) -> int:
+    remaining = sorted((reuse[concept_id] for concept_id in reuse if concept_id not in baseline), reverse=True)
     additions = target_count - len(baseline)
     return sum(reuse[concept_id] for concept_id in baseline) + sum(remaining[:additions])
 
@@ -114,8 +87,8 @@ def pct(value: float) -> str:
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--json", action="store_true", help="Emit machine-readable JSON")
-    parser.add_argument("--check", action="store_true", help="Fail if coverage-plan invariants drift")
+    parser.add_argument("--json", action="store_true")
+    parser.add_argument("--check", action="store_true")
     args = parser.parse_args()
 
     paths = load_paths()
@@ -126,6 +99,7 @@ def main() -> int:
     core40 = baseline | set(plan["core40Additions"])
     core60 = core40 | set(plan["core60Additions"])
     core80 = core60 | set(plan["core80Additions"])
+    core100 = core80 | set(plan["core100Additions"])
     actual = load_actual_guide_ids()
 
     stage_sets = {
@@ -133,6 +107,7 @@ def main() -> int:
         "core-40": core40,
         "core-60": core60,
         "core-80": core80,
+        "core-100": core100,
     }
     stages = {name: stage_metrics(selected, paths, reuse) for name, selected in stage_sets.items()}
 
@@ -145,21 +120,21 @@ def main() -> int:
     if sum(reuse.values()) != expected_matrix["pathConceptMembershipCount"]:
         errors.append(f"Path-Concept membership drift: {sum(reuse.values())}")
 
-    expected_counts = {20, 40, 60, 80}
+    expected_counts = {20, 40, 60, 80, 100}
     if {len(selected) for selected in stage_sets.values()} != expected_counts:
-        errors.append("Coverage plan must contain cumulative 20 / 40 / 60 / 80 unique Concepts")
+        errors.append("Coverage plan must contain cumulative 20 / 40 / 60 / 80 / 100 unique Concepts")
 
     expected_actual_by_count = {len(selected): selected for selected in stage_sets.values()}
     expected_actual = expected_actual_by_count.get(len(actual))
     if expected_actual is None:
-        errors.append(f"Published Guide count must match a planned stage (20/40/60/80), got {len(actual)}")
+        errors.append(f"Published Guide count must match a planned stage (20/40/60/80/100), got {len(actual)}")
     elif actual != expected_actual:
         errors.append(
             f"Actual Guide bindings differ from the planned core-{len(actual)} stage: "
             f"missing={sorted(expected_actual - actual)} unexpected={sorted(actual - expected_actual)}"
         )
 
-    unknown = core80 - set(reuse)
+    unknown = core100 - set(reuse)
     if unknown:
         errors.append(f"Unknown planned Concepts: {sorted(unknown)}")
 
@@ -167,6 +142,7 @@ def main() -> int:
         "core-40": float(plan["policy"]["core40MinimumPathCoverage"]),
         "core-60": float(plan["policy"]["core60MinimumPathCoverage"]),
         "core-80": float(plan["policy"]["core80MinimumPathCoverage"]),
+        "core-100": float(plan["policy"]["core100MinimumPathCoverage"]),
     }
     for stage_name, floor in floors.items():
         if stages[stage_name]["minimumPathCoverage"] + 1e-12 < floor:
@@ -174,15 +150,11 @@ def main() -> int:
 
     theoretical = {
         name: theoretical_membership_max(baseline, len(stage_sets[name]), reuse)
-        for name in ("core-40", "core-60", "core-80")
+        for name in ("core-40", "core-60", "core-80", "core-100")
     }
 
     output = {
-        "matrix": {
-            "conceptCount": len(reuse),
-            "pathCount": len(paths),
-            "pathConceptMembershipCount": sum(reuse.values()),
-        },
+        "matrix": {"conceptCount": len(reuse), "pathCount": len(paths), "pathConceptMembershipCount": sum(reuse.values())},
         "publishedGuideCount": len(actual),
         "stages": stages,
         "theoreticalMembershipMaximum": theoretical,
@@ -210,10 +182,7 @@ def main() -> int:
         stage_names = list(stage_sets)
         print("| Path | Concepts | " + " | ".join(stage_names) + " |")
         print("| --- | ---: | " + " | ".join("---:" for _ in stage_names) + " |")
-        by_stage = {
-            name: {row["id"]: row for row in metric["perPath"]}
-            for name, metric in stages.items()
-        }
+        by_stage = {name: {row["id"]: row for row in metric["perPath"]} for name, metric in stages.items()}
         for path_id, path in paths.items():
             first = by_stage[stage_names[0]][path_id]
             cells = []

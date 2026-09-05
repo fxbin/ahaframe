@@ -3,7 +3,7 @@ import { getCoreGuides } from "@/lib/guides-server";
 import type { GuideDirectoryData, GuideDirectoryItem } from "@/lib/guides-directory";
 import { getKnowledgeMap } from "@/lib/knowledge-map-server";
 
-const PUBLISHED_GUIDE_COUNT = 80;
+const PUBLISHED_GUIDE_COUNT = 100;
 
 export async function getGuideDirectory(locale: Locale): Promise<GuideDirectoryData> {
   const [guides, map] = await Promise.all([getCoreGuides(locale), getKnowledgeMap(locale)]);

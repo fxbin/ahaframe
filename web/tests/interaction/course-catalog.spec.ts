@@ -44,9 +44,9 @@ test("the same high-reuse Guide is projected from two canonical Courses with dis
 test("unpublished canonical Concepts remain visible without fake Guide links", async ({ page }) => {
   await page.goto("/en/courses/ai-foundations/");
 
-  const attentionBudget = page.locator('[data-course-concept-id="concept-attention-budget"]');
-  await expect(attentionBudget).toBeVisible();
-  await expect(page.locator('[data-course-guide-concept-id="concept-attention-budget"]')).toHaveCount(0);
+  const sequenceOrdering = page.locator('[data-course-concept-id="concept-sequence-ordering"]');
+  await expect(sequenceOrdering).toBeVisible();
+  await expect(page.locator('[data-course-guide-concept-id="concept-sequence-ordering"]')).toHaveCount(0);
 });
 
 test("zh-CN course catalog and detail keep equivalent Guide-aware structure", async ({ page }) => {

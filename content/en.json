@@ -100,6 +100,26 @@
     "guides/test-first-ai/",
     "guides/fact-check-revision/",
     "guides/data-analysis-verification/",
+    "guides/attention-budget/",
+    "guides/instruction-authority/",
+    "guides/instruction-conflict/",
+    "guides/prompt-context-runtime-boundary/",
+    "guides/reasoning-budget/",
+    "guides/capability-vs-guarantee/",
+    "guides/ai-code-review/",
+    "guides/conversation-state/",
+    "guides/model-routing-fallback/",
+    "guides/evidence-granularity/",
+    "guides/memory-authority-conflict/",
+    "guides/mcp-boundaries/",
+    "guides/mcp-capability-negotiation/",
+    "guides/interrupt-cancel/",
+    "guides/loop-vs-graph/",
+    "guides/runtime-enforcement/",
+    "guides/ship-block-inconclusive/",
+    "guides/adapter-finetuning/",
+    "guides/curriculum-decomposition/",
+    "guides/automation-maintenance/",
     "learning/",
     "pricing/",
     "early-access/",
@@ -130,21 +150,8 @@
   ],
   "brand": "AhaFrame",
   "ui": {
-    "nav": {
-      "lessons": "Courses",
-      "guides": "Guides",
-      "roadmap": "Knowledge Map",
-      "pricing": "Pricing",
-      "about": "About",
-      "early_access": "Join Early Access",
-      "menu": "Menu"
-    },
-    "footer": {
-      "tagline": "Clear AI courses with real interactive practice.",
-      "sitemap": "Sitemap",
-      "about": "About",
-      "early_access": "Early Access"
-    },
+    "nav": {"lessons":"Courses","guides":"Guides","roadmap":"Knowledge Map","pricing":"Pricing","about":"About","early_access":"Join Early Access","menu":"Menu"},
+    "footer": {"tagline":"Clear AI courses with real interactive practice.","sitemap":"Sitemap","about":"About","early_access":"Early Access"},
     "language": {"en":"English","zh-CN":"简体中文"}
   },
   "home": {
@@ -158,5 +165,5 @@
     "context-window": {"name":"Context Window Lab","category":"Context Engineering","level":"Beginner","minutes":8,"description":"Visualize how an LLM context window fills up and compare summarization, RAG, memory, and truncation strategies.","quick":"A context window is the model's finite working input budget; system instructions, conversation history, documents, and tool results all compete for that space."},
     "agent-loop": {"name":"Agent Loop Simulator","category":"Agents","level":"Intermediate","minutes":9,"description":"Step through an AI agent loop: understand the task, choose an action, call a tool, observe the result, recover from errors, and answer.","quick":"An AI agent repeatedly decides what to do next, acts through tools, observes the result, and uses that observation to decide whether to continue, retry, or answer."}
   },
-  "meta": {"updated":"2026-09-04"}
+  "meta": {"updated":"2026-09-05"}
 }
