@@ -8,7 +8,7 @@ test("global search opens with Ctrl+K, indexes canonical surfaces, and ranks exa
   await expect(dialog).toBeVisible();
   const input = page.getByRole("textbox", { name: "Search AhaFrame" });
   await expect(input).toBeFocused();
-  await expect(page.locator("[data-global-search-results]")).toHaveAttribute("data-search-document-count", "257");
+  await expect(page.locator("[data-global-search-results]")).toHaveAttribute("data-search-document-count", "277");
 
   await input.fill("Timeout ambiguity");
   const guide = page.locator('[data-search-result="guide:timeout-ambiguity"]');
