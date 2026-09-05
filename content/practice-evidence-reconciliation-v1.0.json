@@ -19,7 +19,7 @@
   },
   "expectedPostReconciliation": {
     "guideConceptsExplicitlyCovered": 56,
-    "samePathExplicitPracticeMemberships": 71,
+    "samePathExplicitPracticeMemberships": 72,
     "core80SamePathExplicitPracticeMemberships": 17,
     "evidencePracticeCount": 21,
     "evidencePathMemberships": 25
