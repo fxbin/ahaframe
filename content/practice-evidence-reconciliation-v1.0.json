@@ -1,0 +1,87 @@
+{
+  "version": "1.0.0",
+  "status": "ACTIVE",
+  "policy": {
+    "purpose": "Reconcile existing public Practice semantics with canonical Concept evidence without changing production-wave or runtime semantics.",
+    "productionPlanRemainsCanonicalForWaves": true,
+    "runtimeSemanticsChanged": false,
+    "evidenceMustBeEarnedByInteraction": true,
+    "billingActivation": false,
+    "freeChoiceActivation": false
+  },
+  "baseline": {
+    "publishedGuides": 80,
+    "guideConceptsExplicitlyCovered": 40,
+    "guidedPathConceptMemberships": 143,
+    "samePathExplicitPracticeMemberships": 52,
+    "core80PathConceptMemberships": 21,
+    "core80SamePathExplicitPracticeMemberships": 9
+  },
+  "expectedPostReconciliation": {
+    "guideConceptsExplicitlyCovered": 56,
+    "samePathExplicitPracticeMemberships": 71,
+    "core80SamePathExplicitPracticeMemberships": 17,
+    "evidencePracticeCount": 21,
+    "evidencePathMemberships": 24
+  },
+  "augmentations": [
+    {
+      "experienceId": "token-playground",
+      "addConceptIds": ["concept-next-token-generation", "concept-sampling-controls"],
+      "evidenceSources": ["src/assets/lab-scenarios.js"],
+      "rationale": "The learner directly changes temperature and greedy/sample selection over an explicit next-token candidate distribution, observing probability, entropy and selected-token consequences."
+    },
+    {
+      "experienceId": "rag-failure",
+      "addConceptIds": ["concept-hybrid-retrieval", "concept-reranking"],
+      "evidenceSources": ["src/assets/lab-scenarios.js", "src/assets/broken-rag-pipeline-scenario.js"],
+      "rationale": "The RAG runtime exposes vector versus hybrid retrieval and an explicit reranker toggle whose state changes precision, latency, cost and release evidence."
+    },
+    {
+      "experienceId": "agent-reliability",
+      "addConceptIds": ["concept-retry-amplification"],
+      "evidenceSources": ["src/assets/47000-retry-scenario.js", "src/assets/47000-retry-mission.js"],
+      "rationale": "The $47,000 Retry incident makes timeout ambiguity plus repeated retry of an irreversible refund the central failure mechanism and compares bounded retry/idempotency policies."
+    },
+    {
+      "experienceId": "production-release-gate-build",
+      "addConceptIds": ["concept-observability-diagnosis", "concept-traceability", "concept-online-monitoring"],
+      "evidenceSources": ["src/assets/content-wave-3-scenarios.js", "src/assets/content-wave-3-missions.js"],
+      "rationale": "The release runtime exposes canary/shadow rollout, trace-linked alerts and release SLOs, and makes production observability coverage and production evidence part of the release decision."
+    }
+  ],
+  "referencePractices": [
+    {
+      "experienceId": "context-compression",
+      "nodeType": "LAB",
+      "pathIds": ["path-llm-application-engineering", "path-write-book-ai"],
+      "conceptIds": ["concept-finite-context-budget", "concept-context-management", "concept-context-compaction"],
+      "evidenceSources": ["src/assets/context-compression-scenario.js"],
+      "rationale": "The learner changes compression ratio, summary depth and retrieval/memory budgets under a fixed 16k working-context budget, observing retention, overflow, quality, hallucination risk, latency and cost."
+    },
+    {
+      "experienceId": "instruction-conflict",
+      "nodeType": "MISSION",
+      "pathIds": ["path-production-ai-reliability"],
+      "conceptIds": ["concept-trust-boundary", "concept-prompt-injection-defense", "concept-runtime-enforcement"],
+      "evidenceSources": ["src/assets/instruction-conflict-scenario.js", "src/assets/prompt-injection-attack-scenario.js", "src/assets/prompt-injection-attack-mission.js"],
+      "rationale": "The public Instruction Conflict route runs the Prompt Injection Attack mission, where provenance/trust policy, scoped tools, approval, runtime gates, filters and validators determine whether untrusted instructions reach capability paths."
+    },
+    {
+      "experienceId": "agent-workflow-graph",
+      "nodeType": "LAB",
+      "pathIds": ["path-multi-agent-orchestration"],
+      "conceptIds": ["concept-workflow-decomposition", "concept-parallel-agent-work", "concept-topology-tradeoffs", "concept-coordination-overhead"],
+      "evidenceSources": ["src/assets/agent-workflow-graph-scenario.js"],
+      "rationale": "The learner changes topology, agent count, parallelism, state isolation, retry scope and join strategy and observes coordination overhead, failure propagation, duplicate work, latency, cost and reliability."
+    },
+    {
+      "experienceId": "evaluation-failure",
+      "nodeType": "LAB",
+      "pathIds": ["path-production-ai-reliability"],
+      "conceptIds": ["concept-evaluation-evidence", "concept-slices-regression", "concept-confidence-variance", "concept-release-economics", "concept-ship-block-inconclusive"],
+      "evidenceSources": ["src/assets/evaluation-scenario.js"],
+      "rationale": "The learner changes dataset weighting, sample size, judge mode, veto and cost gates; the runtime exposes slice regressions, confidence width, evaluation cost and SHIP/BLOCK/INCONCLUSIVE release consequences."
+    }
+  ]
+}
