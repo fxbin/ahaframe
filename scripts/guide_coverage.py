@@ -100,6 +100,7 @@ def main() -> int:
     core60 = core40 | set(plan["core60Additions"])
     core80 = core60 | set(plan["core80Additions"])
     core100 = core80 | set(plan["core100Additions"])
+    core120 = core100 | set(plan["core120Additions"])
     actual = load_actual_guide_ids()
 
     stage_sets = {
@@ -108,6 +109,7 @@ def main() -> int:
         "core-60": core60,
         "core-80": core80,
         "core-100": core100,
+        "core-120": core120,
     }
     stages = {name: stage_metrics(selected, paths, reuse) for name, selected in stage_sets.items()}
 
@@ -120,21 +122,21 @@ def main() -> int:
     if sum(reuse.values()) != expected_matrix["pathConceptMembershipCount"]:
         errors.append(f"Path-Concept membership drift: {sum(reuse.values())}")
 
-    expected_counts = {20, 40, 60, 80, 100}
+    expected_counts = {20, 40, 60, 80, 100, 120}
     if {len(selected) for selected in stage_sets.values()} != expected_counts:
-        errors.append("Coverage plan must contain cumulative 20 / 40 / 60 / 80 / 100 unique Concepts")
+        errors.append("Coverage plan must contain cumulative 20 / 40 / 60 / 80 / 100 / 120 unique Concepts")
 
     expected_actual_by_count = {len(selected): selected for selected in stage_sets.values()}
     expected_actual = expected_actual_by_count.get(len(actual))
     if expected_actual is None:
-        errors.append(f"Published Guide count must match a planned stage (20/40/60/80/100), got {len(actual)}")
+        errors.append(f"Published Guide count must match a planned stage (20/40/60/80/100/120), got {len(actual)}")
     elif actual != expected_actual:
         errors.append(
             f"Actual Guide bindings differ from the planned core-{len(actual)} stage: "
             f"missing={sorted(expected_actual - actual)} unexpected={sorted(actual - expected_actual)}"
         )
 
-    unknown = core100 - set(reuse)
+    unknown = core120 - set(reuse)
     if unknown:
         errors.append(f"Unknown planned Concepts: {sorted(unknown)}")
 
@@ -143,14 +145,23 @@ def main() -> int:
         "core-60": float(plan["policy"]["core60MinimumPathCoverage"]),
         "core-80": float(plan["policy"]["core80MinimumPathCoverage"]),
         "core-100": float(plan["policy"]["core100MinimumPathCoverage"]),
+        "core-120": float(plan["policy"]["core120MinimumPathCoverage"]),
     }
     for stage_name, floor in floors.items():
         if stages[stage_name]["minimumPathCoverage"] + 1e-12 < floor:
             errors.append(f"{stage_name} minimum Path coverage fell below plan floor")
 
+    core120_metrics = stages["core-120"]
+    if core120_metrics["membershipCovered"] != 183:
+        errors.append(f"Core-120 must cover exactly 183 Path-Concept memberships, got {core120_metrics['membershipCovered']}")
+    if core120_metrics["pathReach"] != 15:
+        errors.append(f"Core-120 must reach 15/15 Paths, got {core120_metrics['pathReach']}")
+    if plan["policy"].get("automaticFullGuideWaveAfterCore120") is not False:
+        errors.append("Core-120 must remain the final automatic full-Guide wave")
+
     theoretical = {
         name: theoretical_membership_max(baseline, len(stage_sets[name]), reuse)
-        for name in ("core-40", "core-60", "core-80", "core-100")
+        for name in ("core-40", "core-60", "core-80", "core-100", "core-120")
     }
 
     output = {
