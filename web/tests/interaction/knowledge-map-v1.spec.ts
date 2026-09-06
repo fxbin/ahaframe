@@ -46,6 +46,7 @@ test("a non-Guide Concept has a complete English concise surface while a Guide C
   await expect(explanation).toContainText("The order of information inside context can change");
   await expect(explanation).toContainText("Mental model");
   await expect(explanation).toContainText("Why it matters");
+  await expect(explanation.getByRole("link", { name: "AI Foundations", exact: true })).toHaveAttribute("href", "/en/courses/ai-foundations/");
   await expect(sequence.locator('[data-guide-concept-id="concept-sequence-ordering"]')).toHaveCount(0);
 
   await page.locator('[data-branch-id="branch-models-tokens"] > summary').click();
