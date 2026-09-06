@@ -9,14 +9,12 @@ ROOT = Path(__file__).resolve().parents[1]
 CONTENT = ROOT / "content"
 INVENTORY = CONTENT / "ai-knowledge-inventory-v1.0"
 GRAPH_FILE = CONTENT / "ai-knowledge-graph-v1.0.json"
+CONCISE_FILE = CONTENT / "ai-knowledge-concise-v1.0.json"
 LOCALE_FILES = {
     "en": CONTENT / "ai-knowledge-graph-v1.0.en.json",
     "zh-CN": CONTENT / "ai-knowledge-graph-v1.0.zh-CN.json",
 }
 
-# Primary references are attached only to version-sensitive concepts. Stable
-# concepts remain vendor-neutral and do not require a source merely because a
-# product currently demonstrates the pattern well.
 CURRENT_SOURCES = {
     "mcp-2026-07-28-spec": {
         "url": "https://blog.modelcontextprotocol.io/posts/2026-07-28/",
@@ -113,6 +111,39 @@ def validate_freshness(concepts, source_refs):
         raise ValueError(f"current primary references are not exercised by version-sensitive concepts: {sorted(missing)}")
 
 
+def validate_concise_policy(policy, concepts):
+    if policy.get("version") != "1.0.0":
+        raise ValueError("concise Concept policy version mismatch")
+    if policy.get("expectedConceptCount") != len(concepts):
+        raise ValueError("concise Concept expected count does not match canonical inventory")
+    kinds = {item["kind"] for item in concepts}
+    if set(policy.get("genericByKind", {})) != kinds:
+        raise ValueError(f"concise Concept kind templates drifted: expected {sorted(kinds)}")
+    concept_ids = {item["id"] for item in concepts}
+    unknown_overrides = set(policy.get("overrides", {})) - concept_ids
+    if unknown_overrides:
+        raise ValueError(f"concise Concept overrides point to unknown Concepts: {sorted(unknown_overrides)}")
+    for kind, by_locale in policy["genericByKind"].items():
+        for locale in LOCALE_FILES:
+            copy = by_locale.get(locale, {})
+            for field in ("summary", "mentalModel", "whyItMatters"):
+                if not copy.get(field):
+                    raise ValueError(f"concise template missing {kind}/{locale}/{field}")
+    for concept_id, by_locale in policy.get("overrides", {}).items():
+        for locale in LOCALE_FILES:
+            copy = by_locale.get(locale, {})
+            for field in ("summary", "mentalModel", "whyItMatters"):
+                if not copy.get(field):
+                    raise ValueError(f"concise override missing {concept_id}/{locale}/{field}")
+
+
+def concise_copy(policy, item, locale, title):
+    source = policy.get("overrides", {}).get(item["id"], {}).get(locale)
+    if source is None:
+        source = policy["genericByKind"][item["kind"]][locale]
+    return {field: source[field].replace("{title}", title) for field in ("summary", "mentalModel", "whyItMatters")}
+
+
 def materialize_branch(item):
     slug = item.get("slug") or suffix(item["id"], "branch-")
     return {
@@ -190,9 +221,11 @@ def materialize_path(item):
 def build():
     seed = load(GRAPH_FILE)
     seed_locales = {locale: load(path) for locale, path in LOCALE_FILES.items()}
+    concise_policy = load(CONCISE_FILE)
     branches, concepts, edges, paths = load_inventory()
     source_refs = {**seed.get("sourceRefs", {}), **CURRENT_SOURCES}
     validate_freshness(concepts, source_refs)
+    validate_concise_policy(concise_policy, concepts)
 
     graph = {
         "schemaVersion": "1.0.0",
@@ -210,11 +243,9 @@ def build():
         "migration": seed["migration"],
     }
 
-    branch_by_id = {item["id"]: item for item in branches}
     presentations = {}
     for locale, seed_copy in seed_locales.items():
         is_en = locale == "en"
-        old_concepts = seed_copy.get("concepts", {})
         old_edges = seed_copy.get("edges", {})
         branch_copy = {
             item["id"]: {
@@ -226,16 +257,7 @@ def build():
         concept_copy = {}
         for item in concepts:
             title = item["en"] if is_en else item["zh"]
-            branch_title = branch_by_id[item["primaryBranchId"]]["en" if is_en else "zh"]
-            previous = old_concepts.get(item["id"], {})
-            summary = previous.get("summary")
-            if not summary:
-                summary = (
-                    f"A reusable AI concept for reasoning about {title} within {branch_title}."
-                    if is_en
-                    else f"用于理解「{title}」并在「{branch_title}」中做设计与判断的可复用 AI 知识点。"
-                )
-            concept_copy[item["id"]] = {"title": title, "summary": summary}
+            concept_copy[item["id"]] = {"title": title, **concise_copy(concise_policy, item, locale, title)}
 
         edge_copy = {}
         for item in edges:
@@ -292,7 +314,8 @@ def main():
     print(
         f"AI Knowledge Graph v1 inventory: {len(graph['branches'])} branches, "
         f"{len(graph['concepts'])} concepts ({version_sensitive} version-sensitive), "
-        f"{len(graph['edges'])} edges, {len(graph['paths'])} paths."
+        f"{len(graph['edges'])} edges, {len(graph['paths'])} paths; "
+        f"{len(presentations['en']['concepts'])} bilingual concise Concept explanations materialized."
     )
 
 
