@@ -1,0 +1,56 @@
+{
+  "version": "1.0.0",
+  "sourceIssue": 201,
+  "implementationIssue": 219,
+  "decision": "SHIP_CORE_120_THEN_STOP_AUTOMATIC_FULL_GUIDE_WAVES",
+  "selected": [
+    "concept-prompt-specificity",
+    "concept-multimodal-representation",
+    "concept-distribution-shift",
+    "concept-bias-fairness",
+    "concept-repository-context",
+    "concept-dependency-migration-verification",
+    "concept-api-rate-limit-resilience",
+    "concept-metadata-retrieval",
+    "concept-knowledge-graph-structure",
+    "concept-action-grounding",
+    "concept-sandbox-permissions",
+    "concept-delegation-state",
+    "concept-compensation-recovery",
+    "concept-release-economics",
+    "concept-failure-attribution",
+    "concept-finetune-dataset-design",
+    "concept-research-to-outline",
+    "concept-claim-evidence-matrix",
+    "concept-media-quality-review",
+    "concept-customer-problem-research"
+  ],
+  "projectedPublication": {
+    "guideCount": 120,
+    "conceptCoverage": 0.8275862068965517,
+    "pathConceptMemberships": 183,
+    "pathConceptCoverage": 0.8798076923076923,
+    "pathReach": 15,
+    "minimumPathCoverage": 0.85
+  },
+  "practiceEvidence": {
+    "selectedWithExactSamePathExistingEvidence": 10,
+    "conceptIds": [
+      "concept-prompt-specificity",
+      "concept-delegation-state",
+      "concept-compensation-recovery",
+      "concept-release-economics",
+      "concept-failure-attribution",
+      "concept-finetune-dataset-design",
+      "concept-research-to-outline",
+      "concept-claim-evidence-matrix",
+      "concept-media-quality-review",
+      "concept-customer-problem-research"
+    ]
+  },
+  "stoppingRule": {
+    "automaticGuideWaveAfterCore120": false,
+    "remainingConceptTreatmentIssue": 199,
+    "fullGuideRequiresEvidenceTrigger": true
+  }
+}
