@@ -150,11 +150,12 @@ def main():
     subprocess.run([sys.executable, str(ROOT / "scripts" / "guide_coverage.py"), "--check"], cwd=ROOT, check=True)
     subprocess.run([sys.executable, str(ROOT / "scripts" / "practice_density.py"), "--check"], cwd=ROOT, check=True)
     subprocess.run([sys.executable, str(ROOT / "scripts" / "core100_ranking.py"), "--check"], cwd=ROOT, check=True)
+    subprocess.run([sys.executable, str(ROOT / "scripts" / "test_intentional_treatment.py")], cwd=ROOT, check=True)
 
     print(
         "PASS Core Guide v1 publication: 120 canonical Concepts now have substantial OPEN Guides in exact EN/zh-CN parity; "
-        "the published Core-120 set exactly matches #201, coverage and honest Practice-density invariants pass, all Guide detail routes/practice targets are public, "
-        "relations remain Knowledge-Graph-derived, monetization gates stay disabled, and automatic full-Guide waves stop after Core-120."
+        "the published Core-120 set exactly matches #201, coverage and honest Practice-density invariants pass, the remaining 25 Concepts have one final intentional treatment each, "
+        "all Guide detail routes/practice targets are public, relations remain Knowledge-Graph-derived, monetization gates stay disabled, and automatic full-Guide waves stop after Core-120."
     )
 
 

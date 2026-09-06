@@ -1,0 +1,244 @@
+{
+  "version": "1.0.0",
+  "status": "FINAL",
+  "basis": {
+    "canonicalConceptCount": 145,
+    "publishedGuideStage": "core-120",
+    "publishedGuideCount": 120,
+    "remainingConceptCount": 25,
+    "sourceIssue": 199,
+    "conciseSurfaceFollowUpIssue": 202
+  },
+  "policy": {
+    "automaticFullGuideExpansionStoppedAt": "core-120",
+    "core140OrCore145BatchAllowed": false,
+    "preserveCanonicalConceptReachability": true,
+    "fullGuidePromotionRequiresNewEvidence": true,
+    "semanticOverlapDoesNotImplyMerge": true,
+    "allowedTreatments": [
+      "CONCISE_CANONICAL",
+      "PRACTICE_OR_COURSE_FIRST",
+      "SEMANTIC_OVERLAP_REVIEW",
+      "FULL_GUIDE_ON_TRIGGER"
+    ]
+  },
+  "classCounts": {
+    "CONCISE_CANONICAL": 6,
+    "PRACTICE_OR_COURSE_FIRST": 9,
+    "SEMANTIC_OVERLAP_REVIEW": 8,
+    "FULL_GUIDE_ON_TRIGGER": 2
+  },
+  "treatments": [
+    {
+      "conceptId": "concept-sequence-ordering",
+      "pathId": "path-ai-foundations",
+      "treatment": "CONCISE_CANONICAL",
+      "currentSurface": "CONCISE_CANONICAL",
+      "rationale": "Ordering inside a finite context is a focused extension of context-window, attention-budget and relevance mental models; a concise canonical explanation is enough until learner evidence shows a distinct gap."
+    },
+    {
+      "conceptId": "concept-modality-grounding",
+      "pathId": "path-ai-foundations",
+      "treatment": "CONCISE_CANONICAL",
+      "currentSurface": "CONCISE_CANONICAL",
+      "rationale": "Grounding is the concise complement to Multimodal Representation: it explains how representations stay tied to source modalities without requiring another long-form multimodal article."
+    },
+    {
+      "conceptId": "concept-examples-shape-behavior",
+      "pathId": "path-ai-foundations",
+      "treatment": "SEMANTIC_OVERLAP_REVIEW",
+      "currentSurface": "CONCISE_CANONICAL",
+      "resolution": "KEEP_DISTINCT_CONCISE",
+      "rationale": "Examples materially shape model behavior, but most standalone teaching surface overlaps Prompt Specificity, Instruction Authority and Specification before Generation. Keep the canonical node distinct and concise; do not merge or alias it."
+    },
+    {
+      "conceptId": "concept-planning-as-search",
+      "pathId": "path-ai-foundations",
+      "treatment": "SEMANTIC_OVERLAP_REVIEW",
+      "currentSurface": "CONCISE_CANONICAL",
+      "resolution": "KEEP_DISTINCT_CONCISE",
+      "rationale": "Planning-as-search is a useful model of search over candidate actions, but long-form treatment would substantially repeat Reasoning Budget and planning/direct-execution decisions. Preserve it as a concise distinct concept."
+    },
+    {
+      "conceptId": "concept-reasoning-opacity",
+      "pathId": "path-ai-foundations",
+      "treatment": "CONCISE_CANONICAL",
+      "currentSurface": "CONCISE_CANONICAL",
+      "rationale": "The durable lesson is the boundary itself: internal reasoning is not a reliable verification surface. The stronger teaching already lives in Verification over Introspection, Traceability and observable evidence."
+    },
+    {
+      "conceptId": "concept-human-accountability",
+      "pathId": "path-ai-foundations",
+      "treatment": "CONCISE_CANONICAL",
+      "currentSurface": "CONCISE_CANONICAL",
+      "rationale": "Accountability remains a distinct governance boundary, but Human Review Boundary, Auditability and Bias/Fairness already carry the larger engineering decisions. Concise canonical treatment preserves responsibility without duplicating them."
+    },
+    {
+      "conceptId": "concept-plan-before-code",
+      "pathId": "path-vibe-coding",
+      "treatment": "SEMANTIC_OVERLAP_REVIEW",
+      "currentSurface": "CONCISE_CANONICAL",
+      "resolution": "KEEP_DISTINCT_CONCISE",
+      "rationale": "Plan-before-code is an important workflow heuristic, yet a full Guide would largely restate Specification before Generation, Repository Context and Workflow Decomposition. Keep it distinct for retrieval and course sequencing, but concise."
+    },
+    {
+      "conceptId": "concept-context-structure-cache",
+      "pathId": "path-llm-application-engineering",
+      "treatment": "SEMANTIC_OVERLAP_REVIEW",
+      "currentSurface": "CONCISE_CANONICAL",
+      "resolution": "KEEP_DISTINCT_CONCISE",
+      "rationale": "Context structure and cacheability are a real application concern, but current long-form coverage already owns context management, compaction and conversation state. Keep the concept distinct and concise rather than creating a second context-architecture Guide."
+    },
+    {
+      "conceptId": "concept-prompt-caching",
+      "pathId": "path-llm-application-engineering",
+      "treatment": "CONCISE_CANONICAL",
+      "currentSurface": "CONCISE_CANONICAL",
+      "rationale": "Prompt caching is a narrow operational optimization whose provider details can change. A concise source-aware explanation of stable prefixes, cost and invalidation is higher leverage than a provider-specific long Guide by default."
+    },
+    {
+      "conceptId": "concept-user-domain-memory",
+      "pathId": "path-rag-knowledge-systems",
+      "treatment": "CONCISE_CANONICAL",
+      "currentSurface": "CONCISE_CANONICAL",
+      "rationale": "User/domain memory is primarily a scope and authority distinction inside the existing memory lifecycle. Working vs Durable Memory, Memory Lifecycle and Memory Authority Conflict already own the larger system model."
+    },
+    {
+      "conceptId": "concept-hybrid-structured-unstructured-search",
+      "pathId": "path-rag-knowledge-systems",
+      "treatment": "SEMANTIC_OVERLAP_REVIEW",
+      "currentSurface": "CONCISE_CANONICAL",
+      "resolution": "KEEP_DISTINCT_CONCISE",
+      "rationale": "The concept is distinct enough to keep because combining structured constraints with unstructured evidence changes retrieval design, but a full Guide would strongly overlap Hybrid Retrieval, Metadata Retrieval and Knowledge Graph Structure."
+    },
+    {
+      "conceptId": "concept-mcp-tasks-elicitation",
+      "pathId": "path-agent-engineering",
+      "treatment": "FULL_GUIDE_ON_TRIGGER",
+      "currentSurface": "CONCISE_CANONICAL",
+      "rationale": "MCP Tasks and multi-round-trip elicitation are version-sensitive and independently meaningful, but current Practice does not yet exercise the boundary strongly enough to justify a maintained standalone Guide.",
+      "triggers": [
+        "demonstrated direct-search or learner demand",
+        "MCP specification change creates a material maintained teaching surface",
+        "a shipped Practice makes Tasks or elicitation change an engineering decision"
+      ]
+    },
+    {
+      "conceptId": "concept-planning-vs-direct",
+      "pathId": "path-agent-engineering",
+      "treatment": "SEMANTIC_OVERLAP_REVIEW",
+      "currentSurface": "CONCISE_CANONICAL",
+      "resolution": "KEEP_DISTINCT_CONCISE",
+      "rationale": "The planning-versus-direct decision remains useful in Agent Engineering, but its long-form surface overlaps Reasoning Budget, Bounded Autonomy and Planning as Search. Keep the canonical decision point concise."
+    },
+    {
+      "conceptId": "concept-environment-observation",
+      "pathId": "path-agent-engineering",
+      "treatment": "PRACTICE_OR_COURSE_FIRST",
+      "currentSurface": "CONCISE_CANONICAL",
+      "deliveryMode": "COURSE_FIRST",
+      "practiceIds": [],
+      "rationale": "Observation belongs in the Agent Engineering observe-act-ground loop beside Action Grounding and Sandbox Permissions. Current explicit Practice evidence is not strong enough to claim it as practiced, so Course-first treatment is honest until a computer-use interaction earns more."
+    },
+    {
+      "conceptId": "concept-independent-verification",
+      "pathId": "path-multi-agent-orchestration",
+      "treatment": "PRACTICE_OR_COURSE_FIRST",
+      "currentSurface": "CONCISE_CANONICAL",
+      "deliveryMode": "PRACTICE_FIRST",
+      "practiceIds": ["multi-agent-coordination-incident"],
+      "rationale": "Independent verification is already exercised in the canonical multi-agent coordination Practice, where topology, delegation and verification evidence interact. The decision is better learned inside orchestration than as another isolated long Guide."
+    },
+    {
+      "conceptId": "concept-outcome-trajectory-evaluation",
+      "pathId": "path-production-ai-reliability",
+      "treatment": "FULL_GUIDE_ON_TRIGGER",
+      "currentSurface": "CONCISE_CANONICAL",
+      "rationale": "Outcome-versus-trajectory evaluation is a distinct production mental model, but current release/evaluation Practices do not yet make trajectory evidence a sufficiently direct learner-controlled decision to justify a standalone Guide.",
+      "triggers": [
+        "a dedicated agent-evaluation Practice exposes trajectory-level evidence",
+        "a demonstrated Course learning discontinuity remains after neighboring evaluation Guides",
+        "direct-search or production-evaluation demand justifies standalone maintenance"
+      ]
+    },
+    {
+      "conceptId": "concept-cross-layer-architecture",
+      "pathId": "path-production-ai-reliability",
+      "treatment": "SEMANTIC_OVERLAP_REVIEW",
+      "currentSurface": "CONCISE_CANONICAL",
+      "resolution": "KEEP_DISTINCT_CONCISE",
+      "rationale": "Cross-layer architecture is valuable as a synthesis label, but a full article would restate Prompt/Context/Runtime Boundary, Runtime Enforcement, Failure Attribution and production reliability decisions. Preserve the synthesis node without duplicating those Guides."
+    },
+    {
+      "conceptId": "concept-queue-backpressure",
+      "pathId": "path-production-ai-reliability",
+      "treatment": "SEMANTIC_OVERLAP_REVIEW",
+      "currentSurface": "CONCISE_CANONICAL",
+      "resolution": "KEEP_DISTINCT_CONCISE",
+      "rationale": "Queue-level concurrency pressure is not identical to streaming backpressure, so the Concept should not be merged or aliased. Its independent long-form surface is still too small today; keep a concise distinction next to Streaming & Backpressure."
+    },
+    {
+      "conceptId": "concept-inference-serving",
+      "pathId": "path-model-engineering",
+      "treatment": "PRACTICE_OR_COURSE_FIRST",
+      "currentSurface": "CONCISE_CANONICAL",
+      "deliveryMode": "PRACTICE_FIRST",
+      "practiceIds": ["model-adaptation-decision-lab"],
+      "rationale": "Inference serving is version-sensitive and potentially deep, but the current Model Adaptation Decision Lab already exercises serving and deployment trade-offs in the correct application-driven context. Keep source-governed concise support until product depth demands more."
+    },
+    {
+      "conceptId": "concept-source-backed-drafting",
+      "pathId": "path-write-book-ai",
+      "treatment": "PRACTICE_OR_COURSE_FIRST",
+      "currentSurface": "CONCISE_CANONICAL",
+      "deliveryMode": "COURSE_FIRST",
+      "practiceIds": [],
+      "rationale": "Source-backed drafting is a workflow transition inside Write a Book with AI, between source authority/research and fact-check/revision. The Course sequence is the primary teaching surface; no explicit Practice evidence is claimed for this Concept today."
+    },
+    {
+      "conceptId": "concept-knowledge-curation",
+      "pathId": "path-build-knowledge-base",
+      "treatment": "PRACTICE_OR_COURSE_FIRST",
+      "currentSurface": "CONCISE_CANONICAL",
+      "deliveryMode": "COURSE_FIRST",
+      "practiceIds": [],
+      "rationale": "Knowledge curation is best understood as the ingestion stage of a living knowledge-base lifecycle. The Course provides the operational context, while existing Build evidence does not explicitly earn a curation mapping today."
+    },
+    {
+      "conceptId": "concept-research-synthesis",
+      "pathId": "path-research-with-ai",
+      "treatment": "PRACTICE_OR_COURSE_FIRST",
+      "currentSurface": "CONCISE_CANONICAL",
+      "deliveryMode": "PRACTICE_FIRST",
+      "practiceIds": ["research-evidence-mission"],
+      "rationale": "Research Synthesis is already explicitly exercised in Research Evidence Mission after question decomposition, triangulation and claim-evidence work. The synthesis decision is stronger in that evidence workflow than in a detached long Guide."
+    },
+    {
+      "conceptId": "concept-structured-analysis",
+      "pathId": "path-data-analysis-ai",
+      "treatment": "PRACTICE_OR_COURSE_FIRST",
+      "currentSurface": "CONCISE_CANONICAL",
+      "deliveryMode": "PRACTICE_FIRST",
+      "practiceIds": ["data-analysis-verification-lab"],
+      "rationale": "Structured Analysis is explicitly exercised in Data Analysis Verification Lab as part of extract, structure and verify. Practice-first treatment preserves that executable evidence chain instead of splitting the workflow into another article."
+    },
+    {
+      "conceptId": "concept-knowledge-product-publishing",
+      "pathId": "path-course-knowledge-product",
+      "treatment": "PRACTICE_OR_COURSE_FIRST",
+      "currentSurface": "CONCISE_CANONICAL",
+      "deliveryMode": "COURSE_FIRST",
+      "practiceIds": [],
+      "rationale": "Publishing is the outcome-stage transition in the Course/Knowledge Product Path. Curriculum Decomposition, Media Quality Review and Copyright Provenance already carry the harder reusable mental models, so publishing remains Course-first without fabricated Practice evidence."
+    },
+    {
+      "conceptId": "concept-content-marketing-system",
+      "pathId": "path-solo-business-ai",
+      "treatment": "PRACTICE_OR_COURSE_FIRST",
+      "currentSurface": "CONCISE_CANONICAL",
+      "deliveryMode": "COURSE_FIRST",
+      "practiceIds": [],
+      "rationale": "Content marketing is a broad outcome workflow in the Solo Business Path rather than a core AI engineering mental model. Keep it anchored to customer research and the operating-system Course; no explicit Practice evidence is claimed today."
+    }
+  ]
+}
