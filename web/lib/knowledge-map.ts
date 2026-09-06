@@ -24,6 +24,12 @@ export interface KnowledgeMapConceptRelation {
   guideSlug: string | null;
 }
 
+export interface KnowledgeMapConceptPath {
+  id: string;
+  slug: string;
+  title: string;
+}
+
 export interface KnowledgeMapConcept {
   id: string;
   kind: string;
@@ -39,6 +45,7 @@ export interface KnowledgeMapConcept {
   legacyIds: string[];
   guideSlug: string | null;
   relatedConcepts: KnowledgeMapConceptRelation[];
+  pathMemberships: KnowledgeMapConceptPath[];
 }
 
 export interface KnowledgeMapMilestone {
