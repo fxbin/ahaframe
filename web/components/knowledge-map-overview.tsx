@@ -6,13 +6,13 @@ function copy(locale: KnowledgeMap["locale"]) {
     ? {
         kicker: "AI KNOWLEDGE MAP · V1.0", title: "Explore AI as a connected knowledge map.",
         intro: "Open a domain only when you want to inspect the underlying concepts. Every Concept now has a concise explanation; published Guides add a deeper teaching layer. If you want a clear learning order, Courses is the simpler entry point.",
-        branches: "branches", concepts: "concepts", shared: "shared", guide: "Guide", mentalModel: "Mental model", why: "Why it matters", related: "Related concepts", readGuide: "Read the full Guide", coursesKicker: "Prefer a clear path?",
+        branches: "branches", concepts: "concepts", shared: "shared", guide: "Guide", mentalModel: "Mental model", why: "Why it matters", related: "Related concepts", courses: "Courses", readGuide: "Read the full Guide", coursesKicker: "Prefer a clear path?",
         coursesTitle: "Use Courses for goal-oriented learning.", coursesCopy: "The same canonical knowledge is projected into 15 simpler learning paths, without duplicating the graph here.", coursesCta: "Browse all courses",
       }
     : {
         kicker: "AI 知识地图 · V1.0", title: "把 AI 当作一张相互连接的知识地图来探索。",
         intro: "只有当你想查看底层知识关系时，再展开某个领域。现在每个 Concept 都有简明解释；已发布的 Guide 提供更深入的教学层。如果你更需要清晰学习顺序，课程页会更简单。",
-        branches: "个分支", concepts: "个知识点", shared: "跨路径复用", guide: "Guide", mentalModel: "心智模型", why: "为什么重要", related: "相关 Concept", readGuide: "阅读完整 Guide", coursesKicker: "更想按顺序学？",
+        branches: "个分支", concepts: "个知识点", shared: "跨路径复用", guide: "Guide", mentalModel: "心智模型", why: "为什么重要", related: "相关 Concept", courses: "所在课程", readGuide: "阅读完整 Guide", coursesKicker: "更想按顺序学？",
         coursesTitle: "用课程页选择目标导向的学习路径。", coursesCopy: "同一套 canonical knowledge 会投影成 15 条更简单的学习路径，这里不再重复展开第二套课程结构。", coursesCta: "查看全部课程",
       };
 }
@@ -59,6 +59,7 @@ export function KnowledgeMapOverview({ map }: KnowledgeMapOverviewProps) {
                   <div><p className="font-mono text-[9px] uppercase tracking-[0.12em] text-[var(--muted)]">{labels.mentalModel}</p><p className="mt-1">{concept.mentalModel}</p></div>
                   <div><p className="font-mono text-[9px] uppercase tracking-[0.12em] text-[var(--muted)]">{labels.why}</p><p className="mt-1">{concept.whyItMatters}</p></div>
                 </div>
+                {concept.pathMemberships.length > 0 ? <div className="mt-3"><p className="font-mono text-[9px] uppercase tracking-[0.12em] text-[var(--muted)]">{labels.courses}</p><p className="mt-1 flex flex-wrap gap-x-2 gap-y-1">{concept.pathMemberships.map((membership) => <Link key={membership.id} className="hover:text-[var(--brand-accent)] hover:underline" href={`/${segment}/courses/${membership.slug}/`}>{membership.title}</Link>)}</p></div> : null}
                 {concept.relatedConcepts.length > 0 ? <div className="mt-3"><p className="font-mono text-[9px] uppercase tracking-[0.12em] text-[var(--muted)]">{labels.related}</p><p className="mt-1">{concept.relatedConcepts.slice(0, 6).map((related) => related.title).join(" · ")}</p></div> : null}
                 {concept.guideSlug ? <Link href={`/${segment}/guides/${concept.guideSlug}/`} className="mt-3 inline-flex font-medium text-[var(--brand-accent)] hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--brand-accent)]" data-guide-concept-id={concept.id}>{labels.readGuide} <span aria-hidden="true" className="ml-1">→</span></Link> : null}
               </div>
