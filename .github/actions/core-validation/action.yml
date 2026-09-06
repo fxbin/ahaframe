@@ -89,6 +89,10 @@ runs:
       shell: bash
       run: python3 scripts/build_ai_knowledge_graph_v1.py --write
 
+    - name: Test bilingual concise Concept presentation
+      shell: bash
+      run: python3 scripts/test_concise_concepts.py
+
     - name: Test AI Knowledge Graph v1.0 schema contract
       shell: bash
       run: python3 scripts/test_ai_knowledge_graph_v1.py
