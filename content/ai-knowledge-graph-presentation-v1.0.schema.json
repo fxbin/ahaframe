@@ -1,5 +1,5 @@
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$schema": "https://json-schema.org/draft/2020/schema",
   "$id": "https://ahaframe.com/schema/ai-knowledge-graph-presentation-v1.0.schema.json",
   "title": "AhaFrame AI Knowledge Graph presentation v1.0",
   "type": "object",
@@ -37,10 +37,12 @@
     "conceptCopy": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["title", "summary"],
+      "required": ["title", "summary", "mentalModel", "whyItMatters"],
       "properties": {
         "title": { "$ref": "#/$defs/text" },
-        "summary": { "$ref": "#/$defs/text" }
+        "summary": { "$ref": "#/$defs/text" },
+        "mentalModel": { "$ref": "#/$defs/text" },
+        "whyItMatters": { "$ref": "#/$defs/text" }
       }
     },
     "edgeCopy": {
