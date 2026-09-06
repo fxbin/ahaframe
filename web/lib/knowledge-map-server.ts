@@ -19,6 +19,7 @@ const INVENTORY_ROOT = path.join(CONTENT_ROOT, "ai-knowledge-inventory-v1.0");
 const GUIDE_ROOT = path.join(CONTENT_ROOT, "guides");
 const CORE_GUIDE_BUNDLE_COUNT = 24;
 const CORE_GUIDE_COUNT = 120;
+const CANONICAL_CONCEPT_COUNT = 145;
 
 interface DomainSource {
   id: string;
@@ -55,6 +56,13 @@ interface ConceptSource {
   legacyIds: string[];
 }
 
+interface EdgeSource {
+  id: string;
+  fromConceptId: string;
+  toConceptId: string;
+  type: string;
+}
+
 interface MilestoneSource {
   id: string;
   en: string;
@@ -87,7 +95,21 @@ interface InventoryFragment {
   version: string;
   branches?: BranchSource[];
   concepts?: ConceptSource[];
+  edges?: EdgeSource[];
   paths?: PathSource[];
+}
+
+interface ConciseCopy {
+  summary: string;
+  mentalModel: string;
+  whyItMatters: string;
+}
+
+interface ConcisePolicy {
+  version: string;
+  expectedConceptCount: number;
+  genericByKind: Record<string, Record<Locale, ConciseCopy>>;
+  overrides: Record<string, Partial<Record<Locale, ConciseCopy>>>;
 }
 
 interface GuideIndexBundle {
@@ -101,21 +123,23 @@ async function loadJson<T>(filename: string): Promise<T> {
   return JSON.parse(await readFile(path.join(CONTENT_ROOT, filename), "utf8")) as T;
 }
 
-async function loadInventory(): Promise<{ branches: BranchSource[]; concepts: ConceptSource[]; paths: PathSource[] }> {
+async function loadInventory(): Promise<{ branches: BranchSource[]; concepts: ConceptSource[]; edges: EdgeSource[]; paths: PathSource[] }> {
   const filenames = (await readdir(INVENTORY_ROOT)).filter((filename) => filename.endsWith(".json")).sort();
   const fragments = await Promise.all(
     filenames.map(async (filename) => JSON.parse(await readFile(path.join(INVENTORY_ROOT, filename), "utf8")) as InventoryFragment),
   );
   const branches: BranchSource[] = [];
   const concepts: ConceptSource[] = [];
+  const edges: EdgeSource[] = [];
   const paths: PathSource[] = [];
   for (const fragment of fragments) {
     if (fragment.version !== "1.0.0") throw new Error(`Knowledge Map inventory version mismatch: ${fragment.version}`);
     branches.push(...(fragment.branches ?? []));
     concepts.push(...(fragment.concepts ?? []));
+    edges.push(...(fragment.edges ?? []));
     paths.push(...(fragment.paths ?? []));
   }
-  return { branches, concepts, paths };
+  return { branches, concepts, edges, paths };
 }
 
 function expectedGuideWave(filename: string): "core-20" | "core-40" | "core-60" | "core-80" | "core-100" | "core-120" {
@@ -154,15 +178,29 @@ async function loadGuideIndex(locale: Locale): Promise<Map<string, string>> {
   return index;
 }
 
+function resolveConciseCopy(policy: ConcisePolicy, concept: ConceptSource, locale: Locale, title: string): ConciseCopy {
+  const source = policy.overrides[concept.id]?.[locale] ?? policy.genericByKind[concept.kind]?.[locale];
+  if (!source) throw new Error(`Missing concise Concept copy policy for ${locale}/${concept.id}/${concept.kind}.`);
+  return {
+    summary: source.summary.replaceAll("{title}", title),
+    mentalModel: source.mentalModel.replaceAll("{title}", title),
+    whyItMatters: source.whyItMatters.replaceAll("{title}", title),
+  };
+}
+
 export async function getKnowledgeMap(locale: Locale): Promise<KnowledgeMap> {
-  const [seed, presentation, inventory, guideIndex] = await Promise.all([
+  const [seed, presentation, concisePolicy, inventory, guideIndex] = await Promise.all([
     loadJson<{ schemaVersion: string; domains: DomainSource[] }>("ai-knowledge-graph-v1.0.json"),
     loadJson<{ locale: Locale; domains: Record<string, DomainPresentation> }>(`ai-knowledge-graph-v1.0.${locale}.json`),
+    loadJson<ConcisePolicy>("ai-knowledge-concise-v1.0.json"),
     loadInventory(),
     loadGuideIndex(locale),
   ]);
   if (seed.schemaVersion !== "1.0.0") throw new Error("Knowledge Map schema version mismatch.");
   if (presentation.locale !== locale) throw new Error(`Knowledge Map locale mismatch for ${locale}.`);
+  if (concisePolicy.version !== "1.0.0" || concisePolicy.expectedConceptCount !== CANONICAL_CONCEPT_COUNT) {
+    throw new Error("Knowledge Map concise Concept policy version/count mismatch.");
+  }
 
   const isEnglish = locale === "en";
   const domains: KnowledgeMapDomain[] = seed.domains
@@ -183,17 +221,44 @@ export async function getKnowledgeMap(locale: Locale): Promise<KnowledgeMap> {
     description: isEnglish ? branch.enDescription : branch.zhDescription,
   }));
 
-  const concepts: KnowledgeMapConcept[] = inventory.concepts.map((concept) => ({
-    id: concept.id,
-    kind: concept.kind,
-    primaryBranchId: concept.primaryBranchId,
-    branchIds: concept.branchIds,
-    title: isEnglish ? concept.en : concept.zh,
-    difficulty: concept.difficulty,
-    maturity: concept.maturity,
-    versionSensitive: concept.versionSensitive,
-    legacyIds: concept.legacyIds,
-    guideSlug: guideIndex.get(concept.id) ?? null,
+  const conceptBase: Array<Omit<KnowledgeMapConcept, "relatedConcepts">> = inventory.concepts.map((concept) => {
+    const title = isEnglish ? concept.en : concept.zh;
+    const copy = resolveConciseCopy(concisePolicy, concept, locale, title);
+    return {
+      id: concept.id,
+      kind: concept.kind,
+      primaryBranchId: concept.primaryBranchId,
+      branchIds: concept.branchIds,
+      title,
+      ...copy,
+      difficulty: concept.difficulty,
+      maturity: concept.maturity,
+      versionSensitive: concept.versionSensitive,
+      legacyIds: concept.legacyIds,
+      guideSlug: guideIndex.get(concept.id) ?? null,
+    };
+  });
+  if (conceptBase.length !== CANONICAL_CONCEPT_COUNT || new Set(conceptBase.map((item) => item.id)).size !== CANONICAL_CONCEPT_COUNT) {
+    throw new Error(`Knowledge Map requires exactly ${CANONICAL_CONCEPT_COUNT} unique canonical Concepts.`);
+  }
+  const conceptById = new Map(conceptBase.map((concept) => [concept.id, concept]));
+  const relatedByConcept = new Map<string, Array<{ id: string; relationship: string }>>();
+  for (const edge of inventory.edges) {
+    if (!conceptById.has(edge.fromConceptId) || !conceptById.has(edge.toConceptId)) {
+      throw new Error(`Knowledge Map relationship points to unknown Concept: ${edge.id}.`);
+    }
+    relatedByConcept.set(edge.fromConceptId, [...(relatedByConcept.get(edge.fromConceptId) ?? []), { id: edge.toConceptId, relationship: edge.type }]);
+    relatedByConcept.set(edge.toConceptId, [...(relatedByConcept.get(edge.toConceptId) ?? []), { id: edge.fromConceptId, relationship: edge.type }]);
+  }
+  const concepts: KnowledgeMapConcept[] = conceptBase.map((concept) => ({
+    ...concept,
+    relatedConcepts: (relatedByConcept.get(concept.id) ?? [])
+      .map((relation) => {
+        const related = conceptById.get(relation.id);
+        if (!related) throw new Error(`Knowledge Map failed to resolve related Concept ${relation.id}.`);
+        return { id: related.id, title: related.title, relationship: relation.relationship, guideSlug: related.guideSlug };
+      })
+      .sort((a, b) => a.title.localeCompare(b.title)),
   }));
 
   const paths: KnowledgeMapPath[] = inventory.paths.map((item) => ({
@@ -219,7 +284,7 @@ export async function getKnowledgeMap(locale: Locale): Promise<KnowledgeMap> {
     ),
   }));
 
-  if (domains.length !== 3 || branches.length < 35 || concepts.length < 120 || paths.length < 12) {
+  if (domains.length !== 3 || branches.length < 35 || concepts.length !== CANONICAL_CONCEPT_COUNT || paths.length < 12) {
     throw new Error(
       `Knowledge Map inventory is unexpectedly thin: ${domains.length} domains / ${branches.length} branches / ${concepts.length} concepts / ${paths.length} paths.`,
     );
