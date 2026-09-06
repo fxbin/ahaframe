@@ -4,7 +4,7 @@
 
 Core-120 is the **final automatic full-Guide wave** for Content Completeness V1.
 
-The release implements the completed stopping-gate decision in #201 and publishes the exact frozen 20-Concept set without substitutions. After this wave, no Core-140 or Core-145 batch is planned. The remaining 25 canonical Concepts move to #199 for explicit intentional treatment.
+The release implements the completed stopping-gate decision in #201 and publishes the exact frozen 20-Concept set without substitutions. After this wave, no Core-140 or Core-145 batch is planned. The remaining 25 canonical Concepts are governed by the final intentional-treatment contract in `content/guides/intentional-treatment-v1.0.json` and documented in `docs/CONTENT_COMPLETENESS_FINAL_TREATMENT.md`.
 
 ## Publication target
 
@@ -54,14 +54,27 @@ No new Lab, Mission, Incident or Build runtime is introduced to improve the perc
 - Billing and free-choice activation remain false.
 - Deterministic Practice runtime semantics do not change.
 
-## Stopping rule
+## Final treatment after Core-120
 
-After Core-120, a remaining Concept receives a full Guide only when later evidence earns it through at least one of:
+The post-Core-120 residual is exactly **25 Concepts**. #199 resolves them into four explicit treatments rather than leaving them as an implicit future Guide backlog:
 
-1. demonstrated direct-search demand;
-2. a real Course learning discontinuity;
-3. strong existing or newly justified Practice evidence;
-4. a distinct mental model not adequately taught by neighboring Guides;
-5. version-sensitive importance that warrants a maintained standalone source-governed Guide.
+- 6 `CONCISE_CANONICAL`
+- 9 `PRACTICE_OR_COURSE_FIRST`
+- 8 `SEMANTIC_OVERLAP_REVIEW`, all resolved as `KEEP_DISTINCT_CONCISE`
+- 2 `FULL_GUIDE_ON_TRIGGER`
 
-Otherwise #199 assigns concise canonical, Practice/Course-first, or semantic-overlap treatment.
+The two trigger-only candidates are:
+
+- `concept-mcp-tasks-elicitation`
+- `concept-outcome-trajectory-evaluation`
+
+They remain concise today. A future full Guide must be earned by new search demand, a demonstrated Course gap, real Practice evidence, a sufficiently distinct teaching surface, or version-sensitive maintenance value.
+
+This makes the Content Completeness V1 end state intentional rather than uniform:
+
+- 120 substantial full Guides;
+- 25 explicit non-Guide treatments;
+- 145 / 145 canonical Concepts accounted for;
+- no automatic Core-140/Core-145 wave.
+
+#202 follows #199 by implementing/verifying the bilingual concise Concept explanation surface for Concepts that intentionally do not receive full Guides.
