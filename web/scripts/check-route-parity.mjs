@@ -7,8 +7,8 @@ const REPO_ROOT = path.resolve(WEB_ROOT, "..");
 const CONTENT_ROOT = path.join(REPO_ROOT, "content");
 const INVENTORY_ROOT = path.join(CONTENT_ROOT, "ai-knowledge-inventory-v1.0");
 const GUIDE_ROOT = path.join(CONTENT_ROOT, "guides");
-const CORE_GUIDE_BUNDLE_COUNT = 20;
-const CORE_GUIDE_COUNT = 100;
+const CORE_GUIDE_BUNDLE_COUNT = 24;
+const CORE_GUIDE_COUNT = 120;
 
 const REQUIRED_CORE_ROUTES = [
   "", "courses/", "guides/", "learning/", "pricing/", "early-access/",
@@ -47,6 +47,7 @@ function expectedGuideWave(filename) {
   if (number <= 12) return "core-60";
   if (number <= 16) return "core-80";
   if (number <= 20) return "core-100";
+  if (number <= 24) return "core-120";
   throw new Error(`Unsupported Core Guide bundle number: ${filename}`);
 }
 

@@ -10,8 +10,8 @@ ROOT = Path(__file__).resolve().parents[1]
 CONTENT = ROOT / "content"
 GUIDES = CONTENT / "guides"
 INVENTORY = CONTENT / "ai-knowledge-inventory-v1.0"
-GUIDE_COUNT = 100
-BUNDLE_COUNT = 20
+GUIDE_COUNT = 120
+BUNDLE_COUNT = 24
 
 
 def load(path: Path):
@@ -45,6 +45,8 @@ def expected_wave(bundle_number: int) -> str:
         return "core-80"
     if bundle_number <= 20:
         return "core-100"
+    if bundle_number <= 24:
+        return "core-120"
     raise AssertionError(f"unsupported Core Guide bundle number: {bundle_number}")
 
 
@@ -84,6 +86,7 @@ def main():
     manifest = load(CONTENT / "ai-content-production-v1.0.json")
     coverage_plan = load(GUIDES / "coverage-plan-v1.0.json")
     ranking = load(GUIDES / "core100-ranking-v1.0.json")
+    core120_selection = load(GUIDES / "core120-selection-v1.0.json")
 
     require(len(en) == GUIDE_COUNT and len(zh) == GUIDE_COUNT, f"Core Guide publication must contain exactly {GUIDE_COUNT} Guides per locale")
     require([item["slug"] for item in en] == [item["slug"] for item in zh], "EN/zh-CN Guide slug order drifted")
@@ -96,18 +99,25 @@ def main():
     require(len(set(slugs)) == GUIDE_COUNT, "Core Guide slugs must be unique")
     require(len(set(concept_ids)) == GUIDE_COUNT, "Each Core Guide must bind exactly one unique canonical Concept")
 
-    planned_core100 = (
+    planned_core120 = (
         set(coverage_plan["baselineConceptIds"])
         | set(coverage_plan["core40Additions"])
         | set(coverage_plan["core60Additions"])
         | set(coverage_plan["core80Additions"])
         | set(coverage_plan["core100Additions"])
+        | set(coverage_plan["core120Additions"])
     )
-    require(set(concept_ids) == planned_core100, "Published Guide Concept bindings must exactly match the frozen core-100 coverage plan")
+    require(set(concept_ids) == planned_core120, "Published Guide Concept bindings must exactly match the frozen core-120 coverage plan")
     require(
         set(coverage_plan["core100Additions"]) == {item["conceptId"] for item in ranking["selected"]},
-        "Published core100Additions must exactly match the frozen #198 ranking",
+        "Historical published core100Additions must continue to match the frozen #198 ranking",
     )
+    require(
+        coverage_plan["core120Additions"] == core120_selection["selected"],
+        "Published core120Additions must exactly match the frozen #201 Core-120 selection",
+    )
+    require(core120_selection["stoppingRule"]["automaticGuideWaveAfterCore120"] is False, "Core-120 must be the final automatic full-Guide wave")
+    require(coverage_plan["policy"]["automaticFullGuideWaveAfterCore120"] is False, "Coverage plan must not create Core-140 machinery")
 
     require("guides/" in en_routes, "Guide Directory must remain a public canonical route")
     public_guide_routes = sorted(route for route in en_routes if route.startswith("guides/") and route != "guides/")
@@ -142,9 +152,9 @@ def main():
     subprocess.run([sys.executable, str(ROOT / "scripts" / "core100_ranking.py"), "--check"], cwd=ROOT, check=True)
 
     print(
-        "PASS Core Guide v1 publication: 100 canonical Concepts now have substantial OPEN Guides in exact EN/zh-CN parity; "
-        "the published Core-100 set exactly matches #198, coverage-plan and Practice-density invariants pass, all Guide detail routes/practice targets are public, "
-        "relations remain Knowledge-Graph-derived, and monetization gates stay disabled."
+        "PASS Core Guide v1 publication: 120 canonical Concepts now have substantial OPEN Guides in exact EN/zh-CN parity; "
+        "the published Core-120 set exactly matches #201, coverage and honest Practice-density invariants pass, all Guide detail routes/practice targets are public, "
+        "relations remain Knowledge-Graph-derived, monetization gates stay disabled, and automatic full-Guide waves stop after Core-120."
     )
 
 

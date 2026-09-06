@@ -7,11 +7,13 @@
     "duplicateConceptReferencesWithinPath": "deduplicated"
   },
   "policy": {
-    "priority": "Close low-coverage Path gaps first, then maximize covered Path-Concept memberships using Concept reuse across Paths; after core-60, weigh search value, Practice adjacency and pedagogical distinctiveness because cross-Path reuse is nearly exhausted.",
+    "priority": "Close low-coverage Path gaps first, then maximize covered Path-Concept memberships using Concept reuse across Paths; after core-60, weigh search value, Practice adjacency and pedagogical distinctiveness because cross-Path reuse is nearly exhausted. Core-120 is the final automatic full-Guide wave; remaining Concepts require intentional treatment under #199.",
     "core40MinimumPathCoverage": 0.30,
     "core60MinimumPathCoverage": 0.45,
     "core80MinimumPathCoverage": 0.60,
-    "core100MinimumPathCoverage": 0.7272727272727273
+    "core100MinimumPathCoverage": 0.7272727272727273,
+    "core120MinimumPathCoverage": 0.85,
+    "automaticFullGuideWaveAfterCore120": false
   },
   "baselineConceptIds": [
     "concept-probabilistic-behavior",
@@ -122,5 +124,27 @@
     "concept-adapter-finetuning",
     "concept-curriculum-decomposition",
     "concept-automation-maintenance"
+  ],
+  "core120Additions": [
+    "concept-prompt-specificity",
+    "concept-multimodal-representation",
+    "concept-distribution-shift",
+    "concept-bias-fairness",
+    "concept-repository-context",
+    "concept-dependency-migration-verification",
+    "concept-api-rate-limit-resilience",
+    "concept-metadata-retrieval",
+    "concept-knowledge-graph-structure",
+    "concept-action-grounding",
+    "concept-sandbox-permissions",
+    "concept-delegation-state",
+    "concept-compensation-recovery",
+    "concept-release-economics",
+    "concept-failure-attribution",
+    "concept-finetune-dataset-design",
+    "concept-research-to-outline",
+    "concept-claim-evidence-matrix",
+    "concept-media-quality-review",
+    "concept-customer-problem-research"
   ]
 }
