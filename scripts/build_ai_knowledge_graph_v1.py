@@ -257,7 +257,8 @@ def build():
         concept_copy = {}
         for item in concepts:
             title = item["en"] if is_en else item["zh"]
-            concept_copy[item["id"]] = {"title": title, **concise_copy(concise_policy, item, locale, title)}
+            copy = concise_copy(concise_policy, item, locale, title)
+            concept_copy[item["id"]] = {"title": title, "summary": copy["summary"]}
 
         edge_copy = {}
         for item in edges:
@@ -315,7 +316,7 @@ def main():
         f"AI Knowledge Graph v1 inventory: {len(graph['branches'])} branches, "
         f"{len(graph['concepts'])} concepts ({version_sensitive} version-sensitive), "
         f"{len(graph['edges'])} edges, {len(graph['paths'])} paths; "
-        f"{len(presentations['en']['concepts'])} bilingual concise Concept explanations materialized."
+        f"{len(presentations['en']['concepts'])} localized Concept summaries materialized from the canonical concise policy."
     )
 
 
