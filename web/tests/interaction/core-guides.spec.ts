@@ -102,7 +102,9 @@ test("Knowledge Map links only Concepts with published Guides", async ({ page })
   const context = aiNative.locator('details[data-branch-id="branch-context-engineering"]');
   await context.locator(":scope > summary").click();
 
-  const published = context.locator('[data-guide-concept-id="concept-context-management"]');
+  const contextManagement = context.locator('[data-concept-id="concept-context-management"]');
+  await contextManagement.locator(":scope > summary").click();
+  const published = contextManagement.locator('[data-guide-concept-id="concept-context-management"]');
   await expect(published).toBeVisible();
   await expect(published).toHaveAttribute("href", "/en/guides/context-management/");
 
@@ -122,7 +124,9 @@ test("Knowledge Map projects a newly published core-40 Concept to its Guide", as
   const evaluation = production.locator('details[data-branch-id="branch-eval-reliability"]');
   await evaluation.locator(":scope > summary").click();
 
-  const published = evaluation.locator('[data-guide-concept-id="concept-evaluation-evidence"]');
+  const evaluationEvidence = evaluation.locator('[data-concept-id="concept-evaluation-evidence"]');
+  await evaluationEvidence.locator(":scope > summary").click();
+  const published = evaluationEvidence.locator('[data-guide-concept-id="concept-evaluation-evidence"]');
   await expect(published).toBeVisible();
   await expect(published).toHaveAttribute("href", "/en/guides/evaluation-evidence/");
 });
@@ -139,7 +143,9 @@ test("Knowledge Map projects a newly published core-60 Concept to its Guide", as
   const evaluation = production.locator('details[data-branch-id="branch-eval-reliability"]');
   await evaluation.locator(":scope > summary").click();
 
-  const published = evaluation.locator('[data-guide-concept-id="concept-traceability"]');
+  const traceability = evaluation.locator('[data-concept-id="concept-traceability"]');
+  await traceability.locator(":scope > summary").click();
+  const published = traceability.locator('[data-guide-concept-id="concept-traceability"]');
   await expect(published).toBeVisible();
   await expect(published).toHaveAttribute("href", "/en/guides/traceability/");
 });
