@@ -49,6 +49,14 @@ def load_guide_concepts(locale: str):
     return concepts
 
 
+def resolve_copy(policy: dict, concept: dict, locale: str) -> dict[str, str]:
+    title = concept["en"] if locale == "en" else concept["zh"]
+    source = policy.get("overrides", {}).get(concept["id"], {}).get(locale)
+    if source is None:
+        source = policy["genericByKind"][concept["kind"]][locale]
+    return {field: source[field].replace("{title}", title) for field in FIELDS}
+
+
 def main():
     inventory = load_inventory()
     policy = load(POLICY_FILE)
@@ -81,20 +89,29 @@ def main():
         "en": {"summary": 55, "mentalModel": 65, "whyItMatters": 65},
         "zh-CN": {"summary": 20, "mentalModel": 24, "whyItMatters": 24},
     }
+
+    # The canonical concise policy owns all three readable fields for every Concept.
+    # The legacy locale graph artifact remains backward compatible with title+summary only.
+    for locale in LOCALE_FILES:
+        for concept_id, concept in inventory.items():
+            rendered = resolve_copy(policy, concept, locale)
+            for field in FIELDS:
+                value = rendered[field]
+                require(isinstance(value, str) and len(value.strip()) >= minimums[locale][field], f"concise copy too thin: {locale}/{concept_id}/{field}")
+                require("{title}" not in value and "TODO" not in value and "TBD" not in value, f"unresolved concise-copy placeholder: {locale}/{concept_id}/{field}")
+
     for locale, path in LOCALE_FILES.items():
         presentation = load(path)
         require(presentation.get("locale") == locale, f"presentation locale mismatch: {locale}")
         copies = presentation.get("concepts", {})
-        require(set(copies) == canonical_ids, f"{locale} concise presentation must cover exactly 145 canonical Concept IDs")
+        require(set(copies) == canonical_ids, f"{locale} presentation must cover exactly 145 canonical Concept IDs")
         for concept_id, concept in inventory.items():
             copy = copies[concept_id]
             expected_title = concept["en"] if locale == "en" else concept["zh"]
+            rendered = resolve_copy(policy, concept, locale)
             require(copy.get("title") == expected_title, f"localized Concept title drifted: {locale}/{concept_id}")
-            require(set(copy) == {"title", *FIELDS}, f"Concept presentation shape drifted: {locale}/{concept_id}")
-            for field in FIELDS:
-                value = copy.get(field, "")
-                require(isinstance(value, str) and len(value.strip()) >= minimums[locale][field], f"concise copy too thin: {locale}/{concept_id}/{field}")
-                require("{title}" not in value and "TODO" not in value and "TBD" not in value, f"unresolved concise-copy placeholder: {locale}/{concept_id}/{field}")
+            require(set(copy) == {"title", "summary"}, f"legacy Concept presentation shape drifted: {locale}/{concept_id}")
+            require(copy.get("summary") == rendered["summary"], f"materialized Concept summary drifted from canonical concise policy: {locale}/{concept_id}")
 
     for concept_id in treatment_ids:
         override = policy["overrides"][concept_id]
@@ -103,8 +120,9 @@ def main():
             require(set(override[locale]) == set(FIELDS), f"residual Concept concise fields drifted: {locale}/{concept_id}")
 
     print(
-        "PASS concise Concept surface: 145/145 canonical Concepts materialize summary + mental model + why-it-matters in EN/zh-CN; "
-        "120 full Guides remain optional enrichment, all 25 post-Core-120 residual Concepts have authored bilingual copy, and related Concepts remain graph-derived."
+        "PASS concise Concept surface: 145/145 canonical Concepts resolve summary + mental model + why-it-matters in EN/zh-CN; "
+        "120 full Guides remain optional enrichment, all 25 post-Core-120 residual Concepts have authored bilingual copy, "
+        "and legacy locale graph artifacts preserve title+summary compatibility."
     )
 
 
