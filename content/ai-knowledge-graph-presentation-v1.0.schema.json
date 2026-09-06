@@ -37,12 +37,10 @@
     "conceptCopy": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["title", "summary", "mentalModel", "whyItMatters"],
+      "required": ["title", "summary"],
       "properties": {
         "title": { "$ref": "#/$defs/text" },
-        "summary": { "$ref": "#/$defs/text" },
-        "mentalModel": { "$ref": "#/$defs/text" },
-        "whyItMatters": { "$ref": "#/$defs/text" }
+        "summary": { "$ref": "#/$defs/text" }
       }
     },
     "edgeCopy": {
