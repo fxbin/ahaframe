@@ -1,0 +1,86 @@
+{
+  "version": "1.0.0",
+  "wave": "core-20",
+  "concepts": {
+    "concept-probabilistic-behavior": {
+      "en": {"summary": "Modern language models produce distributions over possible continuations rather than retrieving one fixed answer from memory.", "mentalModel": "Treat every generation as a probabilistic choice conditioned on the current input, context, model parameters, and decoding policy.", "whyItMatters": "The same request can legitimately produce different outputs, so reliable systems need constraints and verification instead of assuming deterministic behavior."},
+      "zh-CN": {"summary": "现代语言模型生成的是候选续写的概率分布，而不是从记忆中取出一个固定答案。", "mentalModel": "把每次生成理解成在当前输入、Context、模型参数与解码策略条件下进行的一次概率选择。", "whyItMatters": "同一个请求可能产生不同结果，因此可靠系统需要约束与验证，而不能假设模型天然确定性。"}
+    },
+    "concept-model-vs-runtime-fact": {
+      "en": {"summary": "A model can suggest what may be true, but only the runtime and external systems can establish what actually happened now.", "mentalModel": "Separate model knowledge and prediction from runtime facts such as tool results, database state, permissions, timestamps, and side effects.", "whyItMatters": "Confusing the two causes hallucinated state, incorrect confirmations, and unsafe actions that the model cannot independently verify."},
+      "zh-CN": {"summary": "模型可以推测什么可能是真的，但只有 Runtime 与外部系统才能确认此刻真正发生了什么。", "mentalModel": "把模型知识与预测，同 Tool Result、数据库状态、权限、时间戳和 Side Effect 等 Runtime Fact 明确分开。", "whyItMatters": "混淆两者会产生虚构状态、错误确认和不安全操作，而这些事实模型本身无法独立证明。"}
+    },
+    "concept-tokenization": {
+      "en": {"summary": "Tokenization converts text or other inputs into discrete units that determine model context length, cost, and sequence structure.", "mentalModel": "Reason about prompts in tokens rather than characters: different languages and strings can consume very different amounts of context.", "whyItMatters": "Token boundaries affect context budgets, truncation, pricing, latency, and sometimes how reliably the model recognizes patterns."},
+      "zh-CN": {"summary": "Tokenization 会把文本或其他输入转换成离散 Token，并直接影响 Context 长度、成本和序列结构。", "mentalModel": "分析 Prompt 时优先按 Token 而不是字符计数，因为不同语言和字符串消耗的 Context 可能差异很大。", "whyItMatters": "Token 边界会影响上下文预算、截断、价格、延迟，以及模型识别某些模式的稳定性。"}
+    },
+    "concept-context-window": {
+      "en": {"summary": "The context window is the finite amount of input and generated history a model can consider within one inference episode.", "mentalModel": "Think of context as working space with a hard capacity: every instruction, example, retrieved passage, tool result, and prior turn competes for room.", "whyItMatters": "Exceeding or poorly allocating the window can silently remove critical evidence and make an otherwise capable model behave inconsistently."},
+      "zh-CN": {"summary": "Context Window 是模型在一次推理过程中能够同时考虑的有限输入与生成历史容量。", "mentalModel": "把 Context 当作有硬上限的工作空间；指令、示例、检索片段、Tool Result 和历史对话都在争夺容量。", "whyItMatters": "超过窗口或分配不当会静默丢失关键证据，让原本有能力的模型表现得不稳定。"}
+    },
+    "concept-context-relevance": {
+      "en": {"summary": "Context relevance is the degree to which supplied information actually helps the model make the current decision instead of creating noise.", "mentalModel": "More context is not automatically better; each piece should earn its place by changing or supporting the current task outcome.", "whyItMatters": "Irrelevant context consumes attention and budget, increases contradiction risk, and can reduce answer quality even when the window is not full."},
+      "zh-CN": {"summary": "Context Relevance 指提供的信息是否真正帮助当前决策，而不是只是增加噪声。", "mentalModel": "更多 Context 并不天然更好；每一段信息都应该因为能改变或支撑当前任务结果而获得位置。", "whyItMatters": "无关信息会消耗 Attention 与预算、增加冲突风险，并可能在窗口尚未填满时就降低结果质量。"}
+    },
+    "concept-structured-output-contract": {
+      "en": {"summary": "A structured-output contract defines the exact machine-readable shape, types, required fields, and failure behavior expected from model output.", "mentalModel": "Treat model output like an untrusted API response: constrain its schema, parse it, validate semantics, and handle rejection explicitly.", "whyItMatters": "A valid-looking JSON object can still be incomplete or wrong, so schema plus runtime validation is required for dependable automation."},
+      "zh-CN": {"summary": "Structured Output Contract 明确模型输出应满足的机器可读结构、类型、必填字段以及失败行为。", "mentalModel": "把模型输出当作不可信 API Response：先约束 Schema，再解析、验证语义，并显式处理拒绝或不合法结果。", "whyItMatters": "看起来合法的 JSON 仍可能缺字段或语义错误，因此可靠自动化需要 Schema 与 Runtime Validation 同时存在。"}
+    },
+    "concept-finite-context-budget": {
+      "en": {"summary": "A finite context budget turns prompt construction into a resource-allocation problem across instructions, evidence, memory, and generated history.", "mentalModel": "Allocate context deliberately: reserve capacity for the highest-authority and highest-value information before adding optional detail.", "whyItMatters": "Without an explicit budget, systems tend to accumulate context until important material is truncated, diluted, or too expensive to process."},
+      "zh-CN": {"summary": "有限 Context Budget 会把 Prompt 构建变成在指令、证据、Memory 与历史之间分配资源的问题。", "mentalModel": "要主动分配上下文容量：先为最高 Authority、最高价值的信息保留空间，再加入可选细节。", "whyItMatters": "没有预算时，系统会持续堆积 Context，直到关键内容被截断、稀释，或者处理成本失控。"}
+    },
+    "concept-context-management": {
+      "en": {"summary": "Context management is the application responsibility for selecting, ordering, compressing, refreshing, and removing information supplied to the model.", "mentalModel": "Manage context as a lifecycle, not a string concatenation step: every item has an owner, freshness, authority, purpose, and removal condition.", "whyItMatters": "Good context management keeps long-running applications coherent while controlling token cost, stale information, and instruction conflicts."},
+      "zh-CN": {"summary": "Context Management 是应用层对输入模型的信息进行选择、排序、压缩、刷新和移除的责任。", "mentalModel": "把 Context 当作生命周期而不是字符串拼接；每项信息都应有 Owner、Freshness、Authority、用途和移除条件。", "whyItMatters": "良好的 Context 管理可以让长任务保持一致，同时控制 Token 成本、陈旧信息与指令冲突。"}
+    },
+    "concept-hybrid-retrieval": {
+      "en": {"summary": "Hybrid retrieval combines complementary retrieval signals such as lexical matching and vector similarity instead of trusting one ranking mechanism alone.", "mentalModel": "Use each retriever for the failure mode it handles well, then fuse or rerank candidates under one evaluation objective.", "whyItMatters": "Exact identifiers and semantic paraphrases behave differently, so combining signals can improve recall without giving up precision on literal evidence."},
+      "zh-CN": {"summary": "Hybrid Retrieval 会组合关键词匹配、Vector Similarity 等互补检索信号，而不是只依赖一种排序机制。", "mentalModel": "让不同 Retriever 分别解决自己擅长的失败模式，然后围绕同一评测目标融合或 Rerank 候选结果。", "whyItMatters": "精确标识符与语义改写的检索特征不同，组合信号能在保留字面精度的同时提高召回。"}
+    },
+    "concept-source-authority": {
+      "en": {"summary": "Source authority defines which evidence is allowed to establish a fact when multiple documents, memories, or generated statements disagree.", "mentalModel": "Assign authority before retrieval: distinguish primary sources, governed internal records, user-provided context, secondary commentary, and model-generated claims.", "whyItMatters": "Without authority rules, a system can retrieve relevant but weaker evidence and confidently overwrite the source that should control the decision."},
+      "zh-CN": {"summary": "Source Authority 定义当文档、Memory 或生成内容相互冲突时，哪类证据有资格确定事实。", "mentalModel": "在 Retrieval 之前先定义 Authority：区分一手来源、受治理内部记录、用户提供 Context、二手资料与模型生成结论。", "whyItMatters": "没有 Authority 规则时，系统可能找到相关但更弱的证据，并高置信地覆盖真正应该主导决策的来源。"}
+    },
+    "concept-working-durable-memory": {
+      "en": {"summary": "Working memory supports the current task, while durable memory persists selected information across sessions or workflows under explicit governance.", "mentalModel": "Do not persist everything: promote information from working to durable memory only when it has clear value, scope, authority, and retention rules.", "whyItMatters": "Separating the two prevents temporary guesses and transient task state from becoming long-lived facts that contaminate future behavior."},
+      "zh-CN": {"summary": "Working Memory 服务当前任务，而 Durable Memory 会在明确治理规则下跨会话或工作流保存选择后的信息。", "mentalModel": "不要默认持久化全部内容；只有具备明确价值、作用域、Authority 与保留规则的信息才应从 Working 提升到 Durable。", "whyItMatters": "区分两者可以防止临时猜测和短期任务状态被永久化，并在未来持续污染系统行为。"}
+    },
+    "concept-agent-loop": {
+      "en": {"summary": "An agent loop repeatedly observes state, decides what to do, acts through available capabilities, and evaluates whether to continue or stop.", "mentalModel": "Model the agent as an explicit state machine with observation, decision, action, verification, and stopping conditions rather than an open-ended chat.", "whyItMatters": "The loop is where retries, permissions, memory, side effects, and recovery interact, so leaving it implicit makes failures difficult to bound."},
+      "zh-CN": {"summary": "Agent Loop 会反复观察状态、决定下一步、调用能力执行动作，并判断继续还是停止。", "mentalModel": "把 Agent 建模成具有 Observation、Decision、Action、Verification 与停止条件的显式状态机，而不是无限对话。", "whyItMatters": "Retry、权限、Memory、Side Effect 与 Recovery 都在 Loop 中交汇，隐式循环会让失败难以限制和诊断。"}
+    },
+    "concept-bounded-autonomy": {
+      "en": {"summary": "Bounded autonomy lets an agent act independently only inside predefined capabilities, budgets, risk limits, and escalation conditions.", "mentalModel": "Autonomy is a permission envelope, not a personality trait: define what the system may do, how far it may continue, and when a human must take over.", "whyItMatters": "Useful agents need freedom to act, but unbounded freedom converts model uncertainty into real operational or financial consequences."},
+      "zh-CN": {"summary": "Bounded Autonomy 允许 Agent 只在预先定义的能力、预算、风险边界和升级条件内自主行动。", "mentalModel": "Autonomy 是 Permission Envelope，而不是性格特征；要明确系统能做什么、能走多远，以及何时必须交给人。", "whyItMatters": "Agent 需要一定行动自由，但无边界自治会把模型不确定性直接转化为真实运营或财务后果。"}
+    },
+    "concept-workflow-decomposition": {
+      "en": {"summary": "Workflow decomposition splits a complex objective into explicit stages with clear inputs, outputs, dependencies, and verification boundaries.", "mentalModel": "Decompose around decisions and evidence, not around arbitrary prompt count; each stage should have a reason to exist and a checkable handoff.", "whyItMatters": "Good decomposition localizes failures, enables parallelism where safe, and prevents one oversized model call from hiding multiple responsibilities."},
+      "zh-CN": {"summary": "Workflow Decomposition 会把复杂目标拆成具有清晰输入、输出、依赖和验证边界的显式阶段。", "mentalModel": "围绕 Decision 与 Evidence 拆解，而不是按 Prompt 数量随意切分；每个阶段都应有存在理由和可检查的 Handoff。", "whyItMatters": "合理拆解能局部化失败、在安全位置并行，并避免一个超大模型调用隐藏多种系统责任。"}
+    },
+    "concept-timeout-ambiguity": {
+      "en": {"summary": "A timeout means the caller did not receive a response in time; it does not prove that the remote operation failed or never produced a side effect.", "mentalModel": "Treat timeout as an unknown outcome until status, idempotency state, or an authoritative system of record resolves what actually happened.", "whyItMatters": "Blindly retrying an ambiguous timeout can duplicate payments, refunds, messages, or other irreversible actions."},
+      "zh-CN": {"summary": "Timeout 只表示调用方没有及时收到响应，并不能证明远端操作失败或没有产生 Side Effect。", "mentalModel": "在状态查询、Idempotency 记录或权威 System of Record 证明结果之前，把 Timeout 视为 Unknown Outcome。", "whyItMatters": "对歧义超时盲目 Retry 可能重复付款、退款、发消息或执行其他不可逆操作。"}
+    },
+    "concept-idempotency-boundary": {
+      "en": {"summary": "An idempotency boundary ensures that repeated delivery of the same logical intent does not create repeated external side effects.", "mentalModel": "Assign a stable intent identity before the irreversible operation and make every retry converge on the recorded outcome of that identity.", "whyItMatters": "Retries are unavoidable in distributed systems, so idempotency is the mechanism that keeps transport uncertainty from becoming duplicated business actions."},
+      "zh-CN": {"summary": "Idempotency Boundary 确保同一个逻辑 Intent 被重复提交时，不会重复产生外部 Side Effect。", "mentalModel": "在不可逆操作之前先给 Intent 分配稳定身份，并让所有 Retry 都收敛到该身份已经记录的结果。", "whyItMatters": "分布式系统中 Retry 无法完全避免，Idempotency 能阻止传输不确定性变成重复业务动作。"}
+    },
+    "concept-observability-diagnosis": {
+      "en": {"summary": "Observability is useful when telemetry lets an operator explain why a system behaved as it did, not merely when many metrics are collected.", "mentalModel": "Design logs, traces, metrics, and model/tool evidence around diagnostic questions so failures can be localized across system layers.", "whyItMatters": "Without diagnosis-oriented observability, teams see that quality dropped or latency rose but cannot identify the causal component to fix."},
+      "zh-CN": {"summary": "Observability 的价值在于让操作者解释系统为什么这样运行，而不是单纯收集大量 Metric。", "mentalModel": "围绕诊断问题设计 Log、Trace、Metric 与 Model/Tool Evidence，使失败能够跨系统层被定位。", "whyItMatters": "没有面向诊断的可观测性，团队只能看到质量下降或延迟升高，却无法确定应该修复哪个因果组件。"}
+    },
+    "concept-source-triangulation": {
+      "en": {"summary": "Source triangulation compares independent evidence streams before accepting a claim, especially when any single source may be incomplete or biased.", "mentalModel": "Seek sources with different failure modes, then record where they agree, conflict, or leave the claim unresolved instead of averaging them blindly.", "whyItMatters": "Multiple citations add little value when they repeat the same upstream error; independence is what makes corroboration meaningful."},
+      "zh-CN": {"summary": "Source Triangulation 会在接受结论前比较相互独立的证据流，尤其适用于单一来源可能不完整或带偏差的情况。", "mentalModel": "寻找失败模式不同的来源，并记录它们在哪些地方一致、冲突或仍未解决，而不是简单把多份资料平均处理。", "whyItMatters": "如果多个 Citation 都复制同一个上游错误，数量并不能提高可信度；独立性才让交叉验证真正有意义。"}
+    },
+    "concept-long-form-consistency": {
+      "en": {"summary": "Long-form consistency keeps facts, terminology, voice, references, and structural commitments coherent across many sections generated over time.", "mentalModel": "Maintain explicit canonical notes and review checkpoints outside the model context so later chapters can be checked against stable decisions.", "whyItMatters": "Long documents drift gradually, and small contradictions across chapters can undermine trust even when each paragraph looks individually strong."},
+      "zh-CN": {"summary": "Long-form Consistency 要在长时间、多章节生成过程中保持事实、术语、语气、引用和结构承诺一致。", "mentalModel": "在模型 Context 之外维护显式 Canonical Notes 与 Review Checkpoint，让后续章节能够对照稳定决策进行检查。", "whyItMatters": "长文漂移通常逐步发生，即使每个段落单独看都不错，跨章节的小矛盾也会持续削弱可信度。"}
+    },
+    "concept-workflow-automation-boundary": {
+      "en": {"summary": "The workflow automation boundary decides which steps should run automatically and which decisions still require explicit human or system approval.", "mentalModel": "Automate repeatable, observable, reversible work first; keep high-uncertainty or high-consequence transitions behind stronger review gates.", "whyItMatters": "Automation creates leverage only when the cost of mistakes is bounded; otherwise it simply accelerates the propagation of bad decisions."},
+      "zh-CN": {"summary": "Workflow Automation Boundary 决定哪些步骤可以自动运行，以及哪些决策仍需要明确的人或系统批准。", "mentalModel": "优先自动化可重复、可观察、可逆的工作；对高不确定或高后果转换保留更强 Review Gate。", "whyItMatters": "只有错误成本被限制时自动化才产生杠杆，否则它只是更快地放大和传播错误决策。"}
+    }
+  }
+}
