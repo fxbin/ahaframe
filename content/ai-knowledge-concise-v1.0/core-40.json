@@ -1,0 +1,86 @@
+{
+  "version": "1.0.0",
+  "wave": "core-40",
+  "concepts": {
+    "concept-evaluation-evidence": {
+      "en": {"summary": "Evaluation evidence is the observable data used to judge whether an AI system satisfies a specific quality, safety, or release requirement.", "mentalModel": "Start from the decision you need to make, then collect test cases, measurements, traces, and verifier outputs that can actually support or block that decision.", "whyItMatters": "Without explicit evidence, teams mistake anecdotes, model confidence, or a few successful demos for proof that the system is ready."},
+      "zh-CN": {"summary": "Evaluation Evidence 是用来判断 AI 系统是否满足特定质量、安全或发布要求的可观察数据。", "mentalModel": "先从需要做出的 Decision 出发，再收集真正能够支持或否决该判断的 Test Case、Measurement、Trace 与 Verifier Output。", "whyItMatters": "没有显式证据时，团队很容易把个别案例、模型自信或几个成功 Demo 误认为系统已经可靠。"}
+    },
+    "concept-document-extraction": {
+      "en": {"summary": "Document extraction converts files such as PDFs, images, tables, or forms into structured evidence while preserving where each value came from.", "mentalModel": "Treat extraction as a data pipeline with source coordinates, parsing confidence, schema validation, and recoverable errors rather than as free-form summarization.", "whyItMatters": "Downstream analysis cannot be verified if extracted numbers, fields, or citations lose their connection to the original document."},
+      "zh-CN": {"summary": "Document Extraction 会把 PDF、图片、表格或表单转换成结构化证据，同时保留每个值来自哪里。", "mentalModel": "把 Extraction 当作数据 Pipeline：保留 Source Coordinate、解析置信、Schema Validation 与可恢复错误，而不是自由摘要。", "whyItMatters": "如果抽取后的数字、字段和 Citation 与原文失去联系，后续分析就难以验证和追责。"}
+    },
+    "concept-human-review-boundary": {
+      "en": {"summary": "A human review boundary defines which AI-generated decisions or actions require explicit human approval before they can create consequential effects.", "mentalModel": "Place review at transitions where uncertainty and impact become unacceptable, and give the reviewer the evidence needed to approve, reject, or revise the action.", "whyItMatters": "Human-in-the-loop is ineffective when approval is ceremonial, arrives too late, or lacks the context required to catch the actual risk."},
+      "zh-CN": {"summary": "Human Review Boundary 定义哪些 AI 生成的判断或动作在产生高后果影响前必须获得明确人工批准。", "mentalModel": "把 Review 放在不确定性与影响不可接受的转换点，并向 Reviewer 提供足够证据来批准、拒绝或修改动作。", "whyItMatters": "如果人工审批只是形式、发生太晚或缺少必要 Context，Human-in-the-loop 并不能真正控制风险。"}
+    },
+    "concept-model-selection-tradeoff": {
+      "en": {"summary": "Model selection is a trade-off among capability, latency, cost, context limits, reliability, deployment constraints, and governance requirements.", "mentalModel": "Choose the smallest model that satisfies measured task requirements under the real workload, then escalate only when evidence shows a capability gap.", "whyItMatters": "Defaulting to the largest model can hide architecture problems while increasing cost and latency without materially improving the user outcome."},
+      "zh-CN": {"summary": "Model Selection 是在能力、延迟、成本、Context 上限、可靠性、部署约束和治理要求之间进行权衡。", "mentalModel": "优先选择在真实 Workload 下能够满足已测任务要求的最小模型，只有证据显示能力不足时再升级。", "whyItMatters": "默认使用最大模型会掩盖架构问题，并可能增加成本和延迟，却没有显著改善用户结果。"}
+    },
+    "concept-copyright-provenance": {
+      "en": {"summary": "Copyright provenance tracks the origin, license, transformation history, and permitted use of source material that enters an AI-assisted workflow.", "mentalModel": "For every consequential asset, preserve who supplied it, under what rights, how it was transformed, and what output restrictions remain.", "whyItMatters": "Generated content does not erase source obligations; weak provenance makes later publishing, attribution, and compliance decisions difficult to defend."},
+      "zh-CN": {"summary": "Copyright Provenance 追踪进入 AI 工作流的素材来源、许可、转换历史以及允许的使用方式。", "mentalModel": "对每个重要 Asset 保留谁提供、基于什么权利、经历了哪些转换，以及输出仍受哪些限制。", "whyItMatters": "生成过程不会自动消除来源义务；Provenance 不清会让后续发布、署名和合规判断难以证明。"}
+    },
+    "concept-synthetic-data-distillation": {
+      "en": {"summary": "Synthetic data and distillation use model-generated examples or teacher outputs to transfer behavior into another training or evaluation dataset.", "mentalModel": "Treat synthetic examples as transformed evidence with inherited biases and errors; validate diversity, correctness, coverage, and leakage before using them as supervision.", "whyItMatters": "Scaling generated data can amplify the teacher's blind spots just as quickly as it expands dataset size."},
+      "zh-CN": {"summary": "Synthetic Data 与 Distillation 使用模型生成样本或 Teacher 输出，把行为迁移到另一套训练或评测数据中。", "mentalModel": "把合成样本视为带有继承偏差与错误的变换证据；用于 Supervision 前要验证多样性、正确性、覆盖和数据泄漏。", "whyItMatters": "大量扩展生成数据的同时，也可能同样快速地放大 Teacher 的盲点和系统性错误。"}
+    },
+    "concept-specification-before-generation": {
+      "en": {"summary": "Specification before generation makes the desired behavior, constraints, acceptance criteria, and non-goals explicit before asking AI to produce an artifact.", "mentalModel": "Write the contract first: define what success means and how it will be checked, then use generation as an implementation step inside that boundary.", "whyItMatters": "Clear specifications reduce prompt thrashing and make reviews distinguish true defects from disagreements about an unstated goal."},
+      "zh-CN": {"summary": "Specification Before Generation 是在让 AI 生成产物之前，先明确目标行为、约束、验收标准与 Non-goal。", "mentalModel": "先写 Contract：定义什么叫成功以及如何验证，再把 Generation 当作这个边界内的实现步骤。", "whyItMatters": "清晰 Spec 能减少反复改 Prompt，并让 Review 区分真实缺陷与未声明目标造成的分歧。"}
+    },
+    "concept-supervised-finetuning": {
+      "en": {"summary": "Supervised fine-tuning updates model parameters using curated input-output examples so the model more consistently follows a target behavior distribution.", "mentalModel": "Use SFT when the desired behavior can be demonstrated with representative examples and the gap cannot be solved more cheaply at the application layer.", "whyItMatters": "Fine-tuning changes model behavior globally, so poor examples or weak coverage can create persistent regressions that prompting cannot easily isolate."},
+      "zh-CN": {"summary": "Supervised Fine-tuning 使用经过整理的 Input-Output 样本更新模型参数，使目标行为更稳定地出现在模型分布中。", "mentalModel": "当目标行为能够由代表性样本清楚示范，并且应用层无法更低成本地解决问题时，再考虑 SFT。", "whyItMatters": "Fine-tuning 会全局改变模型行为，低质量样本或覆盖不足会制造难以通过 Prompt 隔离的持久回归。"}
+    },
+    "concept-editorial-voice-control": {
+      "en": {"summary": "Editorial voice control keeps generated writing aligned with explicit tone, terminology, audience, style, and consistency rules across many outputs.", "mentalModel": "Represent voice as reviewable constraints and examples, then check produced text against those rules instead of relying on vague instructions like 'sound professional'.", "whyItMatters": "Stable voice is essential for long-form and product content because small stylistic drift accumulates across sections and weakens trust."},
+      "zh-CN": {"summary": "Editorial Voice Control 用显式语气、术语、受众和风格规则，让大量生成内容保持一致的编辑表达。", "mentalModel": "把 Voice 表达成可审查约束与示例，并据此检查生成文本，而不是依赖“更专业一点”这类模糊指令。", "whyItMatters": "长内容与产品内容中的轻微风格漂移会逐步累积，因此稳定 Voice 会直接影响整体可信度。"}
+    },
+    "concept-vector-similarity": {
+      "en": {"summary": "Vector similarity compares embedding representations to estimate semantic closeness between queries, passages, items, or other encoded objects.", "mentalModel": "Similarity is a ranking signal, not truth: define the embedding space, distance metric, candidate set, and evaluation task before interpreting a score.", "whyItMatters": "High similarity can still retrieve irrelevant or non-authoritative evidence, so downstream filtering and evaluation remain necessary."},
+      "zh-CN": {"summary": "Vector Similarity 通过比较 Embedding 表示，估计 Query、Passage、Item 或其他编码对象之间的语义接近程度。", "mentalModel": "Similarity 是 Ranking Signal 而不是事实；解释分数前要明确 Embedding Space、Distance Metric、候选集合和评测任务。", "whyItMatters": "高相似度仍可能检索到无关或不权威证据，因此后续过滤与 Evaluation 仍然不可缺少。"}
+    },
+    "concept-confidence-variance": {
+      "en": {"summary": "Confidence and variance describe how uncertain an observed metric or model evaluation is across samples, judges, runs, or dataset slices.", "mentalModel": "Read every score together with sample size, dispersion, confidence interval, and slice behavior rather than treating one average as exact truth.", "whyItMatters": "Small or noisy evaluations can reverse apparent winners, causing teams to ship changes whose measured improvement is mostly random variation."},
+      "zh-CN": {"summary": "Confidence 与 Variance 描述某个 Metric 或模型评测在 Sample、Judge、Run 或数据 Slice 之间有多大不确定性。", "mentalModel": "任何分数都应同时查看样本量、离散程度、Confidence Interval 和 Slice 表现，而不是把单一平均值当成精确事实。", "whyItMatters": "小样本或高噪声评测会轻易翻转看似的胜负，导致团队发布实际上只是随机波动的“提升”。"}
+    },
+    "concept-tool-result-validation": {
+      "en": {"summary": "Tool-result validation checks that external tool responses are structurally valid, semantically plausible, authorized, and suitable for the next action.", "mentalModel": "A successful HTTP or function call is only transport success; validate the returned facts, identifiers, status, and error conditions before trusting them.", "whyItMatters": "Agents often fail after a tool call appears successful but returns stale, partial, malformed, or unexpected data that the model then treats as authoritative."},
+      "zh-CN": {"summary": "Tool-result Validation 检查外部 Tool Response 是否结构合法、语义合理、权限正确并适合驱动下一步动作。", "mentalModel": "HTTP 或函数调用成功只代表 Transport Success；真正使用前还要验证返回事实、标识符、状态和错误条件。", "whyItMatters": "Agent 常在 Tool 看似成功却返回陈旧、不完整或异常数据后失败，而模型又容易把这些数据当成权威事实。"}
+    },
+    "concept-versioned-dependencies": {
+      "en": {"summary": "Versioned dependencies make external libraries, models, protocols, APIs, and data schemas explicit inputs whose changes can alter system behavior.", "mentalModel": "Pin what must be reproducible, record compatibility assumptions, and test migrations as behavior changes rather than treating upgrades as routine housekeeping.", "whyItMatters": "AI systems depend on fast-moving components, so silent upgrades can change prompts, tokenization, tool contracts, latency, or evaluation outcomes."},
+      "zh-CN": {"summary": "Versioned Dependencies 把外部 Library、Model、Protocol、API 与 Data Schema 的版本视为会改变系统行为的显式输入。", "mentalModel": "对需要可复现的部分进行 Pin，记录兼容假设，并把 Migration 当作行为变化来测试，而不是普通维护。", "whyItMatters": "AI 组件变化很快，静默升级可能直接改变 Prompt、Tokenization、Tool Contract、延迟或评测结果。"}
+    },
+    "concept-auditability": {
+      "en": {"summary": "Auditability is the ability to reconstruct what inputs, policies, model versions, tools, approvals, and actions produced a consequential outcome.", "mentalModel": "Record the minimum evidence needed for an independent reviewer to trace the decision without relying on hidden memory or a participant's recollection.", "whyItMatters": "When incidents, disputes, or governance reviews occur, systems that cannot reconstruct their decisions cannot reliably explain or improve them."},
+      "zh-CN": {"summary": "Auditability 是能够重建哪些输入、Policy、模型版本、Tool、Approval 和动作共同产生了某个高后果结果。", "mentalModel": "记录足够让独立 Reviewer 重建 Decision 的最小证据，而不是依赖隐藏 Memory 或参与者事后回忆。", "whyItMatters": "发生 Incident、争议或治理审查时，无法重建决策的系统也就无法可靠解释问题或持续改进。"}
+    },
+    "concept-verification-over-introspection": {
+      "en": {"summary": "Verification over introspection means checking outputs against external evidence and executable criteria instead of trusting the model's explanation of its own reasoning.", "mentalModel": "Ask 'what evidence proves this?' before 'why does the model say it believes this?'; prefer tests, source checks, calculations, traces, and independent verifiers.", "whyItMatters": "A model can produce a convincing self-critique while repeating the same hidden mistake, so independent evidence is a stronger correctness signal."},
+      "zh-CN": {"summary": "Verification Over Introspection 强调用外部证据和可执行标准检查结果，而不是相信模型对自身推理的解释。", "mentalModel": "先问“什么证据证明它”，再问“模型为什么说自己相信它”；优先使用 Test、Source Check、Calculation、Trace 与 Independent Verifier。", "whyItMatters": "模型可能生成很有说服力的自我检查却重复同一隐藏错误，因此独立证据通常比自我解释更可靠。"}
+    },
+    "concept-uncertainty-calibration": {
+      "en": {"summary": "Uncertainty calibration aligns expressed confidence with observed correctness so confidence levels have operational meaning across many cases.", "mentalModel": "Measure how often predictions are correct at different confidence bands, and route uncertain cases differently rather than treating confidence as decorative prose.", "whyItMatters": "Overconfident errors are especially dangerous in automation because downstream systems may convert a weak guess into a strong action."},
+      "zh-CN": {"summary": "Uncertainty Calibration 让系统表达的 Confidence 与真实正确率相匹配，使不同置信区间具备实际运营意义。", "mentalModel": "统计不同 Confidence Band 下的真实正确率，并对不确定案例采用不同路由，而不是把置信表达当成装饰性文本。", "whyItMatters": "高置信错误在自动化中尤其危险，因为下游系统可能把一个弱猜测直接转化成强动作。"}
+    },
+    "concept-retrieval-pipeline": {
+      "en": {"summary": "A retrieval pipeline turns a query into candidate evidence through indexing, query transformation, retrieval, filtering, reranking, and context assembly stages.", "mentalModel": "Make each retrieval stage observable and evaluable so recall, precision, authority, latency, and cost failures can be attributed to the right component.", "whyItMatters": "Treating RAG as one opaque vector search call hides where evidence was lost and makes quality improvements difficult to reproduce."},
+      "zh-CN": {"summary": "Retrieval Pipeline 会通过 Index、Query Transformation、Retrieval、Filter、Rerank 与 Context Assembly 把查询转成候选证据。", "mentalModel": "让每个检索阶段都可观察、可评测，从而把 Recall、Precision、Authority、延迟和成本问题归因到正确组件。", "whyItMatters": "如果把 RAG 当成一个黑盒 Vector Search 调用，就很难知道证据在哪一步丢失，也难以稳定改进质量。"}
+    },
+    "concept-knowledge-base-lifecycle": {
+      "en": {"summary": "A knowledge-base lifecycle governs how knowledge is ingested, normalized, indexed, refreshed, corrected, expired, evaluated, and eventually removed.", "mentalModel": "Treat a knowledge base as a maintained product with ownership and freshness policies, not as a one-time upload of documents into a vector store.", "whyItMatters": "Even excellent retrieval degrades when the underlying knowledge becomes stale, duplicated, contradictory, or ownerless."},
+      "zh-CN": {"summary": "Knowledge-base Lifecycle 管理知识如何被 Ingest、规范化、Index、刷新、纠错、过期、评测并最终移除。", "mentalModel": "把 Knowledge Base 当作需要持续维护且有 Owner/Freshness Policy 的产品，而不是一次性把文档上传到 Vector Store。", "whyItMatters": "即使 Retrieval 很强，只要底层知识陈旧、重复、相互冲突或无人负责，整体质量仍会持续下降。"}
+    },
+    "concept-tool-contract": {
+      "en": {"summary": "A tool contract defines the operation name, parameters, types, side effects, permissions, error surface, and result semantics exposed to an AI agent.", "mentalModel": "Design tools as narrow APIs for uncertain callers: make valid actions easy, invalid actions impossible or explicit, and consequential effects visible before execution.", "whyItMatters": "Ambiguous tool interfaces force the model to guess hidden application semantics, increasing invalid calls and unsafe side effects."},
+      "zh-CN": {"summary": "Tool Contract 定义暴露给 AI Agent 的操作名称、参数、类型、Side Effect、权限、错误面与 Result Semantics。", "mentalModel": "把 Tool 设计成面向不确定 Caller 的窄 API：合法动作应清晰，非法动作应不可执行或显式失败，高后果影响要在执行前可见。", "whyItMatters": "模糊 Tool Interface 会迫使模型猜测隐藏的应用语义，从而增加非法调用与不安全 Side Effect。"}
+    },
+    "concept-retrieval-evaluation": {
+      "en": {"summary": "Retrieval evaluation measures whether a retrieval system finds the right evidence for representative queries before generation quality is considered.", "mentalModel": "Evaluate retrieval separately with labeled or inspectable evidence sets, slice by query type, and distinguish recall failures from ranking or authority failures.", "whyItMatters": "A strong generator cannot answer from evidence that retrieval never supplied, so end-to-end scores alone can hide the real bottleneck."},
+      "zh-CN": {"summary": "Retrieval Evaluation 在考虑生成质量之前，先衡量检索系统是否能为代表性 Query 找到正确证据。", "mentalModel": "用带标签或可人工检查的 Evidence Set 单独评测 Retrieval，并按 Query Type 分 Slice，区分 Recall、Ranking 与 Authority Failure。", "whyItMatters": "Generator 再强也无法使用从未被检索到的证据，因此只看端到端分数会掩盖真正瓶颈。"}
+    }
+  }
+}
