@@ -16,7 +16,8 @@ test("English Knowledge Map keeps domain exploration primary and advanced tools 
 
   await build.locator("summary").first().click();
   await expect(build.getByText("AI-Native Software", { exact: true })).toBeVisible();
-  await expect(build.getByText("Agent Engineering", { exact: true })).toBeVisible();
+  const agentBranchSummary = build.locator('[data-branch-id="branch-agents"] > summary');
+  await expect(agentBranchSummary.getByText("Agent Engineering", { exact: true })).toBeVisible();
 
   const coursesBridge = page.getByTestId("knowledge-map-courses-bridge");
   await expect(coursesBridge).toContainText("Use Courses for goal-oriented learning.");
@@ -52,7 +53,9 @@ test("a non-Guide Concept has a complete English concise surface while a Guide C
   await page.locator('[data-branch-id="branch-models-tokens"] > summary').click();
   const probabilistic = page.locator('[data-concept-id="concept-probabilistic-behavior"]');
   await probabilistic.locator("summary").click();
-  await expect(probabilistic.locator('[data-concept-explanation="concept-probabilistic-behavior"]')).toContainText("reasoning lens");
+  await expect(probabilistic.locator('[data-concept-explanation="concept-probabilistic-behavior"]')).toContainText(
+    "Modern language models produce distributions over possible continuations",
+  );
   await expect(probabilistic.locator('[data-guide-concept-id="concept-probabilistic-behavior"]')).toHaveAttribute("href", "/en/guides/probabilistic-model-behavior/");
 });
 
