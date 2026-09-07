@@ -10,10 +10,12 @@ CONTENT = ROOT / "content"
 INVENTORY = CONTENT / "ai-knowledge-inventory-v1.0"
 GRAPH_FILE = CONTENT / "ai-knowledge-graph-v1.0.json"
 CONCISE_FILE = CONTENT / "ai-knowledge-concise-v1.0.json"
+AUTHORED_CONCISE_FILE = CONTENT / "ai-knowledge-concise-authored-v1.0.json"
 LOCALE_FILES = {
     "en": CONTENT / "ai-knowledge-graph-v1.0.en.json",
     "zh-CN": CONTENT / "ai-knowledge-graph-v1.0.zh-CN.json",
 }
+FIELDS = ("summary", "mentalModel", "whyItMatters")
 
 CURRENT_SOURCES = {
     "mcp-2026-07-28-spec": {
@@ -111,48 +113,85 @@ def validate_freshness(concepts, source_refs):
         raise ValueError(f"current primary references are not exercised by version-sensitive concepts: {sorted(missing)}")
 
 
-def validate_concise_policy(policy, concepts):
-    if policy.get("version") != "1.0.0":
-        raise ValueError("concise Concept policy version mismatch")
-    if policy.get("expectedConceptCount") != len(concepts):
-        raise ValueError("concise Concept expected count does not match canonical inventory")
-    kinds = {item["kind"] for item in concepts}
-    if set(policy.get("genericByKind", {})) != kinds:
-        raise ValueError(f"concise Concept kind templates drifted: expected {sorted(kinds)}")
-    concept_ids = {item["id"] for item in concepts}
-    unknown_overrides = set(policy.get("overrides", {})) - concept_ids
-    if unknown_overrides:
-        raise ValueError(f"concise Concept overrides point to unknown Concepts: {sorted(unknown_overrides)}")
-    for kind, by_locale in policy["genericByKind"].items():
-        for locale in LOCALE_FILES:
-            copy = by_locale.get(locale, {})
-            for field in ("summary", "mentalModel", "whyItMatters"):
-                if not copy.get(field):
-                    raise ValueError(f"concise template missing {kind}/{locale}/{field}")
-    for concept_id, by_locale in policy.get("overrides", {}).items():
-        for locale in LOCALE_FILES:
-            copy = by_locale.get(locale, {})
-            for field in ("summary", "mentalModel", "whyItMatters"):
-                if not copy.get(field):
-                    raise ValueError(f"concise override missing {concept_id}/{locale}/{field}")
+def validate_copy(concept_id: str, by_locale: dict):
+    if set(by_locale) != set(LOCALE_FILES):
+        raise ValueError(f"authored concise locale parity drifted: {concept_id}")
+    for locale in LOCALE_FILES:
+        copy = by_locale[locale]
+        if set(copy) != set(FIELDS):
+            raise ValueError(f"authored concise fields drifted: {locale}/{concept_id}")
+        for field in FIELDS:
+            value = copy[field]
+            if not isinstance(value, str) or not value.strip():
+                raise ValueError(f"authored concise copy missing: {locale}/{concept_id}/{field}")
+            if "{title}" in value or "TODO" in value or "TBD" in value:
+                raise ValueError(f"authored concise placeholder is forbidden: {locale}/{concept_id}/{field}")
 
 
-def concise_copy(policy, item, locale, title):
-    source = policy.get("overrides", {}).get(item["id"], {}).get(locale)
-    if source is None:
-        source = policy["genericByKind"][item["kind"]][locale]
-    return {field: source[field].replace("{title}", title) for field in ("summary", "mentalModel", "whyItMatters")}
+def load_authored_concise(concise_policy: dict, manifest: dict, concepts: list[dict]) -> dict[str, dict]:
+    if manifest.get("version") != "1.0.0":
+        raise ValueError("authored concise manifest version mismatch")
+    if manifest.get("expectedConceptCount") != len(concepts):
+        raise ValueError("authored concise expected count does not match canonical inventory")
+    if manifest.get("publishedGuideConceptCount") != 120 or manifest.get("residualConceptCount") != 25:
+        raise ValueError("authored concise Guide/residual counts drifted")
+    policy = manifest.get("policy", {})
+    if policy.get("allConceptsRequireAuthoredCopy") is not True:
+        raise ValueError("all canonical Concepts must require authored concise copy")
+    if policy.get("publishedGenericFallbackAllowed") is not False:
+        raise ValueError("published generic concise fallback must stay disabled")
+    if policy.get("guideIsOptionalEnrichment") is not True or policy.get("relatedConceptsRemainGraphDerived") is not True:
+        raise ValueError("authored concise architecture policy drifted")
+    if manifest.get("residualSource") != "ai-knowledge-concise-v1.0.json#overrides":
+        raise ValueError("authored concise residual source drifted")
+
+    canonical_ids = {item["id"] for item in concepts}
+    authored: dict[str, dict] = {}
+    core_count = 0
+    for relative in manifest.get("guideBackedFragments", []):
+        fragment = load(CONTENT / relative)
+        if fragment.get("version") != "1.0.0":
+            raise ValueError(f"authored concise fragment version drifted: {relative}")
+        entries = fragment.get("concepts", {})
+        if len(entries) != 20:
+            raise ValueError(f"authored concise fragment must contain exactly 20 Concepts: {relative}")
+        for concept_id, by_locale in entries.items():
+            if concept_id in authored:
+                raise ValueError(f"duplicate authored concise Concept: {concept_id}")
+            validate_copy(concept_id, by_locale)
+            authored[concept_id] = by_locale
+            core_count += 1
+    if core_count != manifest["publishedGuideConceptCount"]:
+        raise ValueError(f"authored concise Guide-backed count drifted: {core_count}")
+
+    residual = concise_policy.get("overrides", {})
+    if len(residual) != manifest["residualConceptCount"]:
+        raise ValueError(f"authored concise residual count drifted: {len(residual)}")
+    for concept_id, by_locale in residual.items():
+        if concept_id in authored:
+            raise ValueError(f"residual concise copy overlaps Guide-backed copy: {concept_id}")
+        validate_copy(concept_id, by_locale)
+        authored[concept_id] = by_locale
+
+    if set(authored) != canonical_ids:
+        missing = sorted(canonical_ids - set(authored))
+        unknown = sorted(set(authored) - canonical_ids)
+        raise ValueError(f"authored concise partition must exactly cover canonical Concepts; missing={missing}, unknown={unknown}")
+    return authored
+
+
+def concise_copy(authored: dict[str, dict], item: dict, locale: str):
+    try:
+        return authored[item["id"]][locale]
+    except KeyError as exc:
+        raise ValueError(f"missing authored concise copy: {locale}/{item['id']}") from exc
 
 
 def materialize_branch(item):
     slug = item.get("slug") or suffix(item["id"], "branch-")
     return {
-        "id": item["id"],
-        "domainId": item["domainId"],
-        "parentBranchId": item["parentBranchId"],
-        "slug": slug,
-        "order": item["order"],
-        "titleKey": f"branches.{slug}.title",
+        "id": item["id"], "domainId": item["domainId"], "parentBranchId": item["parentBranchId"],
+        "slug": slug, "order": item["order"], "titleKey": f"branches.{slug}.title",
         "descriptionKey": f"branches.{slug}.description",
     }
 
@@ -160,29 +199,19 @@ def materialize_branch(item):
 def materialize_concept(item):
     slug = suffix(item["id"], "concept-")
     return {
-        "id": item["id"],
-        "kind": item["kind"],
-        "primaryBranchId": item["primaryBranchId"],
-        "branchIds": item["branchIds"],
-        "titleKey": f"concepts.{slug}.title",
-        "summaryKey": f"concepts.{slug}.summary",
-        "difficulty": item["difficulty"],
-        "maturity": item["maturity"],
-        "versionSensitive": item["versionSensitive"],
-        "sourceRefs": item["sourceRefs"],
-        "tags": item["tags"],
-        "legacyIds": item["legacyIds"],
+        "id": item["id"], "kind": item["kind"], "primaryBranchId": item["primaryBranchId"],
+        "branchIds": item["branchIds"], "titleKey": f"concepts.{slug}.title",
+        "summaryKey": f"concepts.{slug}.summary", "difficulty": item["difficulty"],
+        "maturity": item["maturity"], "versionSensitive": item["versionSensitive"],
+        "sourceRefs": item["sourceRefs"], "tags": item["tags"], "legacyIds": item["legacyIds"],
     }
 
 
 def materialize_edge(item):
     slug = suffix(item["id"], "edge-")
     return {
-        "id": item["id"],
-        "fromConceptId": item["fromConceptId"],
-        "toConceptId": item["toConceptId"],
-        "type": item["type"],
-        "rationaleKey": f"edges.{slug}.rationale",
+        "id": item["id"], "fromConceptId": item["fromConceptId"], "toConceptId": item["toConceptId"],
+        "type": item["type"], "rationaleKey": f"edges.{slug}.rationale",
     }
 
 
@@ -192,28 +221,17 @@ def materialize_path(item):
     for order, milestone in enumerate(item["milestones"]):
         milestone_slug = suffix(milestone["id"], "milestone-")
         milestones.append({
-            "id": milestone["id"],
-            "order": order,
-            "titleKey": f"milestones.{milestone_slug}.title",
+            "id": milestone["id"], "order": order, "titleKey": f"milestones.{milestone_slug}.title",
             "conceptIds": list(dict.fromkeys(milestone["conceptIds"])),
-            "contentNodeIds": list(dict.fromkeys(milestone["contentNodeIds"])),
-            "required": milestone["required"],
+            "contentNodeIds": list(dict.fromkeys(milestone["contentNodeIds"])), "required": milestone["required"],
         })
     return {
-        "id": item["id"],
-        "kind": item["kind"],
-        "slug": item["slug"],
-        "domainIds": item["domainIds"],
-        "branchIds": item["branchIds"],
-        "titleKey": f"paths.{path_slug}.title",
-        "descriptionKey": f"paths.{path_slug}.description",
-        "goalKey": f"paths.{path_slug}.goal",
-        "deliverableKey": f"paths.{path_slug}.deliverable",
-        "audienceTags": item["audienceTags"],
-        "difficulty": item["difficulty"],
-        "lifecycle": item["lifecycle"],
-        "recommendedPrerequisitePathIds": item["recommendedPrerequisitePathIds"],
-        "milestones": milestones,
+        "id": item["id"], "kind": item["kind"], "slug": item["slug"], "domainIds": item["domainIds"],
+        "branchIds": item["branchIds"], "titleKey": f"paths.{path_slug}.title",
+        "descriptionKey": f"paths.{path_slug}.description", "goalKey": f"paths.{path_slug}.goal",
+        "deliverableKey": f"paths.{path_slug}.deliverable", "audienceTags": item["audienceTags"],
+        "difficulty": item["difficulty"], "lifecycle": item["lifecycle"],
+        "recommendedPrerequisitePathIds": item["recommendedPrerequisitePathIds"], "milestones": milestones,
         "capstoneContentIds": item["capstoneContentIds"],
     }
 
@@ -222,25 +240,18 @@ def build():
     seed = load(GRAPH_FILE)
     seed_locales = {locale: load(path) for locale, path in LOCALE_FILES.items()}
     concise_policy = load(CONCISE_FILE)
+    authored_manifest = load(AUTHORED_CONCISE_FILE)
     branches, concepts, edges, paths = load_inventory()
+    authored = load_authored_concise(concise_policy, authored_manifest, concepts)
     source_refs = {**seed.get("sourceRefs", {}), **CURRENT_SOURCES}
     validate_freshness(concepts, source_refs)
-    validate_concise_policy(concise_policy, concepts)
 
     graph = {
-        "schemaVersion": "1.0.0",
-        "graphVersion": "1.0.0",
-        "status": "DRAFT",
-        "locales": ["en", "zh-CN"],
-        "domains": seed["domains"],
-        "branches": [materialize_branch(item) for item in branches],
-        "concepts": [materialize_concept(item) for item in concepts],
-        "edges": [materialize_edge(item) for item in edges],
-        "paths": [materialize_path(item) for item in paths],
-        "contentNodes": seed["contentNodes"],
-        "accessPolicies": seed["accessPolicies"],
-        "sourceRefs": source_refs,
-        "migration": seed["migration"],
+        "schemaVersion": "1.0.0", "graphVersion": "1.0.0", "status": "DRAFT", "locales": ["en", "zh-CN"],
+        "domains": seed["domains"], "branches": [materialize_branch(item) for item in branches],
+        "concepts": [materialize_concept(item) for item in concepts], "edges": [materialize_edge(item) for item in edges],
+        "paths": [materialize_path(item) for item in paths], "contentNodes": seed["contentNodes"],
+        "accessPolicies": seed["accessPolicies"], "sourceRefs": source_refs, "migration": seed["migration"],
     }
 
     presentations = {}
@@ -248,16 +259,13 @@ def build():
         is_en = locale == "en"
         old_edges = seed_copy.get("edges", {})
         branch_copy = {
-            item["id"]: {
-                "title": item["en"] if is_en else item["zh"],
-                "description": item["enDescription"] if is_en else item["zhDescription"],
-            }
+            item["id"]: {"title": item["en"] if is_en else item["zh"], "description": item["enDescription"] if is_en else item["zhDescription"]}
             for item in branches
         }
         concept_copy = {}
         for item in concepts:
             title = item["en"] if is_en else item["zh"]
-            copy = concise_copy(concise_policy, item, locale, title)
+            copy = concise_copy(authored, item, locale)
             concept_copy[item["id"]] = {"title": title, "summary": copy["summary"]}
 
         edge_copy = {}
@@ -269,13 +277,11 @@ def build():
                 target_title = concept_copy[item["toConceptId"]]["title"]
                 rationale = (
                     f"Connect {source_title} to {target_title} as a {item['type'].lower().replace('_', ' ')} relationship."
-                    if is_en
-                    else f"将「{source_title}」与「{target_title}」建立为 {item['type']} 关系。"
+                    if is_en else f"将「{source_title}」与「{target_title}」建立为 {item['type']} 关系。"
                 )
             edge_copy[item["id"]] = {"rationale": rationale}
 
-        path_copy = {}
-        milestone_copy = {}
+        path_copy, milestone_copy = {}, {}
         for path_item in paths:
             path_copy[path_item["id"]] = {
                 "title": path_item["en"] if is_en else path_item["zh"],
@@ -287,18 +293,10 @@ def build():
                 milestone_copy[milestone["id"]] = {"title": milestone["en"] if is_en else milestone["zh"]}
 
         presentations[locale] = {
-            "schemaVersion": "1.0.0",
-            "graphVersion": "1.0.0",
-            "locale": locale,
-            "domains": seed_copy["domains"],
-            "branches": branch_copy,
-            "concepts": concept_copy,
-            "edges": edge_copy,
-            "paths": path_copy,
-            "milestones": milestone_copy,
-            "content": seed_copy["content"],
+            "schemaVersion": "1.0.0", "graphVersion": "1.0.0", "locale": locale,
+            "domains": seed_copy["domains"], "branches": branch_copy, "concepts": concept_copy,
+            "edges": edge_copy, "paths": path_copy, "milestones": milestone_copy, "content": seed_copy["content"],
         }
-
     return graph, presentations
 
 
@@ -316,7 +314,7 @@ def main():
         f"AI Knowledge Graph v1 inventory: {len(graph['branches'])} branches, "
         f"{len(graph['concepts'])} concepts ({version_sensitive} version-sensitive), "
         f"{len(graph['edges'])} edges, {len(graph['paths'])} paths; "
-        f"{len(presentations['en']['concepts'])} localized Concept summaries materialized from the canonical concise policy."
+        f"{len(presentations['en']['concepts'])} authored bilingual Concept summaries materialized with published generic fallback disabled."
     )
 
 
