@@ -16,7 +16,8 @@ test("English Knowledge Map keeps domain exploration primary and advanced tools 
 
   await build.locator("summary").first().click();
   await expect(build.getByText("AI-Native Software", { exact: true })).toBeVisible();
-  await expect(build.getByText("Agent Engineering", { exact: true })).toBeVisible();
+  const agentBranchSummary = build.locator('[data-branch-id="branch-agents"] > summary');
+  await expect(agentBranchSummary.getByText("Agent Engineering", { exact: true })).toBeVisible();
 
   const coursesBridge = page.getByTestId("knowledge-map-courses-bridge");
   await expect(coursesBridge).toContainText("Use Courses for goal-oriented learning.");
@@ -31,6 +32,31 @@ test("English Knowledge Map keeps domain exploration primary and advanced tools 
 
   const recommendation = page.locator("aside").filter({ hasText: "Recommended next" });
   await expect(recommendation).toContainText("Token Playground");
+});
+
+test("a non-Guide Concept has a complete English concise surface while a Guide Concept adds enrichment", async ({ page }) => {
+  await page.goto("/en/learning/");
+  const understand = page.getByTestId("knowledge-domain-understand-ai");
+  await understand.locator("summary").first().click();
+  await page.locator('[data-branch-id="branch-ai-foundations"] > summary').click();
+  await page.locator('[data-branch-id="branch-context-representation"] > summary').click();
+
+  const sequence = page.locator('[data-concept-id="concept-sequence-ordering"]');
+  await sequence.locator("summary").click();
+  const explanation = sequence.locator('[data-concept-explanation="concept-sequence-ordering"]');
+  await expect(explanation).toContainText("The order of information inside context can change");
+  await expect(explanation).toContainText("Mental model");
+  await expect(explanation).toContainText("Why it matters");
+  await expect(explanation.getByRole("link", { name: "AI Foundations", exact: true })).toHaveAttribute("href", "/en/courses/ai-foundations/");
+  await expect(sequence.locator('[data-guide-concept-id="concept-sequence-ordering"]')).toHaveCount(0);
+
+  await page.locator('[data-branch-id="branch-models-tokens"] > summary').click();
+  const probabilistic = page.locator('[data-concept-id="concept-probabilistic-behavior"]');
+  await probabilistic.locator("summary").click();
+  await expect(probabilistic.locator('[data-concept-explanation="concept-probabilistic-behavior"]')).toContainText(
+    "Modern language models produce distributions over possible continuations",
+  );
+  await expect(probabilistic.locator('[data-guide-concept-id="concept-probabilistic-behavior"]')).toHaveAttribute("href", "/en/guides/probabilistic-model-behavior/");
 });
 
 test("Chinese Knowledge Map keeps the same simplified information architecture", async ({ page }) => {
@@ -55,4 +81,20 @@ test("Chinese Knowledge Map keeps the same simplified information architecture",
   await advanced.locator("summary").first().click();
   await expect(page.getByTestId("guided-path-v09-compat").getByText("STAGE 00", { exact: true })).toBeVisible();
   await expect(page.getByText(/Mastered|已掌握/i)).toHaveCount(0);
+});
+
+test("Chinese non-Guide Concept explanation preserves authored parity", async ({ page }) => {
+  await page.goto("/zh-cn/learning/");
+  const understand = page.getByTestId("knowledge-domain-understand-ai");
+  await understand.locator("summary").first().click();
+  await page.locator('[data-branch-id="branch-ai-foundations"] > summary').click();
+  await page.locator('[data-branch-id="branch-context-representation"] > summary').click();
+
+  const sequence = page.locator('[data-concept-id="concept-sequence-ordering"]');
+  await sequence.locator("summary").click();
+  const explanation = sequence.locator('[data-concept-explanation="concept-sequence-ordering"]');
+  await expect(explanation).toContainText("Context 中的信息顺序会改变模型关注哪些事实和指令");
+  await expect(explanation).toContainText("心智模型");
+  await expect(explanation).toContainText("为什么重要");
+  await expect(sequence.locator('[data-guide-concept-id="concept-sequence-ordering"]')).toHaveCount(0);
 });

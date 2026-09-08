@@ -1,0 +1,86 @@
+{
+  "version": "1.0.0",
+  "wave": "core-60",
+  "concepts": {
+    "concept-pretraining-objective": {
+      "en": {"summary": "The pretraining objective defines the prediction task used to learn broad statistical structure from large datasets before application-specific adaptation.", "mentalModel": "Understand model behavior by asking what training signal rewarded it during pretraining, what patterns that signal teaches well, and what guarantees it never provided.", "whyItMatters": "Many apparent model limitations follow directly from optimizing prediction rather than truth, policy compliance, or task-specific correctness."},
+      "zh-CN": {"summary": "Pretraining Objective 定义模型在大规模数据上学习广泛统计结构时所优化的预测任务。", "mentalModel": "理解模型行为时要追问：预训练奖励了什么信号、这种信号擅长学到哪些模式，以及它从未提供哪些 Guarantee。", "whyItMatters": "许多模型局限来自优化目标本身：模型主要被训练做预测，而不是天然优化 Truth、Policy Compliance 或具体任务正确性。"}
+    },
+    "concept-parallel-agent-work": {
+      "en": {"summary": "Parallel agent work runs independent or weakly coupled tasks concurrently when their outputs can be combined without unsafe shared-state conflicts.", "mentalModel": "Parallelize only after identifying true independence, explicit inputs, bounded side effects, and a deterministic join or verification step.", "whyItMatters": "Parallel agents can reduce latency, but hidden dependencies create duplicated effort, conflicting writes, correlated errors, and expensive reconciliation."},
+      "zh-CN": {"summary": "Parallel Agent Work 会在任务真正独立或弱耦合时并发执行，并在受控的 Join/Verification 阶段合并结果。", "mentalModel": "只有确认输入独立、共享状态受控、Side Effect 有边界且存在确定的合并或验证步骤后，才进行并行。", "whyItMatters": "并行可以降低延迟，但隐藏依赖会制造重复工作、冲突写入、相关性错误和高成本 Reconciliation。"}
+    },
+    "concept-visual-briefing": {
+      "en": {"summary": "A visual brief translates a creative goal into explicit subject, composition, hierarchy, style, constraints, references, and acceptance criteria before image generation.", "mentalModel": "Specify what the image must communicate and how it should be judged before describing decorative details or choosing a generation model.", "whyItMatters": "Without a brief, iteration becomes subjective prompt tweaking and teams cannot distinguish a model failure from an unclear visual objective."},
+      "zh-CN": {"summary": "Visual Briefing 会在生图前把创作目标转成明确的主体、构图、层级、风格、约束、参考与验收标准。", "mentalModel": "先定义图片必须传达什么以及如何判断好坏，再描述装饰性细节或选择 Generation Model。", "whyItMatters": "没有 Brief 时，迭代容易退化成主观改 Prompt，也很难区分是模型失败还是视觉目标本身不清晰。"}
+    },
+    "concept-model-capability-envelope": {
+      "en": {"summary": "A model capability envelope describes the tasks, modalities, context conditions, reliability ranges, and failure modes within which a model is currently useful.", "mentalModel": "Treat capability as an empirically measured operating region rather than a universal property inferred from a benchmark score or product label.", "whyItMatters": "Systems fail when designers assume a model that succeeds on one workload will generalize to different data, tools, languages, or risk levels."},
+      "zh-CN": {"summary": "Model Capability Envelope 描述模型在什么任务、模态、Context 条件、可靠区间和失败模式下才真正可用。", "mentalModel": "把 Capability 当作通过真实测量得到的 Operating Region，而不是从一个 Benchmark 分数或产品标签推导出的普遍属性。", "whyItMatters": "如果把某个 Workload 上的成功直接外推到不同数据、Tool、语言或风险等级，系统很容易在边界外失效。"}
+    },
+    "concept-least-privilege": {
+      "en": {"summary": "Least privilege gives an AI agent only the minimum capabilities, data access, scope, and duration required to complete its current responsibility.", "mentalModel": "Grant narrow permissions to specific operations and resources, then expand only when a demonstrated task requirement cannot be satisfied safely otherwise.", "whyItMatters": "Model mistakes and prompt injection become far less damaging when the runtime simply does not expose unnecessary powers."},
+      "zh-CN": {"summary": "Least Privilege 只给 AI Agent 完成当前责任所需的最小能力、数据访问、作用域和持续时间。", "mentalModel": "把权限收窄到具体 Operation 与 Resource，只有真实任务需求无法安全完成时才逐步扩大。", "whyItMatters": "当 Runtime 根本不暴露多余能力时，模型错误和 Prompt Injection 即使发生，造成的损害也会显著缩小。"}
+    },
+    "concept-verification-loop": {
+      "en": {"summary": "A verification loop repeatedly compares a produced result with explicit acceptance evidence and uses failures to drive bounded revision or escalation.", "mentalModel": "Generate → verify → classify failure → revise or stop; verification must have independent criteria and a finite budget rather than asking the same model to 'try again'.", "whyItMatters": "Iteration only improves quality when failure information changes the next action; unstructured retries can repeat the same mistake indefinitely."},
+      "zh-CN": {"summary": "Verification Loop 会反复把生成结果与显式验收证据比较，并根据失败类型进行有限修改或升级处理。", "mentalModel": "遵循 Generate → Verify → Classify Failure → Revise/Stop；Verifier 要有独立标准和有限预算，而不是简单让同一模型“再试一次”。", "whyItMatters": "只有失败信息真正改变下一步动作时迭代才会提升质量，否则无结构 Retry 可能无限重复同一错误。"}
+    },
+    "concept-latency-throughput-basics": {
+      "en": {"summary": "Latency measures how long one request takes while throughput measures how much work a system completes over time under a given workload.", "mentalModel": "Analyze first-token latency, total completion time, concurrency, batching, queueing, and resource saturation separately because improving one can worsen another.", "whyItMatters": "AI systems often appear fast in single-user demos but collapse under concurrent traffic when throughput and queueing are ignored."},
+      "zh-CN": {"summary": "Latency 衡量单次请求耗时，而 Throughput 衡量系统在特定 Workload 下单位时间能完成多少工作。", "mentalModel": "分别分析 First-token Latency、总完成时间、Concurrency、Batching、Queueing 与资源饱和，因为优化一个指标可能恶化另一个。", "whyItMatters": "AI 系统常在单用户 Demo 中很快，却在并发流量下因忽略 Throughput 与 Queueing 而迅速退化。"}
+    },
+    "concept-trust-boundary": {
+      "en": {"summary": "A trust boundary marks where data, instructions, identities, or capabilities cross from one authority domain into another and must be validated before gaining influence.", "mentalModel": "Assume anything crossing the boundary is untrusted until provenance, authorization, structure, and allowed effect are checked by the receiving layer.", "whyItMatters": "Prompt injection and confused-deputy failures occur when untrusted content is allowed to inherit privileges it never legitimately possessed."},
+      "zh-CN": {"summary": "Trust Boundary 标记数据、指令、身份或能力从一个 Authority Domain 进入另一个 Domain 的位置。", "mentalModel": "任何跨越边界的内容都先视为 Untrusted，直到接收层验证 Provenance、Authorization、结构与允许产生的影响。", "whyItMatters": "Prompt Injection 与 Confused Deputy 问题往往源于不可信内容被错误继承了本不属于它的权限。"}
+    },
+    "concept-traceability": {
+      "en": {"summary": "Traceability links a system outcome back through the sequence of inputs, model calls, retrievals, tool actions, state changes, and decisions that produced it.", "mentalModel": "Preserve causal execution history with stable identifiers so an operator can move backward from an observed failure to the responsible step and evidence.", "whyItMatters": "Without traceability, debugging becomes guesswork and evaluation cannot tell whether a failure came from the model, retrieval, tool, or runtime."},
+      "zh-CN": {"summary": "Traceability 把系统结果连接回产生它的输入、模型调用、Retrieval、Tool Action、State Change 与 Decision 序列。", "mentalModel": "用稳定 Identifier 保留因果执行历史，让操作者能从观察到的 Failure 反向定位负责步骤及其证据。", "whyItMatters": "没有 Traceability 时调试会退化成猜测，Evaluation 也难以区分问题来自 Model、Retrieval、Tool 还是 Runtime。"}
+    },
+    "concept-slices-regression": {
+      "en": {"summary": "Dataset slices reveal whether an apparent aggregate improvement hides regressions for specific user groups, languages, tasks, risk categories, or operating conditions.", "mentalModel": "Define meaningful slices before release and require important slices to satisfy their own thresholds rather than accepting only a higher overall average.", "whyItMatters": "AI changes often redistribute quality, so a global metric can improve while a critical cohort becomes significantly worse."},
+      "zh-CN": {"summary": "Dataset Slice 用于发现整体平均值提升是否掩盖了特定用户群、语言、任务、风险类别或运行条件上的 Regression。", "mentalModel": "在发布前定义有意义的 Slice，并要求关键 Slice 各自满足 Threshold，而不是只接受更高的全局平均值。", "whyItMatters": "AI 改动经常重新分配质量，因此总体 Metric 变好时，关键 Cohort 仍可能明显退化。"}
+    },
+    "concept-preference-posttraining": {
+      "en": {"summary": "Preference post-training shapes model behavior using comparative or preference signals so outputs better align with desired helpfulness, style, safety, or task behavior.", "mentalModel": "View preference optimization as changing the probability of behaviors, not as installing immutable rules or a factual database inside the model.", "whyItMatters": "Post-training can make a model appear more reliable while still requiring runtime enforcement for permissions, truth, and consequential actions."},
+      "zh-CN": {"summary": "Preference Post-training 使用比较或偏好信号调整模型，使输出更符合期望的 Helpful、Style、Safety 或任务行为。", "mentalModel": "把 Preference Optimization 理解成改变行为出现概率，而不是向模型安装不可违反的规则或权威事实数据库。", "whyItMatters": "Post-training 能让模型表现更稳定，但权限、Truth 与高后果动作仍然需要 Runtime Enforcement。"}
+    },
+    "concept-prompt-decomposition": {
+      "en": {"summary": "Prompt decomposition separates a complex request into smaller reasoning or production steps when intermediate outputs need distinct context, verification, or control.", "mentalModel": "Split only where a boundary changes inputs, evidence, responsibility, or acceptance criteria; do not fragment one coherent task merely to create more prompts.", "whyItMatters": "Good decomposition exposes errors and improves control, while excessive decomposition increases latency, coordination overhead, and context drift."},
+      "zh-CN": {"summary": "Prompt Decomposition 会在中间步骤需要不同 Context、Verification 或控制时，把复杂请求拆成较小的推理或生产步骤。", "mentalModel": "只在输入、证据、责任或验收标准发生变化的边界上拆分，不要为了增加 Prompt 数量而切碎一个完整任务。", "whyItMatters": "合理拆分能暴露错误并提高控制力，过度拆分则会增加延迟、协调成本和 Context Drift。"}
+    },
+    "concept-privacy-data-boundary": {
+      "en": {"summary": "A privacy data boundary defines which personal or sensitive information may enter model context, logs, memory, external tools, or third-party services.", "mentalModel": "Classify data before use, minimize what crosses each boundary, and attach purpose, retention, access, and deletion rules to sensitive information.", "whyItMatters": "AI workflows copy context across many layers, so one poorly controlled transfer can create persistent exposure well beyond the original request."},
+      "zh-CN": {"summary": "Privacy Data Boundary 定义哪些个人或敏感信息可以进入 Model Context、Log、Memory、External Tool 或第三方服务。", "mentalModel": "数据使用前先分类，最小化跨边界内容，并为敏感信息绑定 Purpose、Retention、Access 与 Deletion 规则。", "whyItMatters": "AI 工作流会在多层复制 Context，一个失控的数据传递就可能制造远超原始请求范围的持久暴露。"}
+    },
+    "concept-memory-lifecycle": {
+      "en": {"summary": "Memory lifecycle governs when information is captured, written, scoped, retrieved, corrected, refreshed, expired, and deleted across an AI system.", "mentalModel": "Every memory entry needs provenance, owner, scope, write policy, freshness expectations, and an explicit end-of-life condition.", "whyItMatters": "Persistent memory becomes a long-lived source of behavior, so stale or incorrectly scoped entries can repeatedly corrupt future decisions."},
+      "zh-CN": {"summary": "Memory Lifecycle 管理信息何时被 Capture、写入、限定 Scope、Retrieval、纠错、刷新、过期与删除。", "mentalModel": "每条 Memory 都需要 Provenance、Owner、Scope、Write Policy、Freshness 预期以及明确的 End-of-life 条件。", "whyItMatters": "持久 Memory 会长期影响系统行为，因此陈旧或 Scope 错误的信息可能持续污染未来 Decision。"}
+    },
+    "concept-research-question-decomposition": {
+      "en": {"summary": "Research question decomposition turns a broad question into answerable subquestions with explicit definitions, evidence needs, scope, and unresolved assumptions.", "mentalModel": "Decompose by claims that would change the final conclusion, then map each subquestion to the evidence required to support or falsify it.", "whyItMatters": "Without decomposition, AI research tends to collect broadly relevant information without proving the specific claims needed for a defensible conclusion."},
+      "zh-CN": {"summary": "Research Question Decomposition 会把宽泛问题拆成具有明确定义、证据需求、Scope 与待验证假设的可回答子问题。", "mentalModel": "围绕会改变最终结论的 Claim 来拆解，并为每个子问题映射能够支持或推翻它所需的 Evidence。", "whyItMatters": "如果不先拆问题，AI Research 容易收集大量“相关资料”，却无法证明最终结论真正依赖的具体 Claim。"}
+    },
+    "concept-topology-tradeoffs": {
+      "en": {"summary": "Orchestration topology determines how loops, agents, stages, branches, joins, and shared state are connected, creating different latency and failure-propagation trade-offs.", "mentalModel": "Choose the simplest topology that matches real dependencies, then evaluate coordination cost, isolation, retry scope, and verification at joins.", "whyItMatters": "A more elaborate multi-agent graph can look sophisticated while producing slower, more correlated, and harder-to-debug failures than a single controlled loop."},
+      "zh-CN": {"summary": "Orchestration Topology 决定 Loop、Agent、Stage、Branch、Join 与 Shared State 如何连接，并形成不同的延迟和失败传播权衡。", "mentalModel": "选择能够表达真实依赖的最简单 Topology，再评估 Coordination Cost、Isolation、Retry Scope 与 Join Verification。", "whyItMatters": "更复杂的 Multi-Agent Graph 可能看起来先进，却比单一受控 Loop 更慢、更相关并且更难调试。"}
+    },
+    "concept-multimodal-iteration": {
+      "en": {"summary": "Multimodal iteration improves an artifact by alternating between generation, direct inspection of visual or audio evidence, targeted changes, and explicit quality checks.", "mentalModel": "Inspect the actual modality after each meaningful change; textual descriptions of the asset are not substitutes for seeing or hearing the produced result.", "whyItMatters": "Many visual and audio defects are obvious in the artifact but invisible in prompts or metadata, so inspection must remain part of the loop."},
+      "zh-CN": {"summary": "Multimodal Iteration 通过 Generation、直接检查视觉/音频证据、定向修改和显式质量检查之间的循环来改进产物。", "mentalModel": "每次重要修改后都直接查看或听取真实 Modality；文字描述不能替代对最终图像或音频结果的检查。", "whyItMatters": "很多视觉和音频缺陷在真实产物中很明显，却不会出现在 Prompt 或 Metadata 中，因此 Inspection 必须留在 Loop 内。"}
+    },
+    "concept-open-closed-model-tradeoff": {
+      "en": {"summary": "Open and closed models trade off control, hosting flexibility, transparency, ecosystem access, capability, operational burden, and vendor dependency differently.", "mentalModel": "Select deployment posture from concrete requirements such as data boundary, customization, latency, cost, auditability, and maintenance capacity rather than ideology.", "whyItMatters": "The wrong choice can create unnecessary infrastructure burden or vendor lock-in without improving the application behavior users actually need."},
+      "zh-CN": {"summary": "Open 与 Closed Model 在控制力、部署灵活性、透明度、生态、能力、运维成本和 Vendor Dependency 上有不同权衡。", "mentalModel": "根据 Data Boundary、Customization、Latency、Cost、Auditability 与维护能力等具体要求选择部署姿态，而不是按立场选模型。", "whyItMatters": "错误选择可能制造不必要的基础设施负担或 Vendor Lock-in，却没有改善用户真正需要的应用行为。"}
+    },
+    "concept-memory-expiry": {
+      "en": {"summary": "Memory expiry removes or invalidates stored information when its retention period, freshness window, authority, consent, or task relevance no longer holds.", "mentalModel": "Every durable memory should answer 'when does this stop being safe to use?' through TTL, source revision, explicit deletion, or policy-driven invalidation.", "whyItMatters": "Memory without expiry turns obsolete preferences and facts into persistent hidden context that can silently bias future outputs."},
+      "zh-CN": {"summary": "Memory Expiry 会在 Retention、Freshness、Authority、Consent 或任务相关性不再成立时移除或使存储信息失效。", "mentalModel": "每条 Durable Memory 都应回答“什么时候它不再安全可用”，通过 TTL、Source Revision、显式删除或 Policy Invalidation 实现。", "whyItMatters": "没有 Expiry 的 Memory 会把过时偏好与事实变成长期隐藏 Context，并持续无声地影响未来输出。"}
+    },
+    "concept-customer-support-copilot": {
+      "en": {"summary": "A customer-support copilot assists a human agent with grounded answers, retrieval, drafting, summarization, and suggested actions while preserving escalation and approval boundaries.", "mentalModel": "Start with assistance that keeps a human as decision owner, then automate only the support actions that have reliable knowledge, safe tools, and bounded consequences.", "whyItMatters": "Support is a high-frequency environment where stale knowledge or an incorrect action can quickly affect real customers, accounts, and money."},
+      "zh-CN": {"summary": "Customer Support Copilot 通过 Grounded Answer、Retrieval、Draft、Summary 与 Action Suggestion 辅助人工客服，同时保留 Escalation 与 Approval 边界。", "mentalModel": "先让人保持 Decision Owner，再只自动化那些知识可靠、Tool 安全且后果有边界的 Support Action。", "whyItMatters": "客服是高频真实环境，陈旧知识或错误动作会迅速影响真实客户、账户和资金，因此自动化边界尤其重要。"}
+    }
+  }
+}

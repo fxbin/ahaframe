@@ -1,0 +1,21 @@
+{
+  "version": "1.0.0",
+  "expectedConceptCount": 145,
+  "publishedGuideConceptCount": 120,
+  "residualConceptCount": 25,
+  "policy": {
+    "allConceptsRequireAuthoredCopy": true,
+    "publishedGenericFallbackAllowed": false,
+    "guideIsOptionalEnrichment": true,
+    "relatedConceptsRemainGraphDerived": true
+  },
+  "guideBackedFragments": [
+    "ai-knowledge-concise-v1.0/core-20.json",
+    "ai-knowledge-concise-v1.0/core-40.json",
+    "ai-knowledge-concise-v1.0/core-60.json",
+    "ai-knowledge-concise-v1.0/core-80.json",
+    "ai-knowledge-concise-v1.0/core-100.json",
+    "ai-knowledge-concise-v1.0/core-120.json"
+  ],
+  "residualSource": "ai-knowledge-concise-v1.0.json#overrides"
+}

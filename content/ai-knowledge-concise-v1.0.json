@@ -1,0 +1,198 @@
+{
+  "version": "1.0.0",
+  "expectedConceptCount": 145,
+  "policy": {
+    "purpose": "Provide a readable bilingual baseline for every canonical Concept without requiring a full Guide.",
+    "guideIsOptionalEnrichment": true,
+    "relatedConceptsRemainGraphDerived": true,
+    "residualConceptsRequireAuthoredCopy": true
+  },
+  "genericByKind": {
+    "CONCEPT": {
+      "en": {
+        "summary": "{title} is a core mechanism or representation that changes how an AI system behaves or should be designed.",
+        "mentalModel": "Treat {title} as part of the system mechanism, not as a label: ask what inputs it transforms, what constraints it introduces, and what behavior it changes.",
+        "whyItMatters": "Understanding this mechanism prevents architectural decisions from being based on surface-level model behavior alone."
+      },
+      "zh-CN": {
+        "summary": "「{title}」描述一个会影响 AI 系统行为或设计方式的核心机制或表示。",
+        "mentalModel": "不要只把「{title}」当作术语；要追问它接收什么输入、引入什么约束，以及最终改变了什么系统行为。",
+        "whyItMatters": "理解这个机制，可以避免仅凭模型表面表现做架构判断。"
+      }
+    },
+    "MENTAL_MODEL": {
+      "en": {
+        "summary": "{title} is a reasoning lens for making an AI design boundary explicit instead of relying on intuition.",
+        "mentalModel": "Use {title} to separate responsibilities and trade-offs before choosing prompts, models, tools, or runtime controls.",
+        "whyItMatters": "Clear mental boundaries reduce designs that look convincing in a demo but fail when real data, state, or side effects appear."
+      },
+      "zh-CN": {
+        "summary": "「{title}」是一种把 AI 系统设计边界显式化的思考框架，而不是依赖直觉。",
+        "mentalModel": "使用「{title}」先拆清责任与权衡，再决定 Prompt、模型、工具或 Runtime 控制应该放在哪里。",
+        "whyItMatters": "清晰的心智边界可以减少 Demo 看似正确、遇到真实数据、状态或 Side Effect 就失效的设计。"
+      }
+    },
+    "PRACTICE": {
+      "en": {
+        "summary": "{title} is a repeatable working move that makes an AI task more controllable, inspectable, and verifiable.",
+        "mentalModel": "Treat {title} as an explicit step with inputs, a decision, and observable acceptance evidence rather than an informal habit.",
+        "whyItMatters": "Repeatable practice turns one-off AI success into a workflow that can be reviewed, debugged, and improved."
+      },
+      "zh-CN": {
+        "summary": "「{title}」是一种可重复执行的工作动作，用来让 AI 任务更可控、可检查、可验证。",
+        "mentalModel": "把「{title}」设计成具有明确输入、判断和验收证据的步骤，而不是一种模糊习惯。",
+        "whyItMatters": "可重复的 Practice 才能把一次性的 AI 成功变成可审查、可调试、可持续改进的工作流。"
+      }
+    },
+    "PATTERN": {
+      "en": {
+        "summary": "{title} is a reusable engineering pattern for placing responsibility, control, and failure handling in the right layer.",
+        "mentalModel": "Apply {title} when a recurring system boundary needs an explicit contract instead of prompt-level hope or hidden convention.",
+        "whyItMatters": "Stable patterns reduce ambiguous ownership and make failures easier to contain, diagnose, and recover from."
+      },
+      "zh-CN": {
+        "summary": "「{title}」是一种可复用的工程模式，用于把责任、控制和失败处理放到正确的系统层。",
+        "mentalModel": "当同一种边界反复出现时，用「{title}」建立显式 Contract，而不是依赖 Prompt 期待或隐含约定。",
+        "whyItMatters": "稳定的 Pattern 能减少责任歧义，并让失败更容易隔离、诊断和恢复。"
+      }
+    },
+    "RISK": {
+      "en": {
+        "summary": "{title} is a recurring AI-system failure mode that can look harmless locally while distorting system-level decisions.",
+        "mentalModel": "Treat {title} as something to expose with evidence and guardrails, not something to wish away with a stronger prompt.",
+        "whyItMatters": "Unmodeled risks tend to surface late, after they are entangled with users, data, or irreversible actions."
+      },
+      "zh-CN": {
+        "summary": "「{title}」是一类反复出现的 AI 系统风险，局部看似无害，却可能扭曲系统级判断。",
+        "mentalModel": "把「{title}」当作需要证据和 Guardrail 暴露的失败面，而不是试图用更强 Prompt 把它隐藏掉。",
+        "whyItMatters": "未建模的风险往往会在已经连接用户、数据或不可逆操作之后才暴露。"
+      }
+    },
+    "SYSTEM_COMPONENT": {
+      "en": {
+        "summary": "{title} is an explicit subsystem or lifecycle responsibility that should be designed, observed, and tested rather than hidden inside a model call.",
+        "mentalModel": "Model {title} with clear inputs, state, outputs, limits, and failure behavior so the surrounding application can reason about it.",
+        "whyItMatters": "Production reliability depends on software-visible boundaries, not on assuming the model will coordinate the component correctly."
+      },
+      "zh-CN": {
+        "summary": "「{title}」是一个需要被显式设计、观察和测试的子系统或生命周期责任，而不应该藏在一次模型调用里。",
+        "mentalModel": "为「{title}」定义清楚输入、状态、输出、限制和失败行为，让外围应用能够对它进行推理和控制。",
+        "whyItMatters": "生产可靠性依赖软件可见的边界，而不是假设模型会自动把组件协调正确。"
+      }
+    },
+    "METRIC": {
+      "en": {
+        "summary": "{title} is an operational measurement frame for connecting AI-system behavior to engineering trade-offs.",
+        "mentalModel": "Use {title} as decision evidence: define what is measured, under which workload, and what trade-off or release choice the number should inform.",
+        "whyItMatters": "Metrics without a decision boundary encourage optimization of numbers that do not improve the actual system outcome."
+      },
+      "zh-CN": {
+        "summary": "「{title}」是一套把 AI 系统行为连接到工程权衡的度量框架。",
+        "mentalModel": "把「{title}」作为决策证据：明确测量对象、工作负载，以及这个数字最终要支持哪一种 Trade-off 或发布判断。",
+        "whyItMatters": "没有决策边界的 Metric 很容易优化数字，却没有改善真实系统结果。"
+      }
+    }
+  },
+  "overrides": {
+    "concept-sequence-ordering": {
+      "en": {"summary": "The order of information inside context can change which facts and instructions the model attends to and how it resolves competing signals.", "mentalModel": "Think of context as an ordered sequence with position, adjacency, and recency effects—not as an unordered bag of equally visible facts.", "whyItMatters": "With conflicting instructions or retrieved evidence, changing only the order can change model behavior even when the content is identical."},
+      "zh-CN": {"summary": "Context 中的信息顺序会改变模型关注哪些事实和指令，也会影响它如何解决相互竞争的信号。", "mentalModel": "把 Context 理解成有顺序的序列，而不是所有事实同等可见的信息袋；位置、邻近关系和先后次序都会产生影响。", "whyItMatters": "当指令或检索证据存在冲突时，即使内容完全相同，仅调整顺序也可能改变模型行为。"}
+    },
+    "concept-modality-grounding": {
+      "en": {"summary": "Modality grounding ties a claim back to evidence in the original image, audio, video, document, or sensor stream instead of trusting a cross-modal summary.", "mentalModel": "A multimodal representation is an intermediate view; important claims should still be checked against spatial, temporal, or structural evidence in the source modality.", "whyItMatters": "Information can be lost or distorted during modality conversion, especially for precise visual, temporal, or location-sensitive claims."},
+      "zh-CN": {"summary": "模态 Grounding 是把结论重新落到原始图像、音频、视频、文档或传感器证据上，而不是只相信跨模态摘要。", "mentalModel": "多模态表示只是中间视图；重要结论仍应回到原始模态，核对其中的空间、时间或结构证据。", "whyItMatters": "模态转换会丢失或扭曲信息，尤其容易影响精确的视觉、时序和定位判断。"}
+    },
+    "concept-examples-shape-behavior": {
+      "en": {"summary": "Examples can strongly steer format, tone, and local reasoning patterns, but they do not create an enforceable policy boundary.", "mentalModel": "Use examples as behavioral demonstrations; use runtime checks, permissions, and explicit contracts for guarantees that must hold.", "whyItMatters": "This prevents teams from mistaking few-shot imitation for security, authorization, or correctness enforcement."},
+      "zh-CN": {"summary": "示例可以强烈影响格式、语气和局部推理模式，但它不会形成可强制执行的策略边界。", "mentalModel": "把 Example 当作行为示范；对于必须成立的保证，仍要依赖 Runtime 校验、权限和显式 Contract。", "whyItMatters": "区分这两者，可以避免把 Few-shot 模仿误认为安全、授权或正确性约束。"}
+    },
+    "concept-planning-as-search": {
+      "en": {"summary": "Planning is useful when the system must explore alternative action sequences before committing to one, rather than simply generating a longer reasoning trace.", "mentalModel": "Treat a plan as search over candidate paths with costs, constraints, observations, and stopping rules.", "whyItMatters": "Extra planning only pays off when exploring alternatives can change the decision; otherwise it adds latency and failure surface."},
+      "zh-CN": {"summary": "当系统需要在执行前比较多条候选行动路径时，Planning 才真正有价值，而不是单纯生成更长的思考过程。", "mentalModel": "把 Plan 理解成对候选路径的搜索：每条路径都有成本、约束、观察结果和停止条件。", "whyItMatters": "只有探索替代方案能够改变决策时，额外 Planning 才值得；否则它只会增加延迟和失败面。"}
+    },
+    "concept-reasoning-opacity": {
+      "en": {"summary": "Internal reasoning is not a reliable audit trail; systems should expose observable inputs, actions, outputs, and verification evidence instead.", "mentalModel": "Judge the system through evidence you can inspect and reproduce, not through a persuasive explanation of how it says it reasoned.", "whyItMatters": "Opaque reasoning cannot substitute for traces, tests, source evidence, or runtime facts when debugging or governing a system."},
+      "zh-CN": {"summary": "内部推理并不是可靠的审计记录；系统应暴露可观察的输入、动作、输出和验证证据。", "mentalModel": "评价系统时应依赖可检查、可复现的证据，而不是依赖模型对自己如何推理的有说服力解释。", "whyItMatters": "不透明推理不能替代 Trace、测试、来源证据和 Runtime 事实，尤其是在调试和治理场景。"}
+    },
+    "concept-human-accountability": {
+      "en": {"summary": "A person or organization remains responsible for consequential AI outcomes even when generation or decisions are heavily automated.", "mentalModel": "Automation can delegate work, but it cannot erase ownership: define who approves risk, monitors outcomes, and answers for harm or policy violations.", "whyItMatters": "Governance fails when everyone can point to the model while no human role owns the final decision boundary."},
+      "zh-CN": {"summary": "即使生成和判断高度自动化，仍必须有人或组织对高后果 AI 结果承担责任。", "mentalModel": "自动化可以委派工作，但不能消除 Owner：需要明确谁批准风险、谁监控结果、谁对伤害或策略违规负责。", "whyItMatters": "如果所有人都能把责任推给模型，而没有角色拥有最终决策边界，治理就会失效。"}
+    },
+    "concept-plan-before-code": {
+      "en": {"summary": "Plan before code resolves intent, affected surfaces, constraints, and verification steps before an AI coding agent edits the repository.", "mentalModel": "A useful plan is a small executable hypothesis about what must change and how you will know the change is safe—not a ceremonial essay.", "whyItMatters": "This reduces broad unnecessary edits and makes architectural regressions easier to catch before code generation compounds them."},
+      "zh-CN": {"summary": "先规划再改代码，是在 Coding Agent 动仓库之前先明确 Intent、影响面、约束和验证步骤。", "mentalModel": "有用的 Plan 是一个小型、可执行的修改假设：要改什么，以及如何证明它安全；而不是形式化长文。", "whyItMatters": "这样可以减少不必要的大范围修改，并在代码生成放大问题之前更早发现架构回归。"}
+    },
+    "concept-context-structure-cache": {
+      "en": {"summary": "Context can be structured so stable instructions and reusable prefixes stay consistent while volatile task data changes later in the prompt.", "mentalModel": "Separate stable and dynamic context regions; optimize structure first, then let caching exploit the stable prefix where supported.", "whyItMatters": "Cache-friendly structure can reduce cost and latency without sacrificing clarity about context ownership."},
+      "zh-CN": {"summary": "Context 可以被组织成稳定指令与可复用前缀保持不变，而变化频繁的任务数据放在后部动态区域。", "mentalModel": "先区分 Stable 与 Dynamic Context，再在支持时让 Cache 利用稳定前缀；不要反过来为了 Cache 破坏上下文结构。", "whyItMatters": "这样既能降低成本和延迟，也能保持 Context 责任边界清晰。"}
+    },
+    "concept-prompt-caching": {
+      "en": {"summary": "Prompt caching reuses computation for stable prompt prefixes; it is a performance optimization, not a substitute for context management.", "mentalModel": "Design stable prefixes around genuinely reusable instructions and data, then measure hit rate, invalidation behavior, cost, and latency.", "whyItMatters": "Poor caching can couple prompts to provider details or preserve stale context while delivering little real savings."},
+      "zh-CN": {"summary": "Prompt Caching 复用稳定 Prompt 前缀的计算结果；它是性能优化，而不是 Context Management 的替代品。", "mentalModel": "围绕真正可复用的指令和数据设计稳定前缀，然后测量命中率、失效行为、成本和延迟。", "whyItMatters": "设计不当的 Cache 会让 Prompt 过度绑定 Provider 细节，甚至保留陈旧 Context，却没有带来实际收益。"}
+    },
+    "concept-user-domain-memory": {
+      "en": {"summary": "User memory stores person-specific state and preferences, while domain knowledge represents shared facts that should come from governed sources.", "mentalModel": "Keep personalization and source-of-truth knowledge in separate authority domains with different write, expiry, and correction policies.", "whyItMatters": "Mixing them can let one user's remembered preference overwrite authoritative knowledge or leak into another user's context."},
+      "zh-CN": {"summary": "User Memory 保存用户特定的状态与偏好，而 Domain Knowledge 表示应来自受治理来源的共享事实。", "mentalModel": "把个性化记忆和 Source of Truth 放在不同的 Authority Domain 中，并采用不同的写入、过期和纠错策略。", "whyItMatters": "混在一起可能让某个用户的偏好覆盖权威知识，甚至污染其他用户的 Context。"}
+    },
+    "concept-hybrid-structured-unstructured-search": {
+      "en": {"summary": "Hybrid structured/unstructured search combines semantic or lexical retrieval with filters, fields, relations, and exact structured constraints.", "mentalModel": "Use unstructured search to find meaning and structured queries to enforce known entities, dates, permissions, or relationships; fuse results deliberately.", "whyItMatters": "When evidence spans documents and structured records, either retrieval style alone can miss critical constraints."},
+      "zh-CN": {"summary": "结构化与非结构化混合搜索，把语义或关键词检索与字段、Filter、关系和精确结构约束结合起来。", "mentalModel": "用非结构化搜索寻找语义，用结构化查询约束实体、日期、权限或关系，再显式融合两类结果。", "whyItMatters": "当证据同时分布在文档和结构化记录中时，单独依赖任何一种检索方式都可能遗漏关键约束。"}
+    },
+    "concept-mcp-tasks-elicitation": {
+      "en": {"summary": "MCP Tasks and elicitation-style interactions extend a single request/response tool call into multi-round-trip work with explicit lifecycle and user-input boundaries.", "mentalModel": "Treat long-running task state, elicited information, cancellation, and completion as protocol/application responsibilities rather than hidden conversational state.", "whyItMatters": "This version-sensitive boundary matters when MCP workflows become asynchronous or require structured user participation across multiple turns."},
+      "zh-CN": {"summary": "MCP Tasks 与 Elicitation 类交互把一次 Request/Response 工具调用扩展为具有生命周期和用户输入边界的多轮交互。", "mentalModel": "把长任务状态、Elicited 信息、取消与完成语义视为 Protocol/Application 责任，而不是隐藏在对话状态里。", "whyItMatters": "当 MCP 工作流变成异步任务或需要跨多轮的结构化用户参与时，这个版本敏感边界会直接影响系统正确性。"}
+    },
+    "concept-planning-vs-direct": {
+      "en": {"summary": "Planning and direct execution are two runtime strategies: planning adds an intermediate decision process, while direct execution acts from the current state immediately.", "mentalModel": "Choose planning only when decomposing or comparing alternatives can materially improve the next action; otherwise prefer the simpler direct loop.", "whyItMatters": "Unnecessary planning increases latency, token cost, and stale assumptions without necessarily improving outcomes."},
+      "zh-CN": {"summary": "Planning 与 Direct Execution 是两种 Runtime 策略：前者增加显式中间决策过程，后者根据当前状态直接行动。", "mentalModel": "只有当拆解或比较替代方案能够显著改善下一步动作时才使用 Planning；否则优先保持更简单的 Direct Loop。", "whyItMatters": "不必要的 Planning 会增加延迟、Token 成本和陈旧假设，却不一定改善结果。"}
+    },
+    "concept-environment-observation": {
+      "en": {"summary": "Environment observation reads the current visible or machine-readable state before an agent decides what action is valid.", "mentalModel": "Use an observe → interpret → act loop; never let a stale plan stand in for checking the state that the action will actually affect.", "whyItMatters": "Interfaces change and actions have side effects, so stale state can make an otherwise correct browser or computer-use plan unsafe."},
+      "zh-CN": {"summary": "Environment Observation 是 Agent 在决定可执行动作之前，先读取当前可见或机器可读的环境状态。", "mentalModel": "采用 Observe → Interpret → Act 循环；不要让旧 Plan 替代对实际操作目标状态的重新检查。", "whyItMatters": "界面会变化、操作存在 Side Effect，陈旧状态会让原本正确的 Browser/Computer Use 计划变得不安全。"}
+    },
+    "concept-independent-verification": {
+      "en": {"summary": "Independent verification separates the producer of an answer or action from the mechanism that checks it, reducing shared assumptions and correlated failure.", "mentalModel": "A verifier should receive the evidence and acceptance criteria it needs without inheriting every hidden assumption of the producer.", "whyItMatters": "Adding more agents only improves reliability when their failures are not perfectly correlated."},
+      "zh-CN": {"summary": "Independent Verification 把答案或动作的生产者与检查机制分离，从而减少共享假设和相关性失败。", "mentalModel": "Verifier 应获得完成检查所需的证据与验收标准，但不应继承 Producer 的全部隐含假设。", "whyItMatters": "只有不同角色的失败不是高度相关时，增加 Agent 才可能真正提高可靠性。"}
+    },
+    "concept-outcome-trajectory-evaluation": {
+      "en": {"summary": "Outcome evaluation judges the final result; trajectory evaluation also inspects the actions, tool calls, and decisions used to reach it.", "mentalModel": "Use outcome metrics for end-state quality and trajectory evidence when unsafe, wasteful, or brittle paths can still produce a superficially correct result.", "whyItMatters": "Two agent runs can end at the same answer while one violates policy, wastes resources, or relies on an unrecoverable path."},
+      "zh-CN": {"summary": "Outcome Evaluation 评估最终结果；Trajectory Evaluation 还会检查到达结果之前的动作、工具调用和决策序列。", "mentalModel": "最终质量用 Outcome Metric 判断；当危险、浪费或脆弱路径也可能得到表面正确结果时，再加入 Trajectory Evidence。", "whyItMatters": "两个 Agent Run 可能得到同样答案，但其中一个可能违规、浪费资源或走了不可恢复的路径。"}
+    },
+    "concept-cross-layer-architecture": {
+      "en": {"summary": "Cross-layer architecture separates model behavior, context/retrieval, tools, runtime state, policy, and product guarantees so failures can be assigned to the layer that can control them.", "mentalModel": "Do not solve every problem in the prompt; map each requirement to the layer that has the authority and observability to enforce it.", "whyItMatters": "Production AI failures often come from responsibility leaking between layers rather than from one isolated model error."},
+      "zh-CN": {"summary": "Cross-layer Architecture 把模型行为、Context/Retrieval、Tools、Runtime State、Policy 和产品保证拆到不同责任层。", "mentalModel": "不要试图用 Prompt 解决所有问题；把每个要求放到真正拥有 Enforcement 权限和可观测性的那一层。", "whyItMatters": "生产 AI 的很多失败并不是单个模型错误，而是责任在不同层之间泄漏造成的。"}
+    },
+    "concept-queue-backpressure": {
+      "en": {"summary": "Queue backpressure controls how producers, workers, and downstream services behave when incoming work exceeds safe processing capacity.", "mentalModel": "Model queue depth, concurrency limits, admission control, retry behavior, and cancellation together so overload slows or sheds work instead of cascading.", "whyItMatters": "Uncontrolled concurrency turns latency spikes into retry storms, duplicate work, and resource exhaustion in long-running or agent workloads."},
+      "zh-CN": {"summary": "Queue Backpressure 用来控制当输入工作量超过安全处理能力时，Producer、Worker 和下游服务应该如何响应。", "mentalModel": "把 Queue Depth、Concurrency Limit、Admission Control、Retry 和 Cancellation 一起设计，让过载时系统能够减速或丢弃工作，而不是级联失效。", "whyItMatters": "在长任务或 Agent 工作负载中，失控并发会把延迟尖峰放大成 Retry Storm、重复工作和资源耗尽。"}
+    },
+    "concept-inference-serving": {
+      "en": {"summary": "Inference serving turns a chosen model into an operational service by managing memory, batching, quantization, concurrency, latency, and deployment constraints.", "mentalModel": "Treat serving as a systems problem: the same model can have very different cost and latency profiles depending on runtime, hardware, batching, and precision choices.", "whyItMatters": "Model quality alone does not determine whether an adapted model is practical to deploy or economical to operate."},
+      "zh-CN": {"summary": "Inference Serving 把选定模型变成可运营服务，需要管理内存、Batching、Quantization、Concurrency、Latency 和部署约束。", "mentalModel": "把 Serving 当作系统问题：同一个模型会因为 Runtime、硬件、Batching 和精度选择不同而呈现完全不同的成本与延迟。", "whyItMatters": "模型质量本身并不能决定一个适配后的模型是否真正可部署、可承受。"}
+    },
+    "concept-source-backed-drafting": {
+      "en": {"summary": "Source-backed drafting ties factual claims to known sources while the text is written instead of adding citations after unsupported prose already exists.", "mentalModel": "Draft from an evidence set and preserve claim-to-source links so later revision can update or remove claims when sources change.", "whyItMatters": "Fluent unsupported text becomes expensive to verify once it has propagated across chapters and arguments."},
+      "zh-CN": {"summary": "Source-backed Drafting 是在写作过程中就把事实性 Claim 绑定到已知 Source，而不是先生成无依据正文再事后补引用。", "mentalModel": "从 Evidence Set 出发写作，并保留 Claim → Source 连接，使来源变化时可以定位并更新或删除相关内容。", "whyItMatters": "无证据的流畅文本一旦扩散到多个章节和论证中，后续验证成本会非常高。"}
+    },
+    "concept-knowledge-curation": {
+      "en": {"summary": "Knowledge curation continually decides what enters a knowledge base, what stays authoritative, what must be updated, and what should be retired.", "mentalModel": "Treat ingestion as an editorial lifecycle with ownership, provenance, freshness, duplication, and deletion rules—not as a one-time upload job.", "whyItMatters": "Retrieval quality cannot remain high when the corpus accumulates stale, conflicting, or ownerless material."},
+      "zh-CN": {"summary": "Knowledge Curation 是持续决定哪些内容进入知识库、哪些保持权威、哪些需要更新、哪些应该淘汰的工作。", "mentalModel": "把 Ingestion 当作带 Owner、Provenance、Freshness、去重和删除规则的编辑生命周期，而不是一次性上传任务。", "whyItMatters": "如果 Corpus 不断积累陈旧、冲突或无人负责的材料，再好的 Retrieval 也无法长期保持质量。"}
+    },
+    "concept-research-synthesis": {
+      "en": {"summary": "Research synthesis combines evidence into a conclusion while preserving uncertainty, source disagreement, and unresolved questions instead of averaging them away.", "mentalModel": "Separate supported consensus, conflicting evidence, and open gaps; synthesize the evidence structure before writing a single narrative conclusion.", "whyItMatters": "A smooth summary can hide the exact disagreements that should change a decision or trigger further research."},
+      "zh-CN": {"summary": "Research Synthesis 是把证据组合成结论，同时保留不确定性、来源分歧和未解决问题，而不是把它们平均掉。", "mentalModel": "先区分已支持的共识、冲突证据和开放缺口，再综合 Evidence Structure，最后才形成叙事性结论。", "whyItMatters": "流畅摘要很容易隐藏真正应该改变决策或触发继续研究的关键分歧。"}
+    },
+    "concept-structured-analysis": {
+      "en": {"summary": "Structured analysis separates extraction, normalization, calculation, interpretation, and synthesis so each transformation can be checked independently.", "mentalModel": "Turn messy material into explicit tables, fields, assumptions, and intermediate results before asking the model for a final narrative.", "whyItMatters": "Unverifiable reasoning often enters when raw evidence and interpretation are collapsed into one opaque generation step."},
+      "zh-CN": {"summary": "Structured Analysis 把抽取、标准化、计算、解释和综合拆开，使每次数据转换都可以独立检查。", "mentalModel": "先把杂乱材料转成明确的表格、字段、假设和中间结果，再让模型生成最终叙事。", "whyItMatters": "如果原始证据和解释被压在一次黑盒生成里，最容易混入无法验证的推断。"}
+    },
+    "concept-knowledge-product-publishing": {
+      "en": {"summary": "Knowledge-product publishing packages reviewed learning content into a versioned, navigable, distributable artifact with clear ownership and release criteria.", "mentalModel": "Publishing is a release step: validate completeness, media, rights, navigation, versioning, and update ownership before distribution.", "whyItMatters": "A good curriculum can still fail as a product when learners cannot navigate it, trust its version, or receive maintained updates."},
+      "zh-CN": {"summary": "Knowledge Product Publishing 是把经过审查的学习内容打包成有版本、可导航、可分发并有明确 Owner 的产品。", "mentalModel": "把 Publishing 当作 Release：发布前检查完整性、媒体质量、版权、导航、版本以及后续维护责任。", "whyItMatters": "即使课程内容很好，如果学习者无法导航、无法确认版本或得不到持续更新，知识产品仍会失败。"}
+    },
+    "concept-content-marketing-system": {
+      "en": {"summary": "A content-marketing system connects customer questions, reusable content production, distribution, measurement, and feedback into a repeatable operating loop.", "mentalModel": "Treat content as an owned pipeline with inputs, cadence, channels, conversion signals, and maintenance—not as isolated AI-generated posts.", "whyItMatters": "For a solo business, repeatability and feedback compound while one-off generation quickly becomes an unsustainable queue of assets."},
+      "zh-CN": {"summary": "Content Marketing System 把客户问题、可复用内容生产、分发、测量和反馈连接成可重复运营循环。", "mentalModel": "把内容当作有输入、节奏、渠道、转化信号和维护责任的 Pipeline，而不是一堆独立 AI 生成帖子。", "whyItMatters": "对一人公司而言，可重复流程和反馈会产生复利，而一次性生成只会快速积累难以维护的素材。"}
+    }
+  }
+}

@@ -17,17 +17,35 @@ export interface KnowledgeMapBranch {
   description: string;
 }
 
+export interface KnowledgeMapConceptRelation {
+  id: string;
+  title: string;
+  relationship: string;
+  guideSlug: string | null;
+}
+
+export interface KnowledgeMapConceptPath {
+  id: string;
+  slug: string;
+  title: string;
+}
+
 export interface KnowledgeMapConcept {
   id: string;
   kind: string;
   primaryBranchId: string;
   branchIds: string[];
   title: string;
+  summary: string;
+  mentalModel: string;
+  whyItMatters: string;
   difficulty: string;
   maturity: string;
   versionSensitive: boolean;
   legacyIds: string[];
   guideSlug: string | null;
+  relatedConcepts: KnowledgeMapConceptRelation[];
+  pathMemberships: KnowledgeMapConceptPath[];
 }
 
 export interface KnowledgeMapMilestone {

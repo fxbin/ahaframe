@@ -104,13 +104,13 @@ export async function getSearchDocuments(locale: Locale): Promise<SearchDocument
       id: `concept:${concept.id}`,
       type: "concept",
       title: concept.title,
-      summary: [branch?.description, domain?.description].filter(Boolean).join(" "),
+      summary: concept.summary,
       route: concept.guideSlug ? `/${segment}/guides/${concept.guideSlug}/` : `/${segment}/learning/`,
       slug: concept.id,
       aliases: concept.legacyIds,
-      body: "",
+      body: [concept.mentalModel, concept.whyItMatters, ...concept.relatedConcepts.map((related) => related.title)].join(" "),
       metadata: [concept.kind, concept.difficulty, branch?.title, domain?.title, ...(pathTitlesByConcept.get(concept.id) ?? [])].filter(Boolean).join(" "),
-      context: [branch?.title, concept.guideSlug ? (locale === "zh-CN" ? "已有 Guide" : "Guide available") : (locale === "zh-CN" ? "知识地图" : "Knowledge Map")].filter(Boolean).join(" · "),
+      context: [branch?.title, concept.guideSlug ? (locale === "zh-CN" ? "已有 Guide" : "Guide available") : (locale === "zh-CN" ? "知识地图解释" : "Knowledge Map explanation")].filter(Boolean).join(" · "),
     };
   });
 

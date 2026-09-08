@@ -1,0 +1,86 @@
+{
+  "version": "1.0.0",
+  "wave": "core-80",
+  "concepts": {
+    "concept-next-token-generation": {
+      "en": {"summary": "Next-token generation repeatedly predicts a distribution for the next token, selects one under a decoding policy, appends it, and then predicts again.", "mentalModel": "Generation is an autoregressive loop: each chosen token becomes part of the next input, so early choices can redirect all later probabilities.", "whyItMatters": "This explains why small decoding or context changes can cascade into very different completions and why long outputs accumulate uncertainty."},
+      "zh-CN": {"summary": "Next-token Generation 会反复预测下一个 Token 的概率分布，根据解码策略选出一个，再把它加入输入继续预测。", "mentalModel": "把生成理解成 Autoregressive Loop：每个已选择 Token 都会成为下一步输入，因此早期选择会持续改变后续概率。", "whyItMatters": "这解释了为什么轻微的 Decoding 或 Context 变化会产生完全不同的续写，也解释了长输出如何逐步累积不确定性。"}
+    },
+    "concept-sampling-controls": {
+      "en": {"summary": "Sampling controls such as temperature and probability truncation change how a model selects tokens from its predicted distribution without changing the underlying model weights.", "mentalModel": "Treat decoding settings as output-risk controls: lower randomness narrows choices while higher randomness explores more low-probability alternatives.", "whyItMatters": "Sampling can improve diversity or stability, but it cannot repair missing knowledge, weak reasoning, or incorrect context supplied to the model."},
+      "zh-CN": {"summary": "Sampling Control 如 Temperature 与概率截断，会改变模型如何从预测分布中选择 Token，但不会改变模型参数本身。", "mentalModel": "把 Decoding Setting 当作输出风险控制：更低随机性收窄选择，更高随机性会探索更多低概率候选。", "whyItMatters": "Sampling 能调整多样性与稳定性，却无法修复缺失知识、错误 Context 或模型本身的能力缺口。"}
+    },
+    "concept-embeddings-semantic-space": {
+      "en": {"summary": "Embeddings map objects such as text, images, or items into vectors whose geometry captures task-relevant patterns of similarity and relationship.", "mentalModel": "An embedding is a learned coordinate system: nearby points are similar according to the training objective, not necessarily equivalent in truth or authority.", "whyItMatters": "Semantic search and clustering depend on this geometry, so retrieval quality is bounded by what the embedding space actually represents well."},
+      "zh-CN": {"summary": "Embedding 会把文本、图像或 Item 映射到向量空间，其几何关系表达训练目标学到的语义相似与关系模式。", "mentalModel": "把 Embedding 看成学习得到的坐标系；向量接近表示在训练目标下相似，并不意味着事实、Authority 或含义完全等价。", "whyItMatters": "Semantic Search 与 Clustering 都依赖这套几何，因此检索质量受限于 Embedding Space 真正能够表达的内容。"}
+    },
+    "concept-hallucination": {
+      "en": {"summary": "Hallucination is fluent model output that asserts unsupported, invented, or incorrect information as if it were grounded in available evidence.", "mentalModel": "A language model optimizes plausible continuation, so factual confidence must come from source grounding and verification rather than fluency alone.", "whyItMatters": "The more natural an unsupported statement sounds, the easier it is for users and downstream automation to accept an error without checking it."},
+      "zh-CN": {"summary": "Hallucination 指模型以流畅、确定的方式表达实际上没有证据支持、被虚构或错误的信息。", "mentalModel": "语言模型优化的是 Plausible Continuation，因此事实可信度必须来自 Source Grounding 与 Verification，而不能来自语言流畅度。", "whyItMatters": "没有证据的内容越自然，用户和下游自动化越容易在没有检查的情况下接受错误。"}
+    },
+    "concept-context-vs-memory": {
+      "en": {"summary": "Context is information explicitly supplied for the current inference, while memory is application-managed information selected to persist or be retrieved across interactions.", "mentalModel": "Memory is not a magical extra context window; it is a storage and retrieval system whose selected contents eventually re-enter context when needed.", "whyItMatters": "Separating the two clarifies ownership, persistence, freshness, privacy, and why remembered information can still be absent from a particular model call."},
+      "zh-CN": {"summary": "Context 是当前推理显式提供的信息，而 Memory 是由应用选择持久化或跨交互检索的信息。", "mentalModel": "Memory 不是额外的神奇 Context Window；它是存储与 Retrieval 系统，需要时其选中内容仍然要重新进入当前 Context。", "whyItMatters": "区分两者能明确 Owner、Persistence、Freshness 与 Privacy，也解释了为什么“记住”的信息仍可能没有进入某次模型调用。"}
+    },
+    "concept-checkpoint-resume": {
+      "en": {"summary": "Checkpoint and resume persist enough explicit workflow state that a long-running AI task can recover after interruption without replaying unsafe or completed work.", "mentalModel": "Checkpoint durable state at meaningful boundaries: completed steps, outputs, external side effects, pending decisions, version metadata, and the next valid transition.", "whyItMatters": "Long-running agents inevitably encounter crashes and timeouts, so recovery must continue from known state rather than reconstructing intent from conversation text."},
+      "zh-CN": {"summary": "Checkpoint/Resume 会持久化足够的显式 Workflow State，使长任务中断后能够恢复，而不重复危险或已完成动作。", "mentalModel": "在有意义边界保存 Completed Step、Output、External Side Effect、Pending Decision、Version Metadata 与下一合法 Transition。", "whyItMatters": "长任务必然遇到 Crash 与 Timeout，Recovery 应从已知 State 继续，而不是仅靠对话文本重新猜测执行进度。"}
+    },
+    "concept-async-long-running": {
+      "en": {"summary": "Asynchronous long-running work separates task initiation from completion so operations can outlive a single request, connection, or model turn.", "mentalModel": "Represent long work with durable task identity, lifecycle state, progress, cancellation, result retrieval, retries, and ownership outside the chat request.", "whyItMatters": "Without explicit async semantics, users and agents cannot safely distinguish still-running work from failed work or decide whether a retry is appropriate."},
+      "zh-CN": {"summary": "Async Long-running Work 会把任务启动与完成分离，使操作可以跨越一次 Request、连接或模型 Turn 持续运行。", "mentalModel": "在对话请求之外显式建模 Task Identity、Lifecycle State、Progress、Cancellation、Result Retrieval、Retry 与 Owner。", "whyItMatters": "没有明确异步语义时，用户和 Agent 难以区分仍在运行与已经失败，也无法安全判断是否应该 Retry。"}
+    },
+    "concept-reversible-actions": {
+      "en": {"summary": "Reversible actions can be safely undone or corrected, while irreversible actions create side effects whose consequences cannot be reliably rolled back.", "mentalModel": "Classify action reversibility before granting autonomy; use previews, drafts, staging, soft deletes, and approval gates to postpone irreversible commitment.", "whyItMatters": "The acceptable level of model uncertainty is much lower when an action moves money, deletes data, sends messages, or changes external state permanently."},
+      "zh-CN": {"summary": "Reversible Action 可以安全撤销或修正，而 Irreversible Action 会产生无法可靠回滚的外部 Side Effect。", "mentalModel": "授权 Autonomy 前先判断可逆性；通过 Preview、Draft、Staging、Soft Delete 与 Approval Gate 延迟不可逆 Commit。", "whyItMatters": "当动作涉及资金、删除数据、发送消息或永久改变外部状态时，可接受的模型不确定性必须显著降低。"}
+    },
+    "concept-retry-amplification": {
+      "en": {"summary": "Retry amplification occurs when retries multiply load, duplicate side effects, or trigger more failures instead of simply recovering from a transient error.", "mentalModel": "Retry only errors that are safe and likely transient, with bounded attempts, backoff, idempotency, and visibility into the original operation's outcome.", "whyItMatters": "During incidents, uncontrolled retries can turn a small dependency failure into a system-wide outage or repeated financial action."},
+      "zh-CN": {"summary": "Retry Amplification 指 Retry 不但没有恢复短暂错误，反而放大负载、重复 Side Effect 或触发更多失败。", "mentalModel": "只 Retry 安全且可能短暂的错误，并设置有限次数、Backoff、Idempotency，同时确认原始 Operation 的真实 Outcome。", "whyItMatters": "Incident 期间无控制 Retry 可能把一个小型依赖故障迅速放大为系统级 Outage 或重复财务动作。"}
+    },
+    "concept-prompt-injection-defense": {
+      "en": {"summary": "Prompt injection defense prevents untrusted content from gaining instruction authority or reaching capabilities beyond the data role it was meant to play.", "mentalModel": "Separate data from instructions, preserve provenance, restrict tools by policy, validate requested actions, and enforce consequential boundaries outside the model.", "whyItMatters": "Prompt wording alone cannot reliably stop malicious retrieved text or user content from attempting to redirect an agent with real capabilities."},
+      "zh-CN": {"summary": "Prompt Injection Defense 阻止不可信内容获得指令 Authority，或突破其原本只作为 Data 的角色触达更高能力。", "mentalModel": "区分 Data 与 Instruction、保留 Provenance、按 Policy 限制 Tool、验证 Requested Action，并把高后果边界放到模型之外执行。", "whyItMatters": "仅靠 Prompt 无法稳定阻止恶意检索文本或用户内容尝试重定向拥有真实能力的 Agent。"}
+    },
+    "concept-online-monitoring": {
+      "en": {"summary": "Online monitoring watches production behavior after release using operational, quality, safety, cost, and drift signals tied to real traffic.", "mentalModel": "Define what would indicate degradation before shipping, instrument those signals, and connect alerts to investigation, rollback, or traffic-control actions.", "whyItMatters": "Offline evaluation cannot represent every production distribution shift, so release is the beginning of evidence collection rather than the end."},
+      "zh-CN": {"summary": "Online Monitoring 在发布后通过真实流量持续观察 Operation、Quality、Safety、Cost 与 Drift Signal。", "mentalModel": "上线前先定义什么现象代表退化，再建立 Instrumentation，并让 Alert 连接到调查、Rollback 或流量控制动作。", "whyItMatters": "Offline Evaluation 无法覆盖所有生产 Distribution Shift，因此 Release 是持续收集证据的开始，而不是验证结束。"}
+    },
+    "concept-rollout-fallback": {
+      "en": {"summary": "Rollout and fallback control how a new AI behavior receives production traffic and how the system returns to a known safer state when evidence turns negative.", "mentalModel": "Use staged exposure, explicit success and veto signals, and a tested rollback or fallback path that does not depend on the failing component itself.", "whyItMatters": "A safe release process limits blast radius and gives teams time to learn before a model or architecture change reaches every user."},
+      "zh-CN": {"summary": "Rollout/Fallback 控制新 AI 行为如何逐步接收生产流量，以及证据恶化时系统如何回到已知更安全状态。", "mentalModel": "使用分阶段 Exposure、显式 Success/Veto Signal，以及不依赖故障组件本身的已测试 Rollback 或 Fallback Path。", "whyItMatters": "安全发布能限制 Blast Radius，并在模型或架构变化影响全部用户前给团队留下观察和学习空间。"}
+    },
+    "concept-context-compaction": {
+      "en": {"summary": "Context compaction compresses older or lower-value information into a smaller representation so long-running work can remain within a finite context budget.", "mentalModel": "Compact with a retention objective: decide which facts, decisions, unresolved questions, provenance, and constraints must survive before discarding detail.", "whyItMatters": "Naive summarization can save tokens while deleting exactly the evidence or commitments required for coherent continuation."},
+      "zh-CN": {"summary": "Context Compaction 会把较旧或低价值信息压缩成更小表示，让长任务继续运行在有限 Context Budget 内。", "mentalModel": "压缩前先定义 Retention Objective：明确哪些 Fact、Decision、Unresolved Question、Provenance 与 Constraint 必须保留。", "whyItMatters": "粗糙 Summary 虽然节省 Token，却可能恰好删除后续保持一致性所需的关键证据或承诺。"}
+    },
+    "concept-streaming-backpressure": {
+      "en": {"summary": "Streaming backpressure handles the mismatch between how quickly an upstream AI process produces data and how quickly downstream clients or processors can consume it.", "mentalModel": "Make flow control explicit with bounded buffers, pacing, cancellation, batching, or dropping policies rather than assuming every consumer keeps up indefinitely.", "whyItMatters": "Without backpressure, slow clients can cause memory growth, latency spikes, connection failures, or cascading load across the application."},
+      "zh-CN": {"summary": "Streaming Backpressure 处理上游 AI 生成速度与下游 Client 或 Processor 消费速度不一致的问题。", "mentalModel": "使用有限 Buffer、Pacing、Cancellation、Batching 或 Drop Policy 显式控制 Flow，而不是假设 Consumer 永远跟得上。", "whyItMatters": "没有 Backpressure 时，慢 Client 会导致内存增长、延迟尖峰、连接失败，甚至把负载级联到整个应用。"}
+    },
+    "concept-learning-objective-design": {
+      "en": {"summary": "Learning objective design states what a learner should be able to understand, decide, produce, or verify after a learning experience and under what conditions.", "mentalModel": "Write objectives as observable capability changes, then align content, practice, and assessment to the same decision or behavior.", "whyItMatters": "Without clear objectives, AI-generated courses can look comprehensive while failing to produce any measurable change in learner behavior."},
+      "zh-CN": {"summary": "Learning Objective Design 明确学习者完成学习后应该能理解、判断、产出或验证什么，以及在什么条件下做到。", "mentalModel": "把 Objective 写成可观察的 Capability Change，再让 Content、Practice 与 Assessment 对齐到同一个 Decision 或 Behavior。", "whyItMatters": "没有清晰目标时，AI 课程可能看起来内容很多，却无法证明学习者行为或能力发生了真实变化。"}
+    },
+    "concept-coordination-overhead": {
+      "en": {"summary": "Coordination overhead is the extra latency, communication, state management, verification, and failure handling introduced when work is split across multiple agents or stages.", "mentalModel": "Treat coordination as a cost that must be earned by better decomposition, parallelism, specialization, or independent verification compared with a simpler baseline.", "whyItMatters": "Multi-agent systems often add more messages and moving parts than useful intelligence, making them slower and less reliable without clear benefit."},
+      "zh-CN": {"summary": "Coordination Overhead 是把工作拆给多个 Agent 或 Stage 后新增的通信、延迟、State Management、Verification 与 Failure Handling 成本。", "mentalModel": "把 Coordination 当成必须由 Decomposition、Parallelism、Specialization 或 Independent Verification 收益来支付的成本，并与简单 Baseline 比较。", "whyItMatters": "Multi-Agent 很容易增加大量消息与移动部件，却没有增加等价价值，最终反而更慢、更贵、更难可靠。"}
+    },
+    "concept-reranking": {
+      "en": {"summary": "Reranking applies a stronger scoring step to a smaller retrieved candidate set so the most useful evidence is ordered more accurately for the final context.", "mentalModel": "Use cheap retrieval for broad recall, then spend more computation on a bounded candidate set where better relevance judgment can change the final evidence order.", "whyItMatters": "Reranking can improve precision without making first-stage retrieval expensive, but it cannot recover documents that were never retrieved at all."},
+      "zh-CN": {"summary": "Reranking 会对较小的 Retrieval Candidate Set 使用更强评分，使最终 Context 中最有用的证据排序更准确。", "mentalModel": "先用低成本 Retrieval 获得广泛 Recall，再把更高计算成本用于有限候选集，让更好的相关性判断改变最终证据顺序。", "whyItMatters": "Rerank 能提升 Precision 而不必让第一阶段检索昂贵，但它无法找回一开始根本没有被召回的文档。"}
+    },
+    "concept-test-first-ai": {
+      "en": {"summary": "Test-first AI defines executable acceptance evidence before generation or agentic coding so produced changes are evaluated against known behavior instead of aesthetic plausibility.", "mentalModel": "Turn requirements into tests or concrete checks first, then let AI generate toward a fixed target and review any changes to the tests separately.", "whyItMatters": "Without preexisting evidence, an agent can modify both implementation and expectations until its own output appears correct."},
+      "zh-CN": {"summary": "Test-first AI 会在 Generation 或 Agentic Coding 前先定义可执行验收证据，让产物面对固定行为目标而不是“看起来合理”。", "mentalModel": "先把 Requirement 转成 Test 或具体 Check，再让 AI 朝固定 Target 生成；如果测试本身被修改，要单独 Review。", "whyItMatters": "没有预先存在的 Evidence 时，Agent 可能同时修改实现与期望，最终让自己的输出看起来永远是正确的。"}
+    },
+    "concept-fact-check-revision": {
+      "en": {"summary": "Fact-check and revision separates drafting from evidence verification, then uses identified support gaps or contradictions to make targeted corrections.", "mentalModel": "Extract checkable claims, trace each to authoritative sources, classify support, and revise only after the evidence status is explicit.", "whyItMatters": "Asking a model to 'review its draft' often preserves the same unsupported assumptions; claim-level evidence breaks that coupling."},
+      "zh-CN": {"summary": "Fact-check/Revision 把 Drafting 与 Evidence Verification 分离，再根据未被支持或互相矛盾的 Claim 做定向修订。", "mentalModel": "先抽取可验证 Claim，追踪到权威 Source，明确 Support Status，然后再基于证据进行 Revision。", "whyItMatters": "让同一模型泛泛“检查自己的文章”容易保留原有错误假设，而 Claim-level Evidence 能打破这种耦合。"}
+    },
+    "concept-data-analysis-verification": {
+      "en": {"summary": "Data-analysis verification independently checks extraction, transformations, calculations, assumptions, and uncertainty before accepting an AI-assisted analytical conclusion.", "mentalModel": "Separate the pipeline into source data → structured data → calculation → interpretation, and verify each transition with reproducible evidence.", "whyItMatters": "A fluent analytical narrative can hide a single extraction or arithmetic error that invalidates the final business conclusion."},
+      "zh-CN": {"summary": "Data-analysis Verification 会在接受 AI 辅助分析结论前，独立检查 Extraction、Transformation、Calculation、Assumption 与 Uncertainty。", "mentalModel": "把 Pipeline 拆成 Source Data → Structured Data → Calculation → Interpretation，并用可复现证据验证每个 Transition。", "whyItMatters": "再流畅的分析叙事也可能隐藏一个抽取或算术错误，而这个错误足以让最终业务结论完全失效。"}
+    }
+  }
+}

@@ -26,7 +26,7 @@ These remain distinct canonical Concepts, but the useful independent teaching su
 - `concept-prompt-caching`
 - `concept-user-domain-memory`
 
-A concise treatment still needs localized definition, mental model, why-it-matters and canonical Path/relationship context. #202 owns that readable concise surface.
+A concise treatment still needs localized definition, mental model, why-it-matters and canonical Path/relationship context. #202 implements that readable concise surface.
 
 ## 2. PRACTICE_OR_COURSE_FIRST — 9
 
@@ -100,12 +100,16 @@ A full Guide is earned only when one of the following becomes real:
 - a real Course learning discontinuity remains after neighboring evaluation Guides;
 - direct-search or production-evaluation demand warrants standalone coverage.
 
-## Structural completeness after #199
+## Structural completeness after #199 + #202
 
 The end state is deliberately asymmetric:
 
 ```text
 145 canonical Concepts
+├─ 145 bilingual concise Concept explanations
+│  ├─ summary
+│  ├─ mental model
+│  └─ why it matters
 ├─ 120 substantial OPEN Guides
 └─ 25 intentional non-Guide treatments
    ├─ 6 concise canonical
@@ -114,7 +118,7 @@ The end state is deliberately asymmetric:
    └─ 2 full Guide only on new evidence trigger
 ```
 
-This is considered structurally complete because every canonical Concept has an explicit treatment and remains reachable through the same Knowledge Graph / Path architecture.
+This is structurally complete because every canonical Concept has an explicit treatment and a readable EN / zh-CN explanation surface while remaining reachable through the same Knowledge Graph / Path architecture.
 
 ## What this contract forbids
 
@@ -122,7 +126,7 @@ This is considered structurally complete because every canonical Concept has an 
 - no automatically converting the remaining inventory into long Guides;
 - no fabricated Practice evidence to justify a treatment;
 - no merge/deprecation/alias merely because two Concepts overlap;
-- no second relationship graph inside the treatment contract;
+- no second relationship graph inside the treatment or concise-copy contract;
 - no using provider/version churn alone as a reason to create a long article.
 
 ## What can still change later
@@ -137,21 +141,27 @@ Run:
 
 ```bash
 python3 scripts/test_intentional_treatment.py
+python3 scripts/build_ai_knowledge_graph_v1.py --write
+python3 scripts/test_concise_concepts.py
 ```
 
-The validator proves that:
+The combined validators prove that:
 
 - the repository still has 145 canonical Concepts;
 - EN and zh-CN still publish exactly 120 identical Guide Concept bindings;
 - the residual set is exactly 25;
 - the treatment contract partitions that exact residual once and only once;
+- every canonical Concept resolves summary, mental model and why-it-matters in both locales;
+- all 25 post-Core-120 Concepts have authored bilingual concise copy;
 - Practice-first mappings are earned by current evidence;
 - Course-first mappings do not fabricate Practice evidence;
 - all semantic-overlap reviews are resolved;
 - Core-140/Core-145 batch machinery remains absent.
 
-## Next implementation boundary
+## Implemented concise surface
 
-#199 freezes **what treatment each remaining Concept receives**.
+#202 turns the #199 policy into a real product surface.
 
-#202 is the next step: make sure the concise canonical explanation surface is complete and bilingual for all Concepts that intentionally do not have full Guides, using the canonical inventory/presentation layer rather than creating a second curriculum.
+`content/ai-knowledge-concise-v1.0.json` is the canonical bilingual concise-copy policy. Knowledge Map and Unified Search consume the same Concept read model. Course memberships remain derived from canonical Path milestones, Related Concepts remain graph-derived, and a full Guide remains an optional deeper layer.
+
+See `docs/CONCISE_CONCEPT_SURFACE.md` for the implementation and validation contract.

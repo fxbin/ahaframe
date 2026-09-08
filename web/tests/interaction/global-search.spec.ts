@@ -31,6 +31,18 @@ test("Guide full text is searchable beyond title and summary", async ({ page }) 
   await expect(result).toHaveAttribute("data-search-reason", "body");
 });
 
+test("non-Guide Concept concise copy is searchable without fabricating a Guide destination", async ({ page }) => {
+  await page.goto("/en/learning/");
+  await page.keyboard.press("Control+K");
+  const input = page.getByRole("textbox", { name: "Search AhaFrame" });
+  await input.fill("position adjacency recency effects");
+
+  const result = page.locator('[data-search-result="concept:concept-sequence-ordering"]');
+  await expect(result).toBeVisible();
+  await expect(result).toHaveAttribute("data-search-reason", "body");
+  await expect(result).toHaveAttribute("href", "/en/learning/");
+});
+
 test("exact Course and Practice destinations participate without fabricated Course context", async ({ page }) => {
   await page.goto("/en/learning/");
   await page.keyboard.press("Control+K");
