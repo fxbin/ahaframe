@@ -77,4 +77,4 @@ This makes the Content Completeness V1 end state intentional rather than uniform
 - 145 / 145 canonical Concepts accounted for;
 - no automatic Core-140/Core-145 wave.
 
-#202 follows #199 by implementing/verifying the bilingual concise Concept explanation surface for Concepts that intentionally do not receive full Guides.
+#202 completes the follow-up by implementing and validating the bilingual concise Concept explanation surface across all 145 canonical Concepts. The product now exposes the concise layer through the same canonical Knowledge Map/Search read model, while full Guides remain optional deeper enrichment. See `docs/CONCISE_CONCEPT_SURFACE.md` for the implementation and validation contract.
