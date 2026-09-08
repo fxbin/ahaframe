@@ -1,6 +1,8 @@
 # zh-CN Release QA — `release/zh-cn-v1`
 
-Status: release-candidate checklist for issue #47.
+Status: historical release-candidate checklist for issue #47.
+
+> Current `main` note (2026-09-08): the dedicated `Localization Release QA` GitHub Actions workflow was removed after the original zh-CN release work and is not part of the current `.github/workflows` surface. Do **not** configure `Localization Release QA` as a required status check. The current `main` merge gate is `CI` with required jobs `validate` and `validation-read-models`. The remainder of this document preserves the release evidence and checklist that applied to the original `release/zh-cn-v1` train.
 
 ## Scope
 
@@ -46,11 +48,11 @@ Release QA found and corrected two concrete cross-locale defects before release:
 
 It also corrected the Integrated Build duration presentation from `35 min` to `35 分钟` on zh-CN.
 
-## Automated release gates
+## Automated release gates at the time of the release
 
-`CI` protects the existing engine, scenarios, Integrated Build, static build, localization contracts, validation instrumentation, JavaScript syntax, Next.js migration app, and deployment config.
+`CI` protected the existing engine, scenarios, Integrated Build, static build, localization contracts, validation instrumentation, JavaScript syntax, Next.js migration app, and deployment config.
 
-`Localization Release QA` additionally verifies:
+The historical `Localization Release QA` gate additionally verified:
 
 - every English/zh-CN public route pair exists;
 - self-canonical URLs are locale-correct;
@@ -65,6 +67,8 @@ It also corrected the Integrated Build duration presentation from `35 min` to `3
 - representative desktop/mobile HTML structure and interactive controls are present;
 - the production smoke harness covers representative English and zh-CN routes.
 
+These bullets describe historical release evidence; they must not be interpreted as current required-check names.
+
 ## Backend rollout
 
 Before final production smoke:
@@ -74,15 +78,15 @@ Before final production smoke:
 - verify `validation_events.locale`, `aha_feedback.locale`, and `validation_waitlist.locale` accept `en` / `zh-CN`;
 - retain default `en` so older clients/rows remain backward-compatible.
 
-## Release-train checklist: `release/zh-cn-v1` → `main`
+## Historical release-train checklist: `release/zh-cn-v1` → `main`
 
-- [ ] PR #57 is green in both `CI` and `Localization Release QA`.
+- [ ] PR #57 is green in both the release-era `CI` and `Localization Release QA` gates.
 - [ ] Merge PR #57 into `release/zh-cn-v1` and close #47.
 - [ ] Confirm parent localization issue #42 has no remaining child implementation gap.
 - [ ] Apply the additive Supabase locale migration.
 - [ ] Deploy the updated `validation-ingest` function.
 - [ ] Open one release PR from `release/zh-cn-v1` to `main`; do not merge feature branches directly to `main`.
-- [ ] Require normal CI plus localization release QA on the release PR.
+- [ ] Require the release-era CI plus localization release QA on the release PR.
 - [ ] Merge the release PR only after the branch is fully green.
 - [ ] Confirm the production deployment serves `/en/` and `/zh-cn/` route pairs.
 - [ ] Run `scripts/smoke_production.py` against the production validation endpoint.
