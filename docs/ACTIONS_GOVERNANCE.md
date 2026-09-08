@@ -1,6 +1,6 @@
 # GitHub Actions Governance
 
-Status: execution contract for #71.
+Status: execution contract for #71 and repository merge-gate policy for `main`.
 
 ## Goal
 
@@ -20,17 +20,46 @@ Production Gate
 
 ## PR Gate
 
-`CI` and `Localization Release QA` run for pull requests targeting `main`.
+`CI` runs for pull requests targeting `main`.
 
-Feature-branch `push` events do not run these workflows automatically. Before opening a PR, developers/agents should run bounded local checks. A draft PR can be opened when shared CI evidence is needed.
+The merge-relevant required checks are the two stable CI job names:
 
-When a newer commit is pushed to the same PR, `concurrency.cancel-in-progress` cancels obsolete CI/Localization runs for that PR.
+- `validate`
+- `validation-read-models`
+
+Both jobs must complete successfully before a pull request is merged into `main`.
+
+Feature-branch `push` events do not run `CI` automatically. Before opening a PR, developers/agents should run bounded local checks. A draft PR can be opened when shared CI evidence is needed.
+
+A newer PR head supersedes older validation evidence. Merge decisions must be made against the current PR head SHA, not a previously green commit.
+
+## Repository protection contract
+
+GitHub repository settings for `main` should enforce the PR Gate rather than relying on convention alone.
+
+Required repository-side rules:
+
+- require a pull request before merging into `main`;
+- require `validate` to pass;
+- require `validation-read-models` to pass;
+- do not require a reviewer approval count for the current solo-maintainer workflow;
+- do not allow force pushes to `main`;
+- do not allow deletion of `main`;
+- avoid bypassing the required checks for normal merges or direct pushes.
+
+`Production Smoke` is deliberately **not** a pre-merge required check. It is post-merge production evidence and runs only after successful `main` CI.
+
+The removed `Localization Release QA` workflow is also **not** a required check. Its historical release documentation remains useful, but the workflow itself no longer exists in the current `.github/workflows` surface.
+
+CI configuration alone cannot prevent a direct push. The repository protection rule is therefore part of the release contract, not an optional UI preference.
 
 ## Main Gate
 
-Every push to `main` runs `CI` and `Localization Release QA` against the exact merged commit.
+Every push to `main` runs `CI` against the exact merged commit.
 
 Main is intentionally not path-filtered: merged production candidates retain a complete repository-level verification record.
+
+The `main` CI run is post-merge evidence. It does not replace the pre-merge PR requirement or the two required PR checks.
 
 ## Production Gate
 
@@ -40,11 +69,13 @@ This prevents feature-branch CI from creating no-op/skipped Production Smoke wor
 
 Manual `workflow_dispatch` remains available for controlled production smoke reruns.
 
-## Why Localization QA is not path-filtered yet
+## Required-check stability
 
-A workflow skipped by branch/path filtering can leave a required check pending, depending on repository protection configuration. Until the required-check contract is explicit and tested, the first governance pass prefers one predictable Localization QA run per PR/main head over risky path-level workflow suppression.
+Branch protection must reference check names that are present on every PR targeting `main`.
 
-If runner usage remains material after duplicate-run elimination, a later change may keep the workflow/check present while conditionally skipping heavyweight jobs or steps based on a trusted change classifier.
+For the current workflow, the protected check names are the job names `validate` and `validation-read-models`. Renaming or conditionally omitting either job is a repository-governance change because it can leave protected PRs unmergeable or silently weaken the gate.
+
+If a future heavyweight test should run conditionally, keep a stable required check present and move conditional logic inside that check rather than path-filtering the required workflow away.
 
 ## Cost-control rules
 
@@ -58,7 +89,9 @@ If runner usage remains material after duplicate-run elimination, a later change
 ## Invariants
 
 - every PR targeting `main` receives `CI`;
-- every PR targeting `main` receives Localization Release QA;
-- every merge to `main` receives both gates again on the exact merge commit;
+- every PR targeting `main` receives both `validate` and `validation-read-models`;
+- `main` is merged through a pull request rather than normal direct pushes;
+- required checks are evaluated against the current PR head;
+- every merge to `main` receives `CI` again on the exact merge commit;
 - Production Smoke runs only from successful main CI or explicit manual dispatch;
 - production evidence remains tied to an exact commit SHA.
