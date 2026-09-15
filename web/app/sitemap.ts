@@ -3,6 +3,12 @@ import { getLocaleSource, segmentForLocale, type Locale } from "@/lib/content";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") || "https://ahaframe.com";
 const LOCALES: Locale[] = ["en", "zh-CN"];
+const TOOL_ROUTES = [
+  "tools/codex-reset/",
+  "tools/codex-reset/history/",
+  "tools/codex-reset/banked-reset/",
+  "tools/codex-reset/usage-limits/",
+] as const;
 
 function routeUrl(locale: Locale, relative: string): string {
   const segment = segmentForLocale(locale);
@@ -17,8 +23,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
 
   const sources = { en, "zh-CN": zh } as const;
-  return LOCALES.flatMap((locale) =>
-    sources[locale].availableRoutes.map((relative) => ({
+  return LOCALES.flatMap((locale) => {
+    const routes = [...sources[locale].availableRoutes, ...TOOL_ROUTES];
+    return routes.map((relative) => ({
       url: routeUrl(locale, relative),
       alternates: {
         languages: {
@@ -27,6 +34,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
           "x-default": routeUrl("en", relative),
         },
       },
-    })),
-  );
+    }));
+  });
 }
