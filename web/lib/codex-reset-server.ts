@@ -1,4 +1,4 @@
-import { fetchPublicResetSignals } from "@/lib/codex-reset-public-feed";
+import { fetchPublicResetSignals, type PublicResetSignal } from "@/lib/codex-reset-public-feed";
 import { createServiceRoleClient } from "@/lib/supabase/server";
 
 export type CodexResetStatus = "detected" | "confirmed" | "rejected";
@@ -73,6 +73,31 @@ function isDirectTiboSource(url: string): boolean {
   return /(?:x\.com|twitter\.com)\/thsottiaux\/status\/\d+/i.test(url);
 }
 
+function mapPublicSignal(signal: PublicResetSignal): CodexResetEvent {
+  const directTibo = isDirectTiboSource(signal.sourceUrl);
+  const confirmed = directTibo || signal.corroboratedByNextReset;
+  const detectedAt = new Date().toISOString();
+
+  return {
+    id: `public:${signal.kind}:${signal.externalId}`,
+    occurredAt: signal.occurredAt,
+    detectedAt,
+    status: confirmed ? "confirmed" : "detected",
+    kind: signal.kind,
+    sourceType: directTibo ? "x_tibo" : "codex_resets_api",
+    sourceExternalId: signal.externalId,
+    sourceUrl: signal.sourceUrl,
+    sourceLabel: signal.corroboratedByNextReset
+      ? `${signal.sourceLabel} · cross-checked with NextReset`
+      : signal.sourceLabel,
+    evidenceText: signal.kind === "banked"
+      ? "A public source recorded a banked Codex reset credit announcement."
+      : confirmed
+        ? "A public source recorded a full Codex usage reset linked to Tibo's announcement."
+        : "A public reset feed reported a Codex usage reset; secondary corroboration is pending.",
+  };
+}
+
 export async function syncPublicCodexResetFeed(limit = 100): Promise<PublicFeedSyncResult> {
   const signals = await fetchPublicResetSignals(limit);
   if (!signals.length) return { checked: 0, accepted: 0, corroborated: 0 };
@@ -115,21 +140,53 @@ export async function syncPublicCodexResetFeed(limit = 100): Promise<PublicFeedS
 }
 
 export async function getCodexResetSnapshot(limit = 12): Promise<CodexResetSnapshot> {
-  try {
-    await syncPublicCodexResetFeed(Math.max(12, limit)).catch(() => null);
-    const supabase = createServiceRoleClient();
-    const { data, error } = await supabase
-      .from("codex_reset_events")
-      .select("id,occurred_at,detected_at,status,kind,source_type,source_external_id,source_url,source_label,evidence_text")
-      .eq("status", "confirmed")
-      .eq("kind", "full")
-      .order("occurred_at", { ascending: false })
-      .limit(limit);
+  const hasServiceRole = Boolean(
+    process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY,
+  );
 
-    if (error) throw error;
-    const history = ((data ?? []) as ResetEventRow[]).map(mapRow);
-    return { latest: history[0] ?? null, history, dataAvailable: true };
-  } catch {
+  if (hasServiceRole) {
+    try {
+      await syncPublicCodexResetFeed(Math.max(12, limit)).catch((error) => {
+        console.warn("Codex reset feed sync failed; reading persisted history instead.", error);
+      });
+      const supabase = createServiceRoleClient();
+      const { data, error } = await supabase
+        .from("codex_reset_events")
+        .select("id,occurred_at,detected_at,status,kind,source_type,source_external_id,source_url,source_label,evidence_text")
+        .eq("status", "confirmed")
+        .eq("kind", "full")
+        .order("occurred_at", { ascending: false })
+        .limit(limit);
+
+      if (error) throw error;
+      const history = ((data ?? []) as ResetEventRow[]).map(mapRow);
+      if (history.length > 0) {
+        return { latest: history[0], history, dataAvailable: true };
+      }
+    } catch (error) {
+      console.warn("Codex reset persisted history unavailable; falling back to the public feed.", error);
+    }
+  }
+
+  try {
+    const signals = await fetchPublicResetSignals(Math.max(12, limit));
+    if (signals.length === 0) {
+      return { latest: null, history: [], dataAvailable: false };
+    }
+
+    const history = signals
+      .map(mapPublicSignal)
+      .filter((event) => event.status === "confirmed" && event.kind === "full")
+      .sort((a, b) => Date.parse(b.occurredAt) - Date.parse(a.occurredAt))
+      .slice(0, limit);
+
+    return {
+      latest: history[0] ?? null,
+      history,
+      dataAvailable: true,
+    };
+  } catch (error) {
+    console.error("Codex reset public feed unavailable.", error);
     return { latest: null, history: [], dataAvailable: false };
   }
 }
