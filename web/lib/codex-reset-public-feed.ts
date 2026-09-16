@@ -100,13 +100,13 @@ function inferKind(record: Record<string, unknown>): PublicResetKind | null {
 
 function normalizeCandidate(record: Record<string, unknown>): Omit<PublicResetSignal, "corroboratedByNextReset"> | null {
   const occurredAt = parseTimestamp(firstNestedString(record, [
-    "created_at", "createdAt", "timestamp", "time", "date", "occurred_at", "occurredAt", "reset_at", "posted_at",
+    "announced_at", "announcedAt", "created_at", "createdAt", "timestamp", "time", "date", "occurred_at", "occurredAt", "reset_at", "posted_at",
   ]));
   const kind = inferKind(record);
   if (!occurredAt || !kind) return null;
 
   let sourceUrl = firstNestedString(record, [
-    "source_url", "sourceUrl", "tweet_url", "tweetUrl", "x_url", "post_url", "original_url", "originalUrl", "url",
+    "source", "source_url", "sourceUrl", "tweet_url", "tweetUrl", "x_url", "post_url", "original_url", "originalUrl", "url",
   ]);
   const explicitTweetId = firstNestedString(record, ["tweet_id", "tweetId", "post_id", "postId", "status_id", "statusId"]);
   const sourceStatusId = extractXStatusId(sourceUrl);
