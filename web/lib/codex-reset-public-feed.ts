@@ -57,6 +57,30 @@ function extractXStatusId(value: string | null): string | null {
   return match?.[1] ?? null;
 }
 
+function isHttpUrl(value: string | null): value is string {
+  if (!value) return false;
+  try {
+    const url = new URL(value);
+    return url.protocol === "https:" || url.protocol === "http:";
+  } catch {
+    return false;
+  }
+}
+
+function findSourceUrl(record: Record<string, unknown>): string | null {
+  // Prefer fields that are explicitly URLs. Some feeds expose an ingestion
+  // marker such as "webhook" or "observed" in a generic `source` field; that
+  // value is not user-facing evidence and must never become the Source link.
+  const preferred = firstNestedString(record, [
+    "source_url", "sourceUrl", "tweet_url", "tweetUrl", "x_url", "xUrl",
+    "post_url", "postUrl", "original_url", "originalUrl", "permalink", "url",
+  ]);
+  if (isHttpUrl(preferred)) return preferred;
+
+  const generic = firstNestedString(record, ["source"]);
+  return isHttpUrl(generic) ? generic : null;
+}
+
 function collectCandidates(payload: unknown): Record<string, unknown>[] {
   if (Array.isArray(payload)) return payload.map(asRecord).filter((value): value is Record<string, unknown> => Boolean(value));
   const record = asRecord(payload);
@@ -105,13 +129,11 @@ function normalizeCandidate(record: Record<string, unknown>): Omit<PublicResetSi
   const kind = inferKind(record);
   if (!occurredAt || !kind) return null;
 
-  let sourceUrl = firstNestedString(record, [
-    "source", "source_url", "sourceUrl", "tweet_url", "tweetUrl", "x_url", "post_url", "original_url", "originalUrl", "url",
-  ]);
+  let sourceUrl = findSourceUrl(record);
   const explicitTweetId = firstNestedString(record, ["tweet_id", "tweetId", "post_id", "postId", "status_id", "statusId"]);
   const sourceStatusId = extractXStatusId(sourceUrl);
   const xStatusId = sourceStatusId || (explicitTweetId && /^\d{15,}$/.test(explicitTweetId) ? explicitTweetId : null);
-  if (!sourceUrl && xStatusId) sourceUrl = `https://x.com/thsottiaux/status/${xStatusId}`;
+  if (xStatusId) sourceUrl = `https://x.com/thsottiaux/status/${xStatusId}`;
 
   const fallbackId = firstNestedString(record, ["id", "external_id", "externalId", "slug"]);
   const externalId = xStatusId || fallbackId || `${occurredAt}:${kind}`;
@@ -121,8 +143,8 @@ function normalizeCandidate(record: Record<string, unknown>): Omit<PublicResetSi
     occurredAt,
     kind,
     sourceUrl: sourceUrl || "https://codex-resets.com/",
-    sourceLabel: sourceUrl?.includes("x.com/") || sourceUrl?.includes("twitter.com/")
-      ? "Tibo (@thsottiaux) · indexed by Codex Resets"
+    sourceLabel: xStatusId
+      ? "Tibo (@thsottiaux) on X · indexed by Codex Resets"
       : "Codex Resets public feed",
   };
 }
