@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { ingestTiboPosts, type TiboPost } from "@/lib/codex-reset-server";
+import { ingestTiboPosts, syncPublicCodexResetFeed, type TiboPost } from "@/lib/codex-reset-server";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -67,11 +67,21 @@ async function runMonitor(request: NextRequest) {
   }
 
   try {
+    if (!process.env.X_BEARER_TOKEN) {
+      const result = await syncPublicCodexResetFeed(100);
+      return NextResponse.json({
+        ok: true,
+        source: "codex-resets.com + NextReset cross-check",
+        ...result,
+        checkedAt: new Date().toISOString(),
+      });
+    }
+
     const posts = await fetchRecentTiboPosts();
     const accepted = await ingestTiboPosts(posts);
     return NextResponse.json({
       ok: true,
-      source: `@${TIBO_USERNAME}`,
+      source: `@${TIBO_USERNAME} via X API`,
       checked: posts.length,
       accepted,
       checkedAt: new Date().toISOString(),
