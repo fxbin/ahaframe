@@ -127,6 +127,22 @@ function normalizeCandidate(record: Record<string, unknown>): Omit<PublicResetSi
   };
 }
 
+function normalizePayload(payload: unknown): Array<Omit<PublicResetSignal, "corroboratedByNextReset">> {
+  return collectCandidates(payload)
+    .map(normalizeCandidate)
+    .filter((value): value is Omit<PublicResetSignal, "corroboratedByNextReset"> => Boolean(value));
+}
+
+function dedupeSignals(signals: Array<Omit<PublicResetSignal, "corroboratedByNextReset">>) {
+  const deduped = new Map<string, Omit<PublicResetSignal, "corroboratedByNextReset">>();
+  for (const signal of signals) {
+    const xStatusId = extractXStatusId(signal.sourceUrl);
+    const key = xStatusId || `${signal.externalId}:${signal.kind}`;
+    if (!deduped.has(key)) deduped.set(key, signal);
+  }
+  return [...deduped.values()];
+}
+
 async function fetchJson(url: string): Promise<unknown> {
   const response = await fetch(url, {
     headers: { "user-agent": USER_AGENT, accept: "application/json" },
@@ -157,16 +173,26 @@ function corroboratedByNextReset(signal: Omit<PublicResetSignal, "corroboratedBy
 }
 
 export async function fetchPublicResetSignals(limit = 100): Promise<PublicResetSignal[]> {
-  let payload: unknown;
+  let primarySignals: Array<Omit<PublicResetSignal, "corroboratedByNextReset">> = [];
+  let primaryError: unknown = null;
+
   try {
-    payload = await fetchJson(CODEX_RESETS_FEED_URL);
-  } catch {
-    payload = await fetchJson(CODEX_RESETS_STATUS_URL);
+    primarySignals = normalizePayload(await fetchJson(CODEX_RESETS_FEED_URL));
+  } catch (error) {
+    primaryError = error;
   }
 
-  const candidates = collectCandidates(payload)
-    .map(normalizeCandidate)
-    .filter((value): value is Omit<PublicResetSignal, "corroboratedByNextReset"> => Boolean(value))
+  let fallbackSignals: Array<Omit<PublicResetSignal, "corroboratedByNextReset">> = [];
+  if (primarySignals.length === 0) {
+    try {
+      fallbackSignals = normalizePayload(await fetchJson(CODEX_RESETS_STATUS_URL));
+    } catch (fallbackError) {
+      if (primaryError) throw primaryError;
+      throw fallbackError;
+    }
+  }
+
+  const candidates = dedupeSignals([...primarySignals, ...fallbackSignals])
     .sort((a, b) => Date.parse(b.occurredAt) - Date.parse(a.occurredAt))
     .slice(0, limit);
 
