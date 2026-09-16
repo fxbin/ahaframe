@@ -54,8 +54,62 @@ export interface PublicFeedSyncResult {
   corroborated: number;
 }
 
-function mapRow(row: ResetEventRow): CodexResetEvent {
+function isDirectTiboSource(url: string): boolean {
+  return /(?:x\.com|twitter\.com)\/thsottiaux\/status\/\d+/i.test(url);
+}
+
+function isExternalHttpSource(url: string): boolean {
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === "https:" || parsed.protocol === "http:";
+  } catch {
+    return false;
+  }
+}
+
+function eventSummary(status: CodexResetStatus, kind: CodexResetKind) {
+  if (kind === "banked") {
+    return status === "confirmed"
+      ? "Banked Codex reset credit confirmed."
+      : "Banked Codex reset credit detected; confirmation is pending.";
+  }
+  return status === "confirmed"
+    ? "Full Codex usage reset confirmed."
+    : "Codex usage reset detected; rollout confirmation is pending.";
+}
+
+function normalizeUserFacingEvent(event: CodexResetEvent): CodexResetEvent {
+  let sourceUrl = event.sourceUrl;
+  const externalIdLooksLikeTweet = Boolean(event.sourceExternalId && /^\d{15,}$/.test(event.sourceExternalId));
+
+  // Legacy/public-feed rows occasionally persisted ingestion markers such as
+  // `webhook` or `observed` as the source URL. Reconstruct the original Tibo
+  // post whenever we have its status ID; otherwise fall back to the public
+  // catalogue instead of exposing an internal implementation detail.
+  if (!isExternalHttpSource(sourceUrl)) {
+    sourceUrl = externalIdLooksLikeTweet
+      ? `https://x.com/thsottiaux/status/${event.sourceExternalId}`
+      : "https://codex-resets.com/";
+  }
+
+  const directTibo = isDirectTiboSource(sourceUrl);
+  const crossChecked = /nextreset/i.test(event.sourceLabel);
+  const sourceLabel = directTibo
+    ? `Tibo (@thsottiaux) on X${crossChecked ? " · cross-checked with NextReset" : ""}`
+    : crossChecked
+      ? "Codex Resets public feed · cross-checked with NextReset"
+      : "Codex Resets public feed";
+
   return {
+    ...event,
+    sourceUrl,
+    sourceLabel,
+    evidenceText: eventSummary(event.status, event.kind),
+  };
+}
+
+function mapRow(row: ResetEventRow): CodexResetEvent {
+  return normalizeUserFacingEvent({
     id: row.id,
     occurredAt: row.occurred_at,
     detectedAt: row.detected_at,
@@ -66,23 +120,41 @@ function mapRow(row: ResetEventRow): CodexResetEvent {
     sourceUrl: row.source_url,
     sourceLabel: row.source_label,
     evidenceText: row.evidence_text,
-  };
+  });
 }
 
-function isDirectTiboSource(url: string): boolean {
-  return /(?:x\.com|twitter\.com)\/thsottiaux\/status\/\d+/i.test(url);
+function sourceRank(event: CodexResetEvent) {
+  if (isDirectTiboSource(event.sourceUrl)) return 3;
+  if (isExternalHttpSource(event.sourceUrl)) return 2;
+  return 1;
+}
+
+function dedupeEvents(events: CodexResetEvent[]) {
+  const deduped = new Map<string, CodexResetEvent>();
+  for (const event of events) {
+    // The same reset can enter through a seed, public-feed sync and later a
+    // direct X ingestion. Treat timestamp + kind as one event and retain the
+    // strongest user-verifiable source.
+    const key = `${event.kind}:${new Date(event.occurredAt).toISOString()}`;
+    const existing = deduped.get(key);
+    if (!existing || sourceRank(event) > sourceRank(existing)) {
+      deduped.set(key, event);
+    }
+  }
+  return [...deduped.values()].sort((a, b) => Date.parse(b.occurredAt) - Date.parse(a.occurredAt));
 }
 
 function mapPublicSignal(signal: PublicResetSignal): CodexResetEvent {
   const directTibo = isDirectTiboSource(signal.sourceUrl);
   const confirmed = directTibo || signal.corroboratedByNextReset;
   const detectedAt = new Date().toISOString();
+  const status: CodexResetStatus = confirmed ? "confirmed" : "detected";
 
-  return {
+  return normalizeUserFacingEvent({
     id: `public:${signal.kind}:${signal.externalId}`,
     occurredAt: signal.occurredAt,
     detectedAt,
-    status: confirmed ? "confirmed" : "detected",
+    status,
     kind: signal.kind,
     sourceType: directTibo ? "x_tibo" : "codex_resets_api",
     sourceExternalId: signal.externalId,
@@ -90,12 +162,8 @@ function mapPublicSignal(signal: PublicResetSignal): CodexResetEvent {
     sourceLabel: signal.corroboratedByNextReset
       ? `${signal.sourceLabel} · cross-checked with NextReset`
       : signal.sourceLabel,
-    evidenceText: signal.kind === "banked"
-      ? "A public source recorded a banked Codex reset credit announcement."
-      : confirmed
-        ? "A public source recorded a full Codex usage reset linked to Tibo's announcement."
-        : "A public reset feed reported a Codex usage reset; secondary corroboration is pending.",
-  };
+    evidenceText: eventSummary(status, signal.kind),
+  });
 }
 
 export async function syncPublicCodexResetFeed(limit = 100): Promise<PublicFeedSyncResult> {
@@ -106,10 +174,11 @@ export async function syncPublicCodexResetFeed(limit = 100): Promise<PublicFeedS
   const rows = signals.map((signal) => {
     const directTibo = isDirectTiboSource(signal.sourceUrl);
     const confirmed = directTibo || signal.corroboratedByNextReset;
+    const status: CodexResetStatus = confirmed ? "confirmed" : "detected";
     return {
       occurred_at: signal.occurredAt,
       detected_at: now,
-      status: confirmed ? "confirmed" : "detected",
+      status,
       kind: signal.kind,
       source_type: directTibo ? "x_tibo" : "codex_resets_api",
       source_external_id: signal.externalId,
@@ -117,11 +186,7 @@ export async function syncPublicCodexResetFeed(limit = 100): Promise<PublicFeedS
       source_label: signal.corroboratedByNextReset
         ? `${signal.sourceLabel} · cross-checked with NextReset`
         : signal.sourceLabel,
-      evidence_text: signal.kind === "banked"
-        ? "A public source recorded a banked Codex reset credit announcement."
-        : confirmed
-          ? "A public source recorded a full Codex usage reset linked to Tibo's announcement."
-          : "A public reset feed reported a Codex usage reset; secondary corroboration is pending.",
+      evidence_text: eventSummary(status, signal.kind),
       updated_at: now,
     };
   });
@@ -156,10 +221,10 @@ export async function getCodexResetSnapshot(limit = 12): Promise<CodexResetSnaps
         .eq("status", "confirmed")
         .eq("kind", "full")
         .order("occurred_at", { ascending: false })
-        .limit(limit);
+        .limit(Math.max(limit * 3, limit));
 
       if (error) throw error;
-      const history = ((data ?? []) as ResetEventRow[]).map(mapRow);
+      const history = dedupeEvents(((data ?? []) as ResetEventRow[]).map(mapRow)).slice(0, limit);
       if (history.length > 0) {
         return { latest: history[0], history, dataAvailable: true };
       }
@@ -174,10 +239,9 @@ export async function getCodexResetSnapshot(limit = 12): Promise<CodexResetSnaps
       return { latest: null, history: [], dataAvailable: false };
     }
 
-    const history = signals
+    const history = dedupeEvents(signals
       .map(mapPublicSignal)
-      .filter((event) => event.status === "confirmed" && event.kind === "full")
-      .sort((a, b) => Date.parse(b.occurredAt) - Date.parse(a.occurredAt))
+      .filter((event) => event.status === "confirmed" && event.kind === "full"))
       .slice(0, limit);
 
     return {

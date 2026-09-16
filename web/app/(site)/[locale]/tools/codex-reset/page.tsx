@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getCodexResetSnapshot } from "@/lib/codex-reset-server";
+import { CodexResetCalendar } from "@/components/codex-reset-calendar";
+import { getCodexResetSnapshot, type CodexResetEvent } from "@/lib/codex-reset-server";
 import { localeFromSegment, localizedPath } from "@/lib/content";
 import { pageMetadata } from "@/lib/metadata";
 
@@ -40,6 +41,13 @@ function isSameUtcDay(value: string, now = new Date()) {
     && date.getUTCDate() === now.getUTCDate();
 }
 
+function sourceName(event: CodexResetEvent, zh: boolean) {
+  if (/x\.com\/thsottiaux|twitter\.com\/thsottiaux/i.test(event.sourceUrl)) {
+    return zh ? "Tibo 原始 X 帖子 ↗" : "Tibo on X ↗";
+  }
+  return zh ? "公开来源 ↗" : "Public source ↗";
+}
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale: segment } = await params;
   const locale = localeFromSegment(segment);
@@ -58,20 +66,22 @@ export default async function CodexResetPage({ params }: PageProps) {
   const locale = localeFromSegment(segment);
   if (!locale) notFound();
 
-  const snapshot = await getCodexResetSnapshot(6);
+  const snapshot = await getCodexResetSnapshot(20);
   const latest = snapshot.latest;
   const resetToday = latest ? isSameUtcDay(latest.occurredAt) : false;
-  const copy = locale === "zh-CN" ? {
+  const recentHistory = snapshot.history.slice(0, 6);
+  const zh = locale === "zh-CN";
+  const copy = zh ? {
     eyebrow: "AhaFrame Tools · Codex Reset Radar",
     title: "Codex 今天重置了吗？",
     todayConfirmed: "今天已确认发生重置",
     watching: "今天暂无已确认重置 · 正在监控",
     noData: "监控数据暂不可用",
-    checked: "数据源：Codex Resets 公共 feed；保留 Tibo (@thsottiaux) 原始公告链接，并在可用时用 NextReset 做二次校验。",
+    checked: "数据源：Codex Resets 公共 feed；优先保留 Tibo (@thsottiaux) 原始公告链接，并在可用时用 NextReset 做二次校验。",
     lastReset: "最近确认重置",
-    source: "查看原始公告",
-    history: "重置历史",
-    historyCopy: "只把已确认的全量 Usage Reset 计入主历史；Banked Reset 单独处理。",
+    history: "最近重置历史",
+    historyCopy: "主时间线只统计已确认的全量 Usage Reset；Banked Reset 单独处理。",
+    eventTitle: "全量 Usage Reset 已确认",
     viewHistory: "查看完整历史 →",
     notify: "提醒功能即将上线",
     notifyCopy: "第一阶段先把检测准确性与历史数据跑稳，再接 Email / Browser Push。",
@@ -85,11 +95,11 @@ export default async function CodexResetPage({ params }: PageProps) {
     todayConfirmed: "Reset confirmed today",
     watching: "No confirmed reset today · watching",
     noData: "Monitor data is temporarily unavailable",
-    checked: "Source: Codex Resets public feed with original Tibo (@thsottiaux) links, cross-checked against NextReset when available.",
+    checked: "Source: Codex Resets public feed with original Tibo (@thsottiaux) links preferred, cross-checked against NextReset when available.",
     lastReset: "Last confirmed reset",
-    source: "View source announcement",
     history: "Recent reset history",
     historyCopy: "The main timeline only counts confirmed full usage resets. Banked resets are tracked separately.",
+    eventTitle: "Full usage reset confirmed",
     viewHistory: "View full history →",
     notify: "Alerts are next",
     notifyCopy: "We are stabilizing detection and history first, then adding Email / Browser Push.",
@@ -119,7 +129,7 @@ export default async function CodexResetPage({ params }: PageProps) {
               <>
                 <p className="mt-3 text-2xl font-semibold tracking-[-0.025em]">{formatUtc(latest.occurredAt, locale)}</p>
                 <p className="mt-1 text-sm text-[var(--muted)]">{elapsed(latest.occurredAt, locale)}</p>
-                <a className="text-link mt-5 text-sm font-semibold" href={latest.sourceUrl} target="_blank" rel="noreferrer">{copy.source} ↗</a>
+                <a className="text-link mt-5 inline-flex text-sm font-semibold" href={latest.sourceUrl} target="_blank" rel="noreferrer">{sourceName(latest, zh)}</a>
               </>
             ) : (
               <p className="mt-3 text-sm leading-6 text-[var(--muted)]">{copy.watching}</p>
@@ -130,26 +140,33 @@ export default async function CodexResetPage({ params }: PageProps) {
 
       <section className="mt-8 grid gap-6 lg:grid-cols-[1.4fr_0.6fr]">
         <div className="rounded-[18px] border border-[var(--border)] bg-[var(--surface)] p-6 md:p-8">
-          <div className="flex items-end justify-between gap-4">
-            <div>
-              <p className="technical-label">{copy.history}</p>
-              <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--muted)]">{copy.historyCopy}</p>
-            </div>
-            <Link className="text-link hidden text-sm font-semibold sm:inline-flex" href={localizedPath("/tools/codex-reset/history", locale)}>{copy.viewHistory}</Link>
+          <div>
+            <p className="technical-label">{copy.history}</p>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--muted)]">{copy.historyCopy}</p>
           </div>
 
           <div className="mt-6 divide-y divide-[var(--border)]">
-            {snapshot.history.length > 0 ? snapshot.history.map((event) => (
-              <div key={event.id} className="grid gap-2 py-4 sm:grid-cols-[160px_1fr_auto] sm:items-center">
+            {recentHistory.length > 0 ? recentHistory.map((event) => (
+              <div key={event.id} className="grid gap-3 py-4 sm:grid-cols-[160px_1fr_auto] sm:items-center">
                 <time className="font-mono text-xs text-[var(--muted)]">{formatUtc(event.occurredAt, locale)}</time>
-                <p className="text-sm font-medium">{event.evidenceText}</p>
-                <a className="text-link text-xs font-semibold" href={event.sourceUrl} target="_blank" rel="noreferrer">Source ↗</a>
+                <div>
+                  <p className="text-sm font-semibold">{copy.eventTitle}</p>
+                  <p className="mt-1 text-xs leading-5 text-[var(--muted)]">{event.sourceLabel}</p>
+                </div>
+                <a className="text-link text-xs font-semibold" href={event.sourceUrl} target="_blank" rel="noreferrer">{sourceName(event, zh)}</a>
               </div>
             )) : (
               <p className="py-5 text-sm text-[var(--muted)]">{copy.watching}</p>
             )}
           </div>
-          <Link className="text-link mt-4 text-sm font-semibold sm:hidden" href={localizedPath("/tools/codex-reset/history", locale)}>{copy.viewHistory}</Link>
+
+          {snapshot.history.length > 0 ? (
+            <div className="mt-6 border-t border-[var(--border)] pt-6">
+              <CodexResetCalendar events={snapshot.history} locale={locale} weeks={16} />
+            </div>
+          ) : null}
+
+          <Link className="text-link mt-5 inline-flex text-sm font-semibold" href={localizedPath("/tools/codex-reset/history", locale)}>{copy.viewHistory}</Link>
         </div>
 
         <aside className="space-y-6">
