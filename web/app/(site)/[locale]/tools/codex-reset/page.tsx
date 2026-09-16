@@ -33,6 +33,13 @@ function elapsed(value: string, locale: string) {
   return locale === "zh-CN" ? `${days} 天前` : `${days}d ago`;
 }
 
+function isSameUtcDay(value: string, now = new Date()) {
+  const date = new Date(value);
+  return date.getUTCFullYear() === now.getUTCFullYear()
+    && date.getUTCMonth() === now.getUTCMonth()
+    && date.getUTCDate() === now.getUTCDate();
+}
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale: segment } = await params;
   const locale = localeFromSegment(segment);
@@ -53,13 +60,14 @@ export default async function CodexResetPage({ params }: PageProps) {
 
   const snapshot = await getCodexResetSnapshot(6);
   const latest = snapshot.latest;
+  const resetToday = latest ? isSameUtcDay(latest.occurredAt) : false;
   const copy = locale === "zh-CN" ? {
     eyebrow: "AhaFrame Tools · Codex Reset Radar",
     title: "Codex 今天重置了吗？",
-    confirmed: "最近一次重置已确认",
-    watching: "正在监控",
+    todayConfirmed: "今天已确认发生重置",
+    watching: "今天暂无已确认重置 · 正在监控",
     noData: "监控数据暂不可用",
-    checked: "数据源：Tibo (@thsottiaux) 的公开重置公告",
+    checked: "数据源：Codex Resets 公共 feed；保留 Tibo (@thsottiaux) 原始公告链接，并在可用时用 NextReset 做二次校验。",
     lastReset: "最近确认重置",
     source: "查看原始公告",
     history: "重置历史",
@@ -70,14 +78,14 @@ export default async function CodexResetPage({ params }: PageProps) {
     rules: "了解重置规则",
     banked: "Banked Reset 是什么？",
     limits: "Codex Usage Limits 如何工作？",
-    note: "AhaFrame 不代表 OpenAI。Reset 状态基于公开公告与可验证来源。",
+    note: "AhaFrame 不代表 OpenAI。第三方 tracker 可能共享上游数据，因此原始 Tibo 公告链接始终作为主要可验证证据。",
   } : {
     eyebrow: "AhaFrame Tools · Codex Reset Radar",
     title: "Did Codex reset today?",
-    confirmed: "Latest reset confirmed",
-    watching: "Watching for the next reset",
+    todayConfirmed: "Reset confirmed today",
+    watching: "No confirmed reset today · watching",
     noData: "Monitor data is temporarily unavailable",
-    checked: "Source: public reset announcements from Tibo (@thsottiaux)",
+    checked: "Source: Codex Resets public feed with original Tibo (@thsottiaux) links, cross-checked against NextReset when available.",
     lastReset: "Last confirmed reset",
     source: "View source announcement",
     history: "Recent reset history",
@@ -88,7 +96,7 @@ export default async function CodexResetPage({ params }: PageProps) {
     rules: "Reset rules",
     banked: "What is a Banked Reset?",
     limits: "How do Codex usage limits work?",
-    note: "AhaFrame is not affiliated with OpenAI. Reset status is based on public, verifiable announcements.",
+    note: "AhaFrame is not affiliated with OpenAI. Third-party trackers can share upstream data, so original Tibo announcement links remain the primary verifiable evidence.",
   };
 
   return (
@@ -99,8 +107,8 @@ export default async function CodexResetPage({ params }: PageProps) {
           <div>
             <h1 className="editorial-display max-w-3xl text-4xl leading-[0.98] tracking-[-0.045em] md:text-6xl">{copy.title}</h1>
             <div className="mt-7 inline-flex items-center gap-3 rounded-full border border-[var(--border)] bg-[var(--surface-soft)] px-4 py-2 text-sm font-semibold">
-              <span className={`h-2.5 w-2.5 rounded-full ${latest ? "bg-[var(--success)]" : "bg-[var(--warning)]"}`} />
-              {snapshot.dataAvailable ? (latest ? copy.confirmed : copy.watching) : copy.noData}
+              <span className={`h-2.5 w-2.5 rounded-full ${!snapshot.dataAvailable ? "bg-[var(--danger)]" : resetToday ? "bg-[var(--success)]" : "bg-[var(--warning)]"}`} />
+              {!snapshot.dataAvailable ? copy.noData : resetToday ? copy.todayConfirmed : copy.watching}
             </div>
             <p className="mt-4 max-w-2xl text-sm leading-6 text-[var(--muted)]">{copy.checked}</p>
           </div>
