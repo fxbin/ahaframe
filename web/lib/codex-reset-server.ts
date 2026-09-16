@@ -1,3 +1,4 @@
+import { fetchPublicResetSignals } from "@/lib/codex-reset-public-feed";
 import { createServiceRoleClient } from "@/lib/supabase/server";
 
 export type CodexResetStatus = "detected" | "confirmed" | "rejected";
@@ -47,6 +48,12 @@ interface Classification {
   evidenceText: string;
 }
 
+export interface PublicFeedSyncResult {
+  checked: number;
+  accepted: number;
+  corroborated: number;
+}
+
 function mapRow(row: ResetEventRow): CodexResetEvent {
   return {
     id: row.id,
@@ -62,8 +69,54 @@ function mapRow(row: ResetEventRow): CodexResetEvent {
   };
 }
 
+function isDirectTiboSource(url: string): boolean {
+  return /(?:x\.com|twitter\.com)\/thsottiaux\/status\/\d+/i.test(url);
+}
+
+export async function syncPublicCodexResetFeed(limit = 100): Promise<PublicFeedSyncResult> {
+  const signals = await fetchPublicResetSignals(limit);
+  if (!signals.length) return { checked: 0, accepted: 0, corroborated: 0 };
+
+  const now = new Date().toISOString();
+  const rows = signals.map((signal) => {
+    const directTibo = isDirectTiboSource(signal.sourceUrl);
+    const confirmed = directTibo || signal.corroboratedByNextReset;
+    return {
+      occurred_at: signal.occurredAt,
+      detected_at: now,
+      status: confirmed ? "confirmed" : "detected",
+      kind: signal.kind,
+      source_type: directTibo ? "x_tibo" : "codex_resets_api",
+      source_external_id: signal.externalId,
+      source_url: signal.sourceUrl,
+      source_label: signal.corroboratedByNextReset
+        ? `${signal.sourceLabel} · cross-checked with NextReset`
+        : signal.sourceLabel,
+      evidence_text: signal.kind === "banked"
+        ? "A public source recorded a banked Codex reset credit announcement."
+        : confirmed
+          ? "A public source recorded a full Codex usage reset linked to Tibo's announcement."
+          : "A public reset feed reported a Codex usage reset; secondary corroboration is pending.",
+      updated_at: now,
+    };
+  });
+
+  const supabase = createServiceRoleClient();
+  const { error } = await supabase
+    .from("codex_reset_events")
+    .upsert(rows, { onConflict: "source_type,source_external_id", ignoreDuplicates: false });
+  if (error) throw error;
+
+  return {
+    checked: signals.length,
+    accepted: rows.length,
+    corroborated: signals.filter((signal) => signal.corroboratedByNextReset).length,
+  };
+}
+
 export async function getCodexResetSnapshot(limit = 12): Promise<CodexResetSnapshot> {
   try {
+    await syncPublicCodexResetFeed(Math.max(12, limit)).catch(() => null);
     const supabase = createServiceRoleClient();
     const { data, error } = await supabase
       .from("codex_reset_events")
