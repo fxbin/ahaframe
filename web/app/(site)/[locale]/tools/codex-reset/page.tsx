@@ -45,6 +45,9 @@ function sourceName(event: CodexResetEvent, zh: boolean) {
   if (/x\.com\/thsottiaux|twitter\.com\/thsottiaux/i.test(event.sourceUrl)) {
     return zh ? "Tibo 原始 X 帖子 ↗" : "Tibo on X ↗";
   }
+  if (/aihot\.news/i.test(event.sourceUrl)) {
+    return zh ? "AIHOT 重置记录 ↗" : "AIHOT reset record ↗";
+  }
   return zh ? "公开来源 ↗" : "Public source ↗";
 }
 
@@ -76,8 +79,8 @@ export default async function CodexResetPage({ params }: PageProps) {
     title: "Codex 今天重置了吗？",
     todayConfirmed: "今天已确认发生重置",
     watching: "今天暂无已确认重置 · 正在监控",
-    noData: "监控数据暂不可用",
-    checked: "数据源：Codex Resets 公共 feed；优先保留 Tibo (@thsottiaux) 原始公告链接，并在可用时用 NextReset 做二次校验。",
+    noData: "实时源和已保存快照暂不可用",
+    checked: "主数据源：AIHOT Codex Reset API；保留 Tibo (@thsottiaux) 原始 X 链接。AIHOT 不可用时自动降级到 Codex Resets，再降级到 AhaFrame 已保存快照。",
     lastReset: "最近确认重置",
     history: "最近重置历史",
     historyCopy: "主时间线只统计已确认的全量 Usage Reset；Banked Reset 单独处理。",
@@ -88,14 +91,14 @@ export default async function CodexResetPage({ params }: PageProps) {
     rules: "了解重置规则",
     banked: "Banked Reset 是什么？",
     limits: "Codex Usage Limits 如何工作？",
-    note: "AhaFrame 不代表 OpenAI。第三方 tracker 可能共享上游数据，因此原始 Tibo 公告链接始终作为主要可验证证据。",
+    note: "AhaFrame 不代表 OpenAI。AIHOT 与其他第三方 tracker 用于整理公开信号；能取得原帖时，始终优先展示 Tibo 原始 X 帖子作为可验证证据。确认帖时间也不等于每个账号实际到账时间。",
   } : {
     eyebrow: "AhaFrame Tools · Codex Reset Radar",
     title: "Did Codex reset today?",
     todayConfirmed: "Reset confirmed today",
     watching: "No confirmed reset today · watching",
-    noData: "Monitor data is temporarily unavailable",
-    checked: "Source: Codex Resets public feed with original Tibo (@thsottiaux) links preferred, cross-checked against NextReset when available.",
+    noData: "Live sources and saved snapshot are temporarily unavailable",
+    checked: "Primary source: AIHOT Codex Reset API with original Tibo (@thsottiaux) X links preserved. If AIHOT is unavailable, AhaFrame falls back to Codex Resets, then the last saved snapshot.",
     lastReset: "Last confirmed reset",
     history: "Recent reset history",
     historyCopy: "The main timeline only counts confirmed full usage resets. Banked resets are tracked separately.",
@@ -106,7 +109,7 @@ export default async function CodexResetPage({ params }: PageProps) {
     rules: "Reset rules",
     banked: "What is a Banked Reset?",
     limits: "How do Codex usage limits work?",
-    note: "AhaFrame is not affiliated with OpenAI. Third-party trackers can share upstream data, so original Tibo announcement links remain the primary verifiable evidence.",
+    note: "AhaFrame is not affiliated with OpenAI. AIHOT and other third-party trackers organize public signals; when available, the original Tibo X post remains the preferred verifiable evidence. A confirmation-post timestamp is not the exact time every account received the reset.",
   };
 
   return (

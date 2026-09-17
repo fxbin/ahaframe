@@ -29,6 +29,25 @@ export async function createClient() {
 }
 
 /**
+ * Server-side client for data that is intentionally exposed through RLS.
+ * This uses the publishable key and therefore cannot bypass row-level security.
+ */
+export function createPublicDataClient() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const publishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+  if (!url || !publishableKey) {
+    throw new Error("Supabase public data configuration is unavailable.");
+  }
+  return createSupabaseClient(url, publishableKey, {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+      detectSessionInUrl: false,
+    },
+  });
+}
+
+/**
  * Server-only privileged client. Never export this through browser modules and
  * never use it to infer the current user. Authentication must be established by
  * the cookie-bound createClient() first.
