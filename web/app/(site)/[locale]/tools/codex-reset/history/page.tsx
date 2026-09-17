@@ -23,11 +23,20 @@ function formatUtc(value: string, locale: string) {
   }).format(new Date(value));
 }
 
+function isTiboSource(event: CodexResetEvent) {
+  return /x\.com\/thsottiaux|twitter\.com\/thsottiaux/i.test(event.sourceUrl);
+}
+
 function sourceName(event: CodexResetEvent, zh: boolean) {
-  if (/x\.com\/thsottiaux|twitter\.com\/thsottiaux/i.test(event.sourceUrl)) {
-    return zh ? "Tibo 原始 X 帖子 ↗" : "Tibo on X ↗";
-  }
-  return zh ? "公开来源 ↗" : "Public source ↗";
+  return isTiboSource(event)
+    ? (zh ? "Tibo 原始 X 帖子 ↗" : "Tibo on X ↗")
+    : (zh ? "公开信号" : "Public signal");
+}
+
+function sourceDescription(event: CodexResetEvent, zh: boolean) {
+  return isTiboSource(event)
+    ? "Tibo (@thsottiaux) on X"
+    : (zh ? "公开重置信号" : "Public reset signal");
 }
 
 function historyStats(events: CodexResetEvent[]) {
@@ -98,9 +107,13 @@ export default async function CodexResetHistoryPage({ params }: PageProps) {
             <div className="rounded-[16px] border border-[var(--border)] bg-[var(--surface)] p-5">
               <p className="technical-label">{zh ? "最近一次" : "Latest reset"}</p>
               <p className="mt-3 text-lg font-semibold tracking-[-0.02em]">{formatUtc(snapshot.history[0].occurredAt, locale)}</p>
-              <a className="text-link mt-2 inline-flex text-xs font-semibold" href={snapshot.history[0].sourceUrl} target="_blank" rel="noreferrer">
-                {sourceName(snapshot.history[0], zh)}
-              </a>
+              {isTiboSource(snapshot.history[0]) ? (
+                <a className="text-link mt-2 inline-flex text-xs font-semibold" href={snapshot.history[0].sourceUrl} target="_blank" rel="noreferrer">
+                  {sourceName(snapshot.history[0], zh)}
+                </a>
+              ) : (
+                <p className="mt-2 text-xs font-semibold text-[var(--muted)]">{sourceName(snapshot.history[0], zh)}</p>
+              )}
             </div>
           </section>
 
@@ -119,9 +132,13 @@ export default async function CodexResetHistoryPage({ params }: PageProps) {
                 <time className="font-mono text-xs text-[var(--muted)]">{formatUtc(event.occurredAt, locale)}</time>
                 <div>
                   <p className="text-sm font-semibold">{zh ? "全量 Usage Reset 已确认" : "Full usage reset confirmed"}</p>
-                  <p className="mt-1 text-xs leading-5 text-[var(--muted)]">{event.sourceLabel}</p>
+                  <p className="mt-1 text-xs leading-5 text-[var(--muted)]">{sourceDescription(event, zh)}</p>
                 </div>
-                <a href={event.sourceUrl} target="_blank" rel="noreferrer" className="text-link text-xs font-semibold">{sourceName(event, zh)}</a>
+                {isTiboSource(event) ? (
+                  <a href={event.sourceUrl} target="_blank" rel="noreferrer" className="text-link text-xs font-semibold">{sourceName(event, zh)}</a>
+                ) : (
+                  <span className="text-xs font-semibold text-[var(--muted)]">{sourceName(event, zh)}</span>
+                )}
               </article>
             ))}
           </div>
@@ -131,8 +148,8 @@ export default async function CodexResetHistoryPage({ params }: PageProps) {
       </section>
 
       <p className="mt-8 text-xs leading-5 text-[var(--muted)]">{zh
-        ? "AhaFrame 不代表 OpenAI。时间间隔仅描述已记录历史，不代表未来重置承诺或固定周期。第三方 tracker 可能共享上游数据，因此优先展示 Tibo 原始公告。"
-        : "AhaFrame is not affiliated with OpenAI. Interval statistics describe recorded history only; they are not a promise or fixed reset schedule. Third-party trackers can share upstream data, so original Tibo announcements are preferred whenever available."}</p>
+        ? "AhaFrame 不代表 OpenAI。时间间隔仅描述已记录历史，不代表未来重置承诺或固定周期。公开信号可能共享上游数据，因此优先展示 Tibo 原始公告。"
+        : "AhaFrame is not affiliated with OpenAI. Interval statistics describe recorded history only; they are not a promise or fixed reset schedule. Public signals can share upstream data, so original Tibo announcements are preferred whenever available."}</p>
     </main>
   );
 }

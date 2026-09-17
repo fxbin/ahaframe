@@ -69,15 +69,12 @@ async function runMonitor(request: NextRequest) {
   try {
     if (!process.env.X_BEARER_TOKEN) {
       const result = await syncPublicCodexResetFeed(100);
-      const source = result.primarySource === "aihot"
-        ? "AIHOT /api/v1/codex-resets"
-        : result.primarySource === "codex_resets"
-          ? "codex-resets.com fallback + NextReset cross-check"
-          : "no usable public reset source";
       return NextResponse.json({
         ok: true,
-        source,
-        ...result,
+        source: "public reset monitor",
+        checked: result.checked,
+        accepted: result.accepted,
+        corroborated: result.corroborated,
         checkedAt: new Date().toISOString(),
       });
     }

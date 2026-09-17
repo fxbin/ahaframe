@@ -41,14 +41,20 @@ function isSameUtcDay(value: string, now = new Date()) {
     && date.getUTCDate() === now.getUTCDate();
 }
 
+function isTiboSource(event: CodexResetEvent) {
+  return /x\.com\/thsottiaux|twitter\.com\/thsottiaux/i.test(event.sourceUrl);
+}
+
 function sourceName(event: CodexResetEvent, zh: boolean) {
-  if (/x\.com\/thsottiaux|twitter\.com\/thsottiaux/i.test(event.sourceUrl)) {
-    return zh ? "Tibo 原始 X 帖子 ↗" : "Tibo on X ↗";
-  }
-  if (/aihot\.news/i.test(event.sourceUrl)) {
-    return zh ? "AIHOT 重置记录 ↗" : "AIHOT reset record ↗";
-  }
-  return zh ? "公开来源 ↗" : "Public source ↗";
+  return isTiboSource(event)
+    ? (zh ? "Tibo 原始 X 帖子 ↗" : "Tibo on X ↗")
+    : (zh ? "公开信号" : "Public signal");
+}
+
+function sourceDescription(event: CodexResetEvent, zh: boolean) {
+  return isTiboSource(event)
+    ? "Tibo (@thsottiaux) on X"
+    : (zh ? "公开重置信号" : "Public reset signal");
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -80,7 +86,7 @@ export default async function CodexResetPage({ params }: PageProps) {
     todayConfirmed: "今天已确认发生重置",
     watching: "今天暂无已确认重置 · 正在监控",
     noData: "实时源和已保存快照暂不可用",
-    checked: "主数据源：AIHOT Codex Reset API；保留 Tibo (@thsottiaux) 原始 X 链接。AIHOT 不可用时自动降级到 Codex Resets，再降级到 AhaFrame 已保存快照。",
+    checked: "AhaFrame 持续监控公开重置信号，并在可验证时优先保留 Tibo (@thsottiaux) 的原始 X 帖子。",
     lastReset: "最近确认重置",
     history: "最近重置历史",
     historyCopy: "主时间线只统计已确认的全量 Usage Reset；Banked Reset 单独处理。",
@@ -91,14 +97,14 @@ export default async function CodexResetPage({ params }: PageProps) {
     rules: "了解重置规则",
     banked: "Banked Reset 是什么？",
     limits: "Codex Usage Limits 如何工作？",
-    note: "AhaFrame 不代表 OpenAI。AIHOT 与其他第三方 tracker 用于整理公开信号；能取得原帖时，始终优先展示 Tibo 原始 X 帖子作为可验证证据。确认帖时间也不等于每个账号实际到账时间。",
+    note: "AhaFrame 不代表 OpenAI。页面根据公开信号整理重置状态；能取得原帖时，始终优先展示 Tibo 原始 X 帖子作为可验证证据。确认帖时间也不等于每个账号实际到账时间。",
   } : {
     eyebrow: "AhaFrame Tools · Codex Reset Radar",
     title: "Did Codex reset today?",
     todayConfirmed: "Reset confirmed today",
     watching: "No confirmed reset today · watching",
     noData: "Live sources and saved snapshot are temporarily unavailable",
-    checked: "Primary source: AIHOT Codex Reset API with original Tibo (@thsottiaux) X links preserved. If AIHOT is unavailable, AhaFrame falls back to Codex Resets, then the last saved snapshot.",
+    checked: "AhaFrame continuously monitors public reset signals and preserves the original Tibo (@thsottiaux) X post whenever it is available for verification.",
     lastReset: "Last confirmed reset",
     history: "Recent reset history",
     historyCopy: "The main timeline only counts confirmed full usage resets. Banked resets are tracked separately.",
@@ -109,7 +115,7 @@ export default async function CodexResetPage({ params }: PageProps) {
     rules: "Reset rules",
     banked: "What is a Banked Reset?",
     limits: "How do Codex usage limits work?",
-    note: "AhaFrame is not affiliated with OpenAI. AIHOT and other third-party trackers organize public signals; when available, the original Tibo X post remains the preferred verifiable evidence. A confirmation-post timestamp is not the exact time every account received the reset.",
+    note: "AhaFrame is not affiliated with OpenAI. Reset status is assembled from public signals; whenever available, the original Tibo X post remains the preferred verifiable evidence. A confirmation-post timestamp is not the exact time every account received the reset.",
   };
 
   return (
@@ -132,7 +138,11 @@ export default async function CodexResetPage({ params }: PageProps) {
               <>
                 <p className="mt-3 text-2xl font-semibold tracking-[-0.025em]">{formatUtc(latest.occurredAt, locale)}</p>
                 <p className="mt-1 text-sm text-[var(--muted)]">{elapsed(latest.occurredAt, locale)}</p>
-                <a className="text-link mt-5 inline-flex text-sm font-semibold" href={latest.sourceUrl} target="_blank" rel="noreferrer">{sourceName(latest, zh)}</a>
+                {isTiboSource(latest) ? (
+                  <a className="text-link mt-5 inline-flex text-sm font-semibold" href={latest.sourceUrl} target="_blank" rel="noreferrer">{sourceName(latest, zh)}</a>
+                ) : (
+                  <p className="mt-5 text-sm font-semibold text-[var(--muted)]">{sourceName(latest, zh)}</p>
+                )}
               </>
             ) : (
               <p className="mt-3 text-sm leading-6 text-[var(--muted)]">{copy.watching}</p>
@@ -154,9 +164,13 @@ export default async function CodexResetPage({ params }: PageProps) {
                 <time className="font-mono text-xs text-[var(--muted)]">{formatUtc(event.occurredAt, locale)}</time>
                 <div>
                   <p className="text-sm font-semibold">{copy.eventTitle}</p>
-                  <p className="mt-1 text-xs leading-5 text-[var(--muted)]">{event.sourceLabel}</p>
+                  <p className="mt-1 text-xs leading-5 text-[var(--muted)]">{sourceDescription(event, zh)}</p>
                 </div>
-                <a className="text-link text-xs font-semibold" href={event.sourceUrl} target="_blank" rel="noreferrer">{sourceName(event, zh)}</a>
+                {isTiboSource(event) ? (
+                  <a className="text-link text-xs font-semibold" href={event.sourceUrl} target="_blank" rel="noreferrer">{sourceName(event, zh)}</a>
+                ) : (
+                  <span className="text-xs font-semibold text-[var(--muted)]">{sourceName(event, zh)}</span>
+                )}
               </div>
             )) : (
               <p className="py-5 text-sm text-[var(--muted)]">{copy.watching}</p>
