@@ -1,19 +1,25 @@
 export type PublicResetKind = "full" | "banked";
+export type PublicResetStatus = "detected" | "confirmed";
+export type PublicResetProvider = "aihot" | "codex_resets";
 
 export interface PublicResetSignal {
   externalId: string;
   occurredAt: string;
   kind: PublicResetKind;
+  status: PublicResetStatus;
   sourceUrl: string;
   sourceLabel: string;
+  provider: PublicResetProvider;
   corroboratedByNextReset: boolean;
+  checkedAt: string | null;
 }
 
+const AIHOT_CODEX_RESETS_URL = process.env.AIHOT_CODEX_RESETS_URL || "https://aihot.news/api/v1/codex-resets";
 const CODEX_RESETS_FEED_URL = process.env.CODEX_RESETS_FEED_URL || "https://codex-resets.com/api/resets?limit=100&order=desc";
 const CODEX_RESETS_STATUS_URL = process.env.CODEX_RESETS_STATUS_URL || "https://codex-resets.com/api/v1/status";
 const NEXTRESET_HISTORY_URL = process.env.NEXTRESET_HISTORY_URL || "https://nextreset.ai/history/";
 
-const USER_AGENT = "AhaFrame Codex Reset Radar/0.1 (+https://ahaframe.com/tools/codex-reset)";
+const USER_AGENT = "AhaFrame Codex Reset Radar/0.2 (+https://ahaframe.com/tools/codex-reset)";
 
 function asRecord(value: unknown): Record<string, unknown> | null {
   return value && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : null;
@@ -51,6 +57,11 @@ function parseTimestamp(value: string | null): string | null {
   return Number.isNaN(date.getTime()) ? null : date.toISOString();
 }
 
+function dateOnlyToBeijingNoon(value: string | null): string | null {
+  if (!value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
+  return parseTimestamp(`${value}T12:00:00+08:00`);
+}
+
 function extractXStatusId(value: string | null): string | null {
   if (!value) return null;
   const match = value.match(/(?:x\.com|twitter\.com)\/[^/]+\/status\/(\d+)/i);
@@ -68,9 +79,6 @@ function isHttpUrl(value: string | null): value is string {
 }
 
 function findSourceUrl(record: Record<string, unknown>): string | null {
-  // Prefer fields that are explicitly URLs. Some feeds expose an ingestion
-  // marker such as "webhook" or "observed" in a generic `source` field; that
-  // value is not user-facing evidence and must never become the Source link.
   const preferred = firstNestedString(record, [
     "source_url", "sourceUrl", "tweet_url", "tweetUrl", "x_url", "xUrl",
     "post_url", "postUrl", "original_url", "originalUrl", "permalink", "url",
@@ -117,12 +125,81 @@ function inferKind(record: Record<string, unknown>): PublicResetKind | null {
   ].filter(Boolean).join(" ").toLowerCase();
 
   const bankedFlag = record.banked === true || record.is_banked === true || record.isBanked === true;
-  if (bankedFlag || /banked|credit/.test(descriptor)) return "banked";
-  if (/regular|automatic|full|hard reset|usage reset|rate limit reset|reset/.test(descriptor)) return "full";
+  if (bankedFlag || /banked|credit|reset_credit/.test(descriptor)) return "banked";
+  if (/direct_reset|regular|automatic|full|hard reset|usage reset|rate limit reset|reset/.test(descriptor)) return "full";
   return null;
 }
 
-function normalizeCandidate(record: Record<string, unknown>): Omit<PublicResetSignal, "corroboratedByNextReset"> | null {
+function aihotPostUrl(event: Record<string, unknown>): string | null {
+  const posts = event.posts;
+  if (!Array.isArray(posts)) return null;
+  for (const post of posts) {
+    const record = asRecord(post);
+    if (!record) continue;
+    const url = firstString(record, ["url", "sourceUrl", "source_url", "permalink"]);
+    if (isHttpUrl(url)) return url;
+  }
+  return null;
+}
+
+function normalizeAihotEvent(event: Record<string, unknown>, checkedAt: string | null): PublicResetSignal | null {
+  const rawType = firstString(event, ["type"]);
+  const rawStatus = firstString(event, ["status"]);
+  const kind: PublicResetKind | null = rawType === "direct_reset"
+    ? "full"
+    : rawType === "reset_credit"
+      ? "banked"
+      : inferKind(event);
+  const status: PublicResetStatus | null = rawStatus === "confirmed"
+    ? "confirmed"
+    : rawStatus === "announced"
+      ? "detected"
+      : null;
+  if (!kind || !status) return null;
+
+  const confirmedAt = parseTimestamp(firstString(event, ["confirmedAt", "confirmed_at"]));
+  const announcedAt = parseTimestamp(firstString(event, ["announcedAt", "announced_at"]));
+  const updatedAt = parseTimestamp(firstString(event, ["updatedAt", "updated_at"]));
+  const occurredOn = dateOnlyToBeijingNoon(firstString(event, ["occurredOn", "occurred_on"]));
+  const occurredAt = status === "confirmed"
+    ? confirmedAt || announcedAt || occurredOn || updatedAt
+    : announcedAt || updatedAt || confirmedAt || occurredOn;
+  if (!occurredAt) return null;
+
+  const postUrl = aihotPostUrl(event);
+  const sourceUrl = postUrl || "https://aihot.news/codex-reset";
+  const xStatusId = extractXStatusId(sourceUrl);
+  const eventId = firstString(event, ["id", "eventId", "event_id"]);
+  const externalId = xStatusId || eventId || `aihot:${kind}:${occurredAt}`;
+
+  return {
+    externalId,
+    occurredAt,
+    kind,
+    status,
+    sourceUrl,
+    sourceLabel: xStatusId
+      ? "Tibo (@thsottiaux) on X · indexed by AIHOT"
+      : "AIHOT Codex reset monitor",
+    provider: "aihot",
+    corroboratedByNextReset: false,
+    checkedAt,
+  };
+}
+
+function normalizeAihotPayload(payload: unknown): PublicResetSignal[] {
+  const root = asRecord(payload);
+  if (!root) return [];
+  const events = Array.isArray(root.events) ? root.events : [];
+  const checkedAt = parseTimestamp(firstString(root, ["checkedAt", "checked_at"]));
+  return events
+    .map(asRecord)
+    .filter((event): event is Record<string, unknown> => Boolean(event))
+    .map((event) => normalizeAihotEvent(event, checkedAt))
+    .filter((signal): signal is PublicResetSignal => Boolean(signal));
+}
+
+function normalizeLegacyCandidate(record: Record<string, unknown>): Omit<PublicResetSignal, "corroboratedByNextReset"> | null {
   const occurredAt = parseTimestamp(firstNestedString(record, [
     "announced_at", "announcedAt", "created_at", "createdAt", "timestamp", "time", "date", "occurred_at", "occurredAt", "reset_at", "posted_at",
   ]));
@@ -142,21 +219,24 @@ function normalizeCandidate(record: Record<string, unknown>): Omit<PublicResetSi
     externalId,
     occurredAt,
     kind,
+    status: xStatusId ? "confirmed" : "detected",
     sourceUrl: sourceUrl || "https://codex-resets.com/",
     sourceLabel: xStatusId
       ? "Tibo (@thsottiaux) on X · indexed by Codex Resets"
       : "Codex Resets public feed",
+    provider: "codex_resets",
+    checkedAt: null,
   };
 }
 
-function normalizePayload(payload: unknown): Array<Omit<PublicResetSignal, "corroboratedByNextReset">> {
+function normalizeLegacyPayload(payload: unknown): Array<Omit<PublicResetSignal, "corroboratedByNextReset">> {
   return collectCandidates(payload)
-    .map(normalizeCandidate)
+    .map(normalizeLegacyCandidate)
     .filter((value): value is Omit<PublicResetSignal, "corroboratedByNextReset"> => Boolean(value));
 }
 
-function dedupeSignals(signals: Array<Omit<PublicResetSignal, "corroboratedByNextReset">>) {
-  const deduped = new Map<string, Omit<PublicResetSignal, "corroboratedByNextReset">>();
+function dedupeSignals<T extends Omit<PublicResetSignal, "corroboratedByNextReset"> | PublicResetSignal>(signals: T[]): T[] {
+  const deduped = new Map<string, T>();
   for (const signal of signals) {
     const xStatusId = extractXStatusId(signal.sourceUrl);
     const key = xStatusId || `${signal.externalId}:${signal.kind}`;
@@ -170,7 +250,7 @@ async function fetchJson(url: string): Promise<unknown> {
     headers: { "user-agent": USER_AGENT, accept: "application/json" },
     next: { revalidate: 120 },
   });
-  if (!response.ok) throw new Error(`Public reset feed ${response.status}`);
+  if (!response.ok) throw new Error(`Public reset feed ${response.status} from ${new URL(url).host}`);
   return response.json();
 }
 
@@ -194,12 +274,12 @@ function corroboratedByNextReset(signal: Omit<PublicResetSignal, "corroboratedBy
   return html.includes(date) && /Automatic reset|Banked credit|Reset \+ credit/i.test(html);
 }
 
-export async function fetchPublicResetSignals(limit = 100): Promise<PublicResetSignal[]> {
+async function fetchLegacySignals(limit: number): Promise<PublicResetSignal[]> {
   let primarySignals: Array<Omit<PublicResetSignal, "corroboratedByNextReset">> = [];
   let primaryError: unknown = null;
 
   try {
-    primarySignals = normalizePayload(await fetchJson(CODEX_RESETS_FEED_URL));
+    primarySignals = normalizeLegacyPayload(await fetchJson(CODEX_RESETS_FEED_URL));
   } catch (error) {
     primaryError = error;
   }
@@ -207,7 +287,7 @@ export async function fetchPublicResetSignals(limit = 100): Promise<PublicResetS
   let fallbackSignals: Array<Omit<PublicResetSignal, "corroboratedByNextReset">> = [];
   if (primarySignals.length === 0) {
     try {
-      fallbackSignals = normalizePayload(await fetchJson(CODEX_RESETS_STATUS_URL));
+      fallbackSignals = normalizeLegacyPayload(await fetchJson(CODEX_RESETS_STATUS_URL));
     } catch (fallbackError) {
       if (primaryError) throw primaryError;
       throw fallbackError;
@@ -219,8 +299,26 @@ export async function fetchPublicResetSignals(limit = 100): Promise<PublicResetS
     .slice(0, limit);
 
   const nextResetHtml = await fetchNextResetHtml();
-  return candidates.map((signal) => ({
-    ...signal,
-    corroboratedByNextReset: corroboratedByNextReset(signal, nextResetHtml),
-  }));
+  return candidates.map((signal) => {
+    const corroborated = corroboratedByNextReset(signal, nextResetHtml);
+    return {
+      ...signal,
+      status: signal.status === "confirmed" || corroborated ? "confirmed" : "detected",
+      corroboratedByNextReset: corroborated,
+    };
+  });
+}
+
+export async function fetchPublicResetSignals(limit = 100): Promise<PublicResetSignal[]> {
+  try {
+    const aihotSignals = dedupeSignals(normalizeAihotPayload(await fetchJson(AIHOT_CODEX_RESETS_URL)))
+      .sort((a, b) => Date.parse(b.occurredAt) - Date.parse(a.occurredAt))
+      .slice(0, limit);
+    if (aihotSignals.length > 0) return aihotSignals;
+    console.warn("AIHOT Codex reset feed returned no usable events; falling back to Codex Resets.");
+  } catch (error) {
+    console.warn("AIHOT Codex reset feed unavailable; falling back to Codex Resets.", error);
+  }
+
+  return fetchLegacySignals(limit);
 }
