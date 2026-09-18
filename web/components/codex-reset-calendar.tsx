@@ -238,7 +238,7 @@ export function CodexResetCalendar({ events, locale, months = 6 }: CodexResetCal
                       key={key}
                       title={label}
                       aria-label={label}
-                      className={`flex aspect-square items-center justify-center rounded-[9px] text-xs transition-colors ${future ? "text-[var(--muted)]/35" : "text-[var(--muted)] hover:bg-[var(--surface-soft)]"} ${isToday ? "ring-1 ring-[var(--foreground)] ring-offset-1 ring-offset-[var(--paper)]" : ""}`}
+                      className={`flex aspect-square items-center justify-center rounded-[9px] text-xs transition-colors ${future ? "text-[var(--muted)] opacity-35" : "text-[var(--muted)] hover:bg-[var(--surface-soft)]"} ${isToday ? "ring-1 ring-[var(--foreground)] ring-offset-1 ring-offset-[var(--paper)]" : ""}`}
                     >
                       {date.getUTCDate()}
                     </span>
