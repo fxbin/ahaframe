@@ -89,8 +89,8 @@ export default async function CodexResetPage({ params }: PageProps) {
     checked: "AhaFrame 持续监控公开重置信号，并在可验证时优先保留 Tibo (@thsottiaux) 的原始 X 帖子。",
     lastReset: "最近确认重置",
     history: "最近重置历史",
-    historyCopy: "主时间线只统计已确认的全量 Usage Reset；Banked Reset 单独处理。",
-    eventTitle: "全量 Usage Reset 已确认",
+    historyCopy: "主时间线只统计已确认的 Codex 全量额度重置；Banked Reset 单独处理。",
+    eventTitle: "Codex 全量额度重置已确认",
     viewHistory: "查看完整历史 →",
     notify: "提醒功能即将上线",
     notifyCopy: "第一阶段先把检测准确性与历史数据跑稳，再接 Email / Browser Push。",
@@ -158,30 +158,32 @@ export default async function CodexResetPage({ params }: PageProps) {
             <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--muted)]">{copy.historyCopy}</p>
           </div>
 
-          <div className="mt-6 divide-y divide-[var(--border)]">
-            {recentHistory.length > 0 ? recentHistory.map((event) => (
-              <div key={event.id} className="grid gap-3 py-4 sm:grid-cols-[160px_1fr_auto] sm:items-center">
-                <time className="font-mono text-xs text-[var(--muted)]">{formatUtc(event.occurredAt, locale)}</time>
-                <div>
-                  <p className="text-sm font-semibold">{copy.eventTitle}</p>
-                  <p className="mt-1 text-xs leading-5 text-[var(--muted)]">{sourceDescription(event, zh)}</p>
-                </div>
-                {isTiboSource(event) ? (
-                  <a className="text-link text-xs font-semibold" href={event.sourceUrl} target="_blank" rel="noreferrer">{sourceName(event, zh)}</a>
-                ) : (
-                  <span className="text-xs font-semibold text-[var(--muted)]">{sourceName(event, zh)}</span>
-                )}
-              </div>
-            )) : (
-              <p className="py-5 text-sm text-[var(--muted)]">{copy.watching}</p>
-            )}
-          </div>
-
           {snapshot.history.length > 0 ? (
             <div className="mt-6 border-t border-[var(--border)] pt-6">
-              <CodexResetCalendar events={snapshot.history} locale={locale} weeks={16} />
+              <CodexResetCalendar events={snapshot.history} locale={locale} months={6} />
             </div>
           ) : null}
+
+          <div className="mt-7 border-t border-[var(--border)] pt-2">
+            <div className="divide-y divide-[var(--border)]">
+              {recentHistory.length > 0 ? recentHistory.map((event) => (
+                <div key={event.id} className="grid gap-3 py-4 sm:grid-cols-[160px_1fr_auto] sm:items-center">
+                  <time className="font-mono text-xs text-[var(--muted)]">{formatUtc(event.occurredAt, locale)}</time>
+                  <div>
+                    <p className="text-sm font-semibold">{copy.eventTitle}</p>
+                    <p className="mt-1 text-xs leading-5 text-[var(--muted)]">{sourceDescription(event, zh)}</p>
+                  </div>
+                  {isTiboSource(event) ? (
+                    <a className="text-link text-xs font-semibold" href={event.sourceUrl} target="_blank" rel="noreferrer">{sourceName(event, zh)}</a>
+                  ) : (
+                    <span className="text-xs font-semibold text-[var(--muted)]">{sourceName(event, zh)}</span>
+                  )}
+                </div>
+              )) : (
+                <p className="py-5 text-sm text-[var(--muted)]">{copy.watching}</p>
+              )}
+            </div>
+          </div>
 
           <Link className="text-link mt-5 inline-flex text-sm font-semibold" href={localizedPath("/tools/codex-reset/history", locale)}>{copy.viewHistory}</Link>
         </div>
