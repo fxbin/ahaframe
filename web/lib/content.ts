@@ -32,6 +32,7 @@ export interface LocaleSource {
     nav: {
       lessons: string;
       guides: string;
+      tools: string;
       roadmap: string;
       pricing: string;
       about: string;

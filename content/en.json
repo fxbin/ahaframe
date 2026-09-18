@@ -170,7 +170,7 @@
   ],
   "brand": "AhaFrame",
   "ui": {
-    "nav": {"lessons":"Courses","guides":"Guides","roadmap":"Knowledge Map","pricing":"Pricing","about":"About","early_access":"Join Early Access","menu":"Menu"},
+    "nav": {"lessons":"Courses","guides":"Guides","tools":"Tools","roadmap":"Knowledge Map","pricing":"Pricing","about":"About","early_access":"Join Early Access","menu":"Menu"},
     "footer": {"tagline":"Clear AI courses with real interactive practice.","sitemap":"Sitemap","about":"About","early_access":"Early Access"},
     "language": {"en":"English","zh-CN":"简体中文"}
   },
