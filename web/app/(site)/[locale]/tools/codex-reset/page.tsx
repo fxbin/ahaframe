@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CodexResetCalendar } from "@/components/codex-reset-calendar";
+import { buildCodexResetForecast, type ResetForecastConfidence, type ResetForecastLevel } from "@/lib/codex-reset-forecast";
 import { getCodexResetSnapshot, type CodexResetEvent } from "@/lib/codex-reset-server";
 import { localeFromSegment, localizedPath } from "@/lib/content";
 import { pageMetadata } from "@/lib/metadata";
@@ -57,16 +58,56 @@ function sourceDescription(event: CodexResetEvent, zh: boolean) {
     : (zh ? "公开重置信号" : "Public reset signal");
 }
 
+function forecastLevelLabel(level: ResetForecastLevel, zh: boolean) {
+  const labels = zh ? {
+    "very-low": "较低",
+    low: "偏低",
+    medium: "中等",
+    high: "较高",
+    "very-high": "很高",
+    insufficient: "数据不足",
+  } : {
+    "very-low": "Very low",
+    low: "Low",
+    medium: "Medium",
+    high: "High",
+    "very-high": "Very high",
+    insufficient: "Insufficient data",
+  };
+  return labels[level];
+}
+
+function confidenceLabel(confidence: ResetForecastConfidence, zh: boolean) {
+  const labels = zh ? {
+    "very-low": "很低",
+    low: "低",
+    medium: "中",
+    high: "高",
+  } : {
+    "very-low": "Very low",
+    low: "Low",
+    medium: "Medium",
+    high: "High",
+  };
+  return labels[confidence];
+}
+
+function formatForecastDays(value: number | null, zh: boolean) {
+  if (value === null) return "—";
+  const formatted = value < 10 ? value.toFixed(1) : value.toFixed(0);
+  return zh ? `${formatted} 天` : `${formatted} days`;
+}
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale: segment } = await params;
   const locale = localeFromSegment(segment);
   if (!locale) return {};
   const title = locale === "zh-CN"
-    ? "Codex Reset Today — 实时状态、历史与提醒 | AhaFrame"
-    : "Codex Reset Today — Live Status, History & Alerts | AhaFrame";
+    ? "Codex Reset Today — 实时状态、历史与预测 | AhaFrame"
+    : "Codex Reset Today — Live Status, History & Forecast | AhaFrame";
   const description = locale === "zh-CN"
-    ? "追踪 Codex 是否已重置、最近一次确认时间、历史记录与来自 Tibo 的公开重置信号。"
-    : "Track whether Codex reset today, the latest confirmed reset, reset history, and public reset signals from Tibo.";
+    ? "追踪 Codex 是否已重置、最近一次确认时间、历史记录，以及基于历史节奏的未来 24 小时重置概率估计。"
+    : "Track whether Codex reset today, the latest confirmed reset, reset history, and a historical-model estimate for the next 24 hours.";
   return pageMetadata(locale, title, description, "tools/codex-reset/");
 }
 
@@ -75,10 +116,18 @@ export default async function CodexResetPage({ params }: PageProps) {
   const locale = localeFromSegment(segment);
   if (!locale) notFound();
 
-  const snapshot = await getCodexResetSnapshot(20);
+  // The page renders a small recent-history slice, but the forecast needs a
+  // substantially larger sample so UI pagination never constrains the model.
+  const snapshot = await getCodexResetSnapshot(100);
+  const now = new Date();
   const latest = snapshot.latest;
-  const resetToday = latest ? isSameUtcDay(latest.occurredAt) : false;
+  const resetToday = latest ? isSameUtcDay(latest.occurredAt, now) : false;
   const recentHistory = snapshot.history.slice(0, 6);
+  const forecast = buildCodexResetForecast(
+    snapshot.history.map((event) => event.occurredAt),
+    now,
+    1,
+  );
   const zh = locale === "zh-CN";
   const copy = zh ? {
     eyebrow: "AhaFrame Tools · Codex Reset Radar",
@@ -88,6 +137,21 @@ export default async function CodexResetPage({ params }: PageProps) {
     noData: "实时源和已保存快照暂不可用",
     checked: "AhaFrame 持续监控公开重置信号，并在可验证时优先保留 Tibo (@thsottiaux) 的原始 X 帖子。",
     lastReset: "最近确认重置",
+    forecast: "重置预测",
+    forecastTitle: "未来 24 小时重置可能性",
+    forecastSettled: "今天已经确认发生重置，当前预测窗口已结算。",
+    forecastInsufficient: "正在积累历史数据",
+    forecastInsufficientCopy: "至少需要 5 个可用的 Full Reset 间隔，才会公开显示概率估计。",
+    confidence: "置信度",
+    sinceLast: "距上次重置",
+    typicalInterval: "典型历史间隔",
+    percentile: "当前间隔位置",
+    percentileCopy: "已超过 {value}% 的历史间隔",
+    sample: "可用历史",
+    sampleCopy: "{resets} 次重置 · {intervals} 个间隔",
+    model: "模型",
+    modelCopy: "Weibull 生存模型 + Bayesian 平滑经验 Hazard",
+    forecastNote: "这是基于已确认 Full Reset 历史的统计估计，不代表 OpenAI 官方计划，也不是下一次重置时间承诺。",
     history: "最近重置历史",
     historyCopy: "主时间线只统计已确认的 Codex 全量额度重置；Banked Reset 单独处理。",
     eventTitle: "Codex 全量额度重置已确认",
@@ -106,6 +170,21 @@ export default async function CodexResetPage({ params }: PageProps) {
     noData: "Live sources and saved snapshot are temporarily unavailable",
     checked: "AhaFrame continuously monitors public reset signals and preserves the original Tibo (@thsottiaux) X post whenever it is available for verification.",
     lastReset: "Last confirmed reset",
+    forecast: "Reset forecast",
+    forecastTitle: "Reset likelihood in the next 24 hours",
+    forecastSettled: "A reset has already been confirmed today, so the current forecast window is settled.",
+    forecastInsufficient: "Building the historical sample",
+    forecastInsufficientCopy: "At least 5 usable Full Reset intervals are required before a probability estimate is published.",
+    confidence: "Confidence",
+    sinceLast: "Since last reset",
+    typicalInterval: "Typical historical interval",
+    percentile: "Current gap position",
+    percentileCopy: "Longer than {value}% of historical intervals",
+    sample: "Usable history",
+    sampleCopy: "{resets} resets · {intervals} intervals",
+    model: "Model",
+    modelCopy: "Weibull survival model + Bayesian-smoothed empirical hazard",
+    forecastNote: "This is a statistical estimate from confirmed Full Reset history. It is not an OpenAI schedule or a promise of when the next reset will occur.",
     history: "Recent reset history",
     historyCopy: "The main timeline only counts confirmed full usage resets. Banked resets are tracked separately.",
     eventTitle: "Full usage reset confirmed",
@@ -117,6 +196,13 @@ export default async function CodexResetPage({ params }: PageProps) {
     limits: "How do Codex usage limits work?",
     note: "AhaFrame is not affiliated with OpenAI. Reset status is assembled from public signals; whenever available, the original Tibo X post remains the preferred verifiable evidence. A confirmation-post timestamp is not the exact time every account received the reset.",
   };
+
+  const percentileText = forecast.historicalPercentile === null
+    ? "—"
+    : copy.percentileCopy.replace("{value}", String(Math.round(forecast.historicalPercentile * 100)));
+  const sampleText = copy.sampleCopy
+    .replace("{resets}", String(forecast.sampleSize))
+    .replace("{intervals}", String(forecast.intervalCount));
 
   return (
     <main className="shell py-12 md:py-16">
@@ -147,6 +233,72 @@ export default async function CodexResetPage({ params }: PageProps) {
             ) : (
               <p className="mt-3 text-sm leading-6 text-[var(--muted)]">{copy.watching}</p>
             )}
+          </div>
+        </div>
+      </section>
+
+      <section className="mt-8 rounded-[18px] border border-[var(--border)] bg-[var(--surface)] p-6 md:p-8">
+        <div className="grid gap-8 lg:grid-cols-[0.82fr_1.18fr] lg:items-start">
+          <div>
+            <p className="technical-label">{copy.forecast}</p>
+            <h2 className="mt-3 text-2xl font-semibold tracking-[-0.03em]">{copy.forecastTitle}</h2>
+
+            {resetToday ? (
+              <div className="mt-6 rounded-[14px] border border-[var(--border)] bg-[var(--primary-soft)] p-5">
+                <p className="text-lg font-semibold">{copy.todayConfirmed}</p>
+                <p className="mt-2 text-sm leading-6 text-[var(--muted)]">{copy.forecastSettled}</p>
+              </div>
+            ) : forecast.probability !== null ? (
+              <>
+                <div className="mt-6 flex items-end gap-4">
+                  <p className="text-6xl font-semibold tracking-[-0.06em]">
+                    {Math.round(forecast.probability * 100)}%
+                  </p>
+                  <div className="pb-1.5">
+                    <p className="text-sm font-semibold">{forecastLevelLabel(forecast.level, zh)}</p>
+                    <p className="mt-1 text-xs text-[var(--muted)]">
+                      {copy.confidence} · {confidenceLabel(forecast.confidence, zh)}
+                    </p>
+                  </div>
+                </div>
+                <div className="mt-5 h-2 overflow-hidden rounded-full bg-[var(--surface-soft)]">
+                  <div
+                    className="h-full rounded-full bg-[var(--primary)]"
+                    style={{ width: `${Math.round(forecast.probability * 100)}%` }}
+                  />
+                </div>
+              </>
+            ) : (
+              <div className="mt-6 rounded-[14px] border border-[var(--border)] bg-[var(--surface-soft)] p-5">
+                <p className="text-lg font-semibold">{copy.forecastInsufficient}</p>
+                <p className="mt-2 text-sm leading-6 text-[var(--muted)]">{copy.forecastInsufficientCopy}</p>
+              </div>
+            )}
+
+            <p className="mt-5 max-w-xl text-xs leading-5 text-[var(--muted)]">{copy.forecastNote}</p>
+          </div>
+
+          <div className="grid gap-px overflow-hidden rounded-[14px] border border-[var(--border)] bg-[var(--border)] sm:grid-cols-2">
+            <div className="bg-[var(--paper)] p-4">
+              <p className="technical-label">{copy.sinceLast}</p>
+              <p className="mt-2 text-lg font-semibold">{formatForecastDays(forecast.daysSinceLastReset, zh)}</p>
+            </div>
+            <div className="bg-[var(--paper)] p-4">
+              <p className="technical-label">{copy.typicalInterval}</p>
+              <p className="mt-2 text-lg font-semibold">{formatForecastDays(forecast.typicalIntervalDays, zh)}</p>
+            </div>
+            <div className="bg-[var(--paper)] p-4">
+              <p className="technical-label">{copy.percentile}</p>
+              <p className="mt-2 text-sm font-semibold leading-6">{percentileText}</p>
+            </div>
+            <div className="bg-[var(--paper)] p-4">
+              <p className="technical-label">{copy.sample}</p>
+              <p className="mt-2 text-sm font-semibold leading-6">{sampleText}</p>
+            </div>
+            <div className="bg-[var(--paper)] p-4 sm:col-span-2">
+              <p className="technical-label">{copy.model}</p>
+              <p className="mt-2 text-xs leading-5 text-[var(--muted)]">{copy.modelCopy}</p>
+            </div>
           </div>
         </div>
       </section>
