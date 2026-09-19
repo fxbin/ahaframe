@@ -156,8 +156,6 @@ export default async function CodexResetPage({ params }: PageProps) {
     historyCopy: "主时间线只统计已确认的 Codex 全量额度重置；Banked Reset 单独处理。",
     eventTitle: "Codex 全量额度重置已确认",
     viewHistory: "查看完整历史 →",
-    notify: "提醒功能即将上线",
-    notifyCopy: "第一阶段先把检测准确性与历史数据跑稳，再接 Email / Browser Push。",
     rules: "了解重置规则",
     banked: "Banked Reset 是什么？",
     limits: "Codex Usage Limits 如何工作？",
@@ -189,8 +187,6 @@ export default async function CodexResetPage({ params }: PageProps) {
     historyCopy: "The main timeline only counts confirmed full usage resets. Banked resets are tracked separately.",
     eventTitle: "Full usage reset confirmed",
     viewHistory: "View full history →",
-    notify: "Alerts are next",
-    notifyCopy: "We are stabilizing detection and history first, then adding Email / Browser Push.",
     rules: "Reset rules",
     banked: "What is a Banked Reset?",
     limits: "How do Codex usage limits work?",
@@ -340,11 +336,7 @@ export default async function CodexResetPage({ params }: PageProps) {
           <Link className="text-link mt-5 inline-flex text-sm font-semibold" href={localizedPath("/tools/codex-reset/history", locale)}>{copy.viewHistory}</Link>
         </div>
 
-        <aside className="space-y-6">
-          <div className="rounded-[18px] border border-[var(--border)] bg-[var(--primary-soft)] p-6">
-            <p className="technical-label">{copy.notify}</p>
-            <p className="mt-3 text-sm leading-6 text-[var(--muted)]">{copy.notifyCopy}</p>
-          </div>
+        <aside>
           <div className="rounded-[18px] border border-[var(--border)] bg-[var(--surface)] p-6">
             <p className="technical-label">{copy.rules}</p>
             <div className="mt-4 flex flex-col gap-3 text-sm font-semibold">
