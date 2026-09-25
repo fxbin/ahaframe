@@ -160,17 +160,20 @@ function normalizeAihotEvent(event: Record<string, unknown>, checkedAt: string |
   const confirmedAt = parseTimestamp(firstString(event, ["confirmedAt", "confirmed_at"]));
   const announcedAt = parseTimestamp(firstString(event, ["announcedAt", "announced_at"]));
   const updatedAt = parseTimestamp(firstString(event, ["updatedAt", "updated_at"]));
+  const createdAt = parseTimestamp(firstString(event, ["createdAt", "created_at"]));
   const occurredOn = dateOnlyToBeijingNoon(firstString(event, ["occurredOn", "occurred_on"]));
   const occurredAt = status === "confirmed"
-    ? confirmedAt || announcedAt || occurredOn || updatedAt
-    : announcedAt || updatedAt || confirmedAt || occurredOn;
+    ? confirmedAt || announcedAt || occurredOn || createdAt || updatedAt
+    : announcedAt || createdAt || updatedAt || confirmedAt || occurredOn;
   if (!occurredAt) return null;
 
   const postUrl = aihotPostUrl(event);
   const sourceUrl = postUrl || "https://aihot.news/codex-reset";
   const xStatusId = extractXStatusId(sourceUrl);
   const eventId = firstString(event, ["id", "eventId", "event_id"]);
-  const externalId = xStatusId || eventId || `aihot:${kind}:${occurredAt}`;
+  // A snapshot event keeps the same ID as an announcement moves to confirmed.
+  // The X post can change on confirmation; using its ID would double-count grants.
+  const externalId = eventId || xStatusId || `aihot:${kind}:${occurredAt}`;
 
   return {
     externalId,
@@ -187,7 +190,7 @@ function normalizeAihotEvent(event: Record<string, unknown>, checkedAt: string |
   };
 }
 
-function normalizeAihotPayload(payload: unknown): PublicResetSignal[] {
+export function normalizeAihotPayload(payload: unknown): PublicResetSignal[] {
   const root = asRecord(payload);
   if (!root) return [];
   const events = Array.isArray(root.events) ? root.events : [];
@@ -239,7 +242,9 @@ function dedupeSignals<T extends Omit<PublicResetSignal, "corroboratedByNextRese
   const deduped = new Map<string, T>();
   for (const signal of signals) {
     const xStatusId = extractXStatusId(signal.sourceUrl);
-    const key = xStatusId || `${signal.externalId}:${signal.kind}`;
+    // A single Tibo post can discuss a full reset AND a reset-credit grant.
+    // Keep the event type in the key so one cannot erase the other.
+    const key = `${signal.provider}:${signal.kind}:${signal.externalId || xStatusId}`;
     if (!deduped.has(key)) deduped.set(key, signal);
   }
   return [...deduped.values()];
