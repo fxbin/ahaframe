@@ -33,6 +33,9 @@ interface ResetEventRow {
 export interface CodexResetSnapshot {
   latest: CodexResetEvent | null;
   history: CodexResetEvent[];
+  /** Reset credits have their own timeline; they never enter full-reset forecasts. */
+  bankedHistory: CodexResetEvent[];
+  latestBanked: CodexResetEvent | null;
   dataAvailable: boolean;
 }
 
@@ -145,10 +148,10 @@ function dedupeEvents(events: CodexResetEvent[]) {
 }
 
 function sourceTypeForSignal(signal: PublicResetSignal) {
-  if (isDirectTiboSource(signal.sourceUrl)) {
-    return signal.provider === "aihot" ? "x_tibo_aihot" : "x_tibo";
-  }
-  return signal.provider === "aihot" ? "aihot" : "codex_resets_api";
+  // AIHOT event IDs remain stable when an announcement receives a new X
+  // confirmation post. A single source_type ensures upsert updates the event.
+  if (signal.provider === "aihot") return "aihot";
+  return isDirectTiboSource(signal.sourceUrl) ? "x_tibo" : "codex_resets_api";
 }
 
 function mapPublicSignal(signal: PublicResetSignal): CodexResetEvent {
@@ -171,18 +174,45 @@ function mapPublicSignal(signal: PublicResetSignal): CodexResetEvent {
   });
 }
 
-async function readPersistedConfirmedHistory(limit: number, privileged: boolean): Promise<CodexResetEvent[]> {
+interface ResetHistories {
+  full: CodexResetEvent[];
+  banked: CodexResetEvent[];
+}
+
+function partitionResetHistory(events: CodexResetEvent[], limit: number): ResetHistories {
+  const unique = dedupeEvents(events);
+  return {
+    full: unique.filter((event) => event.kind === "full" && event.status === "confirmed").slice(0, limit),
+    banked: unique.filter((event) =>
+      event.kind === "banked" && (event.status === "confirmed" || event.status === "detected"),
+    ).slice(0, limit),
+  };
+}
+
+function toSnapshot(groups: ResetHistories): CodexResetSnapshot {
+  return {
+    latest: groups.full[0] ?? null,
+    history: groups.full,
+    latestBanked: groups.banked[0] ?? null,
+    bankedHistory: groups.banked,
+    dataAvailable: true,
+  };
+}
+
+async function readPersistedEventHistory(limit: number, privileged: boolean): Promise<ResetHistories> {
   const supabase = privileged ? createServiceRoleClient() : createPublicDataClient();
-  const { data, error } = await supabase
+  // Anonymous RLS exposes confirmed rows only; detected grants can still come
+  // from the live snapshot without granting public access to unverified DB rows.
+  const query = supabase
     .from("codex_reset_events")
     .select("id,occurred_at,detected_at,status,kind,source_type,source_external_id,source_url,source_label,evidence_text")
-    .eq("status", "confirmed")
-    .eq("kind", "full")
     .order("occurred_at", { ascending: false })
-    .limit(Math.max(limit * 3, limit));
-
+    .limit(Math.max(limit * 6, 400));
+  const { data, error } = privileged
+    ? await query.in("status", ["confirmed", "detected"])
+    : await query.eq("status", "confirmed");
   if (error) throw error;
-  return dedupeEvents(((data ?? []) as ResetEventRow[]).map(mapRow)).slice(0, limit);
+  return partitionResetHistory(((data ?? []) as ResetEventRow[]).map(mapRow), limit);
 }
 
 export async function syncPublicCodexResetFeed(limit = 100): Promise<PublicFeedSyncResult> {
@@ -226,10 +256,10 @@ export async function getCodexResetSnapshot(limit = 12): Promise<CodexResetSnaps
 
   if (hasServiceRole) {
     try {
-      const syncResult = await syncPublicCodexResetFeed(Math.max(12, limit));
-      if (syncResult.accepted > 0) {
-        const history = await readPersistedConfirmedHistory(limit, true);
-        if (history.length > 0) return { latest: history[0], history, dataAvailable: true };
+      const synced = await syncPublicCodexResetFeed(Math.max(12, limit));
+      if (synced.accepted > 0) {
+        const groups = await readPersistedEventHistory(limit, true);
+        if (groups.full.length || groups.banked.length) return toSnapshot(groups);
       }
     } catch (error) {
       console.warn("Codex reset upstream sync failed; trying live fallback sources.", error);
@@ -238,16 +268,20 @@ export async function getCodexResetSnapshot(limit = 12): Promise<CodexResetSnaps
 
   try {
     const signals = await fetchPublicResetSignals(Math.max(12, limit));
-    const history = dedupeEvents(signals
-      .map(mapPublicSignal)
-      .filter((event) => event.status === "confirmed" && event.kind === "full"))
-      .slice(0, limit);
-
-    if (history.length > 0) {
-      return { latest: history[0], history, dataAvailable: true };
-    }
+    const groups = partitionResetHistory(signals.map(mapPublicSignal), limit);
+    if (groups.full.length || groups.banked.length) return toSnapshot(groups);
   } catch (error) {
     console.warn("Codex reset live sources unavailable; trying persisted snapshot.", error);
+  }
+
+  // Last known good history should remain visible even during upstream outages.
+  if (hasServiceRole) {
+    try {
+      const groups = await readPersistedEventHistory(limit, true);
+      if (groups.full.length || groups.banked.length) return toSnapshot(groups);
+    } catch (error) {
+      console.warn("Codex reset privileged saved snapshot unavailable.", error);
+    }
   }
 
   const hasPublicSupabase = Boolean(
@@ -255,16 +289,14 @@ export async function getCodexResetSnapshot(limit = 12): Promise<CodexResetSnaps
   );
   if (hasPublicSupabase) {
     try {
-      const history = await readPersistedConfirmedHistory(limit, false);
-      if (history.length > 0) {
-        return { latest: history[0], history, dataAvailable: true };
-      }
+      const groups = await readPersistedEventHistory(limit, false);
+      if (groups.full.length || groups.banked.length) return toSnapshot(groups);
     } catch (error) {
       console.warn("Codex reset persisted public snapshot unavailable.", error);
     }
   }
 
-  return { latest: null, history: [], dataAvailable: false };
+  return { latest: null, history: [], latestBanked: null, bankedHistory: [], dataAvailable: false };
 }
 
 export function classifyTiboResetPost(text: string): Classification | null {

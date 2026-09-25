@@ -123,6 +123,7 @@ export default async function CodexResetPage({ params }: PageProps) {
   const latest = snapshot.latest;
   const resetToday = latest ? isSameUtcDay(latest.occurredAt, now) : false;
   const recentHistory = snapshot.history.slice(0, 6);
+  const recentCredits = snapshot.bankedHistory.slice(0, 3);
   const forecast = buildCodexResetForecast(
     snapshot.history.map((event) => event.occurredAt),
     now,
@@ -153,7 +154,13 @@ export default async function CodexResetPage({ params }: PageProps) {
     modelCopy: "Weibull 生存模型 + Bayesian 平滑经验 Hazard",
     forecastNote: "这是基于已确认 Full Reset 历史的统计估计，不代表 OpenAI 官方计划，也不是下一次重置时间承诺。",
     history: "最近重置历史",
-    historyCopy: "主时间线只统计已确认的 Codex 全量额度重置；Banked Reset 单独处理。",
+    historyCopy: "绿色表示已确认全量重置，琥珀色表示重置卡动态。重置节奏与预测仅使用全量重置。",
+    credits: "重置卡动态",
+    creditsSubtitle: "发放重置卡与全量重置是两种不同事件。",
+    creditsConfirmed: "已确认发放",
+    creditsAnnounced: "发放预告 · 待确认",
+    creditsEmpty: "暂未获取到可验证的重置卡公告。",
+    creditsCaution: "公开公告不代表你的账号必定符合领取条件，也不代表额度已经到账。",
     eventTitle: "Codex 全量额度重置已确认",
     viewHistory: "查看完整历史 →",
     rules: "了解重置规则",
@@ -184,7 +191,13 @@ export default async function CodexResetPage({ params }: PageProps) {
     modelCopy: "Weibull survival model + Bayesian-smoothed empirical hazard",
     forecastNote: "This is a statistical estimate from confirmed Full Reset history. It is not an OpenAI schedule or a promise of when the next reset will occur.",
     history: "Recent reset history",
-    historyCopy: "The main timeline only counts confirmed full usage resets. Banked resets are tracked separately.",
+    historyCopy: "Green marks confirmed full resets; amber marks reset-credit activity. Rhythm and forecasts use only full resets.",
+    credits: "Reset-credit activity",
+    creditsSubtitle: "Reset-credit grants and full usage resets are different events.",
+    creditsConfirmed: "Grant confirmed",
+    creditsAnnounced: "Grant announced · pending",
+    creditsEmpty: "No verifiable reset-credit announcements are available.",
+    creditsCaution: "A public grant announcement does not guarantee eligibility or mean a credit has reached your account.",
     eventTitle: "Full usage reset confirmed",
     viewHistory: "View full history →",
     rules: "Reset rules",
@@ -299,6 +312,38 @@ export default async function CodexResetPage({ params }: PageProps) {
         </div>
       </section>
 
+      <section className="mt-8 rounded-[18px] border border-[var(--border)] bg-[var(--surface)] p-6 md:p-8">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-baseline sm:justify-between">
+          <h2 className="text-xl font-semibold tracking-[-0.025em]">{copy.credits}</h2>
+          <Link className="text-link text-xs font-semibold" href={localizedPath("/tools/codex-reset/banked-reset", locale)}>{copy.banked} →</Link>
+        </div>
+        <p className="mt-2 text-xs leading-5 text-[var(--muted)]">{copy.creditsSubtitle}</p>
+        {recentCredits.length ? (
+          <div className="mt-4 divide-y divide-[var(--border)]">
+            {recentCredits.map((event) => (
+              <div key={event.id} className="grid gap-3 py-3 sm:grid-cols-[145px_1fr_auto] sm:items-center">
+                <time className="font-mono text-xs text-[var(--muted)]">{formatUtc(event.occurredAt, locale)}</time>
+                <span className={`w-fit rounded-full border px-3 py-1 text-xs font-semibold ${
+                  event.status === "confirmed"
+                    ? "border-[#b27719] bg-[#fff1d6] text-[#7a4b04]"
+                    : "border-dashed border-[#b27719] text-[#7a4b04]"
+                }`}>
+                  {event.status === "confirmed" ? copy.creditsConfirmed : copy.creditsAnnounced}
+                </span>
+                {isTiboSource(event) ? (
+                  <a href={event.sourceUrl} target="_blank" rel="noreferrer" className="text-link text-xs font-semibold">{sourceName(event, zh)}</a>
+                ) : (
+                  <span className="text-xs text-[var(--muted)]">{sourceName(event, zh)}</span>
+                )}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="mt-4 text-sm text-[var(--muted)]">{copy.creditsEmpty}</p>
+        )}
+        <p className="mt-4 text-xs leading-5 text-[var(--muted)]">{copy.creditsCaution}</p>
+      </section>
+
       <section className="mt-8 grid gap-6 lg:grid-cols-[1.4fr_0.6fr]">
         <div className="rounded-[18px] border border-[var(--border)] bg-[var(--surface)] p-6 md:p-8">
           <div>
@@ -308,7 +353,7 @@ export default async function CodexResetPage({ params }: PageProps) {
 
           {snapshot.history.length > 0 ? (
             <div className="mt-6 border-t border-[var(--border)] pt-6">
-              <CodexResetCalendar events={snapshot.history} locale={locale} months={6} />
+              <CodexResetCalendar events={snapshot.history} bankedEvents={snapshot.bankedHistory} locale={locale} months={6} />
             </div>
           ) : null}
 
