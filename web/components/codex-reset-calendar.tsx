@@ -149,7 +149,7 @@ export function CodexResetCalendar({ events, bankedEvents = [], locale, months =
               : `Full resets and reset-credit activity over the last ${months} months (UTC). Announcements are not confirmed grants; unmarked days have no recorded activity.`}
           </p>
         </div>
-        <div className="inline-flex w-fit items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--paper)] px-3 py-1.5 text-[11px] text-[var(--muted)]">
+        <div className="flex w-fit flex-wrap items-center gap-2 rounded-[14px] border border-[var(--border)] bg-[var(--paper)] px-3 py-1.5 text-[11px] text-[var(--muted)]">
           <span className="h-2.5 w-2.5 rounded-full bg-[var(--primary)]" />
           <span>{zh ? "全量重置" : "Full reset"}</span>
           <span className="ml-2 h-2.5 w-2.5 rounded-full bg-[#b27719]" />
