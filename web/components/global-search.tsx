@@ -134,7 +134,7 @@ export function GlobalSearch({ locale, documents }: GlobalSearchProps) {
         >
           <div
             ref={dialogRef}
-            className="flex w-full min-w-0 max-w-2xl flex-col overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--background)] shadow-2xl"
+            className="flex w-full min-w-0 max-w-2xl flex-col overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--paper)] shadow-2xl"
             style={{
               maxHeight: viewport
                 ? `${Math.max(160, Math.min(760, viewport.height - (viewport.width < 640 ? 24 : 72)))}px`
