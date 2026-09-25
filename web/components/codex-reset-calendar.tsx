@@ -2,10 +2,13 @@ interface CalendarEvent {
   id?: string;
   occurredAt: string;
   sourceUrl?: string;
+  status?: "confirmed" | "detected";
 }
 
 interface CodexResetCalendarProps {
   events: CalendarEvent[];
+  /** Credit announcements and confirmed grants are markers, not full resets. */
+  bankedEvents?: CalendarEvent[];
   locale: string;
   months?: number;
 }
@@ -94,7 +97,7 @@ function buildMonthDays(month: Date) {
   ];
 }
 
-export function CodexResetCalendar({ events, locale, months = 6 }: CodexResetCalendarProps) {
+export function CodexResetCalendar({ events, bankedEvents = [], locale, months = 6 }: CodexResetCalendarProps) {
   const zh = locale === "zh-CN";
   const now = new Date();
   const todayKey = dayKey(now);
@@ -115,6 +118,15 @@ export function CodexResetCalendar({ events, locale, months = 6 }: CodexResetCal
     eventsByDay.set(key, bucket);
   }
 
+  const bankedByDay = new Map<string, CalendarEvent[]>();
+  for (const event of bankedEvents) {
+    if (Number.isNaN(Date.parse(event.occurredAt))) continue;
+    const key = dayKey(new Date(event.occurredAt));
+    const bucket = bankedByDay.get(key) ?? [];
+    bucket.push(event);
+    bankedByDay.set(key, bucket);
+  }
+
   const latestEvent = sortedEvents.at(-1) ?? null;
   const latestDate = latestEvent ? new Date(latestEvent.occurredAt) : null;
   const gaps = sortedEvents.slice(1).map((event, index) =>
@@ -133,13 +145,17 @@ export function CodexResetCalendar({ events, locale, months = 6 }: CodexResetCal
           <p className="technical-label">{zh ? "重置日历" : "Reset calendar"}</p>
           <p className="mt-1 max-w-2xl text-xs leading-5 text-[var(--muted)]">
             {zh
-              ? `最近 ${months} 个月已确认的 Codex 全量额度重置。空白日期表示没有已确认的重置事件。`
-              : `Confirmed Codex full usage resets across the last ${months} months. Unmarked days have no confirmed reset event.`}
+              ? `最近 ${months} 个月的全量重置与重置卡动态，按 UTC 日期展示。预告不代表已经发放；空白表示暂无相关记录。`
+              : `Full resets and reset-credit activity over the last ${months} months (UTC). Announcements are not confirmed grants; unmarked days have no recorded activity.`}
           </p>
         </div>
         <div className="inline-flex w-fit items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--paper)] px-3 py-1.5 text-[11px] text-[var(--muted)]">
           <span className="h-2.5 w-2.5 rounded-full bg-[var(--primary)]" />
-          <span>{zh ? "已确认重置" : "Confirmed reset"}</span>
+          <span>{zh ? "全量重置" : "Full reset"}</span>
+          <span className="ml-2 h-2.5 w-2.5 rounded-full bg-[#b27719]" />
+          <span>{zh ? "重置卡已发放" : "Credit granted"}</span>
+          <span className="ml-2 h-2.5 w-2.5 rounded-full border border-[#b27719]" />
+          <span>{zh ? "重置卡预告" : "Credit announced"}</span>
           <span className="ml-2 h-2.5 w-2.5 rounded-full border border-[var(--foreground)] bg-transparent" />
           <span>{zh ? "今天" : "Today"}</span>
         </div>
@@ -184,50 +200,79 @@ export function CodexResetCalendar({ events, locale, months = 6 }: CodexResetCal
 
                   const key = dayKey(date);
                   const dayEvents = eventsByDay.get(key) ?? [];
+                  const cardEvents = bankedByDay.get(key) ?? [];
                   const confirmed = dayEvents.length > 0;
+                  const creditGranted = cardEvents.some((event) => event.status === "confirmed");
+                  const creditAnnounced = cardEvents.length > 0 && !creditGranted;
                   const isToday = key === todayKey;
                   const future = date.getTime() > now.getTime();
-                  const label = confirmed
-                    ? `${formatDay(date, locale)} · ${dayEvents.length} ${zh ? "次已确认重置" : dayEvents.length === 1 ? "confirmed reset" : "confirmed resets"}`
-                    : `${formatDay(date, locale)} · ${zh ? "无已确认重置" : "no confirmed reset"}`;
+                  const label = [
+                    formatDay(date, locale),
+                    confirmed ? (zh ? "已确认全量重置" : "confirmed full reset") : null,
+                    creditGranted ? (zh ? "重置卡已发放" : "reset credits confirmed") : null,
+                    creditAnnounced ? (zh ? "重置卡已预告" : "reset credits announced") : null,
+                  ].filter(Boolean).join(" · ");
 
-                  if (confirmed) {
-                    const primaryEvent = dayEvents[dayEvents.length - 1];
-                    const eventTime = new Date(primaryEvent.occurredAt);
+                  if (confirmed || cardEvents.length > 0) {
+                    const detailEvents = [
+                      ...dayEvents.map((event) => ({ ...event, kind: "full" as const })),
+                      ...cardEvents.map((event) => ({ ...event, kind: "banked" as const })),
+                    ].sort((a, b) => Date.parse(b.occurredAt) - Date.parse(a.occurredAt));
+
                     return (
                       <details key={key} className="group relative">
                         <summary
                           aria-label={label}
-                          className={`flex aspect-square cursor-pointer list-none items-center justify-center rounded-[9px] bg-[var(--primary)] text-xs font-semibold text-white shadow-sm transition-transform hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)] focus-visible:ring-offset-2 [&::-webkit-details-marker]:hidden ${isToday ? "ring-2 ring-[var(--foreground)] ring-offset-2 ring-offset-[var(--paper)]" : ""}`}
+                          className={`relative flex aspect-square cursor-pointer list-none items-center justify-center rounded-[9px] text-xs font-semibold transition-transform hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)] focus-visible:ring-offset-2 [&::-webkit-details-marker]:hidden ${
+                            confirmed ? "bg-[var(--primary)] text-white shadow-sm"
+                              : creditGranted ? "border border-[#b27719] bg-[#fff1d6] text-[#7a4b04]"
+                                : "border border-dashed border-[#b27719] bg-[var(--paper)] text-[#7a4b04]"
+                          } ${isToday ? "ring-2 ring-[var(--foreground)] ring-offset-2 ring-offset-[var(--paper)]" : ""}`}
                         >
                           {date.getUTCDate()}
-                          {dayEvents.length > 1 ? (
-                            <span className="absolute right-0 top-0 min-w-4 -translate-y-1/3 translate-x-1/3 rounded-full bg-[var(--foreground)] px-1 text-[9px] leading-4 text-[var(--surface)]">
-                              {dayEvents.length}
+                          {cardEvents.length > 0 && confirmed ? (
+                            <span
+                              aria-hidden="true"
+                              className={`absolute -bottom-0.5 right-0 h-2.5 w-2.5 rounded-full border border-[var(--paper)] ${creditGranted ? "bg-[#b27719]" : "bg-[var(--paper)] ring-1 ring-[#b27719]"}`}
+                            />
+                          ) : null}
+                          {dayEvents.length + cardEvents.length > 2 ? (
+                            <span className="absolute -right-1 -top-1 min-w-4 rounded-full bg-[var(--foreground)] px-1 text-[9px] leading-4 text-[var(--surface)]">
+                              {dayEvents.length + cardEvents.length}
                             </span>
                           ) : null}
                         </summary>
-                        <div className="fixed inset-x-4 bottom-4 z-50 rounded-[14px] border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-paper)] md:absolute md:inset-x-auto md:bottom-auto md:left-1/2 md:top-full md:mt-2 md:w-64 md:-translate-x-1/2">
-                          <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-[var(--muted)]">{formatDay(date, locale)}</p>
-                          <p className="mt-2 text-sm font-semibold">{zh ? "Codex 全量额度重置" : "Codex full usage reset"}</p>
-                          <div className="mt-3 flex items-center justify-between gap-4 text-xs">
-                            <span className="text-[var(--muted)]">{formatUtcTime(eventTime, locale)} UTC</span>
-                            <span className="rounded-full bg-[var(--primary-soft)] px-2 py-1 font-semibold text-[var(--primary)]">
-                              {zh ? "已确认" : "Confirmed"}
-                            </span>
+                        <div className="fixed inset-x-4 bottom-4 z-50 max-h-[65vh] overflow-y-auto rounded-[14px] border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-paper)] md:absolute md:inset-x-auto md:bottom-auto md:left-1/2 md:top-full md:mt-2 md:w-72 md:-translate-x-1/2">
+                          <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-[var(--muted)]">{formatDay(date, locale)} UTC</p>
+                          <div className="mt-2 divide-y divide-[var(--border)]">
+                            {detailEvents.map((event) => {
+                              const credit = event.kind === "banked";
+                              const granted = event.status === "confirmed";
+                              return (
+                                <div key={event.id ?? `${event.kind}:${event.occurredAt}`} className="py-3 first:pt-1 last:pb-0">
+                                  <p className="text-sm font-semibold">
+                                    {credit
+                                      ? (granted ? (zh ? "重置卡已确认发放" : "Reset-credit grant confirmed")
+                                        : (zh ? "重置卡发放预告" : "Reset-credit grant announced"))
+                                      : (zh ? "Codex 全量额度重置" : "Codex full usage reset")}
+                                  </p>
+                                  <div className="mt-2 flex items-center justify-between gap-3 text-xs">
+                                    <span className="text-[var(--muted)]">{formatUtcTime(new Date(event.occurredAt), locale)} UTC</span>
+                                    <span className={`rounded-full px-2 py-1 font-semibold ${credit ? "bg-[#fff1d6] text-[#7a4b04]" : "bg-[var(--primary-soft)] text-[var(--primary)]"}`}>
+                                      {credit && !granted ? (zh ? "待确认" : "Pending") : (zh ? "已确认" : "Confirmed")}
+                                    </span>
+                                  </div>
+                                  {isTiboSource(event.sourceUrl) ? (
+                                    <a className="text-link mt-3 inline-flex text-xs font-semibold" href={event.sourceUrl} target="_blank" rel="noreferrer">
+                                      {zh ? "查看原始公告 ↗" : "View original announcement ↗"}
+                                    </a>
+                                  ) : (
+                                    <p className="mt-3 text-xs text-[var(--muted)]">{zh ? "公开信号" : "Public signal"}</p>
+                                  )}
+                                </div>
+                              );
+                            })}
                           </div>
-                          {isTiboSource(primaryEvent.sourceUrl) ? (
-                            <a
-                              className="text-link mt-4 inline-flex text-xs font-semibold"
-                              href={primaryEvent.sourceUrl}
-                              target="_blank"
-                              rel="noreferrer"
-                            >
-                              {zh ? "查看原始公告 ↗" : "View original announcement ↗"}
-                            </a>
-                          ) : (
-                            <p className="mt-4 text-xs text-[var(--muted)]">{zh ? "公开信号已确认" : "Confirmed by public signal"}</p>
-                          )}
                         </div>
                       </details>
                     );
