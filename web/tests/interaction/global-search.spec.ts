@@ -107,6 +107,9 @@ test("search dialog escapes the sticky header and remains usable in a short mobi
   const input = page.getByRole("textbox", { name: "Search AhaFrame" });
   await expect(overlay).toBeVisible();
   await expect(dialog).toBeVisible();
+  // An undefined CSS variable previously made the modal transparent and let page
+  // content show through it.
+  await expect(dialog).toHaveCSS("background-color", "rgb(255, 253, 247)");
   await expect(input).toBeFocused();
   await expect.poll(() => page.evaluate(() => document.body.style.overflow)).toBe("hidden");
 
