@@ -2,7 +2,7 @@ interface CalendarEvent {
   id?: string;
   occurredAt: string;
   sourceUrl?: string;
-  status?: "confirmed" | "detected";
+  status?: "confirmed" | "detected" | "rejected";
 }
 
 interface CodexResetCalendarProps {
