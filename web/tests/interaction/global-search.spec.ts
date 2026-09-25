@@ -95,3 +95,55 @@ test("zh-CN search uses localized documents and mobile has a visible click trigg
   await expect(result).toHaveAttribute("href", "/zh-cn/guides/timeout-ambiguity/");
   await expect(result).toHaveAttribute("data-search-reason", "exact");
 });
+
+test("search dialog escapes the sticky header and remains usable in a short mobile viewport", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 640 });
+  await page.goto("/en/guides/");
+  const trigger = page.locator("[data-global-search-trigger]");
+  await trigger.click();
+
+  const overlay = page.locator("body > [data-global-search-overlay]");
+  const dialog = page.locator("[data-global-search-dialog]");
+  const input = page.getByRole("textbox", { name: "Search AhaFrame" });
+  await expect(overlay).toBeVisible();
+  await expect(dialog).toBeVisible();
+  await expect(input).toBeFocused();
+  await expect.poll(() => page.evaluate(() => document.body.style.overflow)).toBe("hidden");
+
+  await input.fill("a");
+  await page.setViewportSize({ width: 390, height: 420 }); // Simulate reduced space from a mobile keyboard.
+  await expect.poll(() => dialog.evaluate((element) => {
+    const bounds = element.getBoundingClientRect();
+    const visibleHeight = window.visualViewport?.height ?? window.innerHeight;
+    const visibleTop = window.visualViewport?.offsetTop ?? 0;
+    return bounds.top >= visibleTop - 1 && bounds.bottom <= visibleTop + visibleHeight + 1;
+  })).toBe(true);
+
+  const scroll = page.locator("[data-global-search-results]");
+  await expect.poll(() => scroll.evaluate((element) => element.scrollHeight > element.clientHeight)).toBe(true);
+  await scroll.evaluate((element) => { element.scrollTop = 160; });
+  expect(await scroll.evaluate((element) => element.scrollTop)).toBeGreaterThan(0);
+  expect(await overlay.evaluate((element) => element.scrollWidth <= element.clientWidth + 1)).toBe(true);
+
+  // Escape works even when focus is on the close control, then unlocks the page.
+  await page.getByRole("button", { name: "Close search" }).focus();
+  await page.keyboard.press("Escape");
+  await expect(overlay).toHaveCount(0);
+  await expect(trigger).toBeFocused();
+  await expect.poll(() => page.evaluate(() => document.body.style.overflow)).not.toBe("hidden");
+});
+
+test("search traps keyboard focus inside the viewport-level dialog", async ({ page }) => {
+  await page.goto("/en/");
+  await page.keyboard.press("Control+K");
+  const dialog = page.getByRole("dialog", { name: "Search AhaFrame" });
+  const input = page.getByRole("textbox", { name: "Search AhaFrame" });
+  await input.fill("Timeout ambiguity");
+
+  const lastResult = dialog.locator("a[href]").last();
+  await lastResult.focus();
+  await page.keyboard.press("Tab");
+  await expect(input).toBeFocused();
+  await page.keyboard.press("Shift+Tab");
+  await expect(lastResult).toBeFocused();
+});
