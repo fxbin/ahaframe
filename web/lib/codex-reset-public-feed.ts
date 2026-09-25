@@ -250,10 +250,10 @@ function dedupeSignals<T extends Omit<PublicResetSignal, "corroboratedByNextRese
   return [...deduped.values()];
 }
 
-async function fetchJson(url: string): Promise<unknown> {
+async function fetchJson(url: string, revalidate = 120): Promise<unknown> {
   const response = await fetch(url, {
     headers: { "user-agent": USER_AGENT, accept: "application/json" },
-    next: { revalidate: 120 },
+    next: { revalidate },
   });
   if (!response.ok) throw new Error(`Public reset feed ${response.status} from ${new URL(url).host}`);
   return response.json();
@@ -316,7 +316,7 @@ async function fetchLegacySignals(limit: number): Promise<PublicResetSignal[]> {
 
 export async function fetchPublicResetSignals(limit = 100): Promise<PublicResetSignal[]> {
   try {
-    const aihotSignals = dedupeSignals(normalizeAihotPayload(await fetchJson(AIHOT_CODEX_RESETS_URL)))
+    const aihotSignals = dedupeSignals(normalizeAihotPayload(await fetchJson(AIHOT_CODEX_RESETS_URL, 300)))
       .sort((a, b) => Date.parse(b.occurredAt) - Date.parse(a.occurredAt))
       .slice(0, limit);
     if (aihotSignals.length > 0) return aihotSignals;
