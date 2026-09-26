@@ -596,3 +596,26 @@ body:has(.liquid-radar)::before,body:has(.liquid-guide-page)::before,body:has(.l
 
 .search-parity-row[aria-current="true"]{background:#faeee4;box-shadow:inset 3px 0 #ad6b49;}
 .search-parity-row[aria-current="true"] .search-parity-icon{background:#f9e4d5;}
+
+
+/* Chapters disclose progressively: only the current module expands by default. */
+.guide-outline-chapter{padding:11px 0;border-top:1px solid var(--border);}
+.guide-outline-chapter-title{
+  display:flex;align-items:center;gap:9px;
+  padding:7px 9px;margin:0;cursor:pointer;list-style:none;
+  border-radius:10px;
+}
+.guide-outline-chapter-title::-webkit-details-marker{display:none;}
+.guide-outline-chapter-title>strong{flex:1;}
+.guide-outline-disclosure{color:#996145;font-size:15px;transition:transform .18s;}
+.guide-outline-chapter[open] .guide-outline-disclosure{transform:rotate(180deg);}
+.guide-outline-chapter-title:hover{background:rgba(249,241,233,.68);}
+.guide-outline-lessons{padding-top:4px;}
+.guide-outline-lessons>a,.guide-outline-lessons>span{
+  display:flex;align-items:start;gap:9px;
+  padding:10px 10px;border-radius:10px;
+  font-size:12px;line-height:1.55;transition:background-color .16s;
+}
+.guide-outline-lessons>a:hover{background:#fbf3eb;color:#8d4d30;}
+.guide-outline-lessons>.is-active{background:#fbefe6;color:#874a2f;font-weight:650;}
+.guide-outline-lessons .guide-workspace-step{margin:0;line-height:1.6;}
