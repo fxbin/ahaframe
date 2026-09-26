@@ -123,7 +123,6 @@ export default async function CodexResetPage({ params }: PageProps) {
   const now = new Date();
   const latest = snapshot.latest;
   const resetToday = latest ? isSameUtcDay(latest.occurredAt, now) : false;
-  const recentHistory = snapshot.history.slice(0, 6);
   const recentCredits = snapshot.bankedHistory.slice(0, 3);
   const forecast = buildCodexResetForecast(
     snapshot.history.map((event) => event.occurredAt),
