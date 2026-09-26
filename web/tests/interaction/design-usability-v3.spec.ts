@@ -70,3 +70,20 @@ test("global search recent visits are real and persist across navigation", async
   await expect(page.locator("[data-search-suggestions] .search-parity-section").first()).toContainText("Recently opened");
   await expect(page.locator("[data-search-suggestions] .search-parity-section").first()).toContainText(title);
 });
+
+
+test("untyped search supports keyboard selection rather than implying inactive shortcuts", async ({ page }) => {
+  await page.goto("/en/");
+  const trigger = page.locator("[data-global-search-trigger]");
+  await expect(trigger).toHaveAttribute("data-search-ready", "true");
+  await trigger.click();
+  const suggestions = page.locator("[data-search-suggestions] .search-parity-row");
+  await expect(suggestions.first()).toHaveAttribute("aria-current", "true");
+  const next = suggestions.nth(1);
+  const destination = await next.getAttribute("href");
+  expect(destination).toBeTruthy();
+  await page.keyboard.press("ArrowDown");
+  await expect(next).toHaveAttribute("aria-current", "true");
+  await page.keyboard.press("Enter");
+  await expect(page).toHaveURL(new RegExp(destination!.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/\/$/, "\\/$")));
+});
