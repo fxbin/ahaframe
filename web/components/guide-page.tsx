@@ -125,6 +125,9 @@ export function GuidePage({ locale, data }: { locale: Locale; data: GuidePageDat
                 </div>
                 <h1 className="mt-5 max-w-4xl font-[family-name:var(--font-editorial)] text-4xl font-semibold leading-[1.1] tracking-[-0.05em] sm:text-5xl">{guide.title}</h1>
                 <p className="mt-6 max-w-3xl text-lg leading-8 text-[var(--muted)]">{guide.summary}</p>
+                 <a className="guide-mobile-practice-link" href="#guide-practice">
+                   {locale === "zh-CN" ? "跳转至实践与验证 ↓" : "Jump to practice & verification ↓"}
+                 </a>
               </div>
               <div className="guide-header-model border-y border-[var(--border)] py-5 lg:border-y-0 lg:border-l lg:py-2 lg:pl-8">
                 <p className="technical-label">{labels.mentalModel}</p>
