@@ -225,7 +225,7 @@ export default async function CodexResetPage({ params }: PageProps) {
           <div>
             <p className="editorial-kicker">{copy.eyebrow}</p>
             <h1 id="radar-title" className="editorial-display mt-6 max-w-3xl text-4xl leading-[1.12] tracking-[-0.045em] sm:text-5xl lg:text-6xl">
-              {zh ? <>Codex 今天<span className="liquid-hero-accent">重置了吗？</span></> : copy.title}
+              {zh ? <>Codex 今天<span className="liquid-hero-accent radar-question">重置了吗？</span></> : copy.title}
             </h1>
             <p className="mt-6 max-w-xl text-base leading-8 text-[var(--muted)]">{copy.checked}</p>
           </div>
