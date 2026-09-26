@@ -334,3 +334,45 @@ body:has(.liquid-radar)>*,body:has(.liquid-guide-page)>*,body:has(.liquid-home)>
  .radar-activity-row__body p{font-size:12px;}
  .radar-activity-row__badge{font-size:10px;}
 }
+
+
+/* Diagram derives from the published Timeout ambiguity Guide, not a mocked quiz. */
+.guide-timeout-figure{
+  margin:22px 0;padding:23px 18px!important;
+  border:1px solid #f1e2d6!important;border-radius:17px;
+  background:linear-gradient(145deg,#fffdfb,#fff9f4);
+}
+.guide-timeout-flow{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 60px minmax(0,1fr) minmax(0,1.2fr);
+  gap:8px;align-items:center;padding:9px 0;
+}
+.guide-timeout-node{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:13px 8px;min-height:133px;text-align:center;
+  border-radius:14px;border:1px solid #eaded4;background:#fff;
+  box-shadow:0 8px 16px rgba(108,78,56,.04);
+}
+.guide-timeout-node>span{color:#9f5d3b;background:#f9eee7;border-radius:11px;font-size:22px;width:37px;height:37px;display:grid;place-items:center;margin-bottom:10px;}
+.guide-timeout-node>strong{font-size:13px;}
+.guide-timeout-node>small{font-size:10px;line-height:1.5;color:#766e68;margin-top:4px;}
+.guide-timeout-link{display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;color:#a7613f;}
+.guide-timeout-link>span{font-size:23px;}
+.guide-timeout-link>small{font-size:10px;}
+.guide-timeout-link>i{font-style:normal;font-size:26px;line-height:1;}
+.guide-timeout-outcomes{
+  display:flex;flex-direction:column;gap:7px;
+  border:1px solid #efdccd;border-radius:14px;background:#fff9f4;padding:11px 8px;
+}
+.guide-timeout-outcomes>strong{color:#985b36;font-size:11px;text-align:center;margin-bottom:3px;}
+.guide-timeout-outcomes>span{display:flex;align-items:center;gap:5px;background:#fff;border-radius:8px;padding:6px;font-size:10px;line-height:1.5;color:#665f59;}
+.guide-timeout-outcomes i{flex:0 0 18px;width:18px;height:18px;display:grid;place-items:center;border-radius:50%;font-size:11px;font-style:normal;}
+.guide-timeout-outcomes .success{background:#e0f3e5;color:#24814d;}
+.guide-timeout-outcomes .pending{background:#ede7df;color:#787169;}
+.guide-timeout-outcomes .failed{background:#fae5d7;color:#b96d47;}
+@media(max-width:700px){
+ .guide-timeout-flow{grid-template-columns:minmax(0,1fr) 40px minmax(0,1fr);gap:5px;}
+ .guide-timeout-outcomes{grid-column:1/-1;margin-top:9px;}
+ .guide-timeout-node{padding:10px 4px;min-height:106px;}
+ .guide-timeout-link>small{font-size:9px;}
+}
