@@ -447,3 +447,10 @@ body:has(.liquid-radar)::before,body:has(.liquid-guide-page)::before,body:has(.l
  .radar-month__day,.radar-month__blank{height:45px;}
  .liquid-home .liquid-hero-title{font-size:clamp(2.45rem,9.2vw,3.4rem);}
 }
+
+.liquid-radar-hero h1 .radar-question{display:inline-block;white-space:nowrap;}
+@media(max-width:640px){
+ .liquid-radar-hero h1{font-size:clamp(2.05rem,8vw,2.55rem);line-height:1.22;}
+ .liquid-radar-metrics{grid-template-columns:minmax(0,1fr);}
+ .liquid-radar-metric{min-height:115px;}
+}
