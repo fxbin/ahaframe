@@ -122,7 +122,7 @@ export function CampaignHomePage({ locale, content, knowledgeMap, catalog }: Cam
                 ) : null}
                 <div className="featured-course-copy">
                   <div className="flex items-start justify-between gap-4">
-                    <span className="course-number">{index === 0 ? (locale === "zh-CN" ? "精选课程" : "FEATURED") : String(index + 1).padStart(2, "0")}</span>
+                    <span className="course-number">{index === 0 ? (locale === "zh-CN" ? "编辑精选" : "EDITOR\u0027S PICK") : String(index + 1).padStart(2, "0")}</span>
                     <span className="text-[var(--muted)]" aria-hidden="true">{index === 0 ? "↗" : "⌑"}</span>
                   </div>
                   <h3 className="mt-7 font-[family-name:var(--font-editorial)] text-2xl font-semibold leading-tight tracking-[-0.04em]">{item.path.title}</h3>
