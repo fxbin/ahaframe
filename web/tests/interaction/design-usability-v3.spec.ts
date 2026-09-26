@@ -66,6 +66,7 @@ test("global search recent visits are real and persist across navigation", async
   const suggestion = page.locator("[data-search-suggestions] .search-parity-row").first();
   const title = (await suggestion.locator(".search-parity-copy strong").innerText()).trim();
   await suggestion.click();
+  await expect(page.locator("[data-global-search-overlay]")).toHaveCount(0);
   await trigger.click();
   await expect(page.locator("[data-search-suggestions] .search-parity-section").first()).toContainText("Recently opened");
   await expect(page.locator("[data-search-suggestions] .search-parity-section").first()).toContainText(title);
