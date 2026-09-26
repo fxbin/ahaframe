@@ -536,3 +536,60 @@ body:has(.liquid-radar)::before,body:has(.liquid-guide-page)::before,body:has(.l
  .guide-workspace-body,.guide-workspace-practice{width:100%;min-width:0;}
  .guide-workspace-practice{order:3;}
 }
+
+
+/* A real one-minute decision check, styled like the approved lab panel. */
+.guide-workspace-practice{max-height:calc(100dvh - 120px);overflow-y:auto;scrollbar-width:thin;}
+.guide-quick-check{padding-top:20px;}
+.guide-quick-check__eyebrow{font-size:11px;font-weight:750;color:#ab6340;letter-spacing:.045em;}
+.guide-quick-check__title{margin-top:10px;font:650 20px/1.4 var(--font-editorial);letter-spacing:-.025em;}
+.guide-quick-check__intro{margin-top:10px;font-size:13px;line-height:1.75;color:#6e665f;}
+.guide-quick-check__log{
+  border:1px solid rgba(231,217,206,.9);border-radius:12px;
+  background:rgba(250,248,245,.83);padding:15px 13px;
+  display:flex;flex-direction:column;gap:7px;margin-top:23px;
+}
+.guide-quick-check__log strong{color:#45403d;font-size:12px;margin-bottom:3px;}
+.guide-quick-check__log code{font-family:var(--font-mono);font-size:10.5px;line-height:1.5;color:#776b64;}
+.guide-quick-check__choices{display:flex;flex-direction:column;gap:7px;margin-top:23px;}
+.guide-quick-check__choices legend{font-size:13px;font-weight:700;margin-bottom:12px;}
+.guide-quick-check__option{
+  position:relative;display:flex;gap:11px;align-items:flex-start;
+  padding:11px 12px;border:1px solid transparent;border-radius:12px;
+  cursor:pointer;transition:background-color .16s,border-color .16s;
+}
+.guide-quick-check__option:hover{background:rgba(253,242,232,.64);}
+.guide-quick-check__option.is-chosen{background:#fff6ed;border-color:#edb998;}
+.guide-quick-check__option input{accent-color:#ae603b;width:16px;height:16px;margin-top:3px;flex:0 0 16px;}
+.guide-quick-check__option span{display:flex;flex-direction:column;gap:4px;min-width:0;}
+.guide-quick-check__option strong{font-size:12.5px;font-weight:650;line-height:1.45;}
+.guide-quick-check__option small{color:#7d746e;font-size:11px;line-height:1.5;}
+.guide-quick-check__submit,.guide-quick-check__retry{
+  width:100%;min-height:44px;margin-top:20px;
+  border-radius:12px;background:linear-gradient(120deg,#b47454,#804935);
+  box-shadow:0 8px 16px rgba(140,91,62,.12),inset 0 1px rgba(255,255,255,.4);
+  border:1px solid rgba(141,80,49,.25);color:white;
+  font-size:13px;font-weight:650;
+}
+.guide-quick-check__submit span{margin-left:9px;}
+.guide-quick-check__submit:disabled{opacity:.48;cursor:not-allowed;box-shadow:none;}
+.guide-quick-check__retry{color:#8f4c2e;background:#fff3e9;box-shadow:none;border-color:#e8ccb8;}
+.guide-quick-check__feedback{margin-top:16px;padding:13px;border:1px solid #e6cfb2;border-radius:12px;background:#fffaef;}
+.guide-quick-check__feedback.is-correct{border-color:#a6d6b9;background:#f1fcf4;}
+.guide-quick-check__feedback strong{font-size:12.5px;}
+.guide-quick-check__feedback p{margin-top:8px;font-size:12px;line-height:1.65;}
+.guide-quick-check__note{margin-top:13px;font-size:10.5px;line-height:1.65;color:#827971;}
+/* Improve readable scale and interactive affordances in the command palette. */
+.search-parity-dialog .search-parity-copy strong{font-size:15px;}
+.search-parity-dialog .search-parity-copy small{font-size:12.5px;line-height:1.55;}
+.search-parity-dialog .search-parity-row{min-height:72px;gap:17px;}
+.search-parity-dialog .search-parity-heading{font-size:15px;}
+.search-parity-dialog [data-search-group] a strong{font-size:14px;}
+.search-parity-dialog [data-search-group] a .line-clamp-2{font-size:12px;line-height:1.6;}
+@media(max-width:900px){.guide-workspace-practice{max-height:none;overflow:visible;}}
+@media(max-width:640px){
+ .search-parity-dialog .search-parity-row{min-height:62px;gap:9px;}
+ .search-parity-dialog .search-parity-copy strong{font-size:13.5px;}
+ .search-parity-dialog .search-parity-copy small{font-size:11.5px;}
+ .guide-quick-check__intro{font-size:13px;}
+}
