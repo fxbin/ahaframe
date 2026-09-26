@@ -213,186 +213,147 @@ export default async function CodexResetPage({ params }: PageProps) {
     .replace("{resets}", String(forecast.sampleSize))
     .replace("{intervals}", String(forecast.intervalCount));
 
+  const recentEvents = [
+    ...snapshot.history.slice(0, 6).map((event) => ({ ...event, eventKind: "full" as const })),
+    ...snapshot.bankedHistory.slice(0, 6).map((event) => ({ ...event, eventKind: "banked" as const })),
+  ].sort((a, b) => Date.parse(b.occurredAt) - Date.parse(a.occurredAt)).slice(0, 6);
+
   return (
-    <main className="shell py-12 md:py-16">
-      <section className="rounded-[18px] border border-[var(--border)] bg-[var(--surface)] p-6 shadow-[var(--shadow-paper)] md:p-10">
-        <p className="eyebrow-label">{copy.eyebrow}</p>
-        <div className="mt-6 grid gap-8 lg:grid-cols-[1.25fr_0.75fr] lg:items-end">
+    <main className="liquid-radar">
+      <div className="shell">
+        <section className="liquid-radar-hero" aria-labelledby="radar-title">
           <div>
-            <h1 className="editorial-display max-w-3xl text-4xl leading-[0.98] tracking-[-0.045em] md:text-6xl">{copy.title}</h1>
-            <div className="mt-7 inline-flex items-center gap-3 rounded-full border border-[var(--border)] bg-[var(--surface-soft)] px-4 py-2 text-sm font-semibold">
-              <span className={`h-2.5 w-2.5 rounded-full ${!snapshot.dataAvailable ? "bg-[var(--danger)]" : resetToday ? "bg-[var(--success)]" : "bg-[var(--warning)]"}`} />
-              {!snapshot.dataAvailable ? copy.noData : resetToday ? copy.todayConfirmed : copy.watching}
-            </div>
-            <p className="mt-4 max-w-2xl text-sm leading-6 text-[var(--muted)]">{copy.checked}</p>
+            <p className="editorial-kicker">{copy.eyebrow}</p>
+            <h1 id="radar-title" className="editorial-display mt-6 max-w-3xl text-4xl leading-[1.12] tracking-[-0.045em] sm:text-5xl lg:text-6xl">
+              {zh ? <>Codex 今天<span className="liquid-hero-accent">重置了吗？</span></> : copy.title}
+            </h1>
+            <p className="mt-6 max-w-xl text-base leading-8 text-[var(--muted)]">{copy.checked}</p>
           </div>
 
-          <div className="rounded-[14px] border border-[var(--border)] bg-[var(--paper)] p-5">
+          <div className="liquid-radar-status glass-panel" data-state={!snapshot.dataAvailable ? "unknown" : resetToday ? "confirmed" : "watching"}>
+            <p className="technical-label">{zh ? "当前公开重置状态" : "Public reset status"}</p>
+            <p className={`mt-5 font-[family-name:var(--font-editorial)] text-3xl font-semibold leading-tight tracking-[-.04em] sm:text-4xl ${resetToday ? "text-[var(--success)]" : ""}`}>
+              <span className="liquid-status-dot" style={{ background: !snapshot.dataAvailable ? "var(--danger)" : resetToday ? "var(--success)" : "var(--warning)" }} aria-hidden="true" />
+              {!snapshot.dataAvailable ? copy.noData : resetToday ? copy.todayConfirmed : copy.watching}
+            </p>
+            <p className="mt-5 text-sm leading-6 text-[var(--muted)]">
+              {latest ? `${copy.lastReset}: ${formatUtc(latest.occurredAt, locale)}` : copy.forecastInsufficient}
+            </p>
+            {latest && isTiboSource(latest) ? (
+              <a className="text-link mt-4 w-fit" href={latest.sourceUrl} target="_blank" rel="noreferrer">{sourceName(latest, zh)}</a>
+            ) : null}
+          </div>
+        </section>
+
+        <section className="liquid-radar-metrics" aria-label={zh ? "重置时间与预测" : "Reset timing and forecast"}>
+          <div className="glass-panel liquid-radar-metric">
             <p className="technical-label">{copy.lastReset}</p>
             {latest ? (
               <>
-                <p className="mt-3 text-2xl font-semibold tracking-[-0.025em]">{formatUtc(latest.occurredAt, locale)}</p>
-                <p className="mt-1 text-sm text-[var(--muted)]">{elapsed(latest.occurredAt, locale)}</p>
-                {isTiboSource(latest) ? (
-                  <a className="text-link mt-5 inline-flex text-sm font-semibold" href={latest.sourceUrl} target="_blank" rel="noreferrer">{sourceName(latest, zh)}</a>
-                ) : (
-                  <p className="mt-5 text-sm font-semibold text-[var(--muted)]">{sourceName(latest, zh)}</p>
-                )}
+                <strong className="font-[family-name:var(--font-editorial)] text-2xl font-semibold leading-8">{formatUtc(latest.occurredAt, locale)}</strong>
+                <p className="mt-3 text-xs text-[var(--muted)]">{elapsed(latest.occurredAt, locale)}</p>
               </>
             ) : (
-              <p className="mt-3 text-sm leading-6 text-[var(--muted)]">{copy.watching}</p>
+              <strong className="text-xl font-semibold">{zh ? "暂无可核实记录" : "No verified record yet"}</strong>
             )}
           </div>
-        </div>
-      </section>
 
-      <section className="mt-8 rounded-[18px] border border-[var(--border)] bg-[var(--surface)] p-6 md:p-8">
-        <div className="grid gap-8 lg:grid-cols-[0.82fr_1.18fr] lg:items-start">
-          <div>
-            <p className="technical-label">{copy.forecast}</p>
-            <h2 className="mt-3 text-2xl font-semibold tracking-[-0.03em]">{copy.forecastTitle}</h2>
-
+          <div className="glass-panel liquid-radar-metric">
+            <p className="technical-label">{copy.forecastTitle}</p>
             {resetToday ? (
-              <div className="mt-6 rounded-[14px] border border-[var(--border)] bg-[var(--primary-soft)] p-5">
-                <p className="text-lg font-semibold">{copy.todayConfirmed}</p>
-                <p className="mt-2 text-sm leading-6 text-[var(--muted)]">{copy.forecastSettled}</p>
-              </div>
+              <p className="mt-5 text-lg font-semibold text-[var(--success)]">{copy.forecastSettled}</p>
             ) : forecast.probability !== null ? (
               <>
-                <div className="mt-6 flex items-end gap-4">
-                  <p className="text-6xl font-semibold tracking-[-0.06em]">
-                    {Math.round(forecast.probability * 100)}%
-                  </p>
-                  <div className="pb-1.5">
-                    <p className="text-sm font-semibold">{forecastLevelLabel(forecast.level, zh)}</p>
-                    <p className="mt-1 text-xs text-[var(--muted)]">
-                      {copy.confidence} · {confidenceLabel(forecast.confidence, zh)}
-                    </p>
-                  </div>
+                <div className="mt-3 flex flex-wrap items-baseline gap-4">
+                  <span className="font-[family-name:var(--font-editorial)] text-5xl font-semibold">{Math.round(forecast.probability * 100)}%</span>
+                  <span className="text-sm text-[var(--muted)]">{forecastLevelLabel(forecast.level, zh)} · {copy.confidence}: {confidenceLabel(forecast.confidence, zh)}</span>
                 </div>
-                <div className="mt-5 h-2 overflow-hidden rounded-full bg-[var(--surface-soft)]">
-                  <div
-                    className="h-full rounded-full bg-[var(--primary)]"
-                    style={{ width: `${Math.round(forecast.probability * 100)}%` }}
-                  />
+                <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-[var(--surface-soft)]" aria-hidden="true">
+                  <div className="h-full rounded-full bg-[var(--brand-accent)]" style={{ width: `${Math.round(forecast.probability * 100)}%` }} />
                 </div>
               </>
             ) : (
-              <div className="mt-6 rounded-[14px] border border-[var(--border)] bg-[var(--surface-soft)] p-5">
-                <p className="text-lg font-semibold">{copy.forecastInsufficient}</p>
-                <p className="mt-2 text-sm leading-6 text-[var(--muted)]">{copy.forecastInsufficientCopy}</p>
-              </div>
+              <p className="mt-5 text-lg font-semibold">{copy.forecastInsufficient}</p>
             )}
-
-            <p className="mt-5 max-w-xl text-xs leading-5 text-[var(--muted)]">{copy.forecastNote}</p>
+            <details className="mt-5 border-t border-[var(--border)] pt-4 text-xs text-[var(--muted)]">
+              <summary className="w-fit cursor-pointer font-semibold text-[var(--text)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--brand-accent)]">
+                {zh ? "查看统计依据与限制" : "Method and limitations"} ↓
+              </summary>
+              <p className="mt-3 leading-6">{copy.forecastNote}</p>
+              <p className="mt-2 leading-6">{copy.forecastInsufficientCopy}</p>
+              <dl className="mt-4 grid gap-3 sm:grid-cols-2">
+                <div><dt className="font-semibold">{copy.sinceLast}</dt><dd className="mt-1">{formatForecastDays(forecast.daysSinceLastReset, zh)}</dd></div>
+                <div><dt className="font-semibold">{copy.typicalInterval}</dt><dd className="mt-1">{formatForecastDays(forecast.typicalIntervalDays, zh)}</dd></div>
+                <div><dt className="font-semibold">{copy.percentile}</dt><dd className="mt-1">{percentileText}</dd></div>
+                <div><dt className="font-semibold">{copy.sample}</dt><dd className="mt-1">{sampleText}</dd></div>
+              </dl>
+              <p className="mt-4 font-semibold">{copy.model}: <span className="font-normal">{copy.modelCopy}</span></p>
+            </details>
           </div>
+        </section>
 
-          <div className="grid gap-px overflow-hidden rounded-[14px] border border-[var(--border)] bg-[var(--border)] sm:grid-cols-2">
-            <div className="bg-[var(--paper)] p-4">
-              <p className="technical-label">{copy.sinceLast}</p>
-              <p className="mt-2 text-lg font-semibold">{formatForecastDays(forecast.daysSinceLastReset, zh)}</p>
-            </div>
-            <div className="bg-[var(--paper)] p-4">
-              <p className="technical-label">{copy.typicalInterval}</p>
-              <p className="mt-2 text-lg font-semibold">{formatForecastDays(forecast.typicalIntervalDays, zh)}</p>
-            </div>
-            <div className="bg-[var(--paper)] p-4">
-              <p className="technical-label">{copy.percentile}</p>
-              <p className="mt-2 text-sm font-semibold leading-6">{percentileText}</p>
-            </div>
-            <div className="bg-[var(--paper)] p-4">
-              <p className="technical-label">{copy.sample}</p>
-              <p className="mt-2 text-sm font-semibold leading-6">{sampleText}</p>
-            </div>
-            <div className="bg-[var(--paper)] p-4 sm:col-span-2">
-              <p className="technical-label">{copy.model}</p>
-              <p className="mt-2 text-xs leading-5 text-[var(--muted)]">{copy.modelCopy}</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="mt-8 rounded-[18px] border border-[var(--border)] bg-[var(--surface)] p-6 md:p-8">
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-baseline sm:justify-between">
-          <h2 className="text-xl font-semibold tracking-[-0.025em]">{copy.credits}</h2>
-          <Link className="text-link text-xs font-semibold" href={localizedPath("/tools/codex-reset/banked-reset", locale)}>{copy.banked} →</Link>
-        </div>
-        <p className="mt-2 text-xs leading-5 text-[var(--muted)]">{copy.creditsSubtitle}</p>
-        {recentCredits.length ? (
-          <div className="mt-4 divide-y divide-[var(--border)]">
-            {recentCredits.map((event) => (
-              <div key={event.id} className="grid gap-3 py-3 sm:grid-cols-[145px_1fr_auto] sm:items-center">
-                <time className="font-mono text-xs text-[var(--muted)]">{formatUtc(event.occurredAt, locale)}</time>
-                <span className={`w-fit rounded-full border px-3 py-1 text-xs font-semibold ${
-                  event.status === "confirmed"
-                    ? "border-[#b27719] bg-[#fff1d6] text-[#7a4b04]"
-                    : "border-dashed border-[#b27719] text-[#7a4b04]"
-                }`}>
-                  {event.status === "confirmed" ? copy.creditsConfirmed : copy.creditsAnnounced}
-                </span>
-                {isTiboSource(event) ? (
-                  <a href={event.sourceUrl} target="_blank" rel="noreferrer" className="text-link text-xs font-semibold">{sourceName(event, zh)}</a>
-                ) : (
-                  <span className="text-xs text-[var(--muted)]">{sourceName(event, zh)}</span>
-                )}
+        <section className="liquid-radar-details mt-6" aria-label={copy.history}>
+          <div className="glass-panel liquid-radar-calendar">
+            <div className="flex flex-wrap items-start justify-between gap-5">
+              <div>
+                <h2 className="font-[family-name:var(--font-editorial)] text-2xl font-semibold">{zh ? "重置日历" : "Reset calendar"}</h2>
+                <p className="mt-2 text-xs leading-5 text-[var(--muted)]">{copy.historyCopy}</p>
               </div>
-            ))}
-          </div>
-        ) : (
-          <p className="mt-4 text-sm text-[var(--muted)]">{copy.creditsEmpty}</p>
-        )}
-        <p className="mt-4 text-xs leading-5 text-[var(--muted)]">{copy.creditsCaution}</p>
-      </section>
-
-      <section className="mt-8 grid gap-6 lg:grid-cols-[1.4fr_0.6fr]">
-        <div className="rounded-[18px] border border-[var(--border)] bg-[var(--surface)] p-6 md:p-8">
-          <div>
-            <p className="technical-label">{copy.history}</p>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--muted)]">{copy.historyCopy}</p>
-          </div>
-
-          {snapshot.history.length > 0 ? (
-            <div className="mt-6 border-t border-[var(--border)] pt-6">
-              <CodexResetCalendar events={snapshot.history} bankedEvents={snapshot.bankedHistory} locale={locale} months={6} />
+              <Link className="text-link shrink-0" href={localizedPath("/tools/codex-reset/history", locale)}>{copy.viewHistory}</Link>
             </div>
-          ) : null}
+            {snapshot.history.length || snapshot.bankedHistory.length ? (
+              <div className="mt-6">
+                <CodexResetCalendar events={snapshot.history} bankedEvents={snapshot.bankedHistory} locale={locale} months={3} />
+              </div>
+            ) : (
+              <p className="mt-7 text-sm text-[var(--muted)]">{snapshot.dataAvailable ? copy.watching : copy.noData}</p>
+            )}
+          </div>
 
-          <div className="mt-7 border-t border-[var(--border)] pt-2">
-            <div className="divide-y divide-[var(--border)]">
-              {recentHistory.length > 0 ? recentHistory.map((event) => (
-                <div key={event.id} className="grid gap-3 py-4 sm:grid-cols-[160px_1fr_auto] sm:items-center">
-                  <time className="font-mono text-xs text-[var(--muted)]">{formatUtc(event.occurredAt, locale)}</time>
-                  <div>
-                    <p className="text-sm font-semibold">{copy.eventTitle}</p>
-                    <p className="mt-1 text-xs leading-5 text-[var(--muted)]">{sourceDescription(event, zh)}</p>
+          <aside className="glass-panel liquid-radar-activity">
+            <div className="flex items-baseline justify-between gap-4">
+              <h2 className="font-[family-name:var(--font-editorial)] text-2xl font-semibold">{zh ? "最近事件" : "Recent events"}</h2>
+              <Link className="text-link shrink-0 text-sm" href={localizedPath("/tools/codex-reset/history", locale)}>{copy.viewHistory}</Link>
+            </div>
+            <div className="mt-5 divide-y divide-[var(--border)]">
+              {recentEvents.length ? recentEvents.map((event) => (
+                <div className="py-4" key={event.id}>
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <time className="font-mono text-xs text-[var(--muted)]">{formatUtc(event.occurredAt, locale)}</time>
+                    <span className={`rounded-full px-2.5 py-1 text-[10px] font-semibold ${event.eventKind === "full" ? "bg-[var(--primary-soft)] text-[var(--success)]" : "bg-[#fff1de] text-[#825016]"}`}>
+                      {event.eventKind === "full" ? (zh ? "全量重置" : "Full reset") : event.status === "confirmed" ? copy.creditsConfirmed : copy.creditsAnnounced}
+                    </span>
                   </div>
+                  <p className="mt-2 text-sm font-semibold">{event.eventKind === "full" ? copy.eventTitle : copy.credits}</p>
                   {isTiboSource(event) ? (
-                    <a className="text-link text-xs font-semibold" href={event.sourceUrl} target="_blank" rel="noreferrer">{sourceName(event, zh)}</a>
+                    <a className="text-link mt-2 text-xs" href={event.sourceUrl} target="_blank" rel="noreferrer">{sourceName(event, zh)}</a>
                   ) : (
-                    <span className="text-xs font-semibold text-[var(--muted)]">{sourceName(event, zh)}</span>
+                    <p className="mt-1 text-xs text-[var(--muted)]">{sourceDescription(event, zh)}</p>
                   )}
                 </div>
-              )) : (
-                <p className="py-5 text-sm text-[var(--muted)]">{copy.watching}</p>
-              )}
+              )) : <p className="py-4 text-sm text-[var(--muted)]">{copy.noData}</p>}
             </div>
-          </div>
 
-          <Link className="text-link mt-5 inline-flex text-sm font-semibold" href={localizedPath("/tools/codex-reset/history", locale)}>{copy.viewHistory}</Link>
-        </div>
-
-        <aside>
-          <div className="rounded-[18px] border border-[var(--border)] bg-[var(--surface)] p-6">
-            <p className="technical-label">{copy.rules}</p>
-            <div className="mt-4 flex flex-col gap-3 text-sm font-semibold">
-              <Link className="text-link" href={localizedPath("/tools/codex-reset/banked-reset", locale)}>{copy.banked} →</Link>
-              <Link className="text-link" href={localizedPath("/tools/codex-reset/usage-limits", locale)}>{copy.limits} →</Link>
+            <div className="credits-section mt-7 border-t border-[var(--border)] pt-6">
+              <h3 className="font-[family-name:var(--font-editorial)] text-xl font-semibold">{copy.credits}</h3>
+              <p className="mt-3 text-sm leading-6 text-[var(--muted)]">{copy.creditsSubtitle}</p>
+              <p className="mt-2 text-xs leading-5 text-[var(--muted)]">{copy.creditsCaution}</p>
+              {recentCredits.length ? (
+                <p className="mt-3 text-xs font-semibold text-[#825016]">
+                  {recentCredits[0].status === "confirmed" ? copy.creditsConfirmed : copy.creditsAnnounced}
+                  {" · "}{formatUtc(recentCredits[0].occurredAt, locale)}
+                </p>
+              ) : <p className="mt-3 text-xs text-[var(--muted)]">{copy.creditsEmpty}</p>}
+              <div className="mt-4 flex flex-col gap-3">
+                <Link className="text-link w-fit" href={localizedPath("/tools/codex-reset/banked-reset", locale)}>{copy.banked} →</Link>
+                <Link className="text-link w-fit" href={localizedPath("/tools/codex-reset/usage-limits", locale)}>{copy.limits} →</Link>
+              </div>
             </div>
-          </div>
-        </aside>
-      </section>
+          </aside>
+        </section>
 
-      <p className="mt-8 text-xs leading-5 text-[var(--muted)]">{copy.note}</p>
+        <p className="mt-7 max-w-4xl text-xs leading-6 text-[var(--muted)]">{copy.note}</p>
+      </div>
     </main>
   );
 }
