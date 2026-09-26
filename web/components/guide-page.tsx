@@ -187,7 +187,7 @@ export function GuidePage({ locale, data }: { locale: Locale; data: GuidePageDat
               <p className="mt-6 text-[11px] font-semibold uppercase tracking-wider text-[var(--brand-accent)]">{locale === "zh-CN" ? "本节重点" : "Lesson focus"}</p>
               <h2 className="mt-3 font-[family-name:var(--font-editorial)] text-lg font-semibold leading-snug">{guide.mentalModel}</h2>
               <div className="mt-7 border-t border-[var(--border)] pt-6">
-                <h3 className="text-sm font-semibold">{labels.takeaways}</h3>
+                <h3 className="text-sm font-semibold">{locale === "zh-CN" ? "本节提醒" : "Keep in mind"}</h3>
                 <ul className="mt-3 space-y-3">
                   {guide.takeaways.slice(0, 3).map((point,index)=>(
                     <li key={point} className="flex gap-3 text-xs leading-5 text-[var(--muted)]"><span className="font-mono text-[var(--brand-accent)]">{index+1}.</span><span>{point}</span></li>
