@@ -273,3 +273,30 @@ a.guide-workspace__outline-item:hover {background:#fff5ed;color:#7c4128;}
 @media (prefers-reduced-motion:reduce) {
  .search-result__row,.guide-workspace__submit {transition:none;}
 }
+
+
+/* Information-dense source events use the single-line list from the approved Radar design. */
+.liquid-radar-calendar,.liquid-radar-activity {min-height:510px;}
+.liquid-radar-activity .radar-event-row {
+  display:grid;grid-template-columns:137px 8px minmax(0,1fr) auto;gap:9px;
+  align-items:center;min-height:47px;padding:8px 2px;
+}
+.radar-event__time {font:10px/1.4 var(--font-mono);color:#7a7771;white-space:nowrap;}
+.radar-event__dot {width:7px;height:7px;border-radius:50%;}
+.radar-event__dot.is-full {background:#2f9264;}
+.radar-event__dot.is-credit {background:#ce923f;}
+.radar-event__title {font-size:11px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:620;color:#66615d;}
+.liquid-radar-activity .radar-event__tag {padding:5px 9px;border-radius:99px;font-size:10px;white-space:nowrap;font-weight:650;}
+.radar-event__tag.is-full {background:#eaf5ed;color:#2f7658;}
+.radar-event__tag.is-credit {background:#fff0dc;color:#925b22;}
+.liquid-radar-activity .credits-section {margin-top:18px;padding:15px;}
+.liquid-radar-activity .credits-section p {font-size:11px;line-height:1.6;margin-top:5px;}
+.liquid-radar-activity .credits-section > div:last-child {display:flex;flex-direction:row;gap:18px;margin-top:9px;flex-wrap:wrap;}
+.liquid-radar-activity .credits-section > div:last-child a {font-size:11px;}
+@media(max-width:640px) {
+ .liquid-radar-calendar,.liquid-radar-activity {min-height:0;}
+ .liquid-radar-activity .radar-event-row {grid-template-columns:110px 7px minmax(0,1fr);gap:7px;}
+ .radar-event__tag {grid-column:3;justify-self:start;}
+ .radar-event__time {font-size:9px;}
+ .radar-event__title {white-space:normal;}
+}
