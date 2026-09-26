@@ -65,7 +65,7 @@ function CourseOutline({
             )}
           </div>
         </details>
-      ))}}
+      ))}
     </nav>
   );
 }
