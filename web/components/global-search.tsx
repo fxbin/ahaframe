@@ -37,7 +37,7 @@ export function GlobalSearch({ locale, documents }: GlobalSearchProps) {
   const suggestionGroups = useMemo(() => Object.fromEntries(
     SEARCH_TYPE_ORDER.map((type) => [type, documents
       .filter((item) => item.type === type && !recentDocuments.some((recent) => recent.route === item.route))
-      .slice(0, 2)]),
+      .slice(0, type === "guide" || type === "course" ? 2 : 1)]),
   ) as Record<SearchDocumentType, SearchDocument[]>, [documents, recentDocuments]);
   const defaultSuggestions = useMemo(() => [
     ...recentDocuments, ...SEARCH_TYPE_ORDER.flatMap((type) => suggestionGroups[type]),
