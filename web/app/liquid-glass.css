@@ -138,8 +138,8 @@
   box-shadow:0 8px 24px rgba(164,95,67,.1);
   transform:translateY(-1px);
 }
-.agent-preview__node:nth-child(4) {grid-column: 1 / 2; margin-left:15%;}
-.agent-preview__node:nth-child(5) {grid-column: 3 / 4; margin-right:15%;}
+.agent-preview__node:nth-of-type(4) {grid-column: 1 / 2; margin-left:15%;}
+.agent-preview__node:nth-of-type(5) {grid-column: 3 / 4; margin-right:15%;}
 .agent-preview__number {
   display:grid;place-items:center;
   width:23px;height:23px;border-radius:50%;font:600 .68rem var(--font-mono);
