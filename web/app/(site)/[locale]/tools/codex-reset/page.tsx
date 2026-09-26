@@ -324,19 +324,17 @@ export default async function CodexResetPage({ params }: PageProps) {
             </div>
             <div className="mt-5 divide-y divide-[var(--border)]">
               {recentEvents.length ? recentEvents.map((event) => (
-                <div className="py-4" key={event.id}>
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <time className="font-mono text-xs text-[var(--muted)]">{formatUtc(event.occurredAt, locale)}</time>
-                    <span className={`rounded-full px-2.5 py-1 text-[10px] font-semibold ${event.eventKind === "full" ? "bg-[var(--primary-soft)] text-[var(--success)]" : "bg-[#fff1de] text-[#825016]"}`}>
-                      {event.eventKind === "full" ? (zh ? "全量重置" : "Full reset") : event.status === "confirmed" ? copy.creditsConfirmed : copy.creditsAnnounced}
-                    </span>
-                  </div>
-                  <p className="mt-2 text-sm font-semibold">{event.eventKind === "full" ? copy.eventTitle : copy.credits}</p>
+                <div className="radar-event-row" key={event.id} title={sourceDescription(event, zh)}>
+                  <time className="radar-event__time">{new Date(event.occurredAt).toISOString().slice(0, 16).replace("T", " ")} UTC</time>
+                  <span className={`radar-event__dot ${event.eventKind === "full" ? "is-full" : "is-credit"}`} aria-hidden="true" />
                   {isTiboSource(event) ? (
-                    <a className="text-link mt-2 text-xs" href={event.sourceUrl} target="_blank" rel="noreferrer">{sourceName(event, zh)}</a>
-                  ) : (
-                    <p className="mt-1 text-xs text-[var(--muted)]">{sourceDescription(event, zh)}</p>
-                  )}
+                    <a className="radar-event__title text-link" href={event.sourceUrl} target="_blank" rel="noreferrer">
+                      {event.eventKind === "full" ? copy.eventTitle : copy.credits} ↗
+                    </a>
+                  ) : <strong className="radar-event__title">{event.eventKind === "full" ? copy.eventTitle : copy.credits}</strong>}
+                  <span className={`radar-event__tag ${event.eventKind === "full" ? "is-full" : "is-credit"}`}>
+                    {event.eventKind === "full" ? (zh ? "全量重置" : "Full reset") : event.status === "confirmed" ? copy.creditsConfirmed : copy.creditsAnnounced}
+                  </span>
                 </div>
               )) : <p className="py-4 text-sm text-[var(--muted)]">{copy.noData}</p>}
             </div>
