@@ -259,3 +259,7 @@ body:has(.liquid-radar)>*,body:has(.liquid-guide-page)>*,body:has(.liquid-home)>
 @media(prefers-reduced-transparency:reduce){
  .glass-search-dialog.search-parity-dialog,.glass-panel,.guide-workspace-sidebar,.guide-workspace-practice{background:#fffdfa;}
 }
+
+@media(min-width:901px){
+ .guide-workspace-layout--no-path{grid-template-columns:minmax(0,1.72fr) minmax(255px,.82fr);}
+}
