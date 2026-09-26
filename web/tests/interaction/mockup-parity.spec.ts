@@ -67,3 +67,17 @@ test("reference parity: radar is status-led and calendars remain evidence-backed
   expect(overflow).toBeLessThanOrEqual(1);
   await page.screenshot({ path: "test-results/design-parity/radar-mobile-zh.png", fullPage: false });
 });
+
+test("reference parity: homepage gives one featured path a distinct editorial role", async ({ page }) => {
+  await page.setViewportSize(large);
+  await page.goto("/zh-cn/");
+  await expect(page.locator(".liquid-home .agent-preview")).toBeVisible();
+  await expect(page.locator(".featured-courses-grid .is-featured")).toHaveCount(1);
+  await page.screenshot({ path: "test-results/design-parity/home-desktop-zh.png", fullPage: false });
+
+  await page.setViewportSize(compact);
+  await expect(page.locator(".featured-courses-grid .is-featured")).toBeVisible();
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+  expect(overflow).toBeLessThanOrEqual(1);
+  await page.screenshot({ path: "test-results/design-parity/home-mobile-zh.png", fullPage: false });
+});
