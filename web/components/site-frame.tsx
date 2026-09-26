@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { segmentForLocale, type Locale, type LocaleSource } from "@/lib/content";
 import { getSearchDocuments } from "@/lib/search-server";
 import { GlobalSearch } from "./global-search";
+import { HeaderNav } from "./header-nav";
 import { LocaleSwitch } from "./locale-switch";
 
 interface SiteFrameProps {
@@ -25,23 +26,7 @@ export async function SiteFrame({ locale, source, children }: SiteFrameProps) {
           </Link>
 
           <div className="flex items-center gap-1.5 sm:gap-4 lg:gap-6">
-            <nav className="site-header__nav glass-nav flex items-center gap-3 text-sm sm:gap-6 lg:gap-7" aria-label="Primary navigation">
-              <Link className="transition hover:text-[var(--text)]" href={`/${segment}/courses/`}>
-                {source.ui.nav.lessons}
-              </Link>
-              <Link className="transition hover:text-[var(--text)]" href={`/${segment}/guides/`}>
-                {source.ui.nav.guides}
-              </Link>
-              <Link className="hidden transition hover:text-[var(--text)] sm:inline" href={`/${segment}/tools/codex-reset/`}>
-                {source.ui.nav.tools}
-              </Link>
-              <Link className="hidden transition hover:text-[var(--text)] md:inline" href={`/${segment}/learning/`}>
-                {source.ui.nav.roadmap}
-              </Link>
-              <Link className="hidden transition hover:text-[var(--text)] lg:inline" href={`/${segment}/pricing/`}>
-                {source.ui.nav.pricing}
-              </Link>
-            </nav>
+            <HeaderNav locale={locale} labels={source.ui.nav} />
             <GlobalSearch locale={locale} documents={searchDocuments} />
             <LocaleSwitch locale={locale} labels={source.ui.language} />
           </div>
