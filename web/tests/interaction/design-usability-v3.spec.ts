@@ -85,5 +85,5 @@ test("untyped search supports keyboard selection rather than implying inactive s
   await page.keyboard.press("ArrowDown");
   await expect(next).toHaveAttribute("aria-current", "true");
   await page.keyboard.press("Enter");
-  await expect(page).toHaveURL(new RegExp(destination!.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/\/$/, "\\/$")));
+  await expect(page).toHaveURL(new URL(destination!, page.url()).toString());
 });
