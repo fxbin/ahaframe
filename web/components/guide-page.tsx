@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { GuideProgressControl } from "@/components/guide-progress-control";
+import { GuideQuickCheck } from "@/components/guide-quick-check";
 import type { Locale } from "@/lib/content";
 import { localizedPath, segmentForLocale } from "@/lib/content";
-import type { GuidePageData } from "@/lib/guides";
+import type { GuidePageData, GuideActivePathContext } from "@/lib/guides";
 
 function copy(locale: Locale) {
   return locale === "en"
@@ -35,6 +36,40 @@ function practiceContentId(href: string): string | null {
   return parts.length ? parts[parts.length - 1] : null;
 }
 
+
+function CourseOutline({
+  path, currentSlug, segment,
+}: { path: GuideActivePathContext; currentSlug: string; segment: string }) {
+  return (
+    <nav className="guide-workspace-navigation" aria-label="Learning path lessons">
+      {path.outline.map((milestone, chapterIndex) => (
+        <details className="guide-outline-chapter" key={milestone.id} open={milestone.lessons.some((lesson) => lesson.slug === currentSlug)}>
+          <summary className="guide-outline-chapter-title">
+            <span className="font-mono text-[11px] text-[var(--brand-accent)]">{String(chapterIndex + 1).padStart(2, "0")}</span>
+            <strong>{milestone.title}</strong>
+            <span className="guide-outline-disclosure" aria-hidden="true">⌄</span>
+          </summary>
+          <div className="guide-outline-lessons">
+            {milestone.lessons.map((lesson) =>
+              lesson.slug === currentSlug ? (
+                <span key={lesson.conceptId} aria-current="page" className="is-active">
+                  <span className="guide-workspace-step" aria-hidden="true">●</span>
+                  <strong>{lesson.title}</strong>
+                </span>
+              ) : (
+                <Link key={lesson.conceptId} href={`/${segment}/guides/${lesson.slug}/?path=${encodeURIComponent(path.slug)}`}>
+                  <span className="guide-workspace-step" aria-hidden="true">›</span>
+                  <span>{lesson.title}</span>
+                </Link>
+              ),
+            )}
+          </div>
+        </details>
+      ))}
+    </nav>
+  );
+}
+
 export function GuidePage({ locale, data }: { locale: Locale; data: GuidePageData }) {
   const labels = copy(locale);
   const segment = segmentForLocale(locale);
@@ -44,6 +79,36 @@ export function GuidePage({ locale, data }: { locale: Locale; data: GuidePageDat
   return (
     <main className="editorial-guide-page liquid-guide-page">
       <article>
+
+
+        <div className="shell guide-workspace-shell py-12 sm:py-16">
+          <div className={`guide-workspace-layout ${activePath ? "" : "guide-workspace-layout--no-path"}`}>
+            {activePath ? (
+              <details className="guide-mobile-outline">
+                <summary>
+                  <span>{locale === "zh-CN" ? "课程目录" : "Course outline"} · {activePath.position} / {activePath.total}</span>
+                  <span aria-hidden="true">⌄</span>
+                </summary>
+                <CourseOutline path={activePath} currentSlug={guide.slug} segment={segment} />
+              </details>
+            ) : null}
+            {activePath ? (
+              <aside className="guide-workspace-sidebar" aria-label={locale === "zh-CN" ? "课程目录" : "Course outline"}>
+                <Link href={`/${segment}/courses/${activePath.slug}/`} className="text-xs text-[var(--muted)] hover:text-[var(--brand-accent)]">
+                  ← {locale === "zh-CN" ? "返回课程" : "Back to course"}
+                </Link>
+                <h2 className="mt-6 font-[family-name:var(--font-editorial)] text-xl font-semibold leading-snug">{activePath.title}</h2>
+                <p className="mt-2 text-xs leading-5 text-[var(--muted)]">{activePath.milestoneTitle}</p>
+                <p className="guide-outline-sequence mt-3" data-guide-position>
+                  {locale === "zh-CN" ? `课程序列 · 第 ${activePath.position} / ${activePath.total} 节` : `Lesson ${activePath.position} of ${activePath.total}`}
+                </p>
+                <CourseOutline path={activePath} currentSlug={guide.slug} segment={segment} />
+                <Link href={`/${segment}/courses/${activePath.slug}/`} className="mt-8 inline-block text-xs font-semibold text-[var(--brand-accent)]">
+                  {locale === "zh-CN" ? "查看完整课程目录 →" : "Full course outline →"}
+                </Link>
+              </aside>
+            ) : null}
+            <div className="guide-workspace-body min-w-0">
         <header className="course-detail-hero border-b border-[var(--border)] py-14 sm:py-20">
           <div className="shell">
             {activePath ? (
@@ -58,21 +123,46 @@ export function GuidePage({ locale, data }: { locale: Locale; data: GuidePageDat
                 <div className="mt-4 flex flex-wrap gap-x-3 gap-y-2 font-mono text-[10px] uppercase tracking-[0.08em] text-[var(--muted)]">
                   <span>{concept.kind}</span><span aria-hidden="true">·</span><span>{concept.difficulty}</span><span aria-hidden="true">·</span><span>{guide.readingMinutes} {labels.minutes}</span>
                 </div>
-                <h1 className="mt-5 max-w-4xl font-[family-name:var(--font-editorial)] text-5xl font-semibold leading-[0.98] tracking-[-0.05em] sm:text-6xl">{guide.title}</h1>
+                <h1 className="mt-5 max-w-4xl font-[family-name:var(--font-editorial)] text-4xl font-semibold leading-[1.1] tracking-[-0.05em] sm:text-5xl">{guide.title}</h1>
                 <p className="mt-6 max-w-3xl text-lg leading-8 text-[var(--muted)]">{guide.summary}</p>
+                 <a className="guide-mobile-practice-link" href="#guide-practice">
+                   {locale === "zh-CN" ? "跳转至实践与验证 ↓" : "Jump to practice & verification ↓"}
+                 </a>
               </div>
-              <div className="glass-reading-aside border-y border-[var(--border)] py-5 lg:border-y-0 lg:border-l lg:py-2 lg:pl-8">
+              <div className="guide-header-model border-y border-[var(--border)] py-5 lg:border-y-0 lg:border-l lg:py-2 lg:pl-8">
                 <p className="technical-label">{labels.mentalModel}</p>
                 <p className="mt-3 font-[family-name:var(--font-editorial)] text-2xl leading-9 tracking-[-0.025em]">{guide.mentalModel}</p>
               </div>
             </div>
           </div>
         </header>
-
-        <div className="shell py-12 sm:py-16"><div className="mx-auto max-w-5xl">
           <section className="grid gap-5 border-b border-[var(--border)] pb-10 md:grid-cols-[180px_1fr] md:gap-10">
             <h2 className="technical-label pt-1">{labels.why}</h2><p className="max-w-3xl text-lg leading-8">{guide.whyItMatters}</p>
           </section>
+
+          {guide.slug === "timeout-ambiguity" ? (
+            <section className="guide-timeout-figure" aria-label={locale === "zh-CN" ? "超时的不确定状态示意图" : "Timeout uncertainty diagram"}>
+              <div className="mb-5">
+                <h2 className="font-[family-name:var(--font-editorial)] text-xl font-semibold">
+                  {locale === "zh-CN" ? "超时并不等于失败" : "A timeout is not a confirmed failure"}
+                </h2>
+                <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
+                  {locale === "zh-CN" ? "同一笔退款请求超时后，远端可能处于不同状态。必须先核对，再决定是否重试。" : "A refund can time out while its actual remote result is unknown. Reconcile before retrying."}
+                </p>
+              </div>
+              <div className="guide-timeout-flow">
+                <div className="guide-timeout-node"><span aria-hidden="true">◇</span><strong>Agent</strong><small>{locale === "zh-CN" ? "发送退款请求" : "Sends refund request"}</small></div>
+                <div className="guide-timeout-link" aria-label={locale === "zh-CN" ? "调用过程发生网络超时" : "Network timeout"}><span aria-hidden="true">⏱</span><small>{locale === "zh-CN" ? "网络超时" : "Timeout"}</small><i aria-hidden="true">→</i></div>
+                <div className="guide-timeout-node"><span aria-hidden="true">▤</span><strong>{locale === "zh-CN" ? "远端服务" : "Remote service"}</strong><small>{locale === "zh-CN" ? "可能仍在执行" : "May still execute"}</small></div>
+                <div className="guide-timeout-outcomes">
+                  <strong>{locale === "zh-CN" ? "结果仍不确定" : "Outcome remains unknown"}</strong>
+                  <span><i className="success" aria-hidden="true">✓</i>{locale === "zh-CN" ? "可能已经执行成功" : "May have succeeded"}</span>
+                  <span><i className="pending" aria-hidden="true">···</i>{locale === "zh-CN" ? "也可能仍在处理中" : "May still be pending"}</span>
+                  <span><i className="failed" aria-hidden="true">×</i>{locale === "zh-CN" ? "也可能尚未执行" : "May not have executed"}</span>
+                </div>
+              </div>
+            </section>
+          ) : null}
 
           {guide.sections.map((section) => (
             <section key={section.id} className="grid gap-5 border-b border-[var(--border)] py-10 md:grid-cols-[180px_1fr] md:gap-10">
@@ -133,7 +223,40 @@ export function GuidePage({ locale, data }: { locale: Locale; data: GuidePageDat
             <div><p className="technical-label">{labels.practice}</p>{guide.practice ? <Link className="editorial-primary-action mt-4" href={practiceHref(locale, guide.slug, guide.practice.href, activePath?.slug)} data-guide-practice-link={guide.slug}>{guide.practice.title} <span aria-hidden="true">→</span></Link> : null}</div>
             <Link className="editorial-text-link" href={`/${segment}/learning/`}>{labels.map} <span aria-hidden="true">→</span></Link>
           </footer>
-        </div></div>
+            </div>
+            <aside id="guide-practice" className="guide-workspace-practice" aria-label={locale === "zh-CN" ? "实践与验证" : "Practice and verification"}>
+              <p className="guide-workspace-aside-heading">{locale === "zh-CN" ? "实践与验证" : "Practice & Verify"}</p>
+              {guide.slug === "timeout-ambiguity" ? (
+                <GuideQuickCheck locale={locale} />
+              ) : (
+                <div className="guide-workspace-insights">
+              <p className="mt-6 text-[11px] font-semibold uppercase tracking-wider text-[var(--brand-accent)]">{locale === "zh-CN" ? "本节重点" : "Lesson focus"}</p>
+              <h2 className="mt-3 font-[family-name:var(--font-editorial)] text-lg font-semibold leading-snug">{guide.mentalModel}</h2>
+              <div className="mt-7 border-t border-[var(--border)] pt-6">
+                <h3 className="text-sm font-semibold">{locale === "zh-CN" ? "本节提醒" : "Keep in mind"}</h3>
+                <ul className="mt-3 space-y-3">
+                  {guide.takeaways.slice(0, 3).map((point,index)=>(
+                    <li key={point} className="flex gap-3 text-xs leading-5 text-[var(--muted)]"><span className="font-mono text-[var(--brand-accent)]">{index+1}.</span><span>{point}</span></li>
+                  ))}
+                </ul>
+              </div>
+                </div>
+              )}
+              {guide.practice ? (
+                <div className="guide-workspace-practice-cta">
+                  <p className="text-xs leading-5 text-[var(--muted)]">{locale === "zh-CN" ? "准备好后，在真实交互实验中运用本节知识。" : "Apply this lesson in the linked interactive practice."}</p>
+                  <Link className="primary-action mt-4 w-full justify-center" href={practiceHref(locale, guide.slug, guide.practice.href, activePath?.slug)}>
+                    {locale === "zh-CN" ? "进入实践" : "Open practice"} <span aria-hidden="true">→</span>
+                  </Link>
+                </div>
+              ) : (
+                <p className="mt-8 border-t border-[var(--border)] pt-5 text-xs leading-5 text-[var(--muted)]">
+                  {locale === "zh-CN" ? "这一节目前提供阅读与自我总结，交互练习正在扩展。" : "This lesson currently offers reading and reflection; interactive practice is being expanded."}
+                </p>
+              )}
+            </aside>
+          </div>
+        </div>
       </article>
     </main>
   );

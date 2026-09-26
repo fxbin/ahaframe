@@ -4,6 +4,7 @@ import { segmentForLocale, type Locale, type LocaleSource } from "@/lib/content"
 import { getSearchDocuments } from "@/lib/search-server";
 import { GlobalSearch } from "./global-search";
 import { LocaleSwitch } from "./locale-switch";
+import { MobileNavigation } from "./mobile-navigation";
 
 interface SiteFrameProps {
   locale: Locale;
@@ -20,11 +21,10 @@ export async function SiteFrame({ locale, source, children }: SiteFrameProps) {
     <>
       <header className="site-header sticky top-0 z-50">
         <div className="shell site-header__inner glass-header">
+          <div className="glass-header__identity">
           <Link className="brand inline-flex shrink-0 items-center" href={home}>
-            <span className="glass-brand-mark" aria-hidden="true">A</span>{source.brand}
+            <span className="glass-brand-mark" aria-hidden="true"><svg viewBox="0 0 34 38" role="presentation"><defs><linearGradient id="brandLeft" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#f1ceae"/><stop offset="1" stopColor="#965037"/></linearGradient><linearGradient id="brandRight" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#4d231b"/><stop offset="1" stopColor="#ab6541"/></linearGradient></defs><path d="M15.2 2.5C13.8 7.5 6.9 19.1 3.9 25c-2.1 4.1.7 9.4 5.9 9.4 4.7 0 7.5-5.1 9.2-9.4l-3.8-22.5Z" fill="url(#brandLeft)"/><path d="M18.9 1.6c3.4 8.8 7.1 14.6 11.4 23.1 2.9 5.5-.1 10.3-5.1 10.3-5.9 0-8-5.4-8.3-10.5L18.9 1.6Z" fill="url(#brandRight)"/></svg></span>{source.brand}
           </Link>
-
-          <div className="flex items-center gap-1.5 sm:gap-4 lg:gap-6">
             <nav className="site-header__nav glass-nav flex items-center gap-3 text-sm sm:gap-6 lg:gap-7" aria-label="Primary navigation">
               <Link className="transition hover:text-[var(--text)]" href={`/${segment}/courses/`}>
                 {source.ui.nav.lessons}
@@ -42,8 +42,20 @@ export async function SiteFrame({ locale, source, children }: SiteFrameProps) {
                 {source.ui.nav.pricing}
               </Link>
             </nav>
+          </div>
+          <div className="glass-header__actions">
             <GlobalSearch locale={locale} documents={searchDocuments} />
             <LocaleSwitch locale={locale} labels={source.ui.language} />
+            <MobileNavigation
+              locale={locale}
+              links={[
+                { href: `/${segment}/courses/`, label: source.ui.nav.lessons },
+                { href: `/${segment}/guides/`, label: source.ui.nav.guides },
+                { href: `/${segment}/tools/codex-reset/`, label: source.ui.nav.tools },
+                { href: `/${segment}/learning/`, label: source.ui.nav.roadmap },
+                { href: `/${segment}/pricing/`, label: source.ui.nav.pricing },
+              ]}
+            />
           </div>
         </div>
       </header>

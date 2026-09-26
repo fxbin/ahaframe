@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CodexResetCalendar } from "@/components/codex-reset-calendar";
+import { RadarMonthCalendar } from "@/components/radar-month-calendar";
 import { buildCodexResetForecast, type ResetForecastConfidence, type ResetForecastLevel } from "@/lib/codex-reset-forecast";
 import { getCodexResetSnapshot, type CodexResetEvent } from "@/lib/codex-reset-server";
 import { localeFromSegment, localizedPath } from "@/lib/content";
@@ -122,7 +123,6 @@ export default async function CodexResetPage({ params }: PageProps) {
   const now = new Date();
   const latest = snapshot.latest;
   const resetToday = latest ? isSameUtcDay(latest.occurredAt, now) : false;
-  const recentHistory = snapshot.history.slice(0, 6);
   const recentCredits = snapshot.bankedHistory.slice(0, 3);
   const forecast = buildCodexResetForecast(
     snapshot.history.map((event) => event.occurredAt),
@@ -225,23 +225,28 @@ export default async function CodexResetPage({ params }: PageProps) {
           <div>
             <p className="editorial-kicker">{copy.eyebrow}</p>
             <h1 id="radar-title" className="editorial-display mt-6 max-w-3xl text-4xl leading-[1.12] tracking-[-0.045em] sm:text-5xl lg:text-6xl">
-              {zh ? <>Codex 今天<span className="liquid-hero-accent">重置了吗？</span></> : copy.title}
+              {zh ? <>Codex 今天<span className="liquid-hero-accent radar-question">重置了吗？</span></> : copy.title}
             </h1>
             <p className="mt-6 max-w-xl text-base leading-8 text-[var(--muted)]">{copy.checked}</p>
           </div>
 
           <div className="liquid-radar-status glass-panel" data-state={!snapshot.dataAvailable ? "unknown" : resetToday ? "confirmed" : "watching"}>
-            <p className="technical-label">{zh ? "当前公开重置状态" : "Public reset status"}</p>
-            <p className={`mt-5 font-[family-name:var(--font-editorial)] text-3xl font-semibold leading-tight tracking-[-.04em] sm:text-4xl ${resetToday ? "text-[var(--success)]" : ""}`}>
-              <span className="liquid-status-dot" style={{ background: !snapshot.dataAvailable ? "var(--danger)" : resetToday ? "var(--success)" : "var(--warning)" }} aria-hidden="true" />
-              {!snapshot.dataAvailable ? copy.noData : resetToday ? copy.todayConfirmed : copy.watching}
-            </p>
-            <p className="mt-5 text-sm leading-6 text-[var(--muted)]">
-              {latest ? `${copy.lastReset}: ${formatUtc(latest.occurredAt, locale)}` : copy.forecastInsufficient}
-            </p>
-            {latest && isTiboSource(latest) ? (
-              <a className="text-link mt-4 w-fit" href={latest.sourceUrl} target="_blank" rel="noreferrer">{sourceName(latest, zh)}</a>
-            ) : null}
+            <span className="radar-status-orb" data-state={!snapshot.dataAvailable ? "unknown" : resetToday ? "confirmed" : "watching"} aria-hidden="true">
+              {!snapshot.dataAvailable ? "?" : resetToday ? "✓" : "◷"}
+            </span>
+            <div className="radar-status-copy">
+              <p className="technical-label">{zh ? "今日状态" : "Today's status"}</p>
+              <p className={`mt-4 font-[family-name:var(--font-editorial)] font-semibold tracking-[-.04em] ${resetToday ? "text-[var(--success)]" : ""}`}>
+                <span className="liquid-status-dot" style={{ background: !snapshot.dataAvailable ? "var(--danger)" : resetToday ? "var(--success)" : "var(--warning)" }} aria-hidden="true" />
+                {!snapshot.dataAvailable ? copy.noData : resetToday ? copy.todayConfirmed : copy.watching}
+              </p>
+              <p className="mt-4 text-sm leading-6 text-[var(--muted)]">
+                {latest ? `${copy.lastReset}: ${formatUtc(latest.occurredAt, locale)}` : copy.forecastInsufficient}
+              </p>
+              {latest && isTiboSource(latest) ? (
+                <a className="text-link mt-3 w-fit text-xs" href={latest.sourceUrl} target="_blank" rel="noreferrer">{sourceName(latest, zh)}</a>
+              ) : null}
+            </div>
           </div>
         </section>
 
@@ -303,7 +308,21 @@ export default async function CodexResetPage({ params }: PageProps) {
             </div>
             {snapshot.history.length || snapshot.bankedHistory.length ? (
               <div className="mt-6">
-                <CodexResetCalendar events={snapshot.history} bankedEvents={snapshot.bankedHistory} locale={locale} months={3} />
+                <RadarMonthCalendar
+                  locale={locale}
+                  events={[
+                    ...snapshot.history.map((event) => ({...event, kind: "full" as const})),
+                    ...snapshot.bankedHistory.map((event) => ({...event, kind: "banked" as const})),
+                  ]}
+                />
+                <details className="mt-5 radar-archive">
+                  <summary className="cursor-pointer text-sm font-semibold text-[var(--glass-copper)]">
+                    {zh ? "展开完整历史（日历与间隔）" : "Explore full history, rhythm and intervals"} ↓
+                  </summary>
+                  <div className="mt-5">
+                    <CodexResetCalendar events={snapshot.history} bankedEvents={snapshot.bankedHistory} locale={locale} months={6} />
+                  </div>
+                </details>
               </div>
             ) : (
               <p className="mt-7 text-sm text-[var(--muted)]">{snapshot.dataAvailable ? copy.watching : copy.noData}</p>
@@ -317,19 +336,17 @@ export default async function CodexResetPage({ params }: PageProps) {
             </div>
             <div className="mt-5 divide-y divide-[var(--border)]">
               {recentEvents.length ? recentEvents.map((event) => (
-                <div className="py-4" key={event.id}>
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <time className="font-mono text-xs text-[var(--muted)]">{formatUtc(event.occurredAt, locale)}</time>
-                    <span className={`rounded-full px-2.5 py-1 text-[10px] font-semibold ${event.eventKind === "full" ? "bg-[var(--primary-soft)] text-[var(--success)]" : "bg-[#fff1de] text-[#825016]"}`}>
-                      {event.eventKind === "full" ? (zh ? "全量重置" : "Full reset") : event.status === "confirmed" ? copy.creditsConfirmed : copy.creditsAnnounced}
-                    </span>
+                <div className="radar-activity-row" key={event.id}>
+                  <time className="font-mono text-[var(--muted)]">{formatUtc(event.occurredAt, locale)}</time>
+                  <div className="radar-activity-row__body">
+                    <p><span className={event.eventKind === "full" ? "text-[var(--success)]" : "text-[#b27b29]"} aria-hidden="true">● </span>{event.eventKind === "full" ? copy.eventTitle : copy.credits}</p>
+                    {isTiboSource(event) ? (
+                      <a href={event.sourceUrl} target="_blank" rel="noreferrer">{sourceName(event, zh)}</a>
+                    ) : <small>{sourceDescription(event, zh)}</small>}
                   </div>
-                  <p className="mt-2 text-sm font-semibold">{event.eventKind === "full" ? copy.eventTitle : copy.credits}</p>
-                  {isTiboSource(event) ? (
-                    <a className="text-link mt-2 text-xs" href={event.sourceUrl} target="_blank" rel="noreferrer">{sourceName(event, zh)}</a>
-                  ) : (
-                    <p className="mt-1 text-xs text-[var(--muted)]">{sourceDescription(event, zh)}</p>
-                  )}
+                  <span className={`radar-activity-row__badge ${event.eventKind === "full" ? "bg-[#edf5ee] text-[var(--success)]" : "bg-[#fff1de] text-[#825016]"}`}>
+                    {event.eventKind === "full" ? (zh ? "全量重置" : "Full reset") : event.status === "confirmed" ? copy.creditsConfirmed : copy.creditsAnnounced}
+                  </span>
                 </div>
               )) : <p className="py-4 text-sm text-[var(--muted)]">{copy.noData}</p>}
             </div>
