@@ -44,30 +44,7 @@ export function GuidePage({ locale, data }: { locale: Locale; data: GuidePageDat
   return (
     <main className="editorial-guide-page liquid-guide-page">
       <article>
-        <header className="course-detail-hero border-b border-[var(--border)] py-14 sm:py-20">
-          <div className="shell">
-            {activePath ? (
-              <nav aria-label={labels.course} className="mb-8 flex flex-wrap items-center gap-2 text-sm text-[var(--muted)]" data-guide-active-path={activePath.slug}>
-                <Link className="quiet-link" href={`/${segment}/courses/${activePath.slug}/`}>{activePath.title}</Link>
-                <span aria-hidden="true">→</span><span>{activePath.milestoneTitle}</span>
-              </nav>
-            ) : null}
-            <div className="grid gap-10 lg:grid-cols-[1.1fr_.9fr] lg:items-end">
-              <div className="max-w-4xl">
-                <p className="editorial-kicker">{labels.kicker}</p>
-                <div className="mt-4 flex flex-wrap gap-x-3 gap-y-2 font-mono text-[10px] uppercase tracking-[0.08em] text-[var(--muted)]">
-                  <span>{concept.kind}</span><span aria-hidden="true">·</span><span>{concept.difficulty}</span><span aria-hidden="true">·</span><span>{guide.readingMinutes} {labels.minutes}</span>
-                </div>
-                <h1 className="mt-5 max-w-4xl font-[family-name:var(--font-editorial)] text-5xl font-semibold leading-[0.98] tracking-[-0.05em] sm:text-6xl">{guide.title}</h1>
-                <p className="mt-6 max-w-3xl text-lg leading-8 text-[var(--muted)]">{guide.summary}</p>
-              </div>
-              <div className="glass-reading-aside border-y border-[var(--border)] py-5 lg:border-y-0 lg:border-l lg:py-2 lg:pl-8">
-                <p className="technical-label">{labels.mentalModel}</p>
-                <p className="mt-3 font-[family-name:var(--font-editorial)] text-2xl leading-9 tracking-[-0.025em]">{guide.mentalModel}</p>
-              </div>
-            </div>
-          </div>
-        </header>
+
 
         <div className="shell guide-workspace-shell py-12 sm:py-16">
           <div className={`guide-workspace-layout ${activePath ? "" : "guide-workspace-layout--no-path"}`}>
@@ -93,6 +70,30 @@ export function GuidePage({ locale, data }: { locale: Locale; data: GuidePageDat
               </aside>
             ) : null}
             <div className="guide-workspace-body min-w-0">
+        <header className="course-detail-hero border-b border-[var(--border)] py-14 sm:py-20">
+          <div className="shell">
+            {activePath ? (
+              <nav aria-label={labels.course} className="mb-8 flex flex-wrap items-center gap-2 text-sm text-[var(--muted)]" data-guide-active-path={activePath.slug}>
+                <Link className="quiet-link" href={`/${segment}/courses/${activePath.slug}/`}>{activePath.title}</Link>
+                <span aria-hidden="true">→</span><span>{activePath.milestoneTitle}</span>
+              </nav>
+            ) : null}
+            <div className="grid gap-10 lg:grid-cols-[1.1fr_.9fr] lg:items-end">
+              <div className="max-w-4xl">
+                <p className="editorial-kicker">{labels.kicker}</p>
+                <div className="mt-4 flex flex-wrap gap-x-3 gap-y-2 font-mono text-[10px] uppercase tracking-[0.08em] text-[var(--muted)]">
+                  <span>{concept.kind}</span><span aria-hidden="true">·</span><span>{concept.difficulty}</span><span aria-hidden="true">·</span><span>{guide.readingMinutes} {labels.minutes}</span>
+                </div>
+                <h1 className="mt-5 max-w-4xl font-[family-name:var(--font-editorial)] text-4xl font-semibold leading-[1.1] tracking-[-0.05em] sm:text-5xl">{guide.title}</h1>
+                <p className="mt-6 max-w-3xl text-lg leading-8 text-[var(--muted)]">{guide.summary}</p>
+              </div>
+              <div className="guide-header-model border-y border-[var(--border)] py-5 lg:border-y-0 lg:border-l lg:py-2 lg:pl-8">
+                <p className="technical-label">{labels.mentalModel}</p>
+                <p className="mt-3 font-[family-name:var(--font-editorial)] text-2xl leading-9 tracking-[-0.025em]">{guide.mentalModel}</p>
+              </div>
+            </div>
+          </div>
+        </header>
           <section className="grid gap-5 border-b border-[var(--border)] pb-10 md:grid-cols-[180px_1fr] md:gap-10">
             <h2 className="technical-label pt-1">{labels.why}</h2><p className="max-w-3xl text-lg leading-8">{guide.whyItMatters}</p>
           </section>
