@@ -61,8 +61,8 @@ test("course-linked Guide shows actual published outline and offers an interacti
   await page.setViewportSize({ width: 390, height: 844 });
   await expect(outline).toBeHidden();
   const compact = page.locator(".guide-mobile-outline");
-  await expect(compact.locator("summary")).toBeVisible();
-  await compact.locator("summary").click();
+  await expect(compact.locator(":scope > summary")).toBeVisible();
+  await compact.locator(":scope > summary").click();
   await expect(compact.locator(".guide-outline-chapter").first()).toBeVisible();
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
   expect(overflow).toBeLessThanOrEqual(1);
