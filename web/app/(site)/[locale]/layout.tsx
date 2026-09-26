@@ -15,6 +15,7 @@ import { getLearningGraph } from "@/lib/learning-graph-server";
 import { organizationSchema } from "@/lib/schema";
 import "../../globals.css";
 import "../../editorial-learning.css";
+import "../../liquid-glass.css";
 
 export const metadata: Metadata = {
   title: {
