@@ -3,10 +3,12 @@ import { expect, test } from "@playwright/test";
 test("approved search geometry: centered wide glass dialog, grouped real content, mobile confinement", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.goto("/zh-cn/");
+  await page.screenshot({ path: "test-results/design-parity/home-desktop.png", animations: "disabled" });
   await page.locator("[data-global-search-trigger]").click();
   const dialog = page.getByRole("dialog", { name: "搜索 AhaFrame" });
   await expect(dialog).toBeVisible();
   await expect(dialog.locator(".search-group")).toHaveCount(4);
+  await page.screenshot({ path: "test-results/design-parity/search-desktop.png", animations: "disabled" });
   const desktop = await dialog.boundingBox();
   expect(desktop).not.toBeNull();
   expect(desktop!.width).toBeGreaterThanOrEqual(790);
@@ -18,6 +20,7 @@ test("approved search geometry: centered wide glass dialog, grouped real content
   await page.setViewportSize({ width: 390, height: 640 });
   await page.locator("[data-global-search-trigger]").click();
   await expect(dialog).toBeVisible();
+  await page.screenshot({ path: "test-results/design-parity/search-mobile.png", animations: "disabled" });
   const mobile = await dialog.boundingBox();
   expect(mobile).not.toBeNull();
   expect(mobile!.x).toBeGreaterThanOrEqual(-1);
@@ -49,6 +52,7 @@ test("Guide screenshot layout uses real course context and published incident in
   const reading = workspace.locator(".guide-workspace__reading");
   const right = workspace.locator(".guide-workspace__practice");
   for (const element of [left, reading, right]) await expect(element).toBeVisible();
+  await page.screenshot({ path: "test-results/design-parity/guide-desktop.png", animations: "disabled" });
 
   const boxes = await Promise.all([left, reading, right].map((item) => item.boundingBox()));
   expect(boxes.every(Boolean)).toBe(true);
@@ -63,6 +67,8 @@ test("Guide screenshot layout uses real course context and published incident in
   await expect(right.locator("[data-guide-workspace-practice]")).toHaveAttribute("href", /agent-reliability/);
 
   await page.setViewportSize({ width: 390, height: 844 });
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.screenshot({ path: "test-results/design-parity/guide-mobile.png", animations: "disabled" });
   const mobile = await workspace.evaluate((node) => {
     const children = [node.querySelector(".guide-workspace__outline"), node.querySelector(".guide-workspace__reading"), node.querySelector(".guide-workspace__practice")];
     return {
@@ -82,6 +88,7 @@ test("Radar uses actual month navigation and keeps full-reset and credit marker 
   await page.goto("/en/tools/codex-reset/");
   await expect(page.locator(".liquid-radar-status")).toBeVisible();
   await expect(page.locator(".liquid-radar-metrics > div")).toHaveCount(2);
+  await page.screenshot({ path: "test-results/design-parity/radar-desktop.png", animations: "disabled" });
   const month = page.locator("[data-radar-month]");
   if (await month.count()) {
     const initial = await month.getAttribute("data-radar-month");
