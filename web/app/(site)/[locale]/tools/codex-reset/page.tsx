@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CodexResetCalendar } from "@/components/codex-reset-calendar";
+import { RadarMonthCalendar } from "@/components/radar-month-calendar";
 import { buildCodexResetForecast, type ResetForecastConfidence, type ResetForecastLevel } from "@/lib/codex-reset-forecast";
 import { getCodexResetSnapshot, type CodexResetEvent } from "@/lib/codex-reset-server";
 import { localeFromSegment, localizedPath } from "@/lib/content";
@@ -303,7 +304,21 @@ export default async function CodexResetPage({ params }: PageProps) {
             </div>
             {snapshot.history.length || snapshot.bankedHistory.length ? (
               <div className="mt-6">
-                <CodexResetCalendar events={snapshot.history} bankedEvents={snapshot.bankedHistory} locale={locale} months={3} />
+                <RadarMonthCalendar
+                  locale={locale}
+                  events={[
+                    ...snapshot.history.map((event) => ({...event, kind: "full" as const})),
+                    ...snapshot.bankedHistory.map((event) => ({...event, kind: "banked" as const})),
+                  ]}
+                />
+                <details className="mt-5 radar-archive">
+                  <summary className="cursor-pointer text-sm font-semibold text-[var(--glass-copper)]">
+                    {zh ? "展开完整历史（日历与间隔）" : "Explore full history, rhythm and intervals"} ↓
+                  </summary>
+                  <div className="mt-5">
+                    <CodexResetCalendar events={snapshot.history} bankedEvents={snapshot.bankedHistory} locale={locale} months={6} />
+                  </div>
+                </details>
               </div>
             ) : (
               <p className="mt-7 text-sm text-[var(--muted)]">{snapshot.dataAvailable ? copy.watching : copy.noData}</p>
