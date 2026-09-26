@@ -31,8 +31,8 @@ test("liquid homepage keeps a single CTA and interactive process preview across 
 test("glass theme is bilingual and keeps semantic tool statuses distinct", async ({ page }) => {
   await page.goto("/zh-cn/");
   await expect(page.getByRole("heading", { name: /看见 AI 如何工作/ })).toBeVisible();
-  await expect(page.getByRole("button", { name: /验证/ })).toHaveCount(1);
-  await page.getByRole("button", { name: /验证/ }).click();
+  await expect(page.locator('[data-agent-step="3"]')).toHaveCount(1);
+  await page.locator('[data-agent-step="3"]').click();
   await expect(page.locator(".agent-preview__detail")).toContainText("核对");
   await expect(page.getByRole("link", { name: /体验一个示例/ })).toHaveAttribute("href", "#home-interactive-demo");
 
