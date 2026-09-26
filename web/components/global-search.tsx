@@ -34,6 +34,15 @@ export function GlobalSearch({ locale, documents }: GlobalSearchProps) {
   const results = useMemo(() => searchDocuments(documents, query), [documents, query]);
   const orderedResults = useMemo(() => SEARCH_TYPE_ORDER.flatMap((type) => results.filter((result) => result.type === type)), [results]);
   const recentDocuments = useMemo(() => recentRoutes.map((route) => documents.find((item) => item.route === route)).filter((item): item is SearchDocument => Boolean(item)).slice(0, 2), [recentRoutes, documents]);
+  const suggestionGroups = useMemo(() => Object.fromEntries(
+    SEARCH_TYPE_ORDER.map((type) => [type, documents
+      .filter((item) => item.type === type && !recentDocuments.some((recent) => recent.route === item.route))
+      .slice(0, 2)]),
+  ) as Record<SearchDocumentType, SearchDocument[]>, [documents, recentDocuments]);
+  const defaultSuggestions = useMemo(() => [
+    ...recentDocuments, ...SEARCH_TYPE_ORDER.flatMap((type) => suggestionGroups[type]),
+  ], [recentDocuments, suggestionGroups]);
+  const navigable = query.trim() ? orderedResults : defaultSuggestions;
 
   function visit(route: string) {
     const next = [route, ...recentRoutes.filter((item) => item !== route)].slice(0, 6);
@@ -125,10 +134,10 @@ export function GlobalSearch({ locale, documents }: GlobalSearchProps) {
   }
 
   function onInputKeyDown(event: ReactKeyboardEvent<HTMLInputElement>) {
-    if (!orderedResults.length) return;
-    if (event.key === "ArrowDown") { event.preventDefault(); setActiveIndex((value) => (value + 1) % orderedResults.length); }
-    else if (event.key === "ArrowUp") { event.preventDefault(); setActiveIndex((value) => (value - 1 + orderedResults.length) % orderedResults.length); }
-    else if (event.key === "Enter") { event.preventDefault(); const route = orderedResults[Math.min(activeIndex, orderedResults.length - 1)].route; visit(route); window.location.assign(route); }
+    if (!navigable.length) return;
+    if (event.key === "ArrowDown") { event.preventDefault(); setActiveIndex((value) => (value + 1) % navigable.length); }
+    else if (event.key === "ArrowUp") { event.preventDefault(); setActiveIndex((value) => (value - 1 + navigable.length) % navigable.length); }
+    else if (event.key === "Enter") { event.preventDefault(); const route = navigable[Math.min(activeIndex, navigable.length - 1)].route; visit(route); window.location.assign(route); }
   }
 
   let globalIndex = 0;
@@ -173,7 +182,7 @@ export function GlobalSearch({ locale, documents }: GlobalSearchProps) {
           >
             <div className="flex shrink-0 items-center gap-3 border-b border-[var(--border)] px-5 py-4">
               <span aria-hidden="true" className="text-[var(--brand-accent)]">⌕</span>
-              <input ref={inputRef} className="min-h-10 min-w-0 flex-1 bg-transparent text-base outline-none placeholder:text-[var(--muted)]" value={query} onChange={(event) => { setQuery(event.target.value); setActiveIndex(0); }} onKeyDown={onInputKeyDown} placeholder={copy.placeholder} aria-label={copy.dialog} aria-activedescendant={orderedResults.length ? `search-result-${activeIndex}` : undefined} autoComplete="off" />
+              <input ref={inputRef} className="min-h-10 min-w-0 flex-1 bg-transparent text-base outline-none placeholder:text-[var(--muted)]" value={query} onChange={(event) => { setQuery(event.target.value); setActiveIndex(0); }} onKeyDown={onInputKeyDown} placeholder={copy.placeholder} aria-label={copy.dialog} aria-activedescendant={navigable.length ? (query.trim() ? `search-result-${activeIndex}` : `search-suggestion-${activeIndex}`) : undefined} autoComplete="off" />
               <button type="button" className="quiet-link shrink-0 text-xs" onClick={close} aria-label={copy.close}>Esc</button>
             </div>
 
@@ -184,29 +193,33 @@ export function GlobalSearch({ locale, documents }: GlobalSearchProps) {
                     <section className="search-parity-section" aria-label={locale === "zh-CN" ? "最近访问" : "Recently opened"}>
                       <h2 className="search-parity-heading"><span aria-hidden="true">◷</span>{locale === "zh-CN" ? "最近访问" : "Recently opened"}</h2>
                       <div className="search-parity-rows">
-                        {recentDocuments.map((item) => (
-                          <Link key={item.id} href={item.route} onClick={() => visit(item.route)} className="search-parity-row">
+                        {recentDocuments.map((item) => {
+                          const index = defaultSuggestions.findIndex((entry) => entry.id === item.id);
+                          return (
+                          <Link key={item.id} id={`search-suggestion-${index}`} aria-current={activeIndex === index ? "true" : undefined} href={item.route} onClick={() => visit(item.route)} onMouseEnter={() => setActiveIndex(index)} onFocus={() => setActiveIndex(index)} className="search-parity-row">
                             <span className="search-parity-icon" aria-hidden="true">{typeIcon(item.type)}</span>
                             <span className="search-parity-copy"><strong>{item.title}</strong><small>{item.summary}</small></span>
                             <span className="search-parity-tag">{copy.groups[item.type]}</span><span className="search-parity-chevron" aria-hidden="true">›</span>
                           </Link>
-                        ))}
+                        );})}
                       </div>
                     </section>
                   ) : null}
                   {SEARCH_TYPE_ORDER.map((type) => {
-                    const suggestions = documents.filter((item) => item.type === type).slice(0, 2);
+                    const suggestions = suggestionGroups[type];
                     if (!suggestions.length) return null;
                     return (
                       <section key={type} className="search-parity-section" aria-label={copy.groups[type]}>
                         <h2 className="search-parity-heading"><span aria-hidden="true">{typeIcon(type)}</span>{copy.groups[type]}</h2>
-                        <div className="search-parity-rows">{suggestions.map((item) => (
-                          <Link key={item.id} href={item.route} onClick={() => visit(item.route)} className="search-parity-row">
+                        <div className="search-parity-rows">{suggestions.map((item) => {
+                          const index = defaultSuggestions.findIndex((entry) => entry.id === item.id);
+                          return (
+                          <Link key={item.id} id={`search-suggestion-${index}`} aria-current={activeIndex === index ? "true" : undefined} href={item.route} onClick={() => visit(item.route)} onMouseEnter={() => setActiveIndex(index)} onFocus={() => setActiveIndex(index)} className="search-parity-row">
                             <span className="search-parity-icon" aria-hidden="true">{typeIcon(type)}</span>
                             <span className="search-parity-copy"><strong>{item.title}</strong><small>{item.summary}</small></span>
                             <span className="search-parity-tag">{copy.groups[type]}</span><span className="search-parity-chevron" aria-hidden="true">›</span>
                           </Link>
-                        ))}</div>
+                        );})}</div>
                       </section>
                     );
                   })}
