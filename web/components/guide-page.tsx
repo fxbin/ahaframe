@@ -43,26 +43,29 @@ function CourseOutline({
   return (
     <nav className="guide-workspace-navigation" aria-label="Learning path lessons">
       {path.outline.map((milestone, chapterIndex) => (
-        <div className="guide-outline-chapter" key={milestone.id}>
-          <h3 className="guide-outline-chapter-title">
+        <details className="guide-outline-chapter" key={milestone.id} open={milestone.lessons.some((lesson) => lesson.slug === currentSlug)}>
+          <summary className="guide-outline-chapter-title">
             <span className="font-mono text-[11px] text-[var(--brand-accent)]">{String(chapterIndex + 1).padStart(2, "0")}</span>
-            {milestone.title}
-          </h3>
-          {milestone.lessons.map((lesson) =>
-            lesson.slug === currentSlug ? (
-              <span key={lesson.conceptId} aria-current="page" className="is-active">
-                <span className="guide-workspace-step" aria-hidden="true">●</span>
-                <strong>{lesson.title}</strong>
-              </span>
-            ) : (
-              <Link key={lesson.conceptId} href={`/${segment}/guides/${lesson.slug}/?path=${encodeURIComponent(path.slug)}`}>
-                <span className="guide-workspace-step" aria-hidden="true">›</span>
-                <span>{lesson.title}</span>
-              </Link>
-            ),
-          )}
-        </div>
-      ))}
+            <strong>{milestone.title}</strong>
+            <span className="guide-outline-disclosure" aria-hidden="true">⌄</span>
+          </summary>
+          <div className="guide-outline-lessons">
+            {milestone.lessons.map((lesson) =>
+              lesson.slug === currentSlug ? (
+                <span key={lesson.conceptId} aria-current="page" className="is-active">
+                  <span className="guide-workspace-step" aria-hidden="true">●</span>
+                  <strong>{lesson.title}</strong>
+                </span>
+              ) : (
+                <Link key={lesson.conceptId} href={`/${segment}/guides/${lesson.slug}/?path=${encodeURIComponent(path.slug)}`}>
+                  <span className="guide-workspace-step" aria-hidden="true">›</span>
+                  <span>{lesson.title}</span>
+                </Link>
+              ),
+            )}
+          </div>
+        </details>
+      ))}}
     </nav>
   );
 }
