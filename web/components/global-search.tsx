@@ -33,7 +33,12 @@ export function GlobalSearch({ locale, documents }: GlobalSearchProps) {
       }
     }
     window.addEventListener("keydown", onShortcut);
-    return () => window.removeEventListener("keydown", onShortcut);
+    const trigger = triggerRef.current;
+    trigger?.setAttribute("data-search-ready", "true");
+    return () => {
+      window.removeEventListener("keydown", onShortcut);
+      trigger?.removeAttribute("data-search-ready");
+    };
   }, []);
 
   useEffect(() => {
