@@ -69,7 +69,30 @@ export function GuidePage({ locale, data }: { locale: Locale; data: GuidePageDat
           </div>
         </header>
 
-        <div className="shell py-12 sm:py-16"><div className="mx-auto max-w-5xl">
+        <div className="shell guide-workspace-shell py-12 sm:py-16">
+          <div className="guide-workspace-layout">
+            {activePath ? (
+              <aside className="guide-workspace-sidebar" aria-label={locale === "zh-CN" ? "课程目录" : "Course outline"}>
+                <Link href={`/${segment}/courses/${activePath.slug}/`} className="text-xs text-[var(--muted)] hover:text-[var(--brand-accent)]">
+                  ← {locale === "zh-CN" ? "返回课程" : "Back to course"}
+                </Link>
+                <h2 className="mt-6 font-[family-name:var(--font-editorial)] text-xl font-semibold leading-snug">{activePath.title}</h2>
+                <p className="mt-2 text-xs leading-5 text-[var(--muted)]">{activePath.milestoneTitle}</p>
+                <div className="guide-workspace-navigation">
+                  {activePath.previous ? <Link href={`/${segment}/guides/${activePath.previous.slug}/?path=${encodeURIComponent(activePath.slug)}`}>
+                    <span className="guide-workspace-step">✓</span><span>{activePath.previous.title}</span>
+                  </Link> : null}
+                  <span aria-current="page" className="is-active"><span className="guide-workspace-step">●</span><strong>{guide.title}</strong></span>
+                  {activePath.next ? <Link href={`/${segment}/guides/${activePath.next.slug}/?path=${encodeURIComponent(activePath.slug)}`}>
+                    <span className="guide-workspace-step">›</span><span>{activePath.next.title}</span>
+                  </Link> : null}
+                </div>
+                <Link href={`/${segment}/courses/${activePath.slug}/`} className="mt-8 inline-block text-xs font-semibold text-[var(--brand-accent)]">
+                  {locale === "zh-CN" ? "查看完整课程目录 →" : "Full course outline →"}
+                </Link>
+              </aside>
+            ) : null}
+            <div className="guide-workspace-body min-w-0">
           <section className="grid gap-5 border-b border-[var(--border)] pb-10 md:grid-cols-[180px_1fr] md:gap-10">
             <h2 className="technical-label pt-1">{labels.why}</h2><p className="max-w-3xl text-lg leading-8">{guide.whyItMatters}</p>
           </section>
@@ -133,7 +156,34 @@ export function GuidePage({ locale, data }: { locale: Locale; data: GuidePageDat
             <div><p className="technical-label">{labels.practice}</p>{guide.practice ? <Link className="editorial-primary-action mt-4" href={practiceHref(locale, guide.slug, guide.practice.href, activePath?.slug)} data-guide-practice-link={guide.slug}>{guide.practice.title} <span aria-hidden="true">→</span></Link> : null}</div>
             <Link className="editorial-text-link" href={`/${segment}/learning/`}>{labels.map} <span aria-hidden="true">→</span></Link>
           </footer>
-        </div></div>
+            </div>
+            <aside className="guide-workspace-practice" aria-label={locale === "zh-CN" ? "实践与验证" : "Practice and verification"}>
+              <p className="guide-workspace-aside-heading">{locale === "zh-CN" ? "实践与验证" : "Practice & Verify"}</p>
+              <p className="mt-6 text-[11px] font-semibold uppercase tracking-wider text-[var(--brand-accent)]">{labels.mentalModel}</p>
+              <h2 className="mt-3 font-[family-name:var(--font-editorial)] text-lg font-semibold leading-snug">{guide.mentalModel}</h2>
+              <div className="mt-7 border-t border-[var(--border)] pt-6">
+                <h3 className="text-sm font-semibold">{labels.takeaways}</h3>
+                <ul className="mt-3 space-y-3">
+                  {guide.takeaways.slice(0, 3).map((point,index)=>(
+                    <li key={point} className="flex gap-3 text-xs leading-5 text-[var(--muted)]"><span className="font-mono text-[var(--brand-accent)]">{index+1}.</span><span>{point}</span></li>
+                  ))}
+                </ul>
+              </div>
+              {guide.practice ? (
+                <div className="guide-workspace-practice-cta">
+                  <p className="text-xs leading-5 text-[var(--muted)]">{locale === "zh-CN" ? "准备好后，在真实交互实验中运用本节知识。" : "Apply this lesson in the linked interactive practice."}</p>
+                  <Link className="primary-action mt-4 w-full justify-center" href={practiceHref(locale, guide.slug, guide.practice.href, activePath?.slug)}>
+                    {locale === "zh-CN" ? "进入实践" : "Open practice"} <span aria-hidden="true">→</span>
+                  </Link>
+                </div>
+              ) : (
+                <p className="mt-8 border-t border-[var(--border)] pt-5 text-xs leading-5 text-[var(--muted)]">
+                  {locale === "zh-CN" ? "这一节目前提供阅读与自我总结，交互练习正在扩展。" : "This lesson currently offers reading and reflection; interactive practice is being expanded."}
+                </p>
+              )}
+            </aside>
+          </div>
+        </div>
       </article>
     </main>
   );
