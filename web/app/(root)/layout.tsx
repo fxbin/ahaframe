@@ -5,6 +5,7 @@ import { ValidationBootstrap } from "@/components/validation-bootstrap";
 import { indexingMetadata } from "@/lib/indexing";
 import "../globals.css";
 import "../editorial-learning.css";
+import "../liquid-glass.css";
 
 export const metadata: Metadata = {
   robots: indexingMetadata(),
