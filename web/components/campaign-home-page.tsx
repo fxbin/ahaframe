@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { FirstAhaPanel } from "@/components/first-aha-panel";
+import { AgentFlowPreview } from "@/components/agent-flow-preview";
 import { featuredCourses, type CourseCatalogItem } from "@/lib/course-catalog-server";
 import { segmentForLocale, type Locale } from "@/lib/content";
 import type { CampaignDiscoveryContent } from "@/lib/campaign";
@@ -10,27 +11,6 @@ interface CampaignHomePageProps {
   content: CampaignDiscoveryContent;
   knowledgeMap: KnowledgeMap;
   catalog: CourseCatalogItem[];
-}
-
-function BotanicalBranch() {
-  return (
-    <svg className="botanical-branch" viewBox="0 0 320 220" aria-hidden="true">
-      <path d="M210 206C211 168 205 137 191 112C177 87 162 68 145 48" />
-      <path d="M190 111C214 96 232 75 245 48" />
-      <path d="M176 86C154 80 134 67 118 48" />
-      <path d="M204 142C229 136 249 123 264 105" />
-      <path d="M158 66C151 45 151 28 157 15" />
-      <path d="M236 60C245 42 258 30 276 24" />
-      <circle cx="157" cy="15" r="3" />
-      <circle cx="147" cy="43" r="2.5" />
-      <circle cx="118" cy="48" r="3" />
-      <circle cx="245" cy="48" r="3" />
-      <circle cx="276" cy="24" r="3" />
-      <circle cx="264" cy="105" r="3" />
-      <circle cx="230" cy="133" r="2.5" />
-      <circle cx="139" cy="60" r="2.5" />
-    </svg>
-  );
 }
 
 export function CampaignHomePage({ locale, content, knowledgeMap, catalog }: CampaignHomePageProps) {
@@ -88,39 +68,42 @@ export function CampaignHomePage({ locale, content, knowledgeMap, catalog }: Cam
   });
 
   return (
-    <main className="editorial-home">
-      <section className="editorial-hero border-b border-[var(--border)]">
-        <div className="shell grid min-h-[560px] gap-12 py-16 sm:py-20 lg:grid-cols-[1fr_360px] lg:items-center lg:py-24">
+    <main className="editorial-home liquid-home">
+      <section className="editorial-hero">
+        <div className="shell grid liquid-hero-layout">
           <div>
-            <h1 className="editorial-display max-w-4xl text-5xl leading-[0.98] sm:text-6xl lg:text-[4.75rem]">{labels.headline}</h1>
-            <p className="mt-7 max-w-xl text-lg leading-8 text-[var(--muted)] sm:text-xl">{labels.subheadline}</p>
-            <Link className="editorial-primary-action mt-9" href={`/${segment}/courses/`}>
-              {labels.start} <span aria-hidden="true">→</span>
-            </Link>
+            <p className="editorial-kicker">{locale === "zh-CN" ? "以直观交互，理解 AI" : "LEARN BY SEEING"}</p>
+            <h1 aria-label={labels.headline} className="editorial-display liquid-hero-title mt-5 max-w-3xl">
+              {locale === "zh-CN" ? <>看见 AI 如何工作，<br />才能<span className="liquid-hero-accent">真正理解它</span></> : <>Understand AI by<br /><span className="liquid-hero-accent">seeing it work.</span></>}
+            </h1>
+            <p className="mt-7 max-w-lg text-base leading-8 text-[var(--muted)] sm:text-lg">{labels.subheadline}</p>
+            <div className="mt-9 flex flex-wrap items-center gap-7">
+              <Link className="editorial-primary-action" href={`/${segment}/courses/`}>
+                {labels.start} <span aria-hidden="true">→</span>
+              </Link>
+              <a className="liquid-secondary-action inline-flex items-center gap-3 text-sm font-semibold" href="#home-interactive-demo">
+                <span aria-hidden="true" className="grid h-10 w-10 place-items-center rounded-full border border-[var(--border-strong)] bg-white/80">▶</span>
+                {locale === "zh-CN" ? "体验一个示例" : "Try an example"}
+              </a>
+            </div>
+            <p className="mt-10 text-xs tracking-[.13em] text-[var(--muted)]">
+              {labels.understand} <span className="mx-3" aria-hidden="true">·</span> {labels.build} <span className="mx-3" aria-hidden="true">·</span> {labels.use}
+            </p>
           </div>
-          <div className="hero-botanical" aria-hidden="true">
-            <BotanicalBranch />
-            <span className="hero-red-line" />
+          <div className="liquid-hero-visual">
+            <AgentFlowPreview locale={locale} />
           </div>
         </div>
       </section>
 
-      <section className="border-b border-[var(--border)] py-12 sm:py-16">
-        <div className="shell">
-          <h2 className="text-center font-[family-name:var(--font-editorial)] text-3xl font-semibold tracking-[-0.04em]">{labels.choose}</h2>
-          <div className="mt-8 grid gap-4 lg:grid-cols-3">
-            {domainCards.map(({ domain, title, copy, symbol }) => (
-              <Link key={domain.id} className="learning-goal-card group" href={`/${segment}/courses/#${domain.slug}`}>
-                <span className="learning-goal-symbol" aria-hidden="true">{symbol}</span>
-                <span className="min-w-0 flex-1">
-                  <strong className="block font-[family-name:var(--font-editorial)] text-2xl font-semibold tracking-[-0.035em]">{title}</strong>
-                  <span className="mt-1 block text-sm leading-6 text-[var(--muted)]">{copy}</span>
-                </span>
-                <span className="text-xl transition-transform group-hover:translate-x-1" aria-hidden="true">→</span>
-              </Link>
-            ))}
-          </div>
-        </div>
+      <section className="shell liquid-value-strip" aria-label={labels.choose}>
+        <h2 className="col-span-full mb-0 text-xs font-semibold tracking-[0.12em] text-[var(--muted)]">{labels.choose}</h2>
+        {domainCards.map(({ domain, title, copy }) => (
+          <Link key={domain.id} href={`/${segment}/courses/#${domain.slug}`}>
+            <strong className="block font-[family-name:var(--font-editorial)] text-xl tracking-[-0.03em]">{title} <span aria-hidden="true" className="ml-1 text-[var(--glass-copper)]">↗</span></strong>
+            <span className="mt-2 block max-w-[275px] text-sm leading-6 text-[var(--muted)]">{copy}</span>
+          </Link>
+        ))}
       </section>
 
       <section className="py-14 sm:py-20">
@@ -151,7 +134,7 @@ export function CampaignHomePage({ locale, content, knowledgeMap, catalog }: Cam
         </div>
       </section>
 
-      <section className="border-y border-[var(--border)] bg-[var(--surface)] py-14 sm:py-20">
+      <section id="home-interactive-demo" className="home-demo-section border-y border-[var(--border)] bg-[var(--surface)] py-14 sm:py-20">
         <div className="shell grid gap-10 lg:grid-cols-[0.72fr_1.28fr] lg:items-center">
           <div>
             <p className="editorial-kicker">{labels.practice}</p>

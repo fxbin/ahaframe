@@ -19,13 +19,13 @@ export async function SiteFrame({ locale, source, children }: SiteFrameProps) {
   return (
     <>
       <header className="site-header sticky top-0 z-50">
-        <div className="shell site-header__inner">
-          <Link className="brand text-2xl" href={home}>
-            {source.brand}
+        <div className="shell site-header__inner glass-header">
+          <Link className="brand inline-flex shrink-0 items-center" href={home}>
+            <span className="glass-brand-mark" aria-hidden="true">A</span>{source.brand}
           </Link>
 
           <div className="flex items-center gap-1.5 sm:gap-4 lg:gap-6">
-            <nav className="site-header__nav flex items-center gap-3 text-sm sm:gap-6 lg:gap-7" aria-label="Primary navigation">
+            <nav className="site-header__nav glass-nav flex items-center gap-3 text-sm sm:gap-6 lg:gap-7" aria-label="Primary navigation">
               <Link className="transition hover:text-[var(--text)]" href={`/${segment}/courses/`}>
                 {source.ui.nav.lessons}
               </Link>

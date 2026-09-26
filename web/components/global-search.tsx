@@ -33,7 +33,12 @@ export function GlobalSearch({ locale, documents }: GlobalSearchProps) {
       }
     }
     window.addEventListener("keydown", onShortcut);
-    return () => window.removeEventListener("keydown", onShortcut);
+    const trigger = triggerRef.current;
+    trigger?.setAttribute("data-search-ready", "true");
+    return () => {
+      window.removeEventListener("keydown", onShortcut);
+      trigger?.removeAttribute("data-search-ready");
+    };
   }, []);
 
   useEffect(() => {
@@ -113,7 +118,7 @@ export function GlobalSearch({ locale, documents }: GlobalSearchProps) {
       <button
         ref={triggerRef}
         type="button"
-        className="inline-flex min-h-9 min-w-9 items-center justify-center gap-2 border border-[var(--border)] px-2 text-xs font-semibold text-[var(--muted)] transition hover:border-[var(--text)] hover:text-[var(--text)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--brand-accent)] sm:px-3"
+        className="glass-search-trigger inline-flex min-h-9 min-w-9 items-center justify-center gap-2 border border-[var(--border)] px-2 text-xs font-semibold text-[var(--muted)] transition hover:border-[var(--text)] hover:text-[var(--text)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--brand-accent)] sm:px-3"
         onClick={() => { setActiveIndex(0); setOpen(true); }}
         aria-label={copy.trigger}
         aria-haspopup="dialog"
@@ -124,7 +129,7 @@ export function GlobalSearch({ locale, documents }: GlobalSearchProps) {
 
       {open && typeof document !== "undefined" ? createPortal(
         <div
-          className="fixed inset-x-0 z-[1000] flex items-start justify-center overflow-y-auto overscroll-contain bg-black/45 px-3 py-3 sm:px-6 sm:pb-6 sm:pt-12"
+          className="glass-search-overlay fixed inset-x-0 z-[1000] flex items-start justify-center overflow-y-auto overscroll-contain px-3 py-3 sm:px-6 sm:pb-6 sm:pt-12"
           style={{
             top: viewport?.offsetTop ?? 0,
             height: viewport ? `${viewport.height}px` : "100dvh",
@@ -134,7 +139,7 @@ export function GlobalSearch({ locale, documents }: GlobalSearchProps) {
         >
           <div
             ref={dialogRef}
-            className="flex w-full min-w-0 max-w-2xl flex-col overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--paper)] shadow-2xl"
+            className="glass-search-dialog flex w-full min-w-0 max-w-2xl flex-col overflow-hidden"
             style={{
               maxHeight: viewport
                 ? `${Math.max(160, Math.min(760, viewport.height - (viewport.width < 640 ? 24 : 72)))}px`
@@ -146,14 +151,33 @@ export function GlobalSearch({ locale, documents }: GlobalSearchProps) {
             data-global-search-dialog
             onKeyDown={onDialogKeyDown}
           >
-            <div className="flex shrink-0 items-center gap-3 border-b border-[var(--border)] px-4 py-3">
+            <div className="flex shrink-0 items-center gap-3 border-b border-[var(--border)] px-5 py-4">
               <span aria-hidden="true" className="text-[var(--brand-accent)]">⌕</span>
               <input ref={inputRef} className="min-h-10 min-w-0 flex-1 bg-transparent text-base outline-none placeholder:text-[var(--muted)]" value={query} onChange={(event) => { setQuery(event.target.value); setActiveIndex(0); }} onKeyDown={onInputKeyDown} placeholder={copy.placeholder} aria-label={copy.dialog} aria-activedescendant={orderedResults.length ? `search-result-${activeIndex}` : undefined} autoComplete="off" />
               <button type="button" className="quiet-link shrink-0 text-xs" onClick={close} aria-label={copy.close}>Esc</button>
             </div>
 
-            <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-3" data-global-search-results data-search-document-count={documents.length}>
-              {!query.trim() ? <p className="px-3 py-8 text-sm leading-6 text-[var(--muted)]">{copy.hint}</p> : !orderedResults.length ? <p className="px-3 py-8 text-sm leading-6 text-[var(--muted)]" data-global-search-empty>{copy.empty}</p> : SEARCH_TYPE_ORDER.map((type) => {
+            <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-4" data-global-search-results data-search-document-count={documents.length}>
+              {!query.trim() ? (
+                <div data-search-suggestions>
+                  <p className="px-2 pb-5 pt-1 text-sm leading-6 text-[var(--muted)]">{copy.hint}</p>
+                  {SEARCH_TYPE_ORDER.map((type) => {
+                    const suggestions = documents.filter((item) => item.type === type).slice(0, 2);
+                    if (!suggestions.length) return null;
+                    return (
+                      <section key={type} className="mb-3 last:mb-0" aria-label={copy.groups[type]}>
+                        <h2 className="px-2 pb-2 pt-2 font-mono text-[11px] font-semibold tracking-[0.08em] text-[var(--glass-copper)]">{copy.groups[type]}</h2>
+                        {suggestions.map((item) => (
+                          <Link key={item.id} href={item.route} className="block rounded-xl px-3 py-2.5 transition-colors hover:bg-[var(--brand-accent-soft)]">
+                            <strong className="block text-sm font-semibold">{item.title}</strong>
+                            <span className="mt-1 block line-clamp-1 text-xs leading-5 text-[var(--muted)]">{item.summary}</span>
+                          </Link>
+                        ))}
+                      </section>
+                    );
+                  })}
+                </div>
+              ) : !orderedResults.length ? <p className="px-3 py-8 text-sm leading-6 text-[var(--muted)]" data-global-search-empty>{copy.empty}</p> : SEARCH_TYPE_ORDER.map((type) => {
                 const group = results.filter((result) => result.type === type);
                 if (!group.length) return null;
                 return (
@@ -163,6 +187,11 @@ export function GlobalSearch({ locale, documents }: GlobalSearchProps) {
                   </section>
                 );
               })}
+            </div>
+            <div className="glass-search-foot" aria-hidden="true">
+              <span><kbd>↑↓</kbd> {locale === "zh-CN" ? "选择" : "Navigate"}</span>
+              <span><kbd>Enter</kbd> {locale === "zh-CN" ? "打开" : "Open"}</span>
+              <span><kbd>Esc</kbd> {locale === "zh-CN" ? "关闭" : "Close"}</span>
             </div>
           </div>
         </div>, document.body

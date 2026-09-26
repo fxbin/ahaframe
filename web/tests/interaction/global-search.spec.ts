@@ -109,7 +109,7 @@ test("search dialog escapes the sticky header and remains usable in a short mobi
   await expect(dialog).toBeVisible();
   // An undefined CSS variable previously made the modal transparent and let page
   // content show through it.
-  await expect(dialog).toHaveCSS("background-color", "rgb(255, 253, 247)");
+  await expect(dialog).toHaveCSS("background-color", "rgba(255, 252, 248, 0.94)");
   await expect(input).toBeFocused();
   await expect.poll(() => page.evaluate(() => document.body.style.overflow)).toBe("hidden");
 
@@ -138,6 +138,7 @@ test("search dialog escapes the sticky header and remains usable in a short mobi
 
 test("search traps keyboard focus inside the viewport-level dialog", async ({ page }) => {
   await page.goto("/en/");
+  await expect(page.locator("[data-global-search-trigger]")).toHaveAttribute("data-search-ready", "true");
   await page.keyboard.press("Control+K");
   const dialog = page.getByRole("dialog", { name: "Search AhaFrame" });
   const input = page.getByRole("textbox", { name: "Search AhaFrame" });
@@ -149,4 +150,15 @@ test("search traps keyboard focus inside the viewport-level dialog", async ({ pa
   await expect(input).toBeFocused();
   await page.keyboard.press("Shift+Tab");
   await expect(lastResult).toBeFocused();
+});
+
+test("empty search shows canonical suggestions and preserves the viewport-level glass modal", async ({ page }) => {
+  await page.goto("/en/");
+  await expect(page.locator("[data-global-search-trigger]")).toHaveAttribute("data-search-ready", "true");
+  await page.keyboard.press("Control+K");
+  const dialog = page.locator("[data-global-search-dialog]");
+  await expect(dialog).toHaveClass(/glass-search-dialog/);
+  await expect(dialog.locator("[data-search-suggestions] section")).toHaveCount(4);
+  await expect(page.locator("body > [data-global-search-overlay]")).toHaveClass(/glass-search-overlay/);
+  await expect(dialog.locator(".glass-search-foot")).toContainText("Navigate");
 });

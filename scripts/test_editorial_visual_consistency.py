@@ -48,8 +48,8 @@ if "--primary: var(--brand-accent);" not in editorial_css or "--primary-soft: va
 
 globals_css = (ROOT / "web/app/globals.css").read_text(encoding="utf-8")
 for required in (
-    "--brand-accent: #d63b32;",
-    "--brand-accent-soft: #f6e9e7;",
+    "--brand-accent: #a45f43;",
+    "--brand-accent-soft: #f7eee8;",
     "--success: #2f7658;",
 ):
     if required not in globals_css:

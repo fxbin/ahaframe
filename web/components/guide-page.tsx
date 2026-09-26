@@ -42,9 +42,9 @@ export function GuidePage({ locale, data }: { locale: Locale; data: GuidePageDat
   const practiceId = guide.practice ? practiceContentId(guide.practice.href) : null;
 
   return (
-    <main className="editorial-guide-page">
+    <main className="editorial-guide-page liquid-guide-page">
       <article>
-        <header className="border-b border-[var(--border)] py-14 sm:py-20">
+        <header className="course-detail-hero border-b border-[var(--border)] py-14 sm:py-20">
           <div className="shell">
             {activePath ? (
               <nav aria-label={labels.course} className="mb-8 flex flex-wrap items-center gap-2 text-sm text-[var(--muted)]" data-guide-active-path={activePath.slug}>
@@ -61,7 +61,7 @@ export function GuidePage({ locale, data }: { locale: Locale; data: GuidePageDat
                 <h1 className="mt-5 max-w-4xl font-[family-name:var(--font-editorial)] text-5xl font-semibold leading-[0.98] tracking-[-0.05em] sm:text-6xl">{guide.title}</h1>
                 <p className="mt-6 max-w-3xl text-lg leading-8 text-[var(--muted)]">{guide.summary}</p>
               </div>
-              <div className="border-y border-[var(--border)] py-5 lg:border-y-0 lg:border-l lg:py-2 lg:pl-8">
+              <div className="glass-reading-aside border-y border-[var(--border)] py-5 lg:border-y-0 lg:border-l lg:py-2 lg:pl-8">
                 <p className="technical-label">{labels.mentalModel}</p>
                 <p className="mt-3 font-[family-name:var(--font-editorial)] text-2xl leading-9 tracking-[-0.025em]">{guide.mentalModel}</p>
               </div>
