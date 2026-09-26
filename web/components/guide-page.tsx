@@ -184,7 +184,7 @@ export function GuidePage({ locale, data }: { locale: Locale; data: GuidePageDat
             </div>
             <aside className="guide-workspace-practice" aria-label={locale === "zh-CN" ? "实践与验证" : "Practice and verification"}>
               <p className="guide-workspace-aside-heading">{locale === "zh-CN" ? "实践与验证" : "Practice & Verify"}</p>
-              <p className="mt-6 text-[11px] font-semibold uppercase tracking-wider text-[var(--brand-accent)]">{labels.mentalModel}</p>
+              <p className="mt-6 text-[11px] font-semibold uppercase tracking-wider text-[var(--brand-accent)]">{locale === "zh-CN" ? "本节重点" : "Lesson focus"}</p>
               <h2 className="mt-3 font-[family-name:var(--font-editorial)] text-lg font-semibold leading-snug">{guide.mentalModel}</h2>
               <div className="mt-7 border-t border-[var(--border)] pt-6">
                 <h3 className="text-sm font-semibold">{labels.takeaways}</h3>
