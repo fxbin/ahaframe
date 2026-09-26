@@ -14,11 +14,14 @@ test("reference parity: search palette has actual content groups and no obscured
   const groups = dialog.locator("[data-search-suggestions] .search-parity-section");
   expect(await groups.count()).toBeGreaterThanOrEqual(3);
   await expect(dialog.locator(".search-parity-row").first()).toBeVisible();
+  await expect(page.locator("body > [data-global-search-overlay]")).toHaveCSS("position", "fixed");
   const bounds = await dialog.boundingBox();
   expect(bounds).toBeTruthy();
   expect(bounds!.width).toBeGreaterThanOrEqual(700);
   expect(bounds!.width).toBeLessThanOrEqual(850);
   expect(bounds!.x).toBeGreaterThan(200);
+  expect(bounds!.y).toBeGreaterThanOrEqual(0);
+  expect(bounds!.y).toBeLessThan(180);
   await page.screenshot({ path: "test-results/design-parity/search-desktop-zh.png", fullPage: false });
 
   await page.setViewportSize(compact);
