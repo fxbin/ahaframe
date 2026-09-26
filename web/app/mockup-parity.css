@@ -454,3 +454,47 @@ body:has(.liquid-radar)::before,body:has(.liquid-guide-page)::before,body:has(.l
  .liquid-radar-metrics{grid-template-columns:minmax(0,1fr);}
  .liquid-radar-metric{min-height:115px;}
 }
+
+
+/* Next iteration: make the header read as brand + navigation | actions. */
+.site-header__inner.glass-header{justify-content:space-between;gap:clamp(8px,1.6vw,24px);}
+.glass-header__identity{display:flex;align-items:center;gap:clamp(19px,2.9vw,48px);min-width:0;}
+.glass-header__actions{display:flex;align-items:center;gap:clamp(7px,1.2vw,17px);flex:none;}
+.glass-header__identity .glass-nav{flex-wrap:nowrap;}
+.glass-header__identity .glass-nav a{font-size:clamp(12px,1vw,14px);white-space:nowrap;}
+.glass-mobile-menu{display:none;position:relative;}
+.glass-mobile-menu summary{
+  display:grid;place-items:center;width:38px;height:38px;
+  border:1px solid rgba(230,217,208,.95);border-radius:12px;
+  list-style:none;cursor:pointer;background:rgba(255,255,255,.83);
+  color:#6d4938;font-size:20px;
+}
+.glass-mobile-menu summary::-webkit-details-marker{display:none;}
+.glass-mobile-menu>nav{
+  position:absolute;z-index:80;right:0;top:calc(100% + 13px);
+  min-width:184px;border-radius:16px;
+  border:1px solid rgba(244,230,220,.98);
+  background:rgba(255,253,249,.98);
+  box-shadow:0 18px 46px rgba(75,45,32,.17);
+  padding:8px;
+}
+.glass-mobile-menu>nav a{
+  display:block;padding:12px 14px;border-radius:10px;
+  font-size:14px;line-height:1.4;color:#4b443e;
+}
+.glass-mobile-menu>nav a:hover,.glass-mobile-menu>nav a:focus-visible{background:#faf0e9;color:#914f33;}
+@media(max-width:1180px){
+  .glass-header__identity{gap:clamp(14px,2vw,25px);}
+  .glass-header .glass-search-trigger{min-width:0;}
+}
+@media(max-width:820px){
+  .glass-header__identity .glass-nav{display:none;}
+  .glass-mobile-menu{display:block;}
+}
+@media(max-width:640px){
+ .glass-header__actions{gap:6px;}
+ .glass-header .glass-search-trigger{width:38px;min-width:38px;}
+ .glass-header__identity .brand{font-size:1.2rem;}
+ .glass-brand-mark{width:23px;margin-right:5px;}
+ .glass-brand-mark svg{width:24px;}
+}
