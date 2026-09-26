@@ -24,6 +24,12 @@ test("desktop header groups routes beside the brand; mobile menu retains all des
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
   expect(overflow).toBeLessThanOrEqual(1);
   await page.screenshot({ path: "test-results/design-parity/header-mobile-v3.png", fullPage: false });
+  const mobileFirst = destinations.getByRole("link").first();
+  const destination = await mobileFirst.getAttribute("href");
+  await mobileFirst.click();
+  await expect(page).toHaveURL(new URL(destination!, page.url()).toString());
+  await expect(mobile).not.toHaveAttribute("open", "");
+
 });
 
 test("course-linked Guide shows actual published outline and offers an interactive knowledge check", async ({ page }) => {
@@ -33,6 +39,11 @@ test("course-linked Guide shows actual published outline and offers an interacti
   await expect(outline).toBeVisible();
   expect(await outline.locator(".guide-outline-chapter").count()).toBeGreaterThanOrEqual(2);
   await expect(outline.locator("[aria-current=page]")).toHaveCount(1);
+  await expect(outline.locator(".guide-outline-chapter[open]")).toHaveCount(1);
+  const anotherChapter = outline.locator(".guide-outline-chapter").nth(1);
+  await anotherChapter.locator("summary").click();
+  await expect(anotherChapter).toHaveAttribute("open", "");
+
   await expect(outline.locator("[data-guide-position]")).toContainText("第 1 /");
 
   const check = page.locator("[data-guide-quick-check]");
