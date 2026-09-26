@@ -21,19 +21,18 @@ export function GlobalSearch({ locale, documents }: GlobalSearchProps) {
   const dialogRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
-  const [recentRoutes, setRecentRoutes] = useState<string[]>([]);
+  const [recentRoutes, setRecentRoutes] = useState<string[]>(() => {
+    if (typeof window === "undefined") return [];
+    try {
+      const stored = JSON.parse(window.localStorage.getItem("ahaframe-search-recent-v1") ?? "[]");
+      return Array.isArray(stored) ? stored.filter((route): route is string => typeof route === "string").slice(0, 6) : [];
+    } catch { return []; }
+  });
   const [activeIndex, setActiveIndex] = useState(0);
   const [viewport, setViewport] = useState<{ width: number; height: number; offsetTop: number } | null>(null);
   const results = useMemo(() => searchDocuments(documents, query), [documents, query]);
   const orderedResults = useMemo(() => SEARCH_TYPE_ORDER.flatMap((type) => results.filter((result) => result.type === type)), [results]);
   const recentDocuments = useMemo(() => recentRoutes.map((route) => documents.find((item) => item.route === route)).filter((item): item is SearchDocument => Boolean(item)).slice(0, 2), [recentRoutes, documents]);
-
-  useEffect(() => {
-    try {
-      const stored = JSON.parse(localStorage.getItem("ahaframe-search-recent-v1") ?? "[]");
-      if (Array.isArray(stored)) setRecentRoutes(stored.filter((route): route is string => typeof route === "string").slice(0, 6));
-    } catch { /* Storage may be unavailable or cleared. Search still works. */ }
-  }, []);
 
   function visit(route: string) {
     const next = [route, ...recentRoutes.filter((item) => item !== route)].slice(0, 6);
