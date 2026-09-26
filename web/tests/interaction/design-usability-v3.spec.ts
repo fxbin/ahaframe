@@ -12,7 +12,7 @@ test("desktop header groups routes beside the brand; mobile menu retains all des
   expect(a && b && c).toBeTruthy();
   expect(a!.x).toBeLessThan(b!.x);
   expect(b!.x).toBeLessThan(c!.x);
-  expect(b!.x - a!.right).toBeLessThan(85);
+  expect(b!.x - (a!.x + a!.width)).toBeLessThan(85);
 
   await page.setViewportSize({ width: 390, height: 844 });
   await expect(nav).toBeHidden();
