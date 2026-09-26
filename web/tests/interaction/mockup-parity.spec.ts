@@ -25,6 +25,8 @@ test("reference parity: search palette has actual content groups and no obscured
   await page.screenshot({ path: "test-results/design-parity/search-desktop-zh.png", fullPage: false });
 
   await page.setViewportSize(compact);
+  await expect(dialog.getByPlaceholder("搜索课程、工具或概念…")).toBeVisible();
+  await expect(dialog.locator("[data-search-suggestions] .search-parity-row")).toHaveCount(4);
   const viewport = await dialog.boundingBox();
   expect(viewport).toBeTruthy();
   expect(viewport!.x).toBeGreaterThanOrEqual(0);
