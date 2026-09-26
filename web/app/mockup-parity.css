@@ -22,7 +22,9 @@ body:has(.liquid-radar)::before,body:has(.liquid-guide-page)::before,body:has(.l
     radial-gradient(ellipse 17% 35% at 75% 21%,rgba(246,211,187,.19),transparent 90%),
     radial-gradient(ellipse 36% 30% at 94% 46%,rgba(235,203,179,.12),transparent 80%);
 }
-body:has(.liquid-radar)>*,body:has(.liquid-guide-page)>*,body:has(.liquid-home)>*{position:relative;}
+/* Never change position of body-level portals: doing so makes search
+   invisible below the document even when the dialog is in the DOM. */
+.site-header{position:sticky;top:0;z-index:50;}
 .site-header{z-index:50;}
 .site-header__inner.glass-header{
   width:min(1328px,calc(100% - 56px));
@@ -423,4 +425,25 @@ body:has(.liquid-radar)>*,body:has(.liquid-guide-page)>*,body:has(.liquid-home)>
  .liquid-home .featured-courses-grid{grid-template-columns:1fr;}
  .liquid-home .featured-courses-grid>.featured-course-card.is-featured{grid-template-columns:1fr;gap:17px;}
  .featured-course-art{min-height:160px;}
+}
+
+@media(min-width:1200px){
+ .liquid-radar-hero h1{font-size:clamp(2.85rem,3.85vw,3.5rem);white-space:nowrap;}
+}
+.radar-month__day,.radar-month__blank{height:49px;aspect-ratio:auto;}
+.liquid-home .liquid-hero-layout{grid-template-columns:minmax(0,1fr) minmax(0,1fr);}
+.liquid-home .liquid-hero-title{font-size:clamp(2.7rem,3.85vw,4rem);line-height:1.15;}
+.agent-preview{
+ border-color:rgba(255,255,255,.96);
+ background:radial-gradient(ellipse at 82% 0%,rgba(251,225,204,.16),transparent 68%),
+ linear-gradient(138deg,rgba(255,255,255,.93),rgba(255,252,247,.85));
+ box-shadow:0 26px 60px rgba(126,84,52,.105),inset 0 1px rgba(255,255,255,.99);
+}
+@media(max-width:1023px){
+ .liquid-home .liquid-hero-layout{grid-template-columns:1fr;}
+ .liquid-radar-hero h1{white-space:normal;}
+}
+@media(max-width:640px){
+ .radar-month__day,.radar-month__blank{height:45px;}
+ .liquid-home .liquid-hero-title{font-size:clamp(2.45rem,9.2vw,3.4rem);}
 }
