@@ -33,6 +33,14 @@
 .glass-brand-mark::after {right:0;transform:rotate(-27deg) scaleX(-1);background:linear-gradient(140deg,#e5b889,#9a4c2e 58%,#5c311f);}
 .glass-header .glass-nav {gap:clamp(9px,1.65vw,27px);}
 .glass-header .glass-nav a {font-size:13px;padding:9px 1px;font-weight:540;}
+.glass-header .glass-nav a.nav--active {
+  padding:9px 12px;margin-inline:-10px;border-radius:11px;
+  background:rgba(253,242,234,.94);color:#965336;font-weight:700;
+  box-shadow:inset 0 -2px #b26845;
+}
+@media(max-width:767px){.glass-header .glass-nav .nav-large{display:none;}}
+@media(max-width:1023px){.glass-header .glass-nav .nav-wide{display:none;}}
+
 .glass-search-trigger {min-height:38px;padding:0 12px;border-color:rgba(214,204,196,.95)!important;box-shadow:0 2px 9px rgba(84,50,28,.07),inset 0 1px white;}
 .search-trigger__icon {font-size:22px;line-height:1;color:#6d564b;}
 .glass-header [data-testid="locale-switch"] {flex-shrink:0;}
