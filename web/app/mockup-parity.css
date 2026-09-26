@@ -593,3 +593,6 @@ body:has(.liquid-radar)::before,body:has(.liquid-guide-page)::before,body:has(.l
  .search-parity-dialog .search-parity-copy small{font-size:11.5px;}
  .guide-quick-check__intro{font-size:13px;}
 }
+
+.search-parity-row[aria-current="true"]{background:#faeee4;box-shadow:inset 3px 0 #ad6b49;}
+.search-parity-row[aria-current="true"] .search-parity-icon{background:#f9e4d5;}
