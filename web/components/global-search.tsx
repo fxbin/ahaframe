@@ -197,7 +197,7 @@ export function GlobalSearch({ locale, documents }: GlobalSearchProps) {
                     <section className="search-group" aria-label={copy.recent}>
                       <h2 className="search-group__title">{copy.recent}</h2>
                       {recentDocuments.map((item) => (
-                        <Link key={item.id} href={item.route} className="search-result__row" onClick={() => remember(item)}>
+                        <Link key={item.id} href={item.route} className="search-result__row" onClick={() => { remember(item); setOpen(false); setQuery(""); setActiveIndex(0); }}>
                           <SearchItemIcon type={item.type} />
                           <span className="search-result__text"><strong>{item.title}</strong><small>{item.summary}</small></span>
                           <span className="search-result__tag">{copy.groups[item.type]}</span><span className="search-result__arrow" aria-hidden="true">›</span>
@@ -212,7 +212,7 @@ export function GlobalSearch({ locale, documents }: GlobalSearchProps) {
                       <section key={type} className="search-group" aria-label={copy.groups[type]}>
                         <h2 className="search-group__title">{copy.groups[type]}</h2>
                         {suggestions.map((item) => (
-                          <Link key={item.id} href={item.route} className="search-result__row" onClick={() => remember(item)}>
+                          <Link key={item.id} href={item.route} className="search-result__row" onClick={() => { remember(item); setOpen(false); setQuery(""); setActiveIndex(0); }}>
                             <SearchItemIcon type={item.type} />
                             <span className="search-result__text"><strong>{item.title}</strong><small>{item.summary}</small></span>
                             <span className="search-result__tag">{copy.groups[item.type]}</span><span className="search-result__arrow" aria-hidden="true">›</span>
@@ -235,7 +235,7 @@ export function GlobalSearch({ locale, documents }: GlobalSearchProps) {
                         <Link id={`search-result-${index}`} key={result.id} href={result.route}
                           className={`search-result__row ${active ? "is-active" : ""}`}
                           aria-current={active ? "true" : undefined}
-                          onClick={() => remember(result)}
+                          onClick={() => { remember(result); setOpen(false); setQuery(""); setActiveIndex(0); }}
                           onMouseEnter={() => setActiveIndex(index)} onFocus={() => setActiveIndex(index)}
                           data-search-result={result.id} data-search-score={result.score} data-search-reason={result.reason}>
                           <SearchItemIcon type={result.type} />
