@@ -2,7 +2,7 @@ import Link from "next/link";
 import { GuideProgressControl } from "@/components/guide-progress-control";
 import type { Locale } from "@/lib/content";
 import { localizedPath, segmentForLocale } from "@/lib/content";
-import type { GuidePageData } from "@/lib/guides";
+import type { GuidePageData, GuideActivePathContext } from "@/lib/guides";
 
 function copy(locale: Locale) {
   return locale === "en"
@@ -35,6 +35,37 @@ function practiceContentId(href: string): string | null {
   return parts.length ? parts[parts.length - 1] : null;
 }
 
+
+function CourseOutline({
+  path, currentSlug, segment,
+}: { path: GuideActivePathContext; currentSlug: string; segment: string }) {
+  return (
+    <nav className="guide-workspace-navigation" aria-label="Learning path lessons">
+      {path.outline.map((milestone, chapterIndex) => (
+        <div className="guide-outline-chapter" key={milestone.id}>
+          <h3 className="guide-outline-chapter-title">
+            <span className="font-mono text-[11px] text-[var(--brand-accent)]">{String(chapterIndex + 1).padStart(2, "0")}</span>
+            {milestone.title}
+          </h3>
+          {milestone.lessons.map((lesson) =>
+            lesson.slug === currentSlug ? (
+              <span key={lesson.conceptId} aria-current="page" className="is-active">
+                <span className="guide-workspace-step" aria-hidden="true">●</span>
+                <strong>{lesson.title}</strong>
+              </span>
+            ) : (
+              <Link key={lesson.conceptId} href={`/${segment}/guides/${lesson.slug}/?path=${encodeURIComponent(path.slug)}`}>
+                <span className="guide-workspace-step" aria-hidden="true">›</span>
+                <span>{lesson.title}</span>
+              </Link>
+            ),
+          )}
+        </div>
+      ))}
+    </nav>
+  );
+}
+
 export function GuidePage({ locale, data }: { locale: Locale; data: GuidePageData }) {
   const labels = copy(locale);
   const segment = segmentForLocale(locale);
@@ -49,21 +80,25 @@ export function GuidePage({ locale, data }: { locale: Locale; data: GuidePageDat
         <div className="shell guide-workspace-shell py-12 sm:py-16">
           <div className={`guide-workspace-layout ${activePath ? "" : "guide-workspace-layout--no-path"}`}>
             {activePath ? (
+              <details className="guide-mobile-outline">
+                <summary>
+                  <span>{locale === "zh-CN" ? "课程目录" : "Course outline"} · {activePath.position} / {activePath.total}</span>
+                  <span aria-hidden="true">⌄</span>
+                </summary>
+                <CourseOutline path={activePath} currentSlug={guide.slug} segment={segment} />
+              </details>
+            ) : null}
+            {activePath ? (
               <aside className="guide-workspace-sidebar" aria-label={locale === "zh-CN" ? "课程目录" : "Course outline"}>
                 <Link href={`/${segment}/courses/${activePath.slug}/`} className="text-xs text-[var(--muted)] hover:text-[var(--brand-accent)]">
                   ← {locale === "zh-CN" ? "返回课程" : "Back to course"}
                 </Link>
                 <h2 className="mt-6 font-[family-name:var(--font-editorial)] text-xl font-semibold leading-snug">{activePath.title}</h2>
                 <p className="mt-2 text-xs leading-5 text-[var(--muted)]">{activePath.milestoneTitle}</p>
-                <div className="guide-workspace-navigation">
-                  {activePath.previous ? <Link href={`/${segment}/guides/${activePath.previous.slug}/?path=${encodeURIComponent(activePath.slug)}`}>
-                    <span className="guide-workspace-step">✓</span><span>{activePath.previous.title}</span>
-                  </Link> : null}
-                  <span aria-current="page" className="is-active"><span className="guide-workspace-step">●</span><strong>{guide.title}</strong></span>
-                  {activePath.next ? <Link href={`/${segment}/guides/${activePath.next.slug}/?path=${encodeURIComponent(activePath.slug)}`}>
-                    <span className="guide-workspace-step">›</span><span>{activePath.next.title}</span>
-                  </Link> : null}
-                </div>
+                <p className="guide-outline-sequence mt-3" data-guide-position>
+                  {locale === "zh-CN" ? `课程序列 · 第 ${activePath.position} / ${activePath.total} 节` : `Lesson ${activePath.position} of ${activePath.total}`}
+                </p>
+                <CourseOutline path={activePath} currentSlug={guide.slug} segment={segment} />
                 <Link href={`/${segment}/courses/${activePath.slug}/`} className="mt-8 inline-block text-xs font-semibold text-[var(--brand-accent)]">
                   {locale === "zh-CN" ? "查看完整课程目录 →" : "Full course outline →"}
                 </Link>
