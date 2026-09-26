@@ -619,3 +619,28 @@ body:has(.liquid-radar)::before,body:has(.liquid-guide-page)::before,body:has(.l
 .guide-outline-lessons>a:hover{background:#fbf3eb;color:#8d4d30;}
 .guide-outline-lessons>.is-active{background:#fbefe6;color:#874a2f;font-weight:650;}
 .guide-outline-lessons .guide-workspace-step{margin:0;line-height:1.6;}
+
+
+/* V4 visual review: reduce first-screen density and keep mobile practice reachable.
+   No generated image is used as a production background. */
+.guide-mobile-practice-link {display:none;}
+@media (min-width:1100px) {
+  .liquid-radar {padding-top:36px;}
+  .liquid-radar-status {min-height:222px;}
+  .liquid-radar-metric {min-height:137px;padding:22px 26px;}
+  .liquid-radar-details {margin-top:18px;}
+  .liquid-radar-calendar,.liquid-radar-activity{padding:23px 25px;}
+  .radar-month__day,.radar-month__blank{height:45px;}
+}
+@media (max-width:900px) {
+  .guide-mobile-practice-link{
+    display:inline-flex;align-items:center;
+    margin-top:22px;padding:12px 15px;
+    border:1px solid #e8c8af;border-radius:999px;
+    background:rgba(255,246,238,.88);color:#915137;
+    font-size:13px;font-weight:650;text-decoration:none;
+  }
+  .guide-mobile-practice-link:hover,.guide-mobile-practice-link:focus-visible{background:#fceee2;}
+  #guide-practice{scroll-margin-top:90px;}
+}
+@media(prefers-reduced-motion:reduce){.guide-mobile-practice-link{transition:none;}}
