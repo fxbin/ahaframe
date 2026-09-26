@@ -21,10 +21,30 @@ export function GlobalSearch({ locale, documents }: GlobalSearchProps) {
   const dialogRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const [recentRoutes, setRecentRoutes] = useState<string[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
   const [viewport, setViewport] = useState<{ width: number; height: number; offsetTop: number } | null>(null);
   const results = useMemo(() => searchDocuments(documents, query), [documents, query]);
   const orderedResults = useMemo(() => SEARCH_TYPE_ORDER.flatMap((type) => results.filter((result) => result.type === type)), [results]);
+  const recentDocuments = useMemo(() => recentRoutes.map((route) => documents.find((item) => item.route === route)).filter((item): item is SearchDocument => Boolean(item)).slice(0, 2), [recentRoutes, documents]);
+
+  useEffect(() => {
+    try {
+      const stored = JSON.parse(localStorage.getItem("ahaframe-search-recent-v1") ?? "[]");
+      if (Array.isArray(stored)) setRecentRoutes(stored.filter((route): route is string => typeof route === "string").slice(0, 6));
+    } catch { /* Storage may be unavailable or cleared. Search still works. */ }
+  }, []);
+
+  function visit(route: string) {
+    const next = [route, ...recentRoutes.filter((item) => item !== route)].slice(0, 6);
+    setRecentRoutes(next);
+    try { localStorage.setItem("ahaframe-search-recent-v1", JSON.stringify(next)); } catch { /* optional enhancement */ }
+  }
+
+  function typeIcon(type: SearchDocumentType) {
+    // Distinct visual glyphs supplement text labels; type is always exposed in text.
+    return type === "guide" ? "▤" : type === "course" ? "▱" : type === "practice" ? "⌘" : "◇";
+  }
 
   useEffect(() => {
     function onShortcut(event: globalThis.KeyboardEvent) {
@@ -108,7 +128,7 @@ export function GlobalSearch({ locale, documents }: GlobalSearchProps) {
     if (!orderedResults.length) return;
     if (event.key === "ArrowDown") { event.preventDefault(); setActiveIndex((value) => (value + 1) % orderedResults.length); }
     else if (event.key === "ArrowUp") { event.preventDefault(); setActiveIndex((value) => (value - 1 + orderedResults.length) % orderedResults.length); }
-    else if (event.key === "Enter") { event.preventDefault(); window.location.assign(orderedResults[Math.min(activeIndex, orderedResults.length - 1)].route); }
+    else if (event.key === "Enter") { event.preventDefault(); const route = orderedResults[Math.min(activeIndex, orderedResults.length - 1)].route; visit(route); window.location.assign(route); }
   }
 
   let globalIndex = 0;
@@ -139,10 +159,10 @@ export function GlobalSearch({ locale, documents }: GlobalSearchProps) {
         >
           <div
             ref={dialogRef}
-            className="glass-search-dialog flex w-full min-w-0 max-w-2xl flex-col overflow-hidden"
+            className="glass-search-dialog search-parity-dialog flex w-full min-w-0 max-w-[820px] flex-col overflow-hidden"
             style={{
               maxHeight: viewport
-                ? `${Math.max(160, Math.min(760, viewport.height - (viewport.width < 640 ? 24 : 72)))}px`
+                ? `${Math.max(160, Math.min(940, viewport.height - (viewport.width < 640 ? 24 : 72)))}px`
                 : "calc(100dvh - 2rem)",
             }}
             role="dialog"
@@ -160,19 +180,33 @@ export function GlobalSearch({ locale, documents }: GlobalSearchProps) {
             <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-4" data-global-search-results data-search-document-count={documents.length}>
               {!query.trim() ? (
                 <div data-search-suggestions>
-                  <p className="px-2 pb-5 pt-1 text-sm leading-6 text-[var(--muted)]">{copy.hint}</p>
+                  {recentDocuments.length > 0 ? (
+                    <section className="search-parity-section" aria-label={locale === "zh-CN" ? "最近访问" : "Recently opened"}>
+                      <h2 className="search-parity-heading"><span aria-hidden="true">◷</span>{locale === "zh-CN" ? "最近访问" : "Recently opened"}</h2>
+                      <div className="search-parity-rows">
+                        {recentDocuments.map((item) => (
+                          <Link key={item.id} href={item.route} onClick={() => visit(item.route)} className="search-parity-row">
+                            <span className="search-parity-icon" aria-hidden="true">{typeIcon(item.type)}</span>
+                            <span className="search-parity-copy"><strong>{item.title}</strong><small>{item.summary}</small></span>
+                            <span className="search-parity-tag">{copy.groups[item.type]}</span><span className="search-parity-chevron" aria-hidden="true">›</span>
+                          </Link>
+                        ))}
+                      </div>
+                    </section>
+                  ) : null}
                   {SEARCH_TYPE_ORDER.map((type) => {
                     const suggestions = documents.filter((item) => item.type === type).slice(0, 2);
                     if (!suggestions.length) return null;
                     return (
-                      <section key={type} className="mb-3 last:mb-0" aria-label={copy.groups[type]}>
-                        <h2 className="px-2 pb-2 pt-2 font-mono text-[11px] font-semibold tracking-[0.08em] text-[var(--glass-copper)]">{copy.groups[type]}</h2>
-                        {suggestions.map((item) => (
-                          <Link key={item.id} href={item.route} className="block rounded-xl px-3 py-2.5 transition-colors hover:bg-[var(--brand-accent-soft)]">
-                            <strong className="block text-sm font-semibold">{item.title}</strong>
-                            <span className="mt-1 block line-clamp-1 text-xs leading-5 text-[var(--muted)]">{item.summary}</span>
+                      <section key={type} className="search-parity-section" aria-label={copy.groups[type]}>
+                        <h2 className="search-parity-heading"><span aria-hidden="true">{typeIcon(type)}</span>{copy.groups[type]}</h2>
+                        <div className="search-parity-rows">{suggestions.map((item) => (
+                          <Link key={item.id} href={item.route} onClick={() => visit(item.route)} className="search-parity-row">
+                            <span className="search-parity-icon" aria-hidden="true">{typeIcon(type)}</span>
+                            <span className="search-parity-copy"><strong>{item.title}</strong><small>{item.summary}</small></span>
+                            <span className="search-parity-tag">{copy.groups[type]}</span><span className="search-parity-chevron" aria-hidden="true">›</span>
                           </Link>
-                        ))}
+                        ))}</div>
                       </section>
                     );
                   })}
@@ -183,7 +217,7 @@ export function GlobalSearch({ locale, documents }: GlobalSearchProps) {
                 return (
                   <section key={type} className="mb-3 last:mb-0" aria-label={copy.groups[type]} data-search-group={type}>
                     <h2 className="px-3 pb-1 pt-2 font-mono text-[10px] font-bold tracking-[0.12em] text-[var(--muted)]">{copy.groups[type]}</h2>
-                    <div>{group.map((result) => { const index = globalIndex++; const active = index === activeIndex; return <Link id={`search-result-${index}`} key={result.id} href={result.route} className={`grid gap-1 border-l-2 px-3 py-2.5 outline-none transition ${active ? "border-[var(--brand-accent)] bg-black/[0.055]" : "border-transparent hover:bg-black/[0.035]"}`} onMouseEnter={() => setActiveIndex(index)} onFocus={() => setActiveIndex(index)} data-search-result={result.id} data-search-score={result.score} data-search-reason={result.reason}><span className="flex items-start justify-between gap-4"><strong className="min-w-0 break-words text-sm">{result.title}</strong><span className="max-w-[45%] shrink-0 truncate text-right font-mono text-[9px] uppercase text-[var(--muted)]">{result.context}</span></span>{result.summary ? <span className="line-clamp-2 text-xs leading-5 text-[var(--muted)]">{result.summary}</span> : null}</Link>; })}</div>
+                    <div>{group.map((result) => { const index = globalIndex++; const active = index === activeIndex; return <Link id={`search-result-${index}`} key={result.id} href={result.route} onClick={() => visit(result.route)} className={`grid gap-1 border-l-2 px-3 py-2.5 outline-none transition ${active ? "border-[var(--brand-accent)] bg-black/[0.055]" : "border-transparent hover:bg-black/[0.035]"}`} onMouseEnter={() => setActiveIndex(index)} onFocus={() => setActiveIndex(index)} data-search-result={result.id} data-search-score={result.score} data-search-reason={result.reason}><span className="flex items-start justify-between gap-4"><strong className="min-w-0 break-words text-sm">{result.title}</strong><span className="max-w-[45%] shrink-0 truncate text-right font-mono text-[9px] uppercase text-[var(--muted)]">{result.context}</span></span>{result.summary ? <span className="line-clamp-2 text-xs leading-5 text-[var(--muted)]">{result.summary}</span> : null}</Link>; })}</div>
                   </section>
                 );
               })}
