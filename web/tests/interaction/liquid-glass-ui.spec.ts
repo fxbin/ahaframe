@@ -33,7 +33,7 @@ test("glass theme is bilingual and keeps semantic tool statuses distinct", async
   await expect(page.getByRole("heading", { name: /看见 AI 如何工作/ })).toBeVisible();
   await expect(page.locator('[data-agent-step="3"]')).toHaveCount(1);
   await page.locator('[data-agent-step="3"]').click();
-  await expect(page.locator(".agent-preview__detail")).toContainText("核对");
+  await expect(page.locator(".agent-preview__detail")).toContainText("检查结果是否满足预期");
   await expect(page.getByRole("link", { name: /体验一个示例/ })).toHaveAttribute("href", "#home-interactive-demo");
 
   await page.goto("/en/courses/");
@@ -44,6 +44,7 @@ test("glass theme is bilingual and keeps semantic tool statuses distinct", async
 test("search palette uses body portal and keeps a readable surface when open", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 690 });
   await page.goto("/en/");
+  await expect(page.locator("[data-global-search-trigger]")).toHaveAttribute("data-search-ready", "true");
   await page.keyboard.press("Control+K");
   const dialog = page.locator("body > .glass-search-overlay .glass-search-dialog");
   await expect(dialog).toBeVisible();
