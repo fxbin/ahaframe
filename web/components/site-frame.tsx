@@ -45,6 +45,16 @@ export async function SiteFrame({ locale, source, children }: SiteFrameProps) {
           <div className="glass-header__actions">
             <GlobalSearch locale={locale} documents={searchDocuments} />
             <LocaleSwitch locale={locale} labels={source.ui.language} />
+            <details className="glass-mobile-menu">
+              <summary aria-label={locale === "zh-CN" ? "打开导航菜单" : "Open navigation menu"}>☰</summary>
+              <nav aria-label={locale === "zh-CN" ? "移动端导航" : "Mobile navigation"}>
+                <Link href={`/${segment}/courses/`}>{source.ui.nav.lessons}</Link>
+                <Link href={`/${segment}/guides/`}>{source.ui.nav.guides}</Link>
+                <Link href={`/${segment}/tools/codex-reset/`}>{source.ui.nav.tools}</Link>
+                <Link href={`/${segment}/learning/`}>{source.ui.nav.roadmap}</Link>
+                <Link href={`/${segment}/pricing/`}>{source.ui.nav.pricing}</Link>
+              </nav>
+            </details>
           </div>
         </div>
       </header>
