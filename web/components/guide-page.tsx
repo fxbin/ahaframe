@@ -66,12 +66,12 @@ export function GuidePage({ locale, data, firstAha = null }: { locale: Locale; d
           ) : null}
           <div className="guide-workspace__outline-divider" />
           <p className="guide-workspace__nav-label">{locale === "zh-CN" ? "本节目录" : "On this page"}</p>
-          <a className="guide-workspace__outline-item" href="#guide-why">{labels.why}</a>
+          <a className="guide-workspace__outline-item" href="#guide-why">01 · {labels.why}</a>
           {guide.sections.map((section) => (
-            <a key={section.id} className="guide-workspace__outline-item" href={`#guide-${section.id}`}>{section.title}</a>
+            <a key={section.id} className="guide-workspace__outline-item" href={`#guide-${section.id}`}>0{guide.sections.indexOf(section) + 2} · {section.title}</a>
           ))}
-          <a className="guide-workspace__outline-item" href="#guide-failures">{labels.failures}</a>
-          <a className="guide-workspace__outline-item" href="#guide-takeaways">{labels.takeaways}</a>
+          <a className="guide-workspace__outline-item" href="#guide-failures">04 · {labels.failures}</a>
+          <a className="guide-workspace__outline-item" href="#guide-takeaways">05 · {labels.takeaways}</a>
         </aside>
         <article className="guide-workspace__reading">
         <header className="guide-workspace__header">
