@@ -48,7 +48,7 @@ export function GuidePracticePanel({ locale, title, practiceHref, practiceTitle,
             {evidence ? <span className="text-xs text-[var(--muted)]">{zh ? "步骤 1 / 1" : "Step 1 / 1"}</span> : null}
           </div>
           <h2 className="guide-workspace__aside-title">{evidence ? evidence.title : practiceTitle ?? title}</h2>
-          <p className="guide-workspace__aside-copy">{evidence ? evidence.insightCopy : (zh ? "先读完本节内容，再利用关联练习验证自己的判断。" : "Read this Guide, then use its linked practice to test your judgment.")}</p>
+          <p className="guide-workspace__aside-copy">{evidence ? (zh ? "阅读真实事故记录，选择一个干预方式，再验证实际后果。" : "Review the published incident, choose an intervention and then verify the consequence.") : (zh ? "先读完本节内容，再利用关联练习验证自己的判断。" : "Read this Guide, then use its linked practice to test your judgment.")}</p>
 
           {evidence ? (
             <>
