@@ -14,6 +14,13 @@ function labels(locale: Locale) {
     : { trigger: "Search", shortcut: "⌘K", dialog: "Search AhaFrame", placeholder: "Search Guides, Courses, Practice, or Concepts…", hint: "Type a term to search titles, Guide full text, Concepts, and learning context.", empty: "No matching learning surface. Try a shorter or more specific term.", close: "Close search", groups: { guide: "GUIDES", course: "COURSES", practice: "PRACTICE", concept: "CONCEPTS" } satisfies Record<SearchDocumentType, string> };
 }
 
+function loadRecentRoutes(): string[] {
+  try {
+    const stored = JSON.parse(window.localStorage.getItem("ahaframe-search-recent-v1") ?? "[]");
+    return Array.isArray(stored) ? stored.filter((route): route is string => typeof route === "string").slice(0, 6) : [];
+  } catch { return []; }
+}
+
 export function GlobalSearch({ locale, documents }: GlobalSearchProps) {
   const copy = labels(locale);
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -21,13 +28,7 @@ export function GlobalSearch({ locale, documents }: GlobalSearchProps) {
   const dialogRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
-  const [recentRoutes, setRecentRoutes] = useState<string[]>(() => {
-    if (typeof window === "undefined") return [];
-    try {
-      const stored = JSON.parse(window.localStorage.getItem("ahaframe-search-recent-v1") ?? "[]");
-      return Array.isArray(stored) ? stored.filter((route): route is string => typeof route === "string").slice(0, 6) : [];
-    } catch { return []; }
-  });
+  const [recentRoutes, setRecentRoutes] = useState<string[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
   const [viewport, setViewport] = useState<{ width: number; height: number; offsetTop: number } | null>(null);
   const results = useMemo(() => searchDocuments(documents, query), [documents, query]);
@@ -48,7 +49,7 @@ export function GlobalSearch({ locale, documents }: GlobalSearchProps) {
   useEffect(() => {
     function onShortcut(event: globalThis.KeyboardEvent) {
       if ((event.metaKey || event.ctrlKey) && event.key.toLocaleLowerCase() === "k") {
-        event.preventDefault(); setActiveIndex(0); setOpen(true);
+        event.preventDefault(); setRecentRoutes(loadRecentRoutes()); setActiveIndex(0); setOpen(true);
       }
     }
     window.addEventListener("keydown", onShortcut);
@@ -138,7 +139,7 @@ export function GlobalSearch({ locale, documents }: GlobalSearchProps) {
         ref={triggerRef}
         type="button"
         className="glass-search-trigger inline-flex min-h-9 min-w-9 items-center justify-center gap-2 border border-[var(--border)] px-2 text-xs font-semibold text-[var(--muted)] transition hover:border-[var(--text)] hover:text-[var(--text)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--brand-accent)] sm:px-3"
-        onClick={() => { setActiveIndex(0); setOpen(true); }}
+        onClick={() => { setRecentRoutes(loadRecentRoutes()); setActiveIndex(0); setOpen(true); }}
         aria-label={copy.trigger}
         aria-haspopup="dialog"
         data-global-search-trigger
