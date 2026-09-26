@@ -16,6 +16,7 @@ import { organizationSchema } from "@/lib/schema";
 import "../../globals.css";
 import "../../editorial-learning.css";
 import "../../liquid-glass.css";
+import "../../design-parity.css";
 
 export const metadata: Metadata = {
   title: {

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { GuidePage } from "@/components/guide-page";
+import { getCampaignDiscovery } from "@/lib/campaign";
 import { StructuredData } from "@/components/structured-data";
 import { localeFromSegment } from "@/lib/content";
 import { getCoreGuides, getGuidePageData } from "@/lib/guides-server";
@@ -34,11 +35,15 @@ export default async function GuideRoute({ params, searchParams }: PageProps) {
   const requestedPath = typeof query.path === "string" ? query.path : null;
   const data = await getGuidePageData(locale, slug, requestedPath);
   if (!data) notFound();
+  // Only embed an exercise when its actual published incident is relevant to this Guide.
+  const firstAha = data.guide.practice?.href.includes("agent-reliability")
+    ? (await getCampaignDiscovery(locale)).hero.firstAha
+    : null;
 
   return (
     <>
       <StructuredData value={webPageSchema(locale, `guides/${slug}/`, data.guide.title, data.guide.summary)} />
-      <GuidePage locale={locale} data={data} />
+      <GuidePage locale={locale} data={data} firstAha={firstAha} />
     </>
   );
 }

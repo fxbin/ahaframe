@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { GuideProgressControl } from "@/components/guide-progress-control";
+import { GuidePracticePanel } from "@/components/guide-practice-panel";
+import type { FirstAhaContent } from "@/lib/campaign";
 import type { Locale } from "@/lib/content";
 import { localizedPath, segmentForLocale } from "@/lib/content";
 import type { GuidePageData } from "@/lib/guides";
@@ -35,7 +37,7 @@ function practiceContentId(href: string): string | null {
   return parts.length ? parts[parts.length - 1] : null;
 }
 
-export function GuidePage({ locale, data }: { locale: Locale; data: GuidePageData }) {
+export function GuidePage({ locale, data, firstAha = null }: { locale: Locale; data: GuidePageData; firstAha?: FirstAhaContent | null }) {
   const labels = copy(locale);
   const segment = segmentForLocale(locale);
   const { guide, concept, relatedConcepts, pathMemberships, activePath } = data;
@@ -43,50 +45,74 @@ export function GuidePage({ locale, data }: { locale: Locale; data: GuidePageDat
 
   return (
     <main className="editorial-guide-page liquid-guide-page">
-      <article>
-        <header className="course-detail-hero border-b border-[var(--border)] py-14 sm:py-20">
-          <div className="shell">
+      <div className="guide-workspace">
+        <aside className="guide-workspace__outline glass-panel" aria-label={locale === "zh-CN" ? "课程与章节导航" : "Course and chapter navigation"}>
+          <Link className="guide-workspace__back" href={activePath ? `/${segment}/courses/${activePath.slug}/` : `/${segment}/guides/`}>← {activePath ? (locale === "zh-CN" ? "返回课程" : "Back to course") : (locale === "zh-CN" ? "返回 Guide 列表" : "All Guides")}</Link>
+          <h2>{activePath?.title ?? (locale === "zh-CN" ? "学习指南" : "Learning Guides")}</h2>
+          <p className="guide-workspace__subline">{activePath?.milestoneTitle ?? labels.kicker}</p>
+          <div className="guide-workspace__outline-divider" />
+          {activePath?.previous ? (
+            <Link className="guide-workspace__outline-item" href={`/${segment}/guides/${activePath.previous.slug}/?path=${encodeURIComponent(activePath.slug)}`}>
+              <span className="guide-workspace__step-symbol">◌</span><span>{activePath.previous.title}</span>
+            </Link>
+          ) : null}
+          <span className="guide-workspace__outline-item is-current" aria-current="page">
+            <span className="guide-workspace__step-symbol">▸</span><span>{guide.title}</span>
+          </span>
+          {activePath?.next ? (
+            <Link className="guide-workspace__outline-item" href={`/${segment}/guides/${activePath.next.slug}/?path=${encodeURIComponent(activePath.slug)}`}>
+              <span className="guide-workspace__step-symbol">○</span><span>{activePath.next.title}</span>
+            </Link>
+          ) : null}
+          <div className="guide-workspace__outline-divider" />
+          <p className="guide-workspace__nav-label">{locale === "zh-CN" ? "本节目录" : "On this page"}</p>
+          <a className="guide-workspace__outline-item" href="#guide-why">01 · {labels.why}</a>
+          {guide.sections.map((section) => (
+            <a key={section.id} className="guide-workspace__outline-item" href={`#guide-${section.id}`}>0{guide.sections.indexOf(section) + 2} · {section.title}</a>
+          ))}
+          <a className="guide-workspace__outline-item" href="#guide-failures">04 · {labels.failures}</a>
+          <a className="guide-workspace__outline-item" href="#guide-takeaways">05 · {labels.takeaways}</a>
+        </aside>
+        <article className="guide-workspace__reading">
+        <header className="guide-workspace__header">
+          <div className="guide-workspace__head-inner">
             {activePath ? (
               <nav aria-label={labels.course} className="mb-8 flex flex-wrap items-center gap-2 text-sm text-[var(--muted)]" data-guide-active-path={activePath.slug}>
                 <Link className="quiet-link" href={`/${segment}/courses/${activePath.slug}/`}>{activePath.title}</Link>
                 <span aria-hidden="true">→</span><span>{activePath.milestoneTitle}</span>
               </nav>
             ) : null}
-            <div className="grid gap-10 lg:grid-cols-[1.1fr_.9fr] lg:items-end">
-              <div className="max-w-4xl">
-                <p className="editorial-kicker">{labels.kicker}</p>
-                <div className="mt-4 flex flex-wrap gap-x-3 gap-y-2 font-mono text-[10px] uppercase tracking-[0.08em] text-[var(--muted)]">
-                  <span>{concept.kind}</span><span aria-hidden="true">·</span><span>{concept.difficulty}</span><span aria-hidden="true">·</span><span>{guide.readingMinutes} {labels.minutes}</span>
-                </div>
-                <h1 className="mt-5 max-w-4xl font-[family-name:var(--font-editorial)] text-5xl font-semibold leading-[0.98] tracking-[-0.05em] sm:text-6xl">{guide.title}</h1>
-                <p className="mt-6 max-w-3xl text-lg leading-8 text-[var(--muted)]">{guide.summary}</p>
-              </div>
-              <div className="glass-reading-aside border-y border-[var(--border)] py-5 lg:border-y-0 lg:border-l lg:py-2 lg:pl-8">
-                <p className="technical-label">{labels.mentalModel}</p>
-                <p className="mt-3 font-[family-name:var(--font-editorial)] text-2xl leading-9 tracking-[-0.025em]">{guide.mentalModel}</p>
-              </div>
+            <div className="guide-workspace__title-block">
+              <p className="editorial-kicker">{labels.kicker}</p>
+              <p className="guide-workspace__metadata">{concept.kind} <span aria-hidden="true">·</span> {concept.difficulty} <span aria-hidden="true">·</span> {guide.readingMinutes} {labels.minutes}</p>
+              <h1>{guide.title}</h1>
+              <p className="guide-workspace__summary">{guide.summary}</p>
             </div>
           </div>
         </header>
 
-        <div className="shell py-12 sm:py-16"><div className="mx-auto max-w-5xl">
-          <section className="grid gap-5 border-b border-[var(--border)] pb-10 md:grid-cols-[180px_1fr] md:gap-10">
+        <div className="guide-workspace__body">
+          <section className="guide-workspace__insight" aria-labelledby="guide-mental-model">
+            <span className="guide-workspace__insight-icon" aria-hidden="true">✧</span>
+            <div><h2 id="guide-mental-model">{labels.mentalModel}</h2><p>{guide.mentalModel}</p></div>
+          </section>
+          <section id="guide-why" className="guide-workspace__section border-b border-[var(--border)] pb-10">
             <h2 className="technical-label pt-1">{labels.why}</h2><p className="max-w-3xl text-lg leading-8">{guide.whyItMatters}</p>
           </section>
 
           {guide.sections.map((section) => (
-            <section key={section.id} className="grid gap-5 border-b border-[var(--border)] py-10 md:grid-cols-[180px_1fr] md:gap-10">
+            <section key={section.id} id={`guide-${section.id}`} className="guide-workspace__section border-b border-[var(--border)] py-10">
               <p className="technical-label pt-1">{section.id === "mechanism" ? "01" : "02"}</p>
               <div className="max-w-3xl"><h2 className="font-[family-name:var(--font-editorial)] text-3xl font-semibold tracking-[-0.04em]">{section.title}</h2><p className="mt-4 text-base leading-8 text-[var(--muted)]">{section.body}</p></div>
             </section>
           ))}
 
-          <section className="grid gap-8 border-b border-[var(--border)] py-10 lg:grid-cols-2">
+          <section id="guide-failures" className="guide-workspace__section grid gap-8 border-b border-[var(--border)] py-10 lg:grid-cols-2">
             <div><p className="technical-label">{labels.failures}</p><ul className="mt-5 space-y-4">{guide.failureModes.map((item) => <li key={item} className="flex gap-3 text-sm leading-7"><span className="mt-[0.65rem] h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--warning)]" aria-hidden="true" /><span>{item}</span></li>)}</ul></div>
             <div><p className="technical-label">{labels.heuristics}</p><ul className="mt-5 space-y-4">{guide.heuristics.map((item) => <li key={item} className="flex gap-3 text-sm leading-7"><span className="mt-[0.65rem] h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--brand-accent)]" aria-hidden="true" /><span>{item}</span></li>)}</ul></div>
           </section>
 
-          <section className="grid gap-5 border-b border-[var(--border)] py-10 md:grid-cols-[180px_1fr] md:gap-10">
+          <section id="guide-takeaways" className="guide-workspace__section border-b border-[var(--border)] py-10">
             <h2 className="technical-label pt-1">{labels.takeaways}</h2>
             <ol className="max-w-3xl space-y-4">{guide.takeaways.map((item, index) => <li key={item} className="grid grid-cols-[28px_1fr] gap-3 text-base leading-7"><span className="font-mono text-[10px] font-bold text-[var(--brand-accent)]">{String(index + 1).padStart(2, "0")}</span><span>{item}</span></li>)}</ol>
           </section>
@@ -133,8 +159,17 @@ export function GuidePage({ locale, data }: { locale: Locale; data: GuidePageDat
             <div><p className="technical-label">{labels.practice}</p>{guide.practice ? <Link className="editorial-primary-action mt-4" href={practiceHref(locale, guide.slug, guide.practice.href, activePath?.slug)} data-guide-practice-link={guide.slug}>{guide.practice.title} <span aria-hidden="true">→</span></Link> : null}</div>
             <Link className="editorial-text-link" href={`/${segment}/learning/`}>{labels.map} <span aria-hidden="true">→</span></Link>
           </footer>
-        </div></div>
-      </article>
+        </div>
+        </article>
+        <GuidePracticePanel
+          locale={locale}
+          title={guide.title}
+          practiceHref={guide.practice ? practiceHref(locale, guide.slug, guide.practice.href, activePath?.slug) : null}
+          practiceTitle={guide.practice?.title ?? null}
+          evidence={firstAha}
+          takeaways={guide.takeaways}
+        />
+      </div>
     </main>
   );
 }

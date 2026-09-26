@@ -109,7 +109,7 @@ test("search dialog escapes the sticky header and remains usable in a short mobi
   await expect(dialog).toBeVisible();
   // An undefined CSS variable previously made the modal transparent and let page
   // content show through it.
-  await expect(dialog).toHaveCSS("background-color", "rgba(255, 252, 248, 0.94)");
+  await expect(dialog).toHaveCSS("background-color", "rgba(255, 252, 248, 0.96)");
   await expect(input).toBeFocused();
   await expect.poll(() => page.evaluate(() => document.body.style.overflow)).toBe("hidden");
 

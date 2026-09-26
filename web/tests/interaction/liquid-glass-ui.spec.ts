@@ -48,7 +48,7 @@ test("search palette uses body portal and keeps a readable surface when open", a
   await page.keyboard.press("Control+K");
   const dialog = page.locator("body > .glass-search-overlay .glass-search-dialog");
   await expect(dialog).toBeVisible();
-  await expect(dialog).toHaveCSS("background-color", "rgba(255, 252, 248, 0.94)");
+  await expect(dialog).toHaveCSS("background-color", "rgba(255, 252, 248, 0.96)");
   const clipped = await dialog.evaluate((element) => {
     const rect = element.getBoundingClientRect();
     return rect.left < 0 || rect.right > window.innerWidth + 1;

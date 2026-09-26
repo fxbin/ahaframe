@@ -8,10 +8,18 @@ import { SEARCH_TYPE_ORDER, searchDocuments, type SearchDocument, type SearchDoc
 
 interface GlobalSearchProps { locale: Locale; documents: SearchDocument[]; }
 
+const ITEM_GLYPHS: Record<SearchDocumentType, string> = {
+  guide: "☷", course: "▤", practice: "⌘", concept: "◇",
+};
+
+function SearchItemIcon({ type }: { type: SearchDocumentType }) {
+  return <span className="search-item__icon" aria-hidden="true">{ITEM_GLYPHS[type]}</span>;
+}
+
 function labels(locale: Locale) {
   return locale === "zh-CN"
-    ? { trigger: "搜索", shortcut: "⌘K", dialog: "搜索 AhaFrame", placeholder: "搜索 Guide、课程、Practice 或 Concept…", hint: "输入关键词开始搜索。支持标题、正文、知识点与课程上下文。", empty: "没有找到匹配内容。换一个更具体或更短的关键词试试。", close: "关闭搜索", groups: { guide: "GUIDES", course: "课程", practice: "PRACTICE", concept: "CONCEPTS" } satisfies Record<SearchDocumentType, string> }
-    : { trigger: "Search", shortcut: "⌘K", dialog: "Search AhaFrame", placeholder: "Search Guides, Courses, Practice, or Concepts…", hint: "Type a term to search titles, Guide full text, Concepts, and learning context.", empty: "No matching learning surface. Try a shorter or more specific term.", close: "Close search", groups: { guide: "GUIDES", course: "COURSES", practice: "PRACTICE", concept: "CONCEPTS" } satisfies Record<SearchDocumentType, string> };
+    ? { trigger: "搜索", shortcut: "⌘K", dialog: "搜索 AhaFrame", placeholder: "搜索 Guide、课程、Practice 或 Concept…", hint: "快速找到你想学习或实践的内容。", recent: "最近访问", recommended: "推荐探索", empty: "没有找到匹配内容。换一个更具体或更短的关键词试试。", close: "关闭搜索", groups: { guide: "GUIDES", course: "课程", practice: "PRACTICE", concept: "CONCEPTS" } satisfies Record<SearchDocumentType, string> }
+    : { trigger: "Search", shortcut: "⌘K", dialog: "Search AhaFrame", placeholder: "Search Guides, Courses, Practice, or Concepts…", hint: "Find your next lesson or interactive experience.", recent: "Recently visited", recommended: "Explore", empty: "No matching learning surface. Try a shorter or more specific term.", close: "Close search", groups: { guide: "GUIDES", course: "COURSES", practice: "PRACTICE", concept: "CONCEPTS" } satisfies Record<SearchDocumentType, string> };
 }
 
 export function GlobalSearch({ locale, documents }: GlobalSearchProps) {
@@ -21,10 +29,34 @@ export function GlobalSearch({ locale, documents }: GlobalSearchProps) {
   const dialogRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const [recentIds, setRecentIds] = useState<string[]>([]);
+  const recentKey = `ahaframe:search-recent:${locale}`;
   const [activeIndex, setActiveIndex] = useState(0);
   const [viewport, setViewport] = useState<{ width: number; height: number; offsetTop: number } | null>(null);
   const results = useMemo(() => searchDocuments(documents, query), [documents, query]);
   const orderedResults = useMemo(() => SEARCH_TYPE_ORDER.flatMap((type) => results.filter((result) => result.type === type)), [results]);
+  const recentDocuments = useMemo(() => recentIds.map((id) => documents.find((item) => item.id === id)).filter((item): item is SearchDocument => Boolean(item)).slice(0, 2), [recentIds, documents]);
+  function remember(item: SearchDocument) {
+    try {
+      const next = [item.id, ...recentIds.filter((id) => id !== item.id)].slice(0, 6);
+      localStorage.setItem(recentKey, JSON.stringify(next));
+      setRecentIds(next);
+    } catch {
+      // The search remains usable when local storage is unavailable.
+    }
+  }
+  useEffect(() => {
+    if (!open) return;
+    // Read client-only history after opening; do not trigger a synchronous
+    // state update from the effect or hydrate with user-specific markup.
+    const frame = window.requestAnimationFrame(() => {
+      try {
+        const saved: unknown = JSON.parse(localStorage.getItem(recentKey) || "[]");
+        setRecentIds(Array.isArray(saved) ? saved.filter((id): id is string => typeof id === "string") : []);
+      } catch { setRecentIds([]); }
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [open, recentKey]);
 
   useEffect(() => {
     function onShortcut(event: globalThis.KeyboardEvent) {
@@ -108,7 +140,7 @@ export function GlobalSearch({ locale, documents }: GlobalSearchProps) {
     if (!orderedResults.length) return;
     if (event.key === "ArrowDown") { event.preventDefault(); setActiveIndex((value) => (value + 1) % orderedResults.length); }
     else if (event.key === "ArrowUp") { event.preventDefault(); setActiveIndex((value) => (value - 1 + orderedResults.length) % orderedResults.length); }
-    else if (event.key === "Enter") { event.preventDefault(); window.location.assign(orderedResults[Math.min(activeIndex, orderedResults.length - 1)].route); }
+    else if (event.key === "Enter") { event.preventDefault(); const selected = orderedResults[Math.min(activeIndex, orderedResults.length - 1)]; remember(selected); window.location.assign(selected.route); }
   }
 
   let globalIndex = 0;
@@ -124,7 +156,7 @@ export function GlobalSearch({ locale, documents }: GlobalSearchProps) {
         aria-haspopup="dialog"
         data-global-search-trigger
       >
-        <span aria-hidden="true">⌕</span><span className="hidden sm:inline">{copy.trigger}</span><kbd className="hidden font-mono text-[10px] font-normal lg:inline">{copy.shortcut}</kbd>
+        <span aria-hidden="true" className="search-trigger__icon">⌕</span><span className="hidden sm:inline">{copy.trigger}</span><kbd className="hidden font-mono text-[10px] font-normal lg:inline">{copy.shortcut}</kbd>
       </button>
 
       {open && typeof document !== "undefined" ? createPortal(
@@ -142,7 +174,7 @@ export function GlobalSearch({ locale, documents }: GlobalSearchProps) {
             className="glass-search-dialog flex w-full min-w-0 max-w-2xl flex-col overflow-hidden"
             style={{
               maxHeight: viewport
-                ? `${Math.max(160, Math.min(760, viewport.height - (viewport.width < 640 ? 24 : 72)))}px`
+                ? `${Math.max(160, Math.min(960, viewport.height - (viewport.width < 640 ? 24 : 124)))}px`
                 : "calc(100dvh - 2rem)",
             }}
             role="dialog"
@@ -152,7 +184,7 @@ export function GlobalSearch({ locale, documents }: GlobalSearchProps) {
             onKeyDown={onDialogKeyDown}
           >
             <div className="flex shrink-0 items-center gap-3 border-b border-[var(--border)] px-5 py-4">
-              <span aria-hidden="true" className="text-[var(--brand-accent)]">⌕</span>
+              <span aria-hidden="true" className="search-field__icon">⌕</span>
               <input ref={inputRef} className="min-h-10 min-w-0 flex-1 bg-transparent text-base outline-none placeholder:text-[var(--muted)]" value={query} onChange={(event) => { setQuery(event.target.value); setActiveIndex(0); }} onKeyDown={onInputKeyDown} placeholder={copy.placeholder} aria-label={copy.dialog} aria-activedescendant={orderedResults.length ? `search-result-${activeIndex}` : undefined} autoComplete="off" />
               <button type="button" className="quiet-link shrink-0 text-xs" onClick={close} aria-label={copy.close}>Esc</button>
             </div>
@@ -160,17 +192,30 @@ export function GlobalSearch({ locale, documents }: GlobalSearchProps) {
             <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-4" data-global-search-results data-search-document-count={documents.length}>
               {!query.trim() ? (
                 <div data-search-suggestions>
-                  <p className="px-2 pb-5 pt-1 text-sm leading-6 text-[var(--muted)]">{copy.hint}</p>
+                  <p className="search-default__hint">{copy.hint}</p>
+                  {recentDocuments.length ? (
+                    <section className="search-group" aria-label={copy.recent}>
+                      <h2 className="search-group__title">{copy.recent}</h2>
+                      {recentDocuments.map((item) => (
+                        <Link key={item.id} href={item.route} className="search-result__row" onClick={() => { remember(item); setOpen(false); setQuery(""); setActiveIndex(0); }}>
+                          <SearchItemIcon type={item.type} />
+                          <span className="search-result__text"><strong>{item.title}</strong><small>{item.summary}</small></span>
+                          <span className="search-result__tag">{copy.groups[item.type]}</span><span className="search-result__arrow" aria-hidden="true">›</span>
+                        </Link>
+                      ))}
+                    </section>
+                  ) : null}
                   {SEARCH_TYPE_ORDER.map((type) => {
                     const suggestions = documents.filter((item) => item.type === type).slice(0, 2);
                     if (!suggestions.length) return null;
                     return (
-                      <section key={type} className="mb-3 last:mb-0" aria-label={copy.groups[type]}>
-                        <h2 className="px-2 pb-2 pt-2 font-mono text-[11px] font-semibold tracking-[0.08em] text-[var(--glass-copper)]">{copy.groups[type]}</h2>
+                      <section key={type} className="search-group" aria-label={copy.groups[type]}>
+                        <h2 className="search-group__title">{copy.groups[type]}</h2>
                         {suggestions.map((item) => (
-                          <Link key={item.id} href={item.route} className="block rounded-xl px-3 py-2.5 transition-colors hover:bg-[var(--brand-accent-soft)]">
-                            <strong className="block text-sm font-semibold">{item.title}</strong>
-                            <span className="mt-1 block line-clamp-1 text-xs leading-5 text-[var(--muted)]">{item.summary}</span>
+                          <Link key={item.id} href={item.route} className="search-result__row" onClick={() => { remember(item); setOpen(false); setQuery(""); setActiveIndex(0); }}>
+                            <SearchItemIcon type={item.type} />
+                            <span className="search-result__text"><strong>{item.title}</strong><small>{item.summary}</small></span>
+                            <span className="search-result__tag">{copy.groups[item.type]}</span><span className="search-result__arrow" aria-hidden="true">›</span>
                           </Link>
                         ))}
                       </section>
@@ -181,9 +226,25 @@ export function GlobalSearch({ locale, documents }: GlobalSearchProps) {
                 const group = results.filter((result) => result.type === type);
                 if (!group.length) return null;
                 return (
-                  <section key={type} className="mb-3 last:mb-0" aria-label={copy.groups[type]} data-search-group={type}>
-                    <h2 className="px-3 pb-1 pt-2 font-mono text-[10px] font-bold tracking-[0.12em] text-[var(--muted)]">{copy.groups[type]}</h2>
-                    <div>{group.map((result) => { const index = globalIndex++; const active = index === activeIndex; return <Link id={`search-result-${index}`} key={result.id} href={result.route} className={`grid gap-1 border-l-2 px-3 py-2.5 outline-none transition ${active ? "border-[var(--brand-accent)] bg-black/[0.055]" : "border-transparent hover:bg-black/[0.035]"}`} onMouseEnter={() => setActiveIndex(index)} onFocus={() => setActiveIndex(index)} data-search-result={result.id} data-search-score={result.score} data-search-reason={result.reason}><span className="flex items-start justify-between gap-4"><strong className="min-w-0 break-words text-sm">{result.title}</strong><span className="max-w-[45%] shrink-0 truncate text-right font-mono text-[9px] uppercase text-[var(--muted)]">{result.context}</span></span>{result.summary ? <span className="line-clamp-2 text-xs leading-5 text-[var(--muted)]">{result.summary}</span> : null}</Link>; })}</div>
+                  <section key={type} className="search-group" aria-label={copy.groups[type]} data-search-group={type}>
+                    <h2 className="search-group__title">{copy.groups[type]}</h2>
+                    <div>{group.map((result) => {
+                      const index = globalIndex++;
+                      const active = index === activeIndex;
+                      return (
+                        <Link id={`search-result-${index}`} key={result.id} href={result.route}
+                          className={`search-result__row ${active ? "is-active" : ""}`}
+                          aria-current={active ? "true" : undefined}
+                          onClick={() => { remember(result); setOpen(false); setQuery(""); setActiveIndex(0); }}
+                          onMouseEnter={() => setActiveIndex(index)} onFocus={() => setActiveIndex(index)}
+                          data-search-result={result.id} data-search-score={result.score} data-search-reason={result.reason}>
+                          <SearchItemIcon type={result.type} />
+                          <span className="search-result__text"><strong>{result.title}</strong><small>{result.summary}</small></span>
+                          <span className="search-result__tag">{copy.groups[result.type]}</span>
+                          <span className="search-result__arrow" aria-hidden="true">›</span>
+                        </Link>
+                      );
+                    })}</div>
                   </section>
                 );
               })}

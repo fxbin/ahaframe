@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CodexResetCalendar } from "@/components/codex-reset-calendar";
+import { CodexResetCompactCalendar } from "@/components/codex-reset-compact-calendar";
 import { buildCodexResetForecast, type ResetForecastConfidence, type ResetForecastLevel } from "@/lib/codex-reset-forecast";
 import { getCodexResetSnapshot, type CodexResetEvent } from "@/lib/codex-reset-server";
 import { localeFromSegment, localizedPath } from "@/lib/content";
@@ -122,7 +123,6 @@ export default async function CodexResetPage({ params }: PageProps) {
   const now = new Date();
   const latest = snapshot.latest;
   const resetToday = latest ? isSameUtcDay(latest.occurredAt, now) : false;
-  const recentHistory = snapshot.history.slice(0, 6);
   const recentCredits = snapshot.bankedHistory.slice(0, 3);
   const forecast = buildCodexResetForecast(
     snapshot.history.map((event) => event.occurredAt),
@@ -136,7 +136,7 @@ export default async function CodexResetPage({ params }: PageProps) {
     todayConfirmed: "今天已确认发生重置",
     watching: "今天暂无已确认重置 · 正在监控",
     noData: "实时源和已保存快照暂不可用",
-    checked: "AhaFrame 持续监控公开重置信号，并在可验证时优先保留 Tibo (@thsottiaux) 的原始 X 帖子。",
+    checked: "追踪公开的 Codex 完整重置与额外重置卡公告。公开事件不等于你的个人账号额度到账。",
     lastReset: "最近确认重置",
     forecast: "重置预测",
     forecastTitle: "未来 24 小时重置可能性",
@@ -173,7 +173,7 @@ export default async function CodexResetPage({ params }: PageProps) {
     todayConfirmed: "Reset confirmed today",
     watching: "No confirmed reset today · watching",
     noData: "Live sources and saved snapshot are temporarily unavailable",
-    checked: "AhaFrame continuously monitors public reset signals and preserves the original Tibo (@thsottiaux) X post whenever it is available for verification.",
+    checked: "Follow public Codex full resets and additional reset-credit announcements. Public events do not confirm credit delivery to your personal account.",
     lastReset: "Last confirmed reset",
     forecast: "Reset forecast",
     forecastTitle: "Reset likelihood in the next 24 hours",
@@ -216,7 +216,7 @@ export default async function CodexResetPage({ params }: PageProps) {
   const recentEvents = [
     ...snapshot.history.slice(0, 6).map((event) => ({ ...event, eventKind: "full" as const })),
     ...snapshot.bankedHistory.slice(0, 6).map((event) => ({ ...event, eventKind: "banked" as const })),
-  ].sort((a, b) => Date.parse(b.occurredAt) - Date.parse(a.occurredAt)).slice(0, 6);
+  ].sort((a, b) => Date.parse(b.occurredAt) - Date.parse(a.occurredAt)).slice(0, 5);
 
   return (
     <main className="liquid-radar">
@@ -231,7 +231,8 @@ export default async function CodexResetPage({ params }: PageProps) {
           </div>
 
           <div className="liquid-radar-status glass-panel" data-state={!snapshot.dataAvailable ? "unknown" : resetToday ? "confirmed" : "watching"}>
-            <p className="technical-label">{zh ? "当前公开重置状态" : "Public reset status"}</p>
+            <span className="radar-status__beacon" aria-hidden="true">{resetToday ? "✓" : snapshot.dataAvailable ? "↻" : "!"}</span>
+            <p className="technical-label">{zh ? "今日公开状态 · UTC" : "Public status today · UTC"}</p>
             <p className={`mt-5 font-[family-name:var(--font-editorial)] text-3xl font-semibold leading-tight tracking-[-.04em] sm:text-4xl ${resetToday ? "text-[var(--success)]" : ""}`}>
               <span className="liquid-status-dot" style={{ background: !snapshot.dataAvailable ? "var(--danger)" : resetToday ? "var(--success)" : "var(--warning)" }} aria-hidden="true" />
               {!snapshot.dataAvailable ? copy.noData : resetToday ? copy.todayConfirmed : copy.watching}
@@ -247,6 +248,7 @@ export default async function CodexResetPage({ params }: PageProps) {
 
         <section className="liquid-radar-metrics" aria-label={zh ? "重置时间与预测" : "Reset timing and forecast"}>
           <div className="glass-panel liquid-radar-metric">
+            <span className="radar-metric__icon" aria-hidden="true">◷</span>
             <p className="technical-label">{copy.lastReset}</p>
             {latest ? (
               <>
@@ -259,6 +261,7 @@ export default async function CodexResetPage({ params }: PageProps) {
           </div>
 
           <div className="glass-panel liquid-radar-metric">
+            <span className="radar-metric__icon" aria-hidden="true">%</span>
             <p className="technical-label">{copy.forecastTitle}</p>
             {resetToday ? (
               <p className="mt-5 text-lg font-semibold text-[var(--success)]">{copy.forecastSettled}</p>
@@ -303,7 +306,11 @@ export default async function CodexResetPage({ params }: PageProps) {
             </div>
             {snapshot.history.length || snapshot.bankedHistory.length ? (
               <div className="mt-6">
-                <CodexResetCalendar events={snapshot.history} bankedEvents={snapshot.bankedHistory} locale={locale} months={3} />
+                <CodexResetCompactCalendar events={snapshot.history} bankedEvents={snapshot.bankedHistory} locale={locale} />
+                <details className="radar-extended-history">
+                  <summary>{zh ? "展开过去六个月的完整记录" : "View full six-month history"} <span aria-hidden="true">↓</span></summary>
+                  <CodexResetCalendar events={snapshot.history} bankedEvents={snapshot.bankedHistory} locale={locale} months={6} />
+                </details>
               </div>
             ) : (
               <p className="mt-7 text-sm text-[var(--muted)]">{snapshot.dataAvailable ? copy.watching : copy.noData}</p>
@@ -317,19 +324,17 @@ export default async function CodexResetPage({ params }: PageProps) {
             </div>
             <div className="mt-5 divide-y divide-[var(--border)]">
               {recentEvents.length ? recentEvents.map((event) => (
-                <div className="py-4" key={event.id}>
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <time className="font-mono text-xs text-[var(--muted)]">{formatUtc(event.occurredAt, locale)}</time>
-                    <span className={`rounded-full px-2.5 py-1 text-[10px] font-semibold ${event.eventKind === "full" ? "bg-[var(--primary-soft)] text-[var(--success)]" : "bg-[#fff1de] text-[#825016]"}`}>
-                      {event.eventKind === "full" ? (zh ? "全量重置" : "Full reset") : event.status === "confirmed" ? copy.creditsConfirmed : copy.creditsAnnounced}
-                    </span>
-                  </div>
-                  <p className="mt-2 text-sm font-semibold">{event.eventKind === "full" ? copy.eventTitle : copy.credits}</p>
+                <div className="radar-event-row" key={event.id} title={sourceDescription(event, zh)}>
+                  <time className="radar-event__time">{new Date(event.occurredAt).toISOString().slice(0, 16).replace("T", " ")} UTC</time>
+                  <span className={`radar-event__dot ${event.eventKind === "full" ? "is-full" : "is-credit"}`} aria-hidden="true" />
                   {isTiboSource(event) ? (
-                    <a className="text-link mt-2 text-xs" href={event.sourceUrl} target="_blank" rel="noreferrer">{sourceName(event, zh)}</a>
-                  ) : (
-                    <p className="mt-1 text-xs text-[var(--muted)]">{sourceDescription(event, zh)}</p>
-                  )}
+                    <a className="radar-event__title text-link" href={event.sourceUrl} target="_blank" rel="noreferrer">
+                      {event.eventKind === "full" ? copy.eventTitle : copy.credits} ↗
+                    </a>
+                  ) : <strong className="radar-event__title">{event.eventKind === "full" ? copy.eventTitle : copy.credits}</strong>}
+                  <span className={`radar-event__tag ${event.eventKind === "full" ? "is-full" : "is-credit"}`}>
+                    {event.eventKind === "full" ? (zh ? "全量重置" : "Full reset") : event.status === "confirmed" ? copy.creditsConfirmed : copy.creditsAnnounced}
+                  </span>
                 </div>
               )) : <p className="py-4 text-sm text-[var(--muted)]">{copy.noData}</p>}
             </div>
