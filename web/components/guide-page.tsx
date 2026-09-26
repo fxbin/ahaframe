@@ -98,6 +98,30 @@ export function GuidePage({ locale, data }: { locale: Locale; data: GuidePageDat
             <h2 className="technical-label pt-1">{labels.why}</h2><p className="max-w-3xl text-lg leading-8">{guide.whyItMatters}</p>
           </section>
 
+          {guide.slug === "timeout-ambiguity" ? (
+            <section className="guide-timeout-figure" aria-label={locale === "zh-CN" ? "超时的不确定状态示意图" : "Timeout uncertainty diagram"}>
+              <div className="mb-5">
+                <h2 className="font-[family-name:var(--font-editorial)] text-xl font-semibold">
+                  {locale === "zh-CN" ? "超时并不等于失败" : "A timeout is not a confirmed failure"}
+                </h2>
+                <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
+                  {locale === "zh-CN" ? "同一笔退款请求超时后，远端可能处于不同状态。必须先核对，再决定是否重试。" : "A refund can time out while its actual remote result is unknown. Reconcile before retrying."}
+                </p>
+              </div>
+              <div className="guide-timeout-flow">
+                <div className="guide-timeout-node"><span aria-hidden="true">◇</span><strong>Agent</strong><small>{locale === "zh-CN" ? "发送退款请求" : "Sends refund request"}</small></div>
+                <div className="guide-timeout-link" aria-label={locale === "zh-CN" ? "调用过程发生网络超时" : "Network timeout"}><span aria-hidden="true">⏱</span><small>{locale === "zh-CN" ? "网络超时" : "Timeout"}</small><i aria-hidden="true">→</i></div>
+                <div className="guide-timeout-node"><span aria-hidden="true">▤</span><strong>{locale === "zh-CN" ? "远端服务" : "Remote service"}</strong><small>{locale === "zh-CN" ? "可能仍在执行" : "May still execute"}</small></div>
+                <div className="guide-timeout-outcomes">
+                  <strong>{locale === "zh-CN" ? "结果仍不确定" : "Outcome remains unknown"}</strong>
+                  <span><i className="success" aria-hidden="true">✓</i>{locale === "zh-CN" ? "可能已经执行成功" : "May have succeeded"}</span>
+                  <span><i className="pending" aria-hidden="true">···</i>{locale === "zh-CN" ? "也可能仍在处理中" : "May still be pending"}</span>
+                  <span><i className="failed" aria-hidden="true">×</i>{locale === "zh-CN" ? "也可能尚未执行" : "May not have executed"}</span>
+                </div>
+              </div>
+            </section>
+          ) : null}
+
           {guide.sections.map((section) => (
             <section key={section.id} className="grid gap-5 border-b border-[var(--border)] py-10 md:grid-cols-[180px_1fr] md:gap-10">
               <p className="technical-label pt-1">{section.id === "mechanism" ? "01" : "02"}</p>
