@@ -1,0 +1,261 @@
+/*
+ * Reference-guided visual parity pass, September 2026.
+ * Reference is a static concept: only actual product data and available routes
+ * appear in the implementation. Do not use generated screenshots as UI images.
+ */
+:root{
+  --parity-hairline:rgba(218,199,184,.48);
+  --parity-panel:#fffcf8;
+  --parity-glow:rgba(240,206,180,.4);
+  --parity-shadow:0 18px 48px rgba(91,63,46,.09),inset 0 1px 0 rgba(255,255,255,.98);
+}
+/* Ambient design is independent of business content and has no layout impact. */
+body:has(.liquid-radar), body:has(.liquid-guide-page), body:has(.liquid-home){
+  background:
+    radial-gradient(ellipse 48% 28% at 84% 4%,rgba(250,230,211,.59),transparent 86%),
+    radial-gradient(ellipse 40% 30% at 1% 55%,rgba(250,238,231,.50),transparent 82%),
+    #fbf9f6;
+}
+body:has(.liquid-radar)::before,body:has(.liquid-guide-page)::before,body:has(.liquid-home)::before{
+  content:"";pointer-events:none;position:fixed;inset:0 0 auto;height:720px;z-index:0;
+  background:
+    radial-gradient(ellipse 17% 35% at 75% 21%,rgba(246,211,187,.19),transparent 90%),
+    radial-gradient(ellipse 36% 30% at 94% 46%,rgba(235,203,179,.12),transparent 80%);
+}
+body:has(.liquid-radar)>*,body:has(.liquid-guide-page)>*,body:has(.liquid-home)>*{position:relative;}
+.site-header{z-index:50;}
+.site-header__inner.glass-header{
+  width:min(1328px,calc(100% - 56px));
+  min-height:65px;
+  border:1px solid rgba(255,255,255,.96);
+  background:linear-gradient(135deg,rgba(255,255,255,.88),rgba(255,254,252,.65));
+  box-shadow:0 9px 38px rgba(89,58,38,.06),0 1px 2px rgba(255,255,255,.9) inset;
+  -webkit-backdrop-filter:blur(24px) saturate(132%);
+  backdrop-filter:blur(24px) saturate(132%);
+}
+.glass-header .brand{font-size:clamp(1.2rem,1.9vw,1.8rem);line-height:1;}
+.glass-brand-mark{width:34px;height:38px;margin-right:10px;font-family:unset;}
+.glass-brand-mark svg{width:32px;height:36px;display:block;filter:drop-shadow(0 2px 3px rgba(130,74,48,.15));}
+.glass-header .site-header__nav{gap:clamp(13px,2vw,30px);color:#343333;}
+.glass-header .site-header__nav a{font-weight:500;font-size:14px;}
+.glass-header .glass-search-trigger{
+  min-width:155px;
+  min-height:39px;
+  border-radius:999px;
+  justify-content:flex-start;
+  gap:10px;padding-inline:15px;
+  background:rgba(255,255,255,.84);
+  border:1px solid rgba(218,205,197,.75);
+  box-shadow:0 3px 12px rgba(79,53,42,.04);
+}
+.glass-header .glass-search-trigger kbd{margin-left:auto;color:#85807b;font-size:10px;}
+.glass-panel{border:1px solid rgba(249,242,235,.98);background:linear-gradient(136deg,rgba(255,255,255,.91),rgba(255,251,247,.79));box-shadow:var(--parity-shadow);border-radius:23px;}
+/* Global search: broad command palette with clearly separated rows. */
+.glass-search-overlay{
+ background:rgba(38,33,29,.39);
+ -webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px);
+}
+.glass-search-dialog.search-parity-dialog{
+  width:min(820px,100%);
+  border-radius:29px;
+  padding:20px;
+  border:1px solid rgba(255,255,255,.99);
+  background:linear-gradient(133deg,rgba(255,252,247,.97),rgba(255,253,251,.93));
+  box-shadow:0 32px 100px rgba(49,31,23,.22),0 1px 2px white inset,0 0 0 6px rgba(255,255,255,.13);
+}
+.search-parity-dialog>div:first-child{
+  min-height:61px;border:1px solid rgba(230,219,211,.85)!important;
+  border-radius:15px;padding-inline:18px;background:rgba(255,255,255,.91);
+  box-shadow:0 2px 10px rgba(91,59,38,.045);margin-bottom:12px;
+}
+.search-parity-dialog>div:first-child input{font-size:15px;}
+.search-parity-dialog [data-global-search-results]{
+  padding:6px 8px 8px; scrollbar-width:thin;
+}
+.search-parity-section{margin:12px 0 18px;}
+.search-parity-heading{
+  display:flex;align-items:center;gap:11px;
+  margin:0 0 8px;padding:0 12px;
+  color:#8e492f;font:600 14px/1.4 var(--font-editorial);
+  letter-spacing:0;
+}
+.search-parity-heading>span{display:grid;place-items:center;width:20px;height:20px;font-size:19px;}
+.search-parity-rows{
+  padding:3px 5px;
+  border-radius:15px;
+  border:1px solid rgba(233,221,211,.7);
+  background:rgba(255,255,255,.76);
+}
+.search-parity-row{
+  display:flex;align-items:center;gap:15px;min-height:64px;
+  padding:10px 13px;border-radius:12px;outline-offset:-3px;
+  transition:background-color .18s;
+}
+.search-parity-row+.search-parity-row{border-top:1px solid rgba(230,220,211,.52);border-radius:0 0 12px 12px;}
+.search-parity-row:hover,.search-parity-row:focus-visible{background:#faf2eb;}
+.search-parity-icon{
+  width:43px;height:43px;flex:0 0 43px;display:grid;place-items:center;
+  border-radius:12px;background:linear-gradient(145deg,#fff8f1,#f9eee4);
+  color:#a45f43;font:600 22px/1 var(--font-editorial);
+}
+.search-parity-copy{display:flex;flex:1;flex-direction:column;min-width:0;gap:2px;}
+.search-parity-copy strong{font-size:14px;line-height:1.5;font-weight:650;}
+.search-parity-copy small{font-size:12px;line-height:1.4;color:#78746f;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.search-parity-tag{
+  border-radius:99px;background:#fcf1e8;color:#a55e40;
+  font-size:11px;padding:5px 11px;flex:none;
+}
+.search-parity-chevron{font-size:21px;color:#7b7770;}
+.search-parity-dialog .glass-search-foot{
+  margin-top:4px;border:0;background:transparent;padding:8px 12px 2px;
+}
+.search-parity-dialog [data-search-group]{padding:9px 5px;margin-top:6px;}
+.search-parity-dialog [data-search-group] h2{
+  color:#9c614c;font:600 13px/1.5 var(--font-editorial);letter-spacing:0;
+}
+.search-parity-dialog [data-search-group] a{
+  border-radius:12px;border-left-width:3px;padding:12px 15px;
+}
+.search-parity-dialog [data-search-group] a:hover{background:#fcf4ec;}
+/* Radar: structure aligns with the reference; the sample image data is NOT used. */
+.liquid-radar .shell{width:min(1330px,calc(100% - 64px));}
+.liquid-radar{padding-top:47px;background:none;}
+.liquid-radar-hero{grid-template-columns:minmax(0,.98fr) minmax(0,1.02fr);gap:28px;margin-bottom:20px;}
+.liquid-radar-hero h1{max-width:600px;font-size:clamp(2.6rem,4.5vw,4.6rem);line-height:1.17;}
+.liquid-radar-hero>div:first-child{padding-left:10px;}
+.liquid-radar-hero>div:first-child>p:last-child{
+  font-size:15px;line-height:1.85;max-width:580px;margin-top:19px;
+}
+.liquid-radar-status{
+  border:1px solid rgba(255,255,255,.99);
+  border-radius:25px;
+  min-height:245px;
+  padding:32px 36px 32px 40px;
+  box-shadow:0 17px 48px rgba(98,73,58,.09),inset 0 0 0 6px rgba(255,255,255,.47);
+  background:linear-gradient(145deg,rgba(255,255,255,.93),rgba(250,249,246,.77));
+}
+.liquid-radar-status[data-state="confirmed"]{
+  background:radial-gradient(ellipse at 18% 50%,rgba(182,222,193,.31),transparent 44%),linear-gradient(145deg,rgba(255,255,255,.94),rgba(246,251,246,.85));
+}
+.liquid-radar-status .technical-label{font:600 14px var(--font-editorial);text-transform:none;letter-spacing:0;color:#333;}
+.liquid-radar-status>p:nth-child(2){font-size:clamp(1.65rem,2.55vw,2.55rem);line-height:1.28;}
+.liquid-radar-status .liquid-status-dot{width:15px;height:15px;box-shadow:0 0 0 7px rgba(47,118,88,.08);}
+.liquid-radar-metrics{gap:16px;grid-template-columns:1fr 1fr;}
+.liquid-radar-metric{min-height:155px;padding:28px 31px;}
+.liquid-radar-metric .technical-label{font:600 15px var(--font-editorial);text-transform:none;letter-spacing:0;color:#333;}
+.liquid-radar-metric strong{font-size:clamp(1.25rem,2.1vw,1.95rem);line-height:1.3;}
+.liquid-radar-details{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;margin-top:20px;}
+.liquid-radar-calendar,.liquid-radar-activity{padding:26px 28px;min-height:550px;}
+.liquid-radar-calendar h2,.liquid-radar-activity h2{font-size:24px;}
+.liquid-radar-activity .mt-5.divide-y>div{padding-block:14px;}
+.liquid-radar-calendar .radar-archive .grid:has(>section){grid-template-columns:1fr;}
+/* Single-month focus: no six-month grid in the first-screen calendar. */
+.radar-month{margin-top:4px;}
+.radar-month__head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:19px;}
+.radar-month__controls{display:flex;gap:7px;align-items:center;}
+.radar-month__controls button{
+  display:grid;place-items:center;min-width:32px;height:32px;padding:0 10px;
+  border:1px solid #ede3da;border-radius:99px;background:rgba(255,255,255,.8);
+  font-size:18px;line-height:1;color:#48413a;
+}
+.radar-month__controls button:last-child{font-size:11px;min-width:48px;}
+.radar-month__controls button:disabled{opacity:.35;cursor:default;}
+.radar-month__week,.radar-month__days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;}
+.radar-month__week{margin-bottom:9px;font-size:12px;font-weight:600;text-align:center;color:#555;}
+.radar-month__week>span{padding:4px 0;}
+.radar-month__blank,.radar-month__day{min-width:0;aspect-ratio:1.12;display:flex;align-items:center;justify-content:center;}
+.radar-month__day{
+  position:relative;flex-direction:column;gap:2px;border:1px solid rgba(236,226,217,.79);
+  border-radius:10px;background:rgba(255,255,255,.75);
+  font-family:var(--font-editorial);font-size:16px;
+  transition:background .16s,border-color .16s;
+}
+.radar-month__day:not(:disabled){cursor:pointer;}
+.radar-month__day:not(:disabled):hover{background:#fff8f0;border-color:#cdb19a;}
+.radar-month__day.is-selected{background:#f3e9df;border-color:#b98064;}
+.radar-month__day.is-today{outline:2px solid rgba(47,118,88,.72);outline-offset:-3px;}
+.radar-month__markers{display:flex;justify-content:center;align-items:center;gap:3px;height:5px;}
+.radar-month__markers i,.radar-month__legend i{display:inline-block;width:6px;height:6px;border-radius:50%;}
+.radar-month__markers .full,.radar-month__legend .full{background:#2f9060;}
+.radar-month__markers .credit,.radar-month__legend .credit{background:#d18d26;}
+.radar-month__markers .announced,.radar-month__legend .announced{border:1px solid #b47d37;background:transparent;}
+.radar-month__legend{display:flex;gap:15px;flex-wrap:wrap;margin-top:19px;font-size:11px;color:#71675f;}
+.radar-month__legend span{display:inline-flex;align-items:center;gap:6px;}
+.radar-month__legend i{width:8px;height:8px;}
+.radar-month__detail{border:1px solid #e5d4c5;border-radius:14px;padding:13px 17px;margin-top:14px;background:#fff9f3;}
+.radar-month__detail>div button{font-size:21px;line-height:1;}
+/* Guide workspace: structurally three columns, without fake exercises. */
+.liquid-guide-page .shell.guide-workspace-shell{width:min(1380px,calc(100% - 46px));}
+.guide-workspace-layout{
+  display:grid;grid-template-columns:minmax(210px,.74fr) minmax(0,1.63fr) minmax(260px,.86fr);
+  gap:15px;align-items:start;
+}
+.guide-workspace-sidebar,.guide-workspace-practice{
+  min-width:0;border-radius:22px;border:1px solid #f4ebe1;
+  background:linear-gradient(160deg,rgba(255,255,255,.93),rgba(255,252,248,.84));
+  box-shadow:var(--parity-shadow);
+  padding:25px 21px;
+  position:sticky;top:104px;
+}
+.guide-workspace-body{padding:0 28px;border-radius:23px;background:rgba(255,254,252,.95);border:1px solid #f5ede6;}
+.liquid-guide-page .guide-workspace-body>section{display:block;padding-block:27px;}
+.liquid-guide-page .guide-workspace-body>section p.technical-label{margin-bottom:12px;}
+.liquid-guide-page .guide-workspace-body>section>div{max-width:100%;}
+.guide-workspace-navigation{margin-top:22px;padding-top:14px;border-top:1px solid var(--border);}
+.guide-workspace-navigation>a,.guide-workspace-navigation>span{
+  display:flex;gap:10px;align-items:start;border-radius:10px;padding:13px 9px;
+  font-size:12px;line-height:1.55;color:#66615d;
+}
+.guide-workspace-navigation .is-active{background:#fbf0e7;color:#82482d;}
+.guide-workspace-step{flex:none;font-size:12px;color:#a96144;}
+.guide-workspace-aside-heading{
+  padding:11px 13px;border-radius:11px;border:1px solid #e9d7c8;
+  background:#fffaf5;color:#8f4d31;text-align:center;font-weight:650;
+}
+.guide-workspace-practice-cta{margin-top:28px;padding-top:24px;border-top:1px solid var(--border);}
+.guide-workspace-practice .primary-action{
+  border-radius:13px;border-color:#a86a4c;background:linear-gradient(130deg,#a2684b,#79432f);
+  box-shadow:0 7px 20px rgba(132,76,46,.14);
+}
+@media(max-width:1199px){
+ .guide-workspace-layout{grid-template-columns:minmax(190px,.7fr) minmax(0,1.5fr);}
+ .guide-workspace-practice{grid-column:2;position:static;}
+ .liquid-radar .shell{width:min(100% - 40px,1330px);}
+}
+@media(max-width:900px){
+ .site-header__inner.glass-header{width:calc(100% - 24px);padding:9px 13px;}
+ .glass-header .glass-search-trigger{min-width:0;}
+ .glass-header .glass-search-trigger kbd{display:none;}
+ .liquid-radar-hero,.liquid-radar-details{grid-template-columns:1fr;}
+ .liquid-radar-calendar,.liquid-radar-activity{min-height:0;}
+ .guide-workspace-layout{grid-template-columns:1fr;}
+ .guide-workspace-sidebar{position:static;}
+ .guide-workspace-practice{grid-column:1;}
+ .guide-workspace-body{padding:0 20px;}
+ .liquid-guide-page .shell.guide-workspace-shell{width:min(100% - 30px,850px);}
+}
+@media(max-width:640px){
+ .site-header__inner.glass-header{width:calc(100% - 12px);}
+ .glass-header .glass-search-trigger{padding:8px 11px;min-width:38px;}
+ .search-parity-dialog.glass-search-dialog{padding:9px;border-radius:20px;}
+ .search-parity-dialog [data-global-search-results]{padding:4px;}
+ .search-parity-dialog>div:first-child{min-height:53px;padding-inline:10px;}
+ .search-parity-icon{width:34px;height:36px;flex-basis:34px;font-size:18px;}
+ .search-parity-row{gap:9px;padding:8px;min-height:58px;}
+ .search-parity-tag{font-size:9px;padding:3px 6px;}
+ .search-parity-copy small{font-size:11px;}
+ .liquid-radar{padding-top:27px;}
+ .liquid-radar .shell{width:calc(100% - 24px);}
+ .liquid-radar-hero>div:first-child{padding-left:3px;}
+ .liquid-radar-status{padding:27px 24px;min-height:195px;}
+ .liquid-radar-metric{padding:22px 24px;min-height:120px;}
+ .liquid-radar-calendar,.liquid-radar-activity{padding:18px 14px;}
+ .radar-month__week,.radar-month__days{gap:3px;}
+ .radar-month__day{font-size:13px;border-radius:7px;}
+ .radar-month__legend{gap:10px;font-size:10px;}
+ .guide-workspace-sidebar,.guide-workspace-practice{padding:18px;}
+ .guide-workspace-body{padding:0 16px;}
+}
+@media(prefers-reduced-transparency:reduce){
+ .glass-search-dialog.search-parity-dialog,.glass-panel,.guide-workspace-sidebar,.guide-workspace-practice{background:#fffdfa;}
+}
