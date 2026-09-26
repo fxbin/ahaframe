@@ -3,10 +3,10 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { Locale, LocaleSource } from "@/lib/content";
-import { segmentForLocale } from "@/lib/content";
+
 
 export function HeaderNav({ locale, labels }: { locale: Locale; labels: LocaleSource["ui"]["nav"] }) {
-  const segment = segmentForLocale(locale);
+  const segment = locale === "zh-CN" ? "zh-cn" : "en";
   const pathname = usePathname() || "";
   const items = [
     { key: "courses", title: labels.lessons, href: `/${segment}/courses/`, mobile: "" },
