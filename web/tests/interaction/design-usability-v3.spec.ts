@@ -64,6 +64,8 @@ test("course-linked Guide shows actual published outline and offers an interacti
   await expect(compact.locator(":scope > summary")).toBeVisible();
   await compact.locator(":scope > summary").click();
   await expect(compact.locator(".guide-outline-chapter").first()).toBeVisible();
+  await page.getByRole("link", { name: /跳转至实践与验证/ }).click();
+  await expect(page.locator("#guide-practice")).toBeInViewport();
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
   expect(overflow).toBeLessThanOrEqual(1);
   await page.screenshot({ path: "test-results/design-parity/course-outline-mobile-v3.png", fullPage: false });
