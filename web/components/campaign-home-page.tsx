@@ -112,20 +112,27 @@ export function CampaignHomePage({ locale, content, knowledgeMap, catalog }: Cam
             <h2 className="font-[family-name:var(--font-editorial)] text-3xl font-semibold tracking-[-0.04em]">{labels.featured}</h2>
             <Link className="quiet-link hidden sm:inline-flex" href={`/${segment}/courses/`}>{labels.viewAll} →</Link>
           </div>
-          <div className="mt-7 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <div className="featured-courses-grid mt-7">
             {featured.map((item, index) => (
-              <Link key={item.path.id} className="featured-course-card group" href={`/${segment}/courses/${item.path.slug}/`}>
-                <div className="flex items-start justify-between gap-4">
-                  <span className="course-number">{String(index + 1).padStart(2, "0")}</span>
-                  <span className="text-[var(--muted)]" aria-hidden="true">⌑</span>
-                </div>
-                <h3 className="mt-8 font-[family-name:var(--font-editorial)] text-2xl font-semibold leading-tight tracking-[-0.04em]">{item.path.title}</h3>
-                <p className="mt-3 min-h-12 text-sm leading-6 text-[var(--muted)]">{item.path.description}</p>
-                <div className="mt-8 flex items-center gap-3 border-t border-[var(--border)] pt-4 text-xs text-[var(--muted)]">
-                  <span>{item.path.milestones.length} {locale === "zh-CN" ? "章节" : "sections"}</span>
-                  <span>·</span>
-                  <span>{item.practices.length} {locale === "zh-CN" ? "练习" : "practices"}</span>
-                  <span className="ml-auto transition-transform group-hover:translate-x-1" aria-hidden="true">→</span>
+              <Link key={item.path.id} className={`featured-course-card group ${index === 0 ? "is-featured" : ""}`} href={`/${segment}/courses/${item.path.slug}/`}>
+                {index === 0 ? (
+                  <div className="featured-course-art" aria-hidden="true">
+                    <div className="featured-course-art__layers"><i /><i /><i /><i /></div>
+                  </div>
+                ) : null}
+                <div className="featured-course-copy">
+                  <div className="flex items-start justify-between gap-4">
+                    <span className="course-number">{index === 0 ? (locale === "zh-CN" ? "精选课程" : "FEATURED") : String(index + 1).padStart(2, "0")}</span>
+                    <span className="text-[var(--muted)]" aria-hidden="true">{index === 0 ? "↗" : "⌑"}</span>
+                  </div>
+                  <h3 className="mt-7 font-[family-name:var(--font-editorial)] text-2xl font-semibold leading-tight tracking-[-0.04em]">{item.path.title}</h3>
+                  <p className="mt-3 text-sm leading-6 text-[var(--muted)]">{item.path.description}</p>
+                  <div className="mt-7 flex items-center gap-3 border-t border-[var(--border)] pt-4 text-xs text-[var(--muted)]">
+                    <span>{item.path.milestones.length} {locale === "zh-CN" ? "章节" : "sections"}</span>
+                    <span>·</span>
+                    <span>{item.practices.length} {locale === "zh-CN" ? "练习" : "practices"}</span>
+                    <span className="ml-auto transition-transform group-hover:translate-x-1" aria-hidden="true">→</span>
+                  </div>
                 </div>
               </Link>
             ))}
