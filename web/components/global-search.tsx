@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { createPortal } from "react-dom";
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
 import type { Locale } from "@/lib/content";
 import { SEARCH_TYPE_ORDER, searchDocuments, type SearchDocument, type SearchDocumentType } from "@/lib/search";
@@ -17,9 +18,11 @@ export function GlobalSearch({ locale, documents }: GlobalSearchProps) {
   const copy = labels(locale);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [activeIndex, setActiveIndex] = useState(0);
+  const [viewport, setViewport] = useState<{ width: number; height: number; offsetTop: number } | null>(null);
   const results = useMemo(() => searchDocuments(documents, query), [documents, query]);
   const orderedResults = useMemo(() => SEARCH_TYPE_ORDER.flatMap((type) => results.filter((result) => result.type === type)), [results]);
 
@@ -39,13 +42,64 @@ export function GlobalSearch({ locale, documents }: GlobalSearchProps) {
     return () => window.cancelAnimationFrame(frame);
   }, [open]);
 
+  useEffect(() => {
+    if (!open) return;
+    // Keep the page behind the search dialog still, and size the overlay to
+    // the *visual* viewport so mobile on-screen keyboards cannot hide results.
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const visualViewport = window.visualViewport;
+    function updateViewport() {
+      const visual = window.visualViewport;
+      setViewport({
+        width: visual?.width ?? window.innerWidth,
+        height: visual?.height ?? window.innerHeight,
+        offsetTop: visual?.offsetTop ?? 0,
+      });
+    }
+    updateViewport();
+    visualViewport?.addEventListener("resize", updateViewport);
+    visualViewport?.addEventListener("scroll", updateViewport);
+    window.addEventListener("resize", updateViewport);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      visualViewport?.removeEventListener("resize", updateViewport);
+      visualViewport?.removeEventListener("scroll", updateViewport);
+      window.removeEventListener("resize", updateViewport);
+    };
+  }, [open]);
+
   function close() {
     setOpen(false); setQuery(""); setActiveIndex(0);
     window.requestAnimationFrame(() => triggerRef.current?.focus());
   }
 
+  function onDialogKeyDown(event: ReactKeyboardEvent<HTMLDivElement>) {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      event.stopPropagation();
+      close();
+      return;
+    }
+    if (event.key !== "Tab") return;
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+    const focusable = Array.from(
+      dialog.querySelectorAll<HTMLElement>('input:not([disabled]), button:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])'),
+    ).filter((element) => element.getClientRects().length > 0);
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (!first || !last) return;
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  }
+
   function onInputKeyDown(event: ReactKeyboardEvent<HTMLInputElement>) {
-    if (event.key === "Escape") { event.preventDefault(); close(); return; }
     if (!orderedResults.length) return;
     if (event.key === "ArrowDown") { event.preventDefault(); setActiveIndex((value) => (value + 1) % orderedResults.length); }
     else if (event.key === "ArrowUp") { event.preventDefault(); setActiveIndex((value) => (value - 1 + orderedResults.length) % orderedResults.length); }
@@ -68,29 +122,50 @@ export function GlobalSearch({ locale, documents }: GlobalSearchProps) {
         <span aria-hidden="true">⌕</span><span className="hidden sm:inline">{copy.trigger}</span><kbd className="hidden font-mono text-[10px] font-normal lg:inline">{copy.shortcut}</kbd>
       </button>
 
-      {open ? (
-        <div className="fixed inset-0 z-[100] flex items-start justify-center bg-black/35 px-3 pt-[8vh] sm:px-6 sm:pt-[12vh]" onMouseDown={(event) => event.target === event.currentTarget && close()}>
-          <div className="w-full max-w-2xl overflow-hidden border border-[var(--border)] bg-[var(--background)] shadow-2xl" role="dialog" aria-modal="true" aria-label={copy.dialog} data-global-search-dialog>
-            <div className="flex items-center gap-3 border-b border-[var(--border)] px-4 py-3">
+      {open && typeof document !== "undefined" ? createPortal(
+        <div
+          className="fixed inset-x-0 z-[1000] flex items-start justify-center overflow-y-auto overscroll-contain bg-black/45 px-3 py-3 sm:px-6 sm:pb-6 sm:pt-12"
+          style={{
+            top: viewport?.offsetTop ?? 0,
+            height: viewport ? `${viewport.height}px` : "100dvh",
+          }}
+          data-global-search-overlay
+          onMouseDown={(event) => event.target === event.currentTarget && close()}
+        >
+          <div
+            ref={dialogRef}
+            className="flex w-full min-w-0 max-w-2xl flex-col overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--paper)] shadow-2xl"
+            style={{
+              maxHeight: viewport
+                ? `${Math.max(160, Math.min(760, viewport.height - (viewport.width < 640 ? 24 : 72)))}px`
+                : "calc(100dvh - 2rem)",
+            }}
+            role="dialog"
+            aria-modal="true"
+            aria-label={copy.dialog}
+            data-global-search-dialog
+            onKeyDown={onDialogKeyDown}
+          >
+            <div className="flex shrink-0 items-center gap-3 border-b border-[var(--border)] px-4 py-3">
               <span aria-hidden="true" className="text-[var(--brand-accent)]">⌕</span>
-              <input ref={inputRef} className="min-h-10 flex-1 bg-transparent text-base outline-none placeholder:text-[var(--muted)]" value={query} onChange={(event) => { setQuery(event.target.value); setActiveIndex(0); }} onKeyDown={onInputKeyDown} placeholder={copy.placeholder} aria-label={copy.dialog} aria-activedescendant={orderedResults.length ? `search-result-${activeIndex}` : undefined} autoComplete="off" />
-              <button type="button" className="quiet-link text-xs" onClick={close} aria-label={copy.close}>Esc</button>
+              <input ref={inputRef} className="min-h-10 min-w-0 flex-1 bg-transparent text-base outline-none placeholder:text-[var(--muted)]" value={query} onChange={(event) => { setQuery(event.target.value); setActiveIndex(0); }} onKeyDown={onInputKeyDown} placeholder={copy.placeholder} aria-label={copy.dialog} aria-activedescendant={orderedResults.length ? `search-result-${activeIndex}` : undefined} autoComplete="off" />
+              <button type="button" className="quiet-link shrink-0 text-xs" onClick={close} aria-label={copy.close}>Esc</button>
             </div>
 
-            <div className="max-h-[68vh] overflow-y-auto p-3" data-global-search-results data-search-document-count={documents.length}>
+            <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-3" data-global-search-results data-search-document-count={documents.length}>
               {!query.trim() ? <p className="px-3 py-8 text-sm leading-6 text-[var(--muted)]">{copy.hint}</p> : !orderedResults.length ? <p className="px-3 py-8 text-sm leading-6 text-[var(--muted)]" data-global-search-empty>{copy.empty}</p> : SEARCH_TYPE_ORDER.map((type) => {
                 const group = results.filter((result) => result.type === type);
                 if (!group.length) return null;
                 return (
                   <section key={type} className="mb-3 last:mb-0" aria-label={copy.groups[type]} data-search-group={type}>
                     <h2 className="px-3 pb-1 pt-2 font-mono text-[10px] font-bold tracking-[0.12em] text-[var(--muted)]">{copy.groups[type]}</h2>
-                    <div>{group.map((result) => { const index = globalIndex++; const active = index === activeIndex; return <Link id={`search-result-${index}`} key={result.id} href={result.route} className={`grid gap-1 border-l-2 px-3 py-2.5 outline-none transition ${active ? "border-[var(--brand-accent)] bg-black/[0.055]" : "border-transparent hover:bg-black/[0.035]"}`} onMouseEnter={() => setActiveIndex(index)} onFocus={() => setActiveIndex(index)} data-search-result={result.id} data-search-score={result.score} data-search-reason={result.reason}><span className="flex items-start justify-between gap-4"><strong className="text-sm">{result.title}</strong><span className="shrink-0 font-mono text-[9px] uppercase text-[var(--muted)]">{result.context}</span></span>{result.summary ? <span className="line-clamp-2 text-xs leading-5 text-[var(--muted)]">{result.summary}</span> : null}</Link>; })}</div>
+                    <div>{group.map((result) => { const index = globalIndex++; const active = index === activeIndex; return <Link id={`search-result-${index}`} key={result.id} href={result.route} className={`grid gap-1 border-l-2 px-3 py-2.5 outline-none transition ${active ? "border-[var(--brand-accent)] bg-black/[0.055]" : "border-transparent hover:bg-black/[0.035]"}`} onMouseEnter={() => setActiveIndex(index)} onFocus={() => setActiveIndex(index)} data-search-result={result.id} data-search-score={result.score} data-search-reason={result.reason}><span className="flex items-start justify-between gap-4"><strong className="min-w-0 break-words text-sm">{result.title}</strong><span className="max-w-[45%] shrink-0 truncate text-right font-mono text-[9px] uppercase text-[var(--muted)]">{result.context}</span></span>{result.summary ? <span className="line-clamp-2 text-xs leading-5 text-[var(--muted)]">{result.summary}</span> : null}</Link>; })}</div>
                   </section>
                 );
               })}
             </div>
           </div>
-        </div>
+        </div>, document.body
       ) : null}
     </>
   );
