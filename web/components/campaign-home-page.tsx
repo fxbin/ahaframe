@@ -73,7 +73,7 @@ export function CampaignHomePage({ locale, content, knowledgeMap, catalog }: Cam
         <div className="shell grid liquid-hero-layout">
           <div>
             <p className="editorial-kicker">{locale === "zh-CN" ? "以直观交互，理解 AI" : "LEARN BY SEEING"}</p>
-            <h1 className="editorial-display liquid-hero-title mt-5 max-w-3xl">
+            <h1 aria-label={labels.headline} className="editorial-display liquid-hero-title mt-5 max-w-3xl">
               {locale === "zh-CN" ? <>看见 AI 如何工作，<br />才能<span className="liquid-hero-accent">真正理解它</span></> : <>Understand AI by<br /><span className="liquid-hero-accent">seeing it work.</span></>}
             </h1>
             <p className="mt-7 max-w-lg text-base leading-8 text-[var(--muted)] sm:text-lg">{labels.subheadline}</p>
@@ -97,6 +97,7 @@ export function CampaignHomePage({ locale, content, knowledgeMap, catalog }: Cam
       </section>
 
       <section className="shell liquid-value-strip" aria-label={labels.choose}>
+        <h2 className="col-span-full mb-0 text-xs font-semibold tracking-[0.12em] text-[var(--muted)]">{labels.choose}</h2>
         {domainCards.map(({ domain, title, copy }) => (
           <Link key={domain.id} href={`/${segment}/courses/#${domain.slug}`}>
             <strong className="block font-[family-name:var(--font-editorial)] text-xl tracking-[-0.03em]">{title} <span aria-hidden="true" className="ml-1 text-[var(--glass-copper)]">↗</span></strong>
