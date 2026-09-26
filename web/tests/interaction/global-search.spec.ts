@@ -138,6 +138,7 @@ test("search dialog escapes the sticky header and remains usable in a short mobi
 
 test("search traps keyboard focus inside the viewport-level dialog", async ({ page }) => {
   await page.goto("/en/");
+  await expect(page.locator("[data-global-search-trigger]")).toHaveAttribute("data-search-ready", "true");
   await page.keyboard.press("Control+K");
   const dialog = page.getByRole("dialog", { name: "Search AhaFrame" });
   const input = page.getByRole("textbox", { name: "Search AhaFrame" });
@@ -153,10 +154,11 @@ test("search traps keyboard focus inside the viewport-level dialog", async ({ pa
 
 test("empty search shows canonical suggestions and preserves the viewport-level glass modal", async ({ page }) => {
   await page.goto("/en/");
+  await expect(page.locator("[data-global-search-trigger]")).toHaveAttribute("data-search-ready", "true");
   await page.keyboard.press("Control+K");
   const dialog = page.locator("[data-global-search-dialog]");
   await expect(dialog).toHaveClass(/glass-search-dialog/);
   await expect(dialog.locator("[data-search-suggestions] section")).toHaveCount(4);
   await expect(page.locator("body > [data-global-search-overlay]")).toHaveClass(/glass-search-overlay/);
-  await expect(dialog.getByText("Navigate", { exact: true })).toBeVisible();
+  await expect(dialog.locator(".glass-search-foot")).toContainText("Navigate");
 });
