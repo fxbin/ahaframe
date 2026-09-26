@@ -57,8 +57,8 @@ export function CourseDetailPage({ locale, course }: CourseDetailPageProps) {
   const progressPractices = course.practices.map((practice) => ({ id: practice.id, title: practice.title, route: practice.route }));
 
   return (
-    <main className="course-detail-page">
-      <section className="border-b border-[var(--border)] py-10 sm:py-16">
+    <main className="course-detail-page liquid-course-page">
+      <section className="course-detail-hero border-b border-[var(--border)] py-10 sm:py-16">
         <div className="shell max-w-5xl">
           <Link className="quiet-link text-sm" href={`/${segment}/courses/`}>← {labels.back}</Link>
           <div className="mt-10 grid gap-10 lg:grid-cols-[1fr_320px] lg:items-end">
