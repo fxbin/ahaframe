@@ -224,7 +224,7 @@ export function GuidePage({ locale, data }: { locale: Locale; data: GuidePageDat
             <Link className="editorial-text-link" href={`/${segment}/learning/`}>{labels.map} <span aria-hidden="true">→</span></Link>
           </footer>
             </div>
-            <aside className="guide-workspace-practice" aria-label={locale === "zh-CN" ? "实践与验证" : "Practice and verification"}>
+            <aside id="guide-practice" className="guide-workspace-practice" aria-label={locale === "zh-CN" ? "实践与验证" : "Practice and verification"}>
               <p className="guide-workspace-aside-heading">{locale === "zh-CN" ? "实践与验证" : "Practice & Verify"}</p>
               {guide.slug === "timeout-ambiguity" ? (
                 <GuideQuickCheck locale={locale} />
