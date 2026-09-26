@@ -10,8 +10,8 @@ interface GlobalSearchProps { locale: Locale; documents: SearchDocument[]; }
 
 function labels(locale: Locale) {
   return locale === "zh-CN"
-    ? { trigger: "搜索", shortcut: "⌘K", dialog: "搜索 AhaFrame", placeholder: "搜索 Guide、课程、Practice 或 Concept…", hint: "输入关键词开始搜索。支持标题、正文、知识点与课程上下文。", empty: "没有找到匹配内容。换一个更具体或更短的关键词试试。", close: "关闭搜索", groups: { guide: "GUIDES", course: "课程", practice: "PRACTICE", concept: "CONCEPTS" } satisfies Record<SearchDocumentType, string> }
-    : { trigger: "Search", shortcut: "⌘K", dialog: "Search AhaFrame", placeholder: "Search Guides, Courses, Practice, or Concepts…", hint: "Type a term to search titles, Guide full text, Concepts, and learning context.", empty: "No matching learning surface. Try a shorter or more specific term.", close: "Close search", groups: { guide: "GUIDES", course: "COURSES", practice: "PRACTICE", concept: "CONCEPTS" } satisfies Record<SearchDocumentType, string> };
+    ? { trigger: "搜索", shortcut: "⌘K", dialog: "搜索 AhaFrame", placeholder: "搜索 Guide、课程、Practice 或 Concept…", mobilePlaceholder: "搜索课程、工具或概念…", hint: "输入关键词开始搜索。支持标题、正文、知识点与课程上下文。", empty: "没有找到匹配内容。换一个更具体或更短的关键词试试。", close: "关闭搜索", groups: { guide: "GUIDES", course: "课程", practice: "PRACTICE", concept: "CONCEPTS" } satisfies Record<SearchDocumentType, string> }
+    : { trigger: "Search", shortcut: "⌘K", dialog: "Search AhaFrame", placeholder: "Search Guides, Courses, Practice, or Concepts…", mobilePlaceholder: "Search learning content…", hint: "Type a term to search titles, Guide full text, Concepts, and learning context.", empty: "No matching learning surface. Try a shorter or more specific term.", close: "Close search", groups: { guide: "GUIDES", course: "COURSES", practice: "PRACTICE", concept: "CONCEPTS" } satisfies Record<SearchDocumentType, string> };
 }
 
 function loadRecentRoutes(): string[] {
@@ -34,11 +34,12 @@ export function GlobalSearch({ locale, documents }: GlobalSearchProps) {
   const results = useMemo(() => searchDocuments(documents, query), [documents, query]);
   const orderedResults = useMemo(() => SEARCH_TYPE_ORDER.flatMap((type) => results.filter((result) => result.type === type)), [results]);
   const recentDocuments = useMemo(() => recentRoutes.map((route) => documents.find((item) => item.route === route)).filter((item): item is SearchDocument => Boolean(item)).slice(0, 2), [recentRoutes, documents]);
+  const compactSuggestions = viewport !== null && viewport.width < 640;
   const suggestionGroups = useMemo(() => Object.fromEntries(
     SEARCH_TYPE_ORDER.map((type) => [type, documents
       .filter((item) => item.type === type && !recentDocuments.some((recent) => recent.route === item.route))
-      .slice(0, type === "guide" || type === "course" ? 2 : 1)]),
-  ) as Record<SearchDocumentType, SearchDocument[]>, [documents, recentDocuments]);
+      .slice(0, compactSuggestions ? 1 : type === "guide" || type === "course" ? 2 : 1)]),
+  ) as Record<SearchDocumentType, SearchDocument[]>, [documents, recentDocuments, compactSuggestions]);
   const defaultSuggestions = useMemo(() => [
     ...recentDocuments, ...SEARCH_TYPE_ORDER.flatMap((type) => suggestionGroups[type]),
   ], [recentDocuments, suggestionGroups]);
@@ -187,7 +188,7 @@ export function GlobalSearch({ locale, documents }: GlobalSearchProps) {
           >
             <div className="flex shrink-0 items-center gap-3 border-b border-[var(--border)] px-5 py-4">
               <span aria-hidden="true" className="text-[var(--brand-accent)]">⌕</span>
-              <input ref={inputRef} className="min-h-10 min-w-0 flex-1 bg-transparent text-base outline-none placeholder:text-[var(--muted)]" value={query} onChange={(event) => { setQuery(event.target.value); setActiveIndex(0); }} onKeyDown={onInputKeyDown} placeholder={copy.placeholder} aria-label={copy.dialog} aria-activedescendant={navigable.length ? (query.trim() ? `search-result-${activeIndex}` : `search-suggestion-${activeIndex}`) : undefined} autoComplete="off" />
+              <input ref={inputRef} className="min-h-10 min-w-0 flex-1 bg-transparent text-base outline-none placeholder:text-[var(--muted)]" value={query} onChange={(event) => { setQuery(event.target.value); setActiveIndex(0); }} onKeyDown={onInputKeyDown} placeholder={compactSuggestions ? copy.mobilePlaceholder : copy.placeholder} aria-label={copy.dialog} aria-activedescendant={navigable.length ? (query.trim() ? `search-result-${activeIndex}` : `search-suggestion-${activeIndex}`) : undefined} autoComplete="off" />
               <button type="button" className="quiet-link shrink-0 text-xs" onClick={close} aria-label={copy.close}>Esc</button>
             </div>
 
