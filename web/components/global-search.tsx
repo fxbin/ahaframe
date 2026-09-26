@@ -174,7 +174,7 @@ export function GlobalSearch({ locale, documents }: GlobalSearchProps) {
             className="glass-search-dialog flex w-full min-w-0 max-w-2xl flex-col overflow-hidden"
             style={{
               maxHeight: viewport
-                ? `${Math.max(160, Math.min(760, viewport.height - (viewport.width < 640 ? 24 : 72)))}px`
+                ? `${Math.max(160, Math.min(960, viewport.height - (viewport.width < 640 ? 24 : 124)))}px`
                 : "calc(100dvh - 2rem)",
             }}
             role="dialog"
