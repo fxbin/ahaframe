@@ -47,6 +47,11 @@ export function GlobalSearch({ locale, documents }: GlobalSearchProps) {
   function visit(route: string) {
     const next = [route, ...recentRoutes.filter((item) => item !== route)].slice(0, 6);
     setRecentRoutes(next);
+    // The global search lives in a persistent layout. Close it explicitly,
+    // including same-route selections; navigation alone may keep the modal open.
+    setOpen(false);
+    setQuery("");
+    setActiveIndex(0);
     try { localStorage.setItem("ahaframe-search-recent-v1", JSON.stringify(next)); } catch { /* optional enhancement */ }
   }
 
