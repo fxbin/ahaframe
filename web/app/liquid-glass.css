@@ -100,7 +100,7 @@
 }
 .liquid-hero-visual::before {
   content:""; pointer-events: none; position:absolute; z-index:0;
-  width:70%; height:85%; top:-11%; right:-9%; border-radius:50%;
+  width:70%; height:85%; top:-11%; right:0; border-radius:50%;
   background: radial-gradient(circle at 40% 43%,rgba(244,221,204,.48),rgba(246,218,192,.12) 65%,transparent 78%);
   filter: blur(28px);
 }
