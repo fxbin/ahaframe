@@ -72,7 +72,7 @@ export function CampaignHomePage({ locale, content, knowledgeMap, catalog }: Cam
       <section className="editorial-hero">
         <div className="shell grid liquid-hero-layout">
           <div>
-            <p className="editorial-kicker">${locale === "zh-CN" ? "LEARN BY SEEING" : "LEARN BY SEEING"}</p>
+            <p className="editorial-kicker">{locale === "zh-CN" ? "以直观交互，理解 AI" : "LEARN BY SEEING"}</p>
             <h1 className="editorial-display liquid-hero-title mt-5 max-w-3xl">
               {locale === "zh-CN" ? <>看见 AI 如何工作，<br />才能<span className="liquid-hero-accent">真正理解它</span></> : <>Understand AI by<br /><span className="liquid-hero-accent">seeing it work.</span></>}
             </h1>
