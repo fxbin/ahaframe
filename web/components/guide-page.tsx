@@ -70,7 +70,7 @@ export function GuidePage({ locale, data }: { locale: Locale; data: GuidePageDat
         </header>
 
         <div className="shell guide-workspace-shell py-12 sm:py-16">
-          <div className="guide-workspace-layout">
+          <div className={`guide-workspace-layout ${activePath ? "" : "guide-workspace-layout--no-path"}`}>
             {activePath ? (
               <aside className="guide-workspace-sidebar" aria-label={locale === "zh-CN" ? "课程目录" : "Course outline"}>
                 <Link href={`/${segment}/courses/${activePath.slug}/`} className="text-xs text-[var(--muted)] hover:text-[var(--brand-accent)]">
