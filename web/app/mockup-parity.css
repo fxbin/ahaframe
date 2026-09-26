@@ -498,3 +498,41 @@ body:has(.liquid-radar)::before,body:has(.liquid-guide-page)::before,body:has(.l
  .glass-brand-mark{width:23px;margin-right:5px;}
  .glass-brand-mark svg{width:24px;}
 }
+
+
+/* Canonical course outline: lesson position is NOT a completion claim. */
+.guide-workspace-sidebar{
+  max-height:calc(100dvh - 120px);
+  overflow-y:auto;
+  scrollbar-width:thin;
+  scrollbar-color:#dec6b5 transparent;
+}
+.guide-workspace-navigation{border-top:0;padding-top:2px;margin-top:18px;}
+.guide-outline-sequence{color:#8e624b;font-size:11px;font-weight:600;letter-spacing:.035em;}
+.guide-outline-chapter{padding:16px 0 13px;border-top:1px solid var(--border);}
+.guide-outline-chapter-title{
+  display:flex;gap:9px;align-items:baseline;
+  font-size:12px;font-weight:700;color:#52483e;line-height:1.6;
+  padding:0 9px 8px;
+}
+.guide-outline-chapter>a,.guide-outline-chapter>span{
+  display:flex;align-items:flex-start;gap:10px;
+  padding:9px 12px;border-radius:11px;
+  font-size:12px;line-height:1.65;transition:background-color 150ms,color 150ms;
+}
+.guide-outline-chapter>a:hover,.guide-outline-chapter>a:focus-visible{background:rgba(248,236,225,.75);color:#914b30;}
+.guide-outline-chapter>.is-active{color:#894b32;background:linear-gradient(100deg,#fbecde,#fdf5ef);font-weight:650;}
+.guide-outline-chapter .guide-workspace-step{font-size:12px;line-height:1.65;margin:0;}
+.guide-mobile-outline{display:none;}
+@media(max-width:900px){
+ .liquid-guide-page .guide-workspace-layout{display:flex;flex-direction:column;gap:14px;}
+ .liquid-guide-page .guide-workspace-sidebar{display:none;}
+ .liquid-guide-page .guide-mobile-outline{display:block;width:100%;border-radius:15px;border:1px solid rgba(234,221,209,.9);background:rgba(255,253,250,.95);padding:0 13px;}
+ .guide-mobile-outline>summary{cursor:pointer;display:flex;justify-content:space-between;align-items:center;padding:14px 3px;gap:12px;color:#7e4b32;font-size:13px;font-weight:700;list-style:none;}
+ .guide-mobile-outline>summary::-webkit-details-marker{display:none;}
+ .guide-mobile-outline>summary>span:last-child{transition:transform .15s;}
+ .guide-mobile-outline[open]>summary>span:last-child{transform:rotate(180deg);}
+ .guide-mobile-outline .guide-workspace-navigation{max-height:45vh;overflow:auto;margin-top:0;padding:2px 0 10px;}
+ .guide-workspace-body,.guide-workspace-practice{width:100%;min-width:0;}
+ .guide-workspace-practice{order:3;}
+}
