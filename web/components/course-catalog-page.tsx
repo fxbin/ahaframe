@@ -32,8 +32,8 @@ export function CourseCatalogPage({ locale, knowledgeMap, catalog }: CourseCatal
       };
 
   return (
-    <main className="course-catalog-page">
-      <section className="border-b border-[var(--border)] py-16 sm:py-24">
+    <main className="course-catalog-page liquid-course-page">
+      <section className="course-detail-hero border-b border-[var(--border)] py-16 sm:py-24">
         <div className="shell max-w-5xl">
           <p className="editorial-kicker">{labels.kicker}</p>
           <h1 className="editorial-display mt-5 max-w-4xl text-5xl leading-[0.98] sm:text-6xl lg:text-[4.5rem]">{labels.title}</h1>
