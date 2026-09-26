@@ -47,10 +47,15 @@ export function GlobalSearch({ locale, documents }: GlobalSearchProps) {
   }
   useEffect(() => {
     if (!open) return;
-    try {
-      const saved: unknown = JSON.parse(localStorage.getItem(recentKey) || "[]");
-      setRecentIds(Array.isArray(saved) ? saved.filter((id): id is string => typeof id === "string") : []);
-    } catch { setRecentIds([]); }
+    // Read client-only history after opening; do not trigger a synchronous
+    // state update from the effect or hydrate with user-specific markup.
+    const frame = window.requestAnimationFrame(() => {
+      try {
+        const saved: unknown = JSON.parse(localStorage.getItem(recentKey) || "[]");
+        setRecentIds(Array.isArray(saved) ? saved.filter((id): id is string => typeof id === "string") : []);
+      } catch { setRecentIds([]); }
+    });
+    return () => window.cancelAnimationFrame(frame);
   }, [open, recentKey]);
 
   useEffect(() => {
