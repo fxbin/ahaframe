@@ -18,8 +18,8 @@
 :root {
   --af-canvas: #fbf9f6;
   --af-ink: #242520;
-  --af-copper: #9c573d;
-  --af-copper-soft: #f8eee5;
+  --af-copper: var(--brand-accent);
+  --af-copper-soft: var(--brand-accent-soft);
   --af-glass-edge: rgba(255, 255, 255, .95);
   --af-glass-hairline: rgba(198, 166, 143, .38);
   --af-glass-chrome: rgba(255, 253, 249, .88);
@@ -35,7 +35,7 @@
   --af-shadow-chrome: 0 12px 36px rgba(92, 61, 45, .085), inset 0 1px 0 rgba(255, 255, 255, .98);
   --af-shadow-panel: 0 18px 48px rgba(92, 61, 45, .087), 0 2px 9px rgba(92, 61, 45, .035), inset 0 1px 0 rgba(255, 255, 255, .91);
   --af-shadow-modal: 0 32px 92px rgba(35, 26, 20, .28), 0 0 0 5px rgba(255, 255, 255, .16), inset 0 1px 0 rgba(255, 255, 255, .96);
-  --af-focus-ring: #95563d;
+  --af-focus-ring: var(--brand-accent);
   --af-transition: 160ms ease;
 }
 
