@@ -191,9 +191,19 @@ body:has(.liquid-guide-page)::before {
 :where(
   .glass-header, .glass-search-dialog, .glass-panel,
   .guide-workspace-sidebar, .guide-workspace-practice, .radar-month
-) :is(a, button, summary, input):focus-visible {
+) :is(a, button, summary):focus-visible {
   outline: 2px solid var(--af-focus-ring);
   outline-offset: 3px;
+}
+
+/* The input is a full-width invisible control. Outline its containing search
+ * field rather than painting a distracting rectangle around the text itself. */
+.search-parity-dialog > div:first-child:focus-within {
+  border-color: rgba(164, 95, 67, .65) !important;
+  box-shadow: 0 0 0 3px rgba(164, 95, 67, .13), inset 0 1px 0 #fff;
+}
+.search-parity-dialog input:focus-visible {
+  outline: none;
 }
 
 /* The effect must degrade to an opaque interface when requested or unsupported. */
