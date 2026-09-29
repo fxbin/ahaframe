@@ -17,6 +17,7 @@ import "../../globals.css";
 import "../../editorial-learning.css";
 import "../../liquid-glass.css";
 import "../../mockup-parity.css";
+import "../../material-system.css";
 
 export const metadata: Metadata = {
   title: {
