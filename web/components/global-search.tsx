@@ -10,8 +10,15 @@ interface GlobalSearchProps { locale: Locale; documents: SearchDocument[]; }
 
 function labels(locale: Locale) {
   return locale === "zh-CN"
-    ? { trigger: "搜索", shortcut: "⌘K", dialog: "搜索 AhaFrame", placeholder: "搜索 Guide、课程、Practice 或 Concept…", hint: "输入关键词开始搜索。支持标题、正文、知识点与课程上下文。", empty: "没有找到匹配内容。换一个更具体或更短的关键词试试。", close: "关闭搜索", groups: { guide: "GUIDES", course: "课程", practice: "PRACTICE", concept: "CONCEPTS" } satisfies Record<SearchDocumentType, string> }
-    : { trigger: "Search", shortcut: "⌘K", dialog: "Search AhaFrame", placeholder: "Search Guides, Courses, Practice, or Concepts…", hint: "Type a term to search titles, Guide full text, Concepts, and learning context.", empty: "No matching learning surface. Try a shorter or more specific term.", close: "Close search", groups: { guide: "GUIDES", course: "COURSES", practice: "PRACTICE", concept: "CONCEPTS" } satisfies Record<SearchDocumentType, string> };
+    ? { trigger: "搜索", shortcut: "⌘K", dialog: "搜索 AhaFrame", placeholder: "搜索 Guide、课程、Practice 或 Concept…", mobilePlaceholder: "搜索课程、工具或概念…", hint: "输入关键词开始搜索。支持标题、正文、知识点与课程上下文。", empty: "没有找到匹配内容。换一个更具体或更短的关键词试试。", close: "关闭搜索", groups: { guide: "GUIDES", course: "课程", practice: "PRACTICE", concept: "CONCEPTS" } satisfies Record<SearchDocumentType, string> }
+    : { trigger: "Search", shortcut: "⌘K", dialog: "Search AhaFrame", placeholder: "Search Guides, Courses, Practice, or Concepts…", mobilePlaceholder: "Search learning content…", hint: "Type a term to search titles, Guide full text, Concepts, and learning context.", empty: "No matching learning surface. Try a shorter or more specific term.", close: "Close search", groups: { guide: "GUIDES", course: "COURSES", practice: "PRACTICE", concept: "CONCEPTS" } satisfies Record<SearchDocumentType, string> };
+}
+
+function loadRecentRoutes(): string[] {
+  try {
+    const stored = JSON.parse(window.localStorage.getItem("ahaframe-search-recent-v1") ?? "[]");
+    return Array.isArray(stored) ? stored.filter((route): route is string => typeof route === "string").slice(0, 6) : [];
+  } catch { return []; }
 }
 
 export function GlobalSearch({ locale, documents }: GlobalSearchProps) {
@@ -21,15 +28,43 @@ export function GlobalSearch({ locale, documents }: GlobalSearchProps) {
   const dialogRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const [recentRoutes, setRecentRoutes] = useState<string[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
   const [viewport, setViewport] = useState<{ width: number; height: number; offsetTop: number } | null>(null);
   const results = useMemo(() => searchDocuments(documents, query), [documents, query]);
   const orderedResults = useMemo(() => SEARCH_TYPE_ORDER.flatMap((type) => results.filter((result) => result.type === type)), [results]);
+  const recentDocuments = useMemo(() => recentRoutes.map((route) => documents.find((item) => item.route === route)).filter((item): item is SearchDocument => Boolean(item)).slice(0, 2), [recentRoutes, documents]);
+  const compactSuggestions = viewport !== null && viewport.width < 640;
+  const suggestionGroups = useMemo(() => Object.fromEntries(
+    SEARCH_TYPE_ORDER.map((type) => [type, documents
+      .filter((item) => item.type === type && !recentDocuments.some((recent) => recent.route === item.route))
+      .slice(0, compactSuggestions ? 1 : type === "guide" || type === "course" ? 2 : 1)]),
+  ) as Record<SearchDocumentType, SearchDocument[]>, [documents, recentDocuments, compactSuggestions]);
+  const defaultSuggestions = useMemo(() => [
+    ...recentDocuments, ...SEARCH_TYPE_ORDER.flatMap((type) => suggestionGroups[type]),
+  ], [recentDocuments, suggestionGroups]);
+  const navigable = query.trim() ? orderedResults : defaultSuggestions;
+
+  function visit(route: string) {
+    const next = [route, ...recentRoutes.filter((item) => item !== route)].slice(0, 6);
+    setRecentRoutes(next);
+    // The global search lives in a persistent layout. Close it explicitly,
+    // including same-route selections; navigation alone may keep the modal open.
+    setOpen(false);
+    setQuery("");
+    setActiveIndex(0);
+    try { localStorage.setItem("ahaframe-search-recent-v1", JSON.stringify(next)); } catch { /* optional enhancement */ }
+  }
+
+  function typeIcon(type: SearchDocumentType) {
+    // Distinct visual glyphs supplement text labels; type is always exposed in text.
+    return type === "guide" ? "▤" : type === "course" ? "▱" : type === "practice" ? "⌘" : "◇";
+  }
 
   useEffect(() => {
     function onShortcut(event: globalThis.KeyboardEvent) {
       if ((event.metaKey || event.ctrlKey) && event.key.toLocaleLowerCase() === "k") {
-        event.preventDefault(); setActiveIndex(0); setOpen(true);
+        event.preventDefault(); setRecentRoutes(loadRecentRoutes()); setActiveIndex(0); setOpen(true);
       }
     }
     window.addEventListener("keydown", onShortcut);
@@ -105,10 +140,10 @@ export function GlobalSearch({ locale, documents }: GlobalSearchProps) {
   }
 
   function onInputKeyDown(event: ReactKeyboardEvent<HTMLInputElement>) {
-    if (!orderedResults.length) return;
-    if (event.key === "ArrowDown") { event.preventDefault(); setActiveIndex((value) => (value + 1) % orderedResults.length); }
-    else if (event.key === "ArrowUp") { event.preventDefault(); setActiveIndex((value) => (value - 1 + orderedResults.length) % orderedResults.length); }
-    else if (event.key === "Enter") { event.preventDefault(); window.location.assign(orderedResults[Math.min(activeIndex, orderedResults.length - 1)].route); }
+    if (!navigable.length) return;
+    if (event.key === "ArrowDown") { event.preventDefault(); setActiveIndex((value) => (value + 1) % navigable.length); }
+    else if (event.key === "ArrowUp") { event.preventDefault(); setActiveIndex((value) => (value - 1 + navigable.length) % navigable.length); }
+    else if (event.key === "Enter") { event.preventDefault(); const route = navigable[Math.min(activeIndex, navigable.length - 1)].route; visit(route); window.location.assign(route); }
   }
 
   let globalIndex = 0;
@@ -119,7 +154,7 @@ export function GlobalSearch({ locale, documents }: GlobalSearchProps) {
         ref={triggerRef}
         type="button"
         className="glass-search-trigger inline-flex min-h-9 min-w-9 items-center justify-center gap-2 border border-[var(--border)] px-2 text-xs font-semibold text-[var(--muted)] transition hover:border-[var(--text)] hover:text-[var(--text)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--brand-accent)] sm:px-3"
-        onClick={() => { setActiveIndex(0); setOpen(true); }}
+        onClick={() => { setRecentRoutes(loadRecentRoutes()); setActiveIndex(0); setOpen(true); }}
         aria-label={copy.trigger}
         aria-haspopup="dialog"
         data-global-search-trigger
@@ -139,10 +174,10 @@ export function GlobalSearch({ locale, documents }: GlobalSearchProps) {
         >
           <div
             ref={dialogRef}
-            className="glass-search-dialog flex w-full min-w-0 max-w-2xl flex-col overflow-hidden"
+            className="glass-search-dialog search-parity-dialog flex w-full min-w-0 max-w-[820px] flex-col overflow-hidden"
             style={{
               maxHeight: viewport
-                ? `${Math.max(160, Math.min(760, viewport.height - (viewport.width < 640 ? 24 : 72)))}px`
+                ? `${Math.max(160, Math.min(940, viewport.height - (viewport.width < 640 ? 24 : 72)))}px`
                 : "calc(100dvh - 2rem)",
             }}
             role="dialog"
@@ -153,26 +188,44 @@ export function GlobalSearch({ locale, documents }: GlobalSearchProps) {
           >
             <div className="flex shrink-0 items-center gap-3 border-b border-[var(--border)] px-5 py-4">
               <span aria-hidden="true" className="text-[var(--brand-accent)]">⌕</span>
-              <input ref={inputRef} className="min-h-10 min-w-0 flex-1 bg-transparent text-base outline-none placeholder:text-[var(--muted)]" value={query} onChange={(event) => { setQuery(event.target.value); setActiveIndex(0); }} onKeyDown={onInputKeyDown} placeholder={copy.placeholder} aria-label={copy.dialog} aria-activedescendant={orderedResults.length ? `search-result-${activeIndex}` : undefined} autoComplete="off" />
+              <input ref={inputRef} className="min-h-10 min-w-0 flex-1 bg-transparent text-base outline-none placeholder:text-[var(--muted)]" value={query} onChange={(event) => { setQuery(event.target.value); setActiveIndex(0); }} onKeyDown={onInputKeyDown} placeholder={compactSuggestions ? copy.mobilePlaceholder : copy.placeholder} aria-label={copy.dialog} aria-activedescendant={navigable.length ? (query.trim() ? `search-result-${activeIndex}` : `search-suggestion-${activeIndex}`) : undefined} autoComplete="off" />
               <button type="button" className="quiet-link shrink-0 text-xs" onClick={close} aria-label={copy.close}>Esc</button>
             </div>
 
             <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-4" data-global-search-results data-search-document-count={documents.length}>
               {!query.trim() ? (
                 <div data-search-suggestions>
-                  <p className="px-2 pb-5 pt-1 text-sm leading-6 text-[var(--muted)]">{copy.hint}</p>
+                  {recentDocuments.length > 0 ? (
+                    <section className="search-parity-section" aria-label={locale === "zh-CN" ? "最近访问" : "Recently opened"}>
+                      <h2 className="search-parity-heading"><span aria-hidden="true">◷</span>{locale === "zh-CN" ? "最近访问" : "Recently opened"}</h2>
+                      <div className="search-parity-rows">
+                        {recentDocuments.map((item) => {
+                          const index = defaultSuggestions.findIndex((entry) => entry.id === item.id);
+                          return (
+                          <Link key={item.id} id={`search-suggestion-${index}`} aria-current={activeIndex === index ? "true" : undefined} href={item.route} onClick={() => visit(item.route)} onMouseEnter={() => setActiveIndex(index)} onFocus={() => setActiveIndex(index)} className="search-parity-row">
+                            <span className="search-parity-icon" aria-hidden="true">{typeIcon(item.type)}</span>
+                            <span className="search-parity-copy"><strong>{item.title}</strong><small>{item.summary}</small></span>
+                            <span className="search-parity-tag">{copy.groups[item.type]}</span><span className="search-parity-chevron" aria-hidden="true">›</span>
+                          </Link>
+                        );})}
+                      </div>
+                    </section>
+                  ) : null}
                   {SEARCH_TYPE_ORDER.map((type) => {
-                    const suggestions = documents.filter((item) => item.type === type).slice(0, 2);
+                    const suggestions = suggestionGroups[type];
                     if (!suggestions.length) return null;
                     return (
-                      <section key={type} className="mb-3 last:mb-0" aria-label={copy.groups[type]}>
-                        <h2 className="px-2 pb-2 pt-2 font-mono text-[11px] font-semibold tracking-[0.08em] text-[var(--glass-copper)]">{copy.groups[type]}</h2>
-                        {suggestions.map((item) => (
-                          <Link key={item.id} href={item.route} className="block rounded-xl px-3 py-2.5 transition-colors hover:bg-[var(--brand-accent-soft)]">
-                            <strong className="block text-sm font-semibold">{item.title}</strong>
-                            <span className="mt-1 block line-clamp-1 text-xs leading-5 text-[var(--muted)]">{item.summary}</span>
+                      <section key={type} className="search-parity-section" aria-label={copy.groups[type]}>
+                        <h2 className="search-parity-heading"><span aria-hidden="true">{typeIcon(type)}</span>{copy.groups[type]}</h2>
+                        <div className="search-parity-rows">{suggestions.map((item) => {
+                          const index = defaultSuggestions.findIndex((entry) => entry.id === item.id);
+                          return (
+                          <Link key={item.id} id={`search-suggestion-${index}`} aria-current={activeIndex === index ? "true" : undefined} href={item.route} onClick={() => visit(item.route)} onMouseEnter={() => setActiveIndex(index)} onFocus={() => setActiveIndex(index)} className="search-parity-row">
+                            <span className="search-parity-icon" aria-hidden="true">{typeIcon(type)}</span>
+                            <span className="search-parity-copy"><strong>{item.title}</strong><small>{item.summary}</small></span>
+                            <span className="search-parity-tag">{copy.groups[type]}</span><span className="search-parity-chevron" aria-hidden="true">›</span>
                           </Link>
-                        ))}
+                        );})}</div>
                       </section>
                     );
                   })}
@@ -183,7 +236,7 @@ export function GlobalSearch({ locale, documents }: GlobalSearchProps) {
                 return (
                   <section key={type} className="mb-3 last:mb-0" aria-label={copy.groups[type]} data-search-group={type}>
                     <h2 className="px-3 pb-1 pt-2 font-mono text-[10px] font-bold tracking-[0.12em] text-[var(--muted)]">{copy.groups[type]}</h2>
-                    <div>{group.map((result) => { const index = globalIndex++; const active = index === activeIndex; return <Link id={`search-result-${index}`} key={result.id} href={result.route} className={`grid gap-1 border-l-2 px-3 py-2.5 outline-none transition ${active ? "border-[var(--brand-accent)] bg-black/[0.055]" : "border-transparent hover:bg-black/[0.035]"}`} onMouseEnter={() => setActiveIndex(index)} onFocus={() => setActiveIndex(index)} data-search-result={result.id} data-search-score={result.score} data-search-reason={result.reason}><span className="flex items-start justify-between gap-4"><strong className="min-w-0 break-words text-sm">{result.title}</strong><span className="max-w-[45%] shrink-0 truncate text-right font-mono text-[9px] uppercase text-[var(--muted)]">{result.context}</span></span>{result.summary ? <span className="line-clamp-2 text-xs leading-5 text-[var(--muted)]">{result.summary}</span> : null}</Link>; })}</div>
+                    <div>{group.map((result) => { const index = globalIndex++; const active = index === activeIndex; return <Link id={`search-result-${index}`} key={result.id} href={result.route} onClick={() => visit(result.route)} className={`grid gap-1 border-l-2 px-3 py-2.5 outline-none transition ${active ? "border-[var(--brand-accent)] bg-black/[0.055]" : "border-transparent hover:bg-black/[0.035]"}`} onMouseEnter={() => setActiveIndex(index)} onFocus={() => setActiveIndex(index)} data-search-result={result.id} data-search-score={result.score} data-search-reason={result.reason}><span className="flex items-start justify-between gap-4"><strong className="min-w-0 break-words text-sm">{result.title}</strong><span className="max-w-[45%] shrink-0 truncate text-right font-mono text-[9px] uppercase text-[var(--muted)]">{result.context}</span></span>{result.summary ? <span className="line-clamp-2 text-xs leading-5 text-[var(--muted)]">{result.summary}</span> : null}</Link>; })}</div>
                   </section>
                 );
               })}

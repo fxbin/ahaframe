@@ -1,0 +1,254 @@
+/*
+ * AhaFrame Material System — v1.1
+ *
+ * Single authoritative visual treatment for glass materials.
+ * Page geometry is owned by liquid-glass.css / mockup-parity.css; this
+ * stylesheet is loaded LAST so material depth, contrast and state surfaces
+ * remain consistent across homepage, learning workspace, search and tools.
+ *
+ * Four material roles:
+ *   chrome: floating navigation, dropdown and command palette
+ *   instrument: interactive demos, status, timeline & metrics
+ *   support: navigation/practice sidebars
+ *   reading: opaque text canvas (intentionally NOT frosted)
+ *
+ * All text colors come from semantics in globals.css. No opaque marketing
+ * gradients on evidence-bearing monitoring states.
+ */
+:root {
+  --af-canvas: #fbf9f6;
+  --af-ink: #242520;
+  --af-copper: var(--brand-accent);
+  --af-copper-soft: var(--brand-accent-soft);
+  --af-glass-edge: rgba(255, 255, 255, .95);
+  --af-glass-hairline: rgba(198, 166, 143, .38);
+  --af-glass-chrome: rgba(255, 253, 249, .88);
+  --af-glass-instrument: rgba(255, 252, 248, .80);
+  --af-glass-support: rgba(255, 253, 250, .91);
+  --af-glass-reading: #fffefd;
+  --af-glass-overlay: rgba(44, 37, 31, .43);
+  --af-blur-chrome: 22px;
+  --af-blur-panel: 14px;
+  --af-radius-control: 12px;
+  --af-radius-panel: 22px;
+  --af-radius-modal: 28px;
+  --af-shadow-chrome: 0 12px 36px rgba(92, 61, 45, .085), inset 0 1px 0 rgba(255, 255, 255, .98);
+  --af-shadow-panel: 0 18px 48px rgba(92, 61, 45, .087), 0 2px 9px rgba(92, 61, 45, .035), inset 0 1px 0 rgba(255, 255, 255, .91);
+  --af-shadow-modal: 0 32px 92px rgba(35, 26, 20, .28), 0 0 0 5px rgba(255, 255, 255, .16), inset 0 1px 0 rgba(255, 255, 255, .96);
+  --af-focus-ring: var(--brand-accent);
+  --af-transition: 160ms ease;
+}
+
+/* Warm reflected light behind the material, not foreground decoration. */
+body:has(.liquid-home),
+body:has(.liquid-radar),
+body:has(.liquid-guide-page) {
+  background:
+    radial-gradient(ellipse 35% 26% at 82% 16%, rgba(239, 197, 165, .29), transparent 92%),
+    radial-gradient(ellipse 36% 22% at 7% 48%, rgba(244, 224, 210, .31), transparent 94%),
+    var(--af-canvas);
+}
+body:has(.liquid-home)::before,
+body:has(.liquid-radar)::before,
+body:has(.liquid-guide-page)::before {
+  opacity: .65;
+}
+.site-header__inner.glass-header {
+  isolation: isolate;
+  background-color: var(--af-glass-chrome);
+  background-image: linear-gradient(131deg, rgba(255, 255, 255, .39), transparent 55%, rgba(252, 225, 201, .09));
+  border: 1px solid var(--af-glass-edge);
+  outline: 1px solid var(--af-glass-hairline);
+  outline-offset: -2px;
+  border-radius: 999px;
+  box-shadow: var(--af-shadow-chrome);
+  -webkit-backdrop-filter: blur(var(--af-blur-chrome)) saturate(125%);
+  backdrop-filter: blur(var(--af-blur-chrome)) saturate(125%);
+}
+.glass-header .glass-search-trigger,
+.glass-mobile-menu summary {
+  border-color: rgba(215, 194, 178, .66);
+  background: rgba(255, 255, 255, .84);
+  border-radius: var(--af-radius-control);
+  box-shadow: inset 0 1px 0 white, 0 2px 8px rgba(80, 55, 43, .04);
+  transition: border-color var(--af-transition), background-color var(--af-transition);
+}
+.glass-header .glass-search-trigger { border-radius: 999px; }
+.glass-header .glass-search-trigger:hover,
+.glass-mobile-menu summary:hover { border-color: #b58d74; background: #fffaf5; }
+
+/* One shared glass treatment for cards carrying an action or instrumentation.
+ * Keep real events legible, distinguish them by meaning rather than glaze. */
+.glass-panel,
+.agent-preview,
+.guide-workspace-sidebar,
+.guide-workspace-practice {
+  position: relative;
+  border-radius: var(--af-radius-panel);
+  border: 1px solid var(--af-glass-edge);
+  outline: 1px solid var(--af-glass-hairline);
+  outline-offset: -3px;
+  background-color: var(--af-glass-instrument);
+  background-image:
+    linear-gradient(136deg, rgba(255, 255, 255, .44), rgba(255, 255, 255, .11) 44%, rgba(233, 200, 174, .105) 100%);
+  box-shadow: var(--af-shadow-panel);
+  -webkit-backdrop-filter: blur(var(--af-blur-panel)) saturate(116%);
+  backdrop-filter: blur(var(--af-blur-panel)) saturate(116%);
+}
+.guide-workspace-sidebar,
+.guide-workspace-practice {
+  background-color: var(--af-glass-support);
+  /* Higher opacity keeps long course labels / log output legible. */
+}
+.glass-panel::after,
+.guide-workspace-sidebar::after,
+.guide-workspace-practice::after {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(148deg, rgba(255, 255, 255, .45), transparent 31%, transparent 75%, rgba(255, 255, 255, .13));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .93);
+  opacity: .44;
+}
+
+/* Monitoring status keeps its genuine semantic state. */
+.liquid-radar-status[data-state="confirmed"] {
+  background-color: rgba(244, 253, 247, .91);
+  background-image:
+    radial-gradient(ellipse 42% 80% at 10% 48%, rgba(126, 206, 151, .21), transparent 94%),
+    linear-gradient(125deg, rgba(255, 255, 255, .63), rgba(235, 248, 238, .16));
+}
+.liquid-radar-status[data-state="watching"] {
+  background-color: rgba(255, 251, 243, .90);
+  background-image: linear-gradient(132deg, rgba(255, 255, 255, .50), rgba(255, 237, 208, .17));
+}
+.liquid-radar-status[data-state="unknown"] {
+  background-color: rgba(251, 247, 244, .96);
+  background-image: none;
+}
+
+/* The reading column is the quietest material: intentionally near opaque. */
+.liquid-guide-page .guide-workspace-body,
+.liquid-course-page .course-summary-panel {
+  background: var(--af-glass-reading);
+  border: 1px solid rgba(220, 201, 188, .48);
+  border-radius: var(--af-radius-panel);
+  box-shadow: 0 5px 22px rgba(82, 55, 43, .025);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+.guide-timeout-figure {
+  background: #fffbf6;
+  border-color: rgba(203, 166, 143, .52) !important;
+  box-shadow: inset 0 1px 0 #fff, 0 5px 17px rgba(110, 72, 51, .025);
+}
+.guide-quick-check__log { background: #fffdfb; }
+
+/* Search uses a stronger, optically clear chrome surface.
+ * The fixed body-level portal is NEVER given a transformed ancestor. */
+.glass-search-overlay {
+  background: var(--af-glass-overlay);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+.glass-search-dialog.search-parity-dialog {
+  background-color: rgba(255, 252, 248, .96);
+  background-image:
+    linear-gradient(127deg, rgba(255, 255, 255, .36), rgba(255, 255, 255, .035) 56%, rgba(240, 205, 177, .045));
+  border: 1px solid rgba(255, 255, 255, .97);
+  border-radius: var(--af-radius-modal);
+  outline: 1px solid rgba(204, 171, 151, .54);
+  outline-offset: -4px;
+  box-shadow: var(--af-shadow-modal);
+  -webkit-backdrop-filter: blur(var(--af-blur-chrome)) saturate(119%);
+  backdrop-filter: blur(var(--af-blur-chrome)) saturate(119%);
+}
+.search-parity-dialog > div:first-child,
+.search-parity-rows {
+  background: rgba(255, 255, 255, .87);
+  border-color: rgba(217, 192, 174, .57) !important;
+}
+.search-parity-row[aria-current="true"],
+.glass-search-dialog [data-global-search-results] a[aria-current="true"] {
+  background: #faede3;
+  box-shadow: inset 3px 0 0 var(--af-copper);
+}
+.search-parity-copy small { color: #625c56; }
+.search-parity-heading { color: #88452d; }
+
+/* Controls share an accent, corners, and a meaningful focus state. */
+.liquid-home .editorial-primary-action,
+.guide-quick-check__submit:not(:disabled),
+.guide-workspace-practice .primary-action {
+  border-radius: var(--af-radius-control);
+  color: #fff;
+  background: linear-gradient(135deg, #a76b50, #7b4935);
+  border: 1px solid rgba(104, 52, 35, .22);
+  box-shadow: 0 8px 21px rgba(133, 80, 50, .17), inset 0 1px rgba(255, 255, 255, .31);
+}
+:where(
+  .glass-header, .glass-search-dialog, .glass-panel,
+  .guide-workspace-sidebar, .guide-workspace-practice, .radar-month
+) :is(a, button, summary):focus-visible {
+  outline: 2px solid var(--af-focus-ring);
+  outline-offset: 3px;
+}
+
+/* The input is a full-width invisible control. Outline its containing search
+ * field rather than painting a distracting rectangle around the text itself. */
+.search-parity-dialog > div:first-child:focus-within {
+  border-color: rgba(164, 95, 67, .65) !important;
+  box-shadow: 0 0 0 3px rgba(164, 95, 67, .13), inset 0 1px 0 #fff;
+}
+.search-parity-dialog input:focus-visible {
+  outline: none;
+}
+
+/* The effect must degrade to an opaque interface when requested or unsupported. */
+@supports not (backdrop-filter: blur(1px)) {
+  .site-header__inner.glass-header,
+  .glass-panel, .agent-preview, .guide-workspace-sidebar,
+  .guide-workspace-practice, .glass-search-dialog.search-parity-dialog {
+    background-color: #fffdfa;
+    background-image: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+  .site-header__inner.glass-header,
+  .glass-panel, .agent-preview,
+  .guide-workspace-sidebar, .guide-workspace-practice,
+  .glass-search-dialog.search-parity-dialog {
+    background-color: #fffdfa;
+    background-image: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    outline-color: #c8b7a9;
+    border-color: #d8c7b9;
+  }
+  .liquid-radar-status[data-state="confirmed"] {background: #edf8f0;}
+  .liquid-radar-status[data-state="watching"] {background: #fff8e9;}
+  .glass-search-overlay {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background: rgba(25, 21, 18, .68);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .glass-header .glass-search-trigger, .glass-mobile-menu summary {
+    transition: none;
+  }
+}
+@media (max-width: 640px) {
+  :root {--af-blur-panel: 8px; --af-blur-chrome: 13px;}
+  .glass-search-dialog.search-parity-dialog {border-radius: 19px;}
+  .guide-workspace-sidebar, .guide-workspace-practice {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background-color: #fffdfa;
+    background-image: none;
+  }
+}

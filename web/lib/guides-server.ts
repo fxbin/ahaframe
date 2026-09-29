@@ -146,10 +146,25 @@ function activePathContext(
   const index = sequence.findIndex((item) => item.conceptId === guide.conceptId);
   if (index < 0) return null;
 
+  const included = new Set<string>();
+  const outline = learningPath.milestones.map((milestone) => ({
+    id: milestone.id,
+    title: milestone.title,
+    lessons: milestone.conceptIds.flatMap((conceptId) => {
+      if (included.has(conceptId)) return [];
+      const published = guideByConcept.get(conceptId);
+      if (!published) return [];
+      included.add(conceptId);
+      return [{ conceptId: published.conceptId, slug: published.slug, title: published.title }];
+    }),
+  })).filter((milestone) => milestone.lessons.length > 0);
   return {
     ...membership,
     previous: neighbor(sequence[index - 1]),
     next: neighbor(sequence[index + 1]),
+    position: index + 1,
+    total: sequence.length,
+    outline,
   };
 }
 

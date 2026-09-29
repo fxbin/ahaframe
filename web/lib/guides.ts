@@ -61,6 +61,10 @@ export interface GuideSequenceNeighbor {
 export interface GuideActivePathContext extends GuidePathMembership {
   previous: GuideSequenceNeighbor | null;
   next: GuideSequenceNeighbor | null;
+  /** Position among published Guides in this canonical path, not completion progress. */
+  position: number;
+  total: number;
+  outline: { id: string; title: string; lessons: GuideSequenceNeighbor[] }[];
 }
 
 export interface GuidePracticePathContext {
