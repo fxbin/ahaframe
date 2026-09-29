@@ -49,6 +49,7 @@ test("search uses strong chrome while higher-contrast preferences switch glass o
   const modal = page.locator("[data-global-search-dialog]");
   await expect(modal).toHaveCSS("background-color", "rgba(255, 252, 248, 0.96)");
   await expect(modal).toHaveCSS("border-radius", "28px");
+  await expect(page.getByRole("textbox", { name: "Search AhaFrame" })).toHaveCSS("outline-style", "none");
   await page.screenshot({ path: "test-results/design-parity/material-search-desktop.png", fullPage: false });
   await page.emulateMedia({ contrast: "more", reducedMotion: "reduce" });
   await expect(modal).toHaveCSS("background-color", "rgb(255, 253, 250)");
